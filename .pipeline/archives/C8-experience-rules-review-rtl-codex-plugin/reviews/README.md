@@ -1,12 +1,12 @@
-# C9 Review Artifacts
+# C8 Review Artifacts
 
-This directory is reserved for Agent Review evidence generated during C9.
+This directory is reserved for durable Agent Review evidence generated during C8.
 
 Expected layout:
 
 ```text
 .pipeline/reviews/
-  F001-config-governance/
+  F001-rules-habits/
     M01/
       plan/
       tests/

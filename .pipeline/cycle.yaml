@@ -1,15 +1,18 @@
 cycle:
-  number: 8
-  name: "Hypo-Workflow 体验优化：Rules、自审、RTL 与 Codex Plugin"
+  number: 9
+  name: "Hypo-Workflow 配置治理、PR 管理、Explain 命令与 Claude Resume 修复"
   type: feature
   workflow_kind: build
-  status: completed
-  started: "2026-05-06T15:33:55+08:00"
-  finished: "2026-05-06T17:30:03+08:00"
+  status: active
+  started: "2026-05-06T23:49:17+08:00"
+  finished: null
   preset: tdd
-  context_sources: []
-  previous_cycle: 7
-  summary: "Plan four independent features for structured Rules/Habits, default Agent Review, a domain-pack interface with RTL as the reference pack, and Claude Code support for the official OpenAI Codex plugin."
+  context_sources:
+    - previous_cycle
+    - rules
+    - docs
+  previous_cycle: 8
+  summary: "Audit and document configuration strictness/automation details, add PR management and Git writing workflows, add an Explain command, and fix Claude Resume naming conflicts."
   lifecycle_policy:
     reject:
       default_action: needs_revision
