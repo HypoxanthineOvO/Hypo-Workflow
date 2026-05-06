@@ -37,6 +37,13 @@ Plan / Discover should ask these early:
 2. what effect should the user or evaluator see
 3. how success will be verified
 
+Then turn that into a closed-loop validation plan before decomposition:
+
+- define the exact command, scenario, or procedure that proves the behavior
+- define the observable pass/fail signal, not just the code path being touched
+- define who performs independent validation when the work is non-trivial or delegated
+- reject open-loop plans that only describe implementation steps or "add tests later"
+
 Then apply category-specific follow-up:
 
 - webapp: which browser path, what interaction, what screenshot or visual result
@@ -50,6 +57,8 @@ Requirements:
 - must run E2E
 - must interact with the browser
 - must capture screenshot or other visual evidence
+- must define a real user path with an observable pass/fail result
+- for non-trivial delegated work, browser validation should be reviewed or executed by an independent validator
 - must not claim success from unit tests alone
 
 Typical evidence:
@@ -65,6 +74,8 @@ Requirements:
 - Design must include an agent-friendly CLI
 - CLI and human-facing UI must share the same core interface
 - validation must execute the real CLI scenario
+- validation must include the exact CLI command and the expected observable output or state change
+- for non-trivial delegated work, the implementation worker and CLI validation worker must not be the same worker
 - split core logic between CLI and UI is not acceptable
 
 ## Research Profile
@@ -75,6 +86,8 @@ Requirements:
 - expected direction must be declared
 - validation script must be explicit
 - validation must execute the script and record before / after / delta
+- validation must define what result would disprove the hypothesis or block acceptance
+- for non-trivial delegated work, result review should come from an independent validator or challenger
 - code diff alone is never enough
 
 Typical report fields:

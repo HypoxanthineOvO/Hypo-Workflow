@@ -93,6 +93,45 @@ test("accept and reject commands update cycle state without storing full feedbac
   assert.equal(accepted.state.pipeline.status, "completed");
 });
 
+test("accept blocks when worker separation policy requires missing audit coverage", async () => {
+  const root = await fixtureRoot();
+  await writeConfig(join(root, ".pipeline", "config.yaml"), {
+    acceptance: { mode: "manual", require_user_confirm: true },
+    execution: {
+      worker_separation: {
+        mode: "strict",
+      },
+    },
+  });
+  await writeConfig(join(root, ".pipeline", "cycle.yaml"), {
+    cycle: {
+      number: 5,
+      name: "Acceptance Demo",
+      type: "feature",
+      status: "pending_acceptance",
+      started: "2026-05-02T18:24:36+08:00",
+      preset: "tdd",
+      acceptance: { mode: "manual", state: "pending" },
+    },
+  });
+  await writeConfig(join(root, ".pipeline", "state.yaml"), {
+    pipeline: { name: "Acceptance Demo", status: "pending_acceptance", prompts_total: 1, prompts_completed: 1 },
+    current: { phase: "completed", prompt_name: "M01 / Demo", step: null },
+    acceptance: { scope: "cycle", state: "pending", cycle_id: "C5" },
+  });
+
+  await assert.rejects(
+    acceptCycle(root, {
+      now: "2026-05-03T00:14:00+08:00",
+      workers: [
+        { role: "implement", worker_id: "impl-1" },
+        { role: "test", worker_id: "test-1" },
+      ],
+    }),
+    /acceptance blocked by worker separation policy/i,
+  );
+});
+
 test("cycle acceptance command map and docs are exposed", async () => {
   assert.equal(commandByCanonical("/hw:accept").opencode, "/hw-accept");
   assert.equal(commandByCanonical("/hw:reject").opencode, "/hw-reject");

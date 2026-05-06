@@ -50,8 +50,12 @@ Use this skill to bootstrap `.pipeline/` and the architecture baseline. normal `
    ```
    In non-interactive contexts, use `balanced` unless `--automation` provides `manual`, `balanced`, or `full`.
 5. Generate `.pipeline/config.yaml` with only project-specific values and overrides that differ from global defaults, including `automation.level` when chosen during init.
-6. Generate architecture in single-file or folder mode based on project size unless forced.
-7. Initialize rules configuration unless the user explicitly skips it:
+6. In interactive init, ask for project-local worker separation mode and write it to `execution.worker_separation.mode`:
+   - `off`
+   - `recommended`
+   - `strict`
+7. Generate architecture in single-file or folder mode based on project size unless forced.
+8. Initialize rules configuration unless the user explicitly skips it:
    - show the preset choice in interactive contexts:
      ```text
      📏 Rules 配置
@@ -63,9 +67,9 @@ Use this skill to bootstrap `.pipeline/` and the architecture baseline. normal `
    - create `.pipeline/rules.yaml` with `extends: recommended` by default
    - create `.pipeline/rules/custom/` for future custom rules
    - do not create explicit Cycle metadata during init
-8. After creating `.pipeline/` directories and before initializing `state.yaml`, branch into History Import if `--import-history` is present.
-9. Use `--rescan` to refresh architecture for an existing pipeline.
-10. Set `current.phase=lifecycle_init` when tracking this command through state.
+9. After creating `.pipeline/` directories and before initializing `state.yaml`, branch into History Import if `--import-history` is present.
+10. Use `--rescan` to refresh architecture for an existing pipeline.
+11. Set `current.phase=lifecycle_init` when tracking this command through state.
 
 ## History Import
 

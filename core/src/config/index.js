@@ -19,6 +19,39 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
       compose: true,
       profiles: [],
     },
+    worker_separation: {
+      mode: "recommended",
+      ask_on_init_or_first_plan: true,
+      roles: {
+        implement: {
+          required: true,
+        },
+        test: {
+          required: true,
+        },
+        audit: {
+          required: true,
+        },
+      },
+      providers: {},
+      degradation: {
+        allow_with_confirmation: true,
+        options: [
+          "continue_degraded",
+          "backfill_missing_roles",
+          "switch_provider_and_retry",
+          "cancel_execution",
+        ],
+      },
+      acceptance: {
+        audit_can_block_acceptance: true,
+        audit_blocks_execution_by_default: false,
+      },
+      evidence: {
+        log_roles: true,
+        report_roles: true,
+      },
+    },
   },
   subagent: {
     provider: "codex",
@@ -323,6 +356,80 @@ export function normalizeAutomationPolicy(policy = {}) {
   };
 }
 
+export function resolveWorkerSeparationPolicy(projectConfig = {}, globalConfig = DEFAULT_GLOBAL_CONFIG) {
+  const merged = mergeConfig(
+    mergeConfig(DEFAULT_GLOBAL_CONFIG.execution.worker_separation, globalConfig?.execution?.worker_separation || {}),
+    projectConfig?.execution?.worker_separation || {},
+  );
+  const mode = normalizeWorkerSeparationMode(merged.mode);
+  const roles = normalizeWorkerRoles(merged.roles);
+  const degradation = {
+    allow_with_confirmation: merged.degradation?.allow_with_confirmation !== false,
+    options: normalizeDegradationOptions(merged.degradation?.options),
+  };
+  return {
+    ...merged,
+    mode,
+    ask_on_init_or_first_plan: merged.ask_on_init_or_first_plan !== false,
+    roles,
+    providers: isPlainObject(merged.providers) ? merged.providers : {},
+    degradation,
+    acceptance: {
+      audit_can_block_acceptance: merged.acceptance?.audit_can_block_acceptance !== false,
+      audit_blocks_execution_by_default: Boolean(merged.acceptance?.audit_blocks_execution_by_default),
+    },
+    evidence: {
+      log_roles: merged.evidence?.log_roles !== false,
+      report_roles: merged.evidence?.report_roles !== false,
+    },
+  };
+}
+
+export function assessWorkerSeparationStatus(policyInput = {}, runtime = {}) {
+  const policy = resolveWorkerSeparationPolicy({ execution: { worker_separation: policyInput } });
+  const workers = Array.isArray(runtime.workers) ? runtime.workers : [];
+  const roleMap = new Map(workers.map((worker) => [worker.role, worker]));
+  const requiredRoles = Object.entries(policy.roles)
+    .filter(([, config]) => config.required)
+    .map(([role]) => role);
+  const missingRoles = requiredRoles.filter((role) => !roleMap.get(role));
+  const implementWorker = roleMap.get("implement");
+  const testWorker = roleMap.get("test");
+  const auditWorker = roleMap.get("audit");
+  const collisions = [];
+
+  if (sameWorkerIdentity(implementWorker, testWorker)) {
+    collisions.push("implement_test_shared_worker");
+  }
+  if (sameWorkerIdentity(implementWorker, auditWorker)) {
+    collisions.push("implement_audit_shared_worker");
+  }
+  if (sameWorkerIdentity(testWorker, auditWorker)) {
+    collisions.push("test_audit_shared_worker");
+  }
+
+  const degraded = missingRoles.length > 0 || collisions.length > 0;
+  const canProceed = policy.mode === "off"
+    ? true
+    : policy.mode === "recommended"
+      ? (!degraded || policy.degradation.allow_with_confirmation)
+      : !degraded;
+
+  return {
+    policy,
+    workers,
+    missing_roles: missingRoles,
+    collisions,
+    degraded,
+    can_proceed: canProceed,
+    requires_confirmation: degraded && policy.mode !== "off" && policy.degradation.allow_with_confirmation,
+    acceptance_blocked: policy.mode === "strict"
+      ? degraded
+      : policy.acceptance.audit_can_block_acceptance && runtime.audit_verdict === "insufficient",
+    summary: buildWorkerSeparationSummary(policy, missingRoles, collisions),
+  };
+}
+
 export function buildModelPoolOpenCodeAgents(config = {}) {
   const roles = mergeConfig(DEFAULT_GLOBAL_CONFIG.model_pool.roles, config.model_pool?.roles || {});
   const derived = {
@@ -416,6 +523,62 @@ function migrateRole(role, primary) {
     ...role,
     ...(primary ? { primary } : {}),
   };
+}
+
+function normalizeWorkerSeparationMode(value) {
+  const normalized = String(value || "recommended").trim().toLowerCase();
+  if (["off", "recommended", "strict"].includes(normalized)) {
+    return normalized;
+  }
+  throw new Error(`Unsupported worker separation mode: ${value}`);
+}
+
+function normalizeWorkerRoles(input = {}) {
+  const base = DEFAULT_GLOBAL_CONFIG.execution.worker_separation.roles;
+  return {
+    implement: { required: input.implement?.required !== false && base.implement.required },
+    test: { required: input.test?.required !== false && base.test.required },
+    audit: { required: input.audit?.required !== false && base.audit.required },
+  };
+}
+
+function normalizeDegradationOptions(input) {
+  const allowed = new Set([
+    "continue_degraded",
+    "backfill_missing_roles",
+    "switch_provider_and_retry",
+    "cancel_execution",
+  ]);
+  const values = Array.isArray(input) ? input : DEFAULT_GLOBAL_CONFIG.execution.worker_separation.degradation.options;
+  return values.filter((value) => allowed.has(value));
+}
+
+function sameWorkerIdentity(left, right) {
+  if (!left || !right) return false;
+  const leftId = workerIdentity(left);
+  const rightId = workerIdentity(right);
+  return leftId && rightId && leftId === rightId;
+}
+
+function workerIdentity(worker = {}) {
+  return worker.session_id || worker.worker_id || worker.id || worker.name || null;
+}
+
+function buildWorkerSeparationSummary(policy, missingRoles, collisions) {
+  if (policy.mode === "off") {
+    return "Worker separation disabled for this project.";
+  }
+  if (!missingRoles.length && !collisions.length) {
+    return `Worker separation ${policy.mode} satisfied with implement/test/audit split.`;
+  }
+  const parts = [];
+  if (missingRoles.length) {
+    parts.push(`missing roles: ${missingRoles.join(", ")}`);
+  }
+  if (collisions.length) {
+    parts.push(`shared workers: ${collisions.join(", ")}`);
+  }
+  return `Worker separation ${policy.mode} degraded: ${parts.join("; ")}.`;
 }
 
 function firstModel(role, fallback) {

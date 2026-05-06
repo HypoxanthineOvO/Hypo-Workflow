@@ -350,6 +350,112 @@ $defs:
       description:
         type: string
         minLength: 1
+  worker_separation_mode:
+    type: string
+    enum:
+      - off
+      - recommended
+      - strict
+  worker_separation_role:
+    type: object
+    additionalProperties: false
+    properties:
+      required:
+        type: boolean
+        default: true
+    default:
+      required: true
+  worker_separation_policy:
+    type: object
+    additionalProperties: false
+    properties:
+      mode:
+        $ref: "#/$defs/worker_separation_mode"
+        default: recommended
+      ask_on_init_or_first_plan:
+        type: boolean
+        default: true
+      roles:
+        type: object
+        additionalProperties: false
+        properties:
+          implement:
+            $ref: "#/$defs/worker_separation_role"
+          test:
+            $ref: "#/$defs/worker_separation_role"
+          audit:
+            $ref: "#/$defs/worker_separation_role"
+      providers:
+        type: object
+        default: {}
+        additionalProperties:
+          type: string
+          minLength: 1
+      degradation:
+        type: object
+        additionalProperties: false
+        properties:
+          allow_with_confirmation:
+            type: boolean
+            default: true
+          options:
+            type: array
+            items:
+              type: string
+              enum:
+                - continue_degraded
+                - backfill_missing_roles
+                - switch_provider_and_retry
+                - cancel_execution
+            default:
+              - continue_degraded
+              - backfill_missing_roles
+              - switch_provider_and_retry
+              - cancel_execution
+      acceptance:
+        type: object
+        additionalProperties: false
+        properties:
+          audit_can_block_acceptance:
+            type: boolean
+            default: true
+          audit_blocks_execution_by_default:
+            type: boolean
+            default: false
+      evidence:
+        type: object
+        additionalProperties: false
+        properties:
+          log_roles:
+            type: boolean
+            default: true
+          report_roles:
+            type: boolean
+            default: true
+    default:
+      mode: recommended
+      ask_on_init_or_first_plan: true
+      roles:
+        implement:
+          required: true
+        test:
+          required: true
+        audit:
+          required: true
+      providers: {}
+      degradation:
+        allow_with_confirmation: true
+        options:
+          - continue_degraded
+          - backfill_missing_roles
+          - switch_provider_and_retry
+          - cancel_execution
+      acceptance:
+        audit_can_block_acceptance: true
+        audit_blocks_execution_by_default: false
+      evidence:
+        log_roles: true
+        report_roles: true
   sync_config:
     type: object
     additionalProperties: false
@@ -1413,6 +1519,8 @@ properties:
           selection: auto
           compose: true
           profiles: []
+      worker_separation:
+        $ref: "#/$defs/worker_separation_policy"
       step_overrides:
         type: object
         default: {}
@@ -1469,6 +1577,30 @@ properties:
             hybrid: ask
             auto: allow
           destructive_or_external_side_effects: ask
+      worker_separation:
+        mode: recommended
+        ask_on_init_or_first_plan: true
+        roles:
+          implement:
+            required: true
+          test:
+            required: true
+          audit:
+            required: true
+        providers: {}
+        degradation:
+          allow_with_confirmation: true
+          options:
+            - continue_degraded
+            - backfill_missing_roles
+            - switch_provider_and_retry
+            - cancel_execution
+        acceptance:
+          audit_can_block_acceptance: true
+          audit_blocks_execution_by_default: false
+        evidence:
+          log_roles: true
+          report_roles: true
       steps:
         preset: tdd
   output:

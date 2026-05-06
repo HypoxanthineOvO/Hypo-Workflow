@@ -19,6 +19,7 @@ Use this skill when the user invokes `/hw:accept`.
 
 - Read `.pipeline/cycle.yaml` and `.pipeline/state.yaml`.
 - Require Cycle acceptance state `pending_acceptance` or `acceptance.state: pending`.
+- If project worker separation policy requires audit-backed acceptance, ensure audit did not mark test coverage as insufficient before final acceptance.
 - Mark `cycle.status: completed`.
 - Mark `cycle.acceptance.state: accepted` and store `accepted_at`.
 - If `cycle.lifecycle_policy.accept.next=follow_up_plan` or a planned `cycle.continuations[]` follow-up plan exists:
@@ -41,3 +42,5 @@ Use this skill when the user invokes `/hw:accept`.
 - Archive only when the Cycle close/archive flow is explicitly requested or configured; accepting the gate itself is not a separate runner.
 
 Do not store full review notes in `state.yaml`.
+
+`audit` may ask for re-test or re-implementation without blocking the whole execution by default, but it may still block acceptance when project policy requires it.

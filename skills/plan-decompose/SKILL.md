@@ -30,10 +30,14 @@ For `/hw:plan --batch`, this phase decomposes Feature Queue entries according to
    - implementation scope
    - test spec
    - expected artifacts
-4. For implementation work, prefer a runnable vertical slice: one narrow behavior that crosses only the layers needed to run and validate it.
-5. Flag horizontal-only splits when database/API/UI/schema-only milestones do not produce runnable behavior.
-6. Prefer narrow milestones when architecture may shift later prompts.
-7. Preserve append-mode safety:
+4. Every implementation milestone must define a closed-loop validation path:
+   - exact validation command or executable scenario
+   - observable pass/fail evidence
+   - independent validation owner when the work is non-trivial or delegated
+5. For implementation work, prefer a runnable vertical slice: one narrow behavior that crosses only the layers needed to run and validate it.
+6. Flag horizontal-only or open-loop splits when database/API/UI/schema-only milestones do not produce runnable behavior or credible validation.
+7. Prefer narrow milestones when architecture may shift later prompts.
+8. Preserve append-mode safety:
    - do not silently renumber executed prompts
    - append new prompts after the highest safe sequence number
 
@@ -48,6 +52,7 @@ For `/hw:plan --batch`, this phase decomposes Feature Queue entries according to
   - test spec
   - expected artifacts
   - runnable vertical slice quality, including touched layers and real validation evidence
+  - closed-loop validation path, including pass/fail signal and validation owner
   - unresolved assumptions
 - wait for explicit user confirmation before entering P3 Generate
 - do not generate `.pipeline/` files, prompt files, or architecture files from P2 directly

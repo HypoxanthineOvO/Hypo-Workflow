@@ -81,6 +81,7 @@ Behavior:
 - read `.pipeline/config.yaml`
 - read `~/.hypo-workflow/config.yaml` if present
 - resolve effective config as project > global > defaults before selecting execution mode or subagent provider
+- if `execution.worker_separation.mode` is missing, first `/hw:plan` or interactive `/hw:init` should ask for `off|recommended|strict` before treating it as settled project policy
 - validate config before mutating state
 - read `.pipeline/continuation.yaml` when present; active continuation records `next_action`, `reason`, `updated_at`, `safe_resume_command`, and focused `context`
 - if `--clean` is present, treat the action as a restart and reinitialize from `assets/state-init.yaml`
@@ -94,6 +95,7 @@ Behavior:
 - create `.pipeline/.lock` as a structured execution lease with heartbeat and expiry fields
 - before natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `safe_resume_command: /hw:resume`
 - before declaring completion in Codex or hook-limited environments, run preflight checks for protected writes, format validity, derived artifacts, README freshness, output language, secret markers, and required evidence
+- when worker separation is enabled, required evidence should include implement/test/audit role coverage or an explicit degraded-mode decision
 
 ### `/hw:resume`
 

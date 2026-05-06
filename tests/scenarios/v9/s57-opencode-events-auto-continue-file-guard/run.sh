@@ -4,10 +4,18 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../../../.." && pwd)"
 cd "$ROOT"
 
+tmp_user="${USER:-$(id -un 2>/dev/null || echo unknown)}"
+tmp_log_dir="${TMPDIR:-/tmp}/${tmp_user}"
+mkdir -p "$tmp_log_dir"
+chmod 700 "$tmp_log_dir" 2>/dev/null || true
+
+setup_log="$(mktemp "$tmp_log_dir/hw-s57-setup.XXXXXX.log")"
+init_log="$(mktemp "$tmp_log_dir/hw-s57-init.XXXXXX.log")"
+
 tmp_home="$(mktemp -d)"
 tmp_project="$(mktemp -d)"
-HOME="$tmp_home" node cli/bin/hypo-workflow setup --platform opencode --yes >/tmp/hw-s57-setup.log
-HOME="$tmp_home" node cli/bin/hypo-workflow init-project --platform opencode --project "$tmp_project" >/tmp/hw-s57-init.log
+HOME="$tmp_home" node cli/bin/hypo-workflow setup --platform opencode --yes >"$setup_log"
+HOME="$tmp_home" node cli/bin/hypo-workflow init-project --platform opencode --project "$tmp_project" >"$init_log"
 plugin="$tmp_project/.opencode/plugins/hypo-workflow.ts"
 runtime="$tmp_project/.opencode/runtime/hypo-workflow-hooks.js"
 metadata="$tmp_project/.opencode/hypo-workflow.json"

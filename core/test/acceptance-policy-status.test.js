@@ -8,6 +8,7 @@ import {
   buildGlobalTuiModel,
   buildOpenCodeStatusModel,
   createRejectionFeedbackTemplate,
+  evaluateAcceptanceReadiness,
   evaluateAcceptanceStatus,
   loadConfig,
   resolveAcceptancePolicy,
@@ -128,4 +129,34 @@ test("OpenCode status and global TUI expose acceptance policy and timeout state"
   const tui = await buildGlobalTuiModel({ homeDir: home });
   assert.equal(tui.config.acceptance.mode, "timeout");
   assert.equal(tui.config.acceptance.timeout_hours, 1);
+});
+
+test("acceptance readiness can block on audit-insufficient worker separation policy", () => {
+  const readiness = evaluateAcceptanceReadiness(
+    {
+      acceptance: {
+        state: "pending",
+        audit_verdict: "insufficient",
+      },
+    },
+    {
+      projectConfig: {
+        execution: {
+          worker_separation: {
+            mode: "recommended",
+          },
+        },
+      },
+      workers: [
+        { role: "implement", worker_id: "impl-1" },
+        { role: "test", worker_id: "test-1" },
+        { role: "audit", worker_id: "audit-1" },
+      ],
+      audit_verdict: "insufficient",
+    },
+  );
+
+  assert.equal(readiness.blocked, true);
+  assert.match(readiness.reasons.join("\n"), /insufficient/i);
+  assert.equal(readiness.worker_separation.degraded, false);
 });

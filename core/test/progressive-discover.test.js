@@ -67,7 +67,7 @@ test("buildProgressiveDiscoverPlan starts broad and keeps low-risk work lightwei
   );
   assert.deepEqual(
     full.stages.map((stage) => stage.id),
-    ["assumption_statement", "ambiguity_resolution", "tradeoff_review", "validation_criteria"],
+    ["assumption_statement", "ambiguity_resolution", "tradeoff_review", "validation_criteria", "worker_separation_policy"],
   );
   assert.ok(full.required_outputs.includes(".plan-state/batch-discover.yaml"));
   assert.ok(full.required_outputs.includes(".pipeline/design-concepts.yaml"));

@@ -109,6 +109,8 @@ Discover should use a two-pass discussion shape:
    - validation criteria
    - architecture expectations
    - testing expectations
+   - closed-loop validation path
+   - implementation versus validation ownership
    - integration boundaries
    - migration or compatibility constraints
 
@@ -118,6 +120,7 @@ Interactive questioning rules:
 - move from broad framing to detailed drilling
 - start with task category, desired effect, and verification method before implementation detail
 - summarize what was learned after each round
+- convert "verification method" into a closed-loop test story before leaving Discover: exact command or scenario, observable pass/fail signal, and who independently validates it
 - do not leave Discover until the configured minimum question rounds are complete and the user signals that the requirement interview is sufficient
 - never treat "确认一下" or a plain answer as permission to enter Decompose
 
@@ -167,6 +170,10 @@ Decompose output rules:
   - implementation scope
   - test spec
   - expected artifacts
+- every implementation milestone must also include:
+  - a closed-loop validation path with exact command or executable scenario
+  - observable pass/fail evidence
+  - independent validation ownership when non-trivial or delegated
 - implementation milestones should include a slice quality note:
   - runnable behavior
   - touched layers
@@ -175,6 +182,7 @@ Decompose output rules:
 - prefer 3-6 milestones for medium projects
 - prefer narrower milestones when architecture review is likely to change downstream prompts
 - do not split solely by technical layer unless the milestone is explicitly analysis, docs, setup, or migration-only
+- reject open-loop milestone plans that only say "implement", "add tests", or "verify later" without a credible execution path
 
 Persist milestone planning state in `.plan-state/decompose.yaml` when possible.
 
@@ -226,6 +234,7 @@ Preset selection rules:
 - for each milestone, write a concrete implementation plan with ordered steps, dependencies, verification points, test spec, and constraints before rendering the prompt file
 - convert that implementation plan into the final prompt file format instead of freehand summary text
 - preserve the validation intent from the milestone plan in the generated prompt's `预期测试` and constraints sections
+- preserve closed-loop validation commands, evidence expectations, and implementation-versus-validation ownership in the generated prompt
 - generated implementation prompts must carry Objective, Boundaries, Non-Goals, Validation Commands, Evidence, and Human QA sections when applicable
 
 Required Generate outputs:

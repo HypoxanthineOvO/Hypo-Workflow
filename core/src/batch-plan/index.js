@@ -34,6 +34,7 @@ export function assessRunnableVerticalSlice(milestone = {}) {
   const text = collectMilestoneText(milestone);
   const layers = detectSliceLayers(text);
   const hasValidation = hasRunnableValidation(milestone, text);
+  const hasClosedLoop = hasClosedLoopValidation(milestone, text);
   const runnableBehavior = hasRunnableBehavior(text, hasValidation);
   const flags = [];
 
@@ -45,6 +46,9 @@ export function assessRunnableVerticalSlice(milestone = {}) {
   }
   if (!hasValidation) {
     flags.push("missing_real_validation");
+  }
+  if (hasValidation && !hasClosedLoop) {
+    flags.push("missing_closed_loop_validation");
   }
   if (runnableBehavior && layers.length < 2) {
     flags.push("single_layer_slice");
@@ -62,9 +66,10 @@ export function assessRunnableVerticalSlice(milestone = {}) {
     layers,
     runnable_behavior: runnableBehavior,
     validation_evidence: hasValidation,
+    closed_loop_validation: hasClosedLoop,
     summary: status === "acceptable"
-      ? "Acceptable runnable vertical slice with observable behavior and real validation."
-      : "Weak decomposition: define a runnable vertical slice with observable behavior and real validation.",
+      ? "Acceptable runnable vertical slice with observable behavior and closed-loop validation."
+      : "Weak decomposition: define a runnable vertical slice with observable behavior and closed-loop validation.",
   };
 }
 
@@ -628,6 +633,17 @@ function hasRunnableValidation(milestone, text) {
   return commands.some((command) => String(command).trim())
     || evidence.some((item) => String(item).trim())
     || /\b(node --test|npm test|playwright|e2e|real cli|before\/after|screenshot)\b/.test(text);
+}
+
+function hasClosedLoopValidation(milestone, text) {
+  const commands = Array.isArray(milestone.validation_commands) ? milestone.validation_commands : [];
+  const evidence = Array.isArray(milestone.evidence) ? milestone.evidence : [];
+  const hasCommand = commands.some((command) => String(command).trim())
+    || /\b(node --test|npm test|pnpm test|yarn test|pytest|go test|cargo test|playwright|cypress|real cli|validation script)\b/.test(text);
+  const hasObservableEvidence = evidence.some((item) => String(item).trim())
+    || /\b(before\/after|screenshot|dom assertion|status output|metric delta|stdout|stderr|exit code|report|observable)\b/.test(text);
+  const hasChallengeSignal = /\b(failing|red|non-zero|assert|regression|error|failure|block|mismatch|delta|diff)\b/.test(text);
+  return hasCommand && hasObservableEvidence && (hasChallengeSignal || (commands.length > 0 && evidence.length > 0));
 }
 
 function hasRunnableBehavior(text, hasValidation) {

@@ -38,6 +38,9 @@ test("test profile spec defines compose model and three scenario contracts", asy
     "validation script",
     "CLI",
     "E2E",
+    "closed-loop validation plan",
+    "independent validation",
+    "open-loop plans",
   ]) {
     assert.match(spec, new RegExp(escapeRegExp(phrase), "i"));
   }

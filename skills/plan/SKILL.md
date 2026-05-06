@@ -23,9 +23,13 @@ Progressive Discover is enabled by default as a structure for P1. Start with the
 2. desired effect
 3. verification method
 
+When a project has not yet declared `execution.worker_separation.mode`, Discover should also ask whether the project wants `off`, `recommended`, or `strict` implement/test/audit separation and persist that decision during Generate.
+
 Then continue through assumption statement, ambiguity resolution, tradeoff review, and validation criteria as needed. Keep this structure strong, but do not turn it into a rigid questionnaire.
 
 Test Profiles sit on top of presets. Keep `preset` for step order, but collect category-specific validation policy through `execution.test_profiles` or inferred Discover context.
+
+For testable delivery, planning must design a closed-loop verification path and independent validation ownership before decomposition. Do not accept open-loop plans that only describe code-writing or "run something later" behavior.
 
 Use `/hw:plan --batch` only when the user wants to plan multiple Features in one conversation and create a Feature Queue.
 
@@ -147,15 +151,18 @@ The `plan-tool-required` built-in rule is active for Plan Mode unless disabled i
 9. Run P1 Discover:
    - collect goals, constraints, stack, users, and architecture expectations
    - start by asking task category, desired effect, and verification method
+   - turn verification into a closed-loop test story: exact command or scenario, observable pass/fail signal, and independent validator ownership
    - after the big questions, drive assumption statement, ambiguity resolution, tradeoff review, and validation criteria as needed
    - if context sources were resolved, load them first, present the injected findings to the user, then start interactive questioning
    - when `--batch` is present, collect multiple Feature candidates, priorities, gates, dependencies, acceptance boundaries, category, and verification requirements before leaving Discover
 10. Run P2 Decompose:
    - split work into reviewable milestones with validation points
+   - reject milestone splits that have only open-loop implementation actions and no credible closed-loop validation path
    - in interactive mode, stop after showing the proposed split and wait for user confirmation before P3
    - when `--batch` and `batch.decompose_mode=upfront`, decompose all Features; when `just_in_time`, create Feature scaffolds only
 11. Run P3 Generate:
    - generate `.pipeline/` artifacts and architecture baseline
+   - preserve closed-loop validation commands, evidence expectations, and validator separation in generated prompts
    - when `--batch`, generate Feature Queue, Markdown table, Mermaid graph, and batch architecture notes
 12. Run P4 Confirm:
    - interactive mode waits for user confirmation

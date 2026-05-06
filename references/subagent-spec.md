@@ -16,7 +16,11 @@ Implementation and validation separation is mandatory for non-trivial delegated 
 
 - use an implementation Subagent only for scoped edits or concrete production work
 - use a separate test/review Subagent for test design, failure evidence, final diff review, or assumption challenge
+- use separate worker identities or sessions for implementation and validation; the same Subagent instance must not author and certify the same change
 - an implementation Subagent must not be the sole validator of its own changes
+- non-trivial testable delivery should plan at least two workers when tooling allows: one implementation worker and one validation worker
+- if only one delegated worker is available, the main agent must personally run the adversarial validation pass and record that limitation explicitly
+- validation must try to falsify the change with closed-loop evidence such as a real command, scenario replay, before/after output, screenshot, metric delta, or failure fixture
 - the main agent remains responsible for integration, state/log/report updates, and final judgment
 - use a lightweight proposer/challenger pass for contract, runtime-gate, adapter, or onboarding changes
 
