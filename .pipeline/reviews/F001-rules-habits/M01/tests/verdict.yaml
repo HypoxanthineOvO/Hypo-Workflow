@@ -1,0 +1,32 @@
+schema_version: 1
+cycle_id: C8
+feature_id: F001
+milestone_id: M01
+stage: tests
+round: 1
+reviewer: codex-subagent
+verdict: critical
+final_status: resolved
+reviewed_refs:
+  - core/test/rules-authority.test.js
+  - .pipeline/prompts/00-rules-habits-authority-schema.md
+checked_rules:
+  - structured-rules-authority
+  - tdd-red-green-review
+issues:
+  - id: test-precedence-chain
+    severity: critical
+    status: fixed
+    summary: Same-id builtin/global/project/cycle precedence chain was missing.
+  - id: test-conflict-detail
+    severity: high
+    status: fixed
+    summary: Conflict assertions did not include winner and overridden refs.
+  - id: test-legacy-compatibility
+    severity: high
+    status: fixed
+    summary: Legacy .pipeline/rules.yaml compatibility and overrides were not covered.
+  - id: test-invalid-fields
+    severity: medium
+    status: fixed
+    summary: Invalid structured fields needed deterministic error coverage.

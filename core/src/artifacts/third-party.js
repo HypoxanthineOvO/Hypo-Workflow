@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { loadStructuredRulesAuthority, renderStructuredRulesInstructionBlock } from "../rules/index.js";
 
 export const THIRD_PARTY_ADAPTERS = Object.freeze({
   cursor: {
@@ -36,10 +37,11 @@ export const THIRD_PARTY_MANAGED_END = "<!-- HYPO-WORKFLOW:MANAGED:END -->";
 export async function writeThirdPartyAdapterArtifacts(projectRoot = ".", options = {}) {
   const adapters = selectThirdPartyAdapters(options.platform || "all");
   const files = [];
+  const rulesBlock = await renderAdapterRulesBlock(projectRoot, options);
   for (const adapter of adapters) {
     const file = join(projectRoot, adapter.path);
     const existing = await readOptionalText(file);
-    const rendered = renderThirdPartyAdapter(adapter);
+    const rendered = renderThirdPartyAdapter(adapter, { rulesBlock });
     const next = mergeManagedContent(existing, rendered);
     await mkdir(dirname(file), { recursive: true });
     await writeFile(file, next, "utf8");
@@ -52,7 +54,7 @@ export async function writeThirdPartyAdapterArtifacts(projectRoot = ".", options
   return { files };
 }
 
-export function renderThirdPartyAdapter(adapterOrPlatform) {
+export function renderThirdPartyAdapter(adapterOrPlatform, options = {}) {
   const adapter = typeof adapterOrPlatform === "string" ? THIRD_PARTY_ADAPTERS[adapterOrPlatform] : adapterOrPlatform;
   if (!adapter) throw new Error(`Unsupported third-party adapter: ${adapterOrPlatform}`);
   const body = [
@@ -88,9 +90,11 @@ export function renderThirdPartyAdapter(adapterOrPlatform) {
     "",
     "- 自动化等级来自 `.pipeline/config.yaml` 的 `automation.level`，不能靠平台猜测升级。",
     "- `manual` 保守确认，`balanced` 常规自动化，`full` 尽量连续推进；破坏性、外部副作用、发布动作仍按配置 Gate 执行。",
+    options.rulesBlock ? "" : null,
+    options.rulesBlock ? options.rulesBlock.trimEnd() : null,
     THIRD_PARTY_MANAGED_END,
     "",
-  ].join("\n");
+  ].filter((line) => line !== null).join("\n");
   return `${adapter.frontmatter || ""}${body}`;
 }
 
@@ -130,5 +134,15 @@ async function readOptionalText(file) {
   } catch (error) {
     if (error.code === "ENOENT") return "";
     throw error;
+  }
+}
+
+async function renderAdapterRulesBlock(projectRoot, options = {}) {
+  try {
+    const repoRoot = options.repoRoot || resolve(new URL("../../..", import.meta.url).pathname);
+    const authority = options.rulesAuthority || await loadStructuredRulesAuthority(projectRoot, repoRoot, options);
+    return renderStructuredRulesInstructionBlock(authority);
+  } catch {
+    return "";
   }
 }

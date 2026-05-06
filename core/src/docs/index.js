@@ -204,6 +204,19 @@ function renderUserGuide() {
     "",
     "Hypo-Workflow organizes long-running AI coding work around `.pipeline/` state, prompts, reports, logs, and recovery files.",
     "",
+    "## Install Shape",
+    "",
+    "Start from the platform guide that matches the host agent. The README stays generic; platform pages carry the concrete install or sync commands.",
+    "",
+    "| Platform | Install / sync entry | Guide |",
+    "|---|---|---|",
+    "| Codex | Install or symlink this repo as a Codex Skill source. | `docs/platforms/codex.md` |",
+    "| Claude Code | Install the `hw` plugin or run with `--plugin-dir`; sync project hooks/agents with `hypo-workflow sync --platform claude-code --project .`. | `docs/platforms/claude-code.md` |",
+    "| OpenCode | Generate native commands, agents, plugins, and status artifacts with `hypo-workflow init-project --platform opencode --project .`. | `docs/platforms/opencode.md` |",
+    "| Cursor | Generate `.cursor/rules/hypo-workflow.mdc`. | `docs/platforms/cursor.md` |",
+    "| GitHub Copilot | Generate `.github/copilot-instructions.md`. | `docs/platforms/copilot.md` |",
+    "| Trae | Generate `.trae/rules/project_rules.md`. | `docs/platforms/trae.md` |",
+    "",
     "## Common Workflows",
     "",
     "- Plan work with `/hw:plan`, then execute with `/hw:start` or `/hw:resume`.",
@@ -251,12 +264,22 @@ function renderPlatformGuide(platform) {
   const base = [
     `# ${title} Guide`,
     "",
-    `Commands: ${capability.commands || "supported"}.`,
-    `Ask gates: ${capability.ask || "supported"}.`,
-    `Plan support: ${capability.plan || "supported"}.`,
-    "",
     "Hypo-Workflow does not run project work itself; the host agent performs the work using `.pipeline/` files.",
+    "",
+    "## Capability Summary",
+    "",
+    `- Commands: ${capability.commands || "supported"}.`,
+    `- Ask gates: ${capability.ask || "supported"}.`,
+    `- Plan support: ${capability.plan || "supported"}.`,
+    `- Subagents: ${capability.subagents || "host-dependent"}.`,
+    `- Events/hooks: ${capability.events || "host-dependent"}.`,
+    `- Rules/instructions: ${capability.rules || "host-dependent"}.`,
+    `- Recovery: ${capability.recovery || "pipeline-files"}.`,
   ];
+
+  base.push("", "## Install / Sync", "", ...platformInstallLines(platform));
+  base.push("", "## Supported Features", "", ...platformFeatureLines(platform));
+  base.push("", "## Boundaries", "", ...platformBoundaryLines(platform));
 
   if (["cursor", "copilot", "trae"].includes(platform)) {
     base.push(
@@ -282,6 +305,19 @@ function renderPlatformGuide(platform) {
       "- It does not generate `skills/hw-*` alias skills.",
       "- Settings are merged through project-local `settings.local_file` policy.",
       "- DeepSeek and Mimo may be used through Claude Code agent routing when configured; this is separate from Codex Subagents.",
+      "",
+      "## Optional OpenAI Codex Plugin Inside Claude Code",
+      "",
+      "This is separate from the Hypo-Workflow `hw` plugin. It enables Claude Code to delegate implementation work to the official OpenAI Codex plugin only after capability detection reports `installed`.",
+      "",
+      "```text",
+      "/plugin marketplace add openai/codex-plugin-cc",
+      "/plugin install codex@openai-codex",
+      "/reload-plugins",
+      "/codex:setup",
+      "```",
+      "",
+      "Hypo-Workflow may render this as a confirmation proposal, but it must not execute these slash commands automatically.",
     );
   }
 
@@ -327,6 +363,169 @@ function renderPlatformGuide(platform) {
   }
 
   return base.join("\n") + "\n";
+}
+
+function platformInstallLines(platform) {
+  if (platform === "codex") {
+    return [
+      "For a local checkout:",
+      "",
+      "```bash",
+      "git clone https://github.com/HypoxanthineOvO/Hypo-Workflow.git ~/.codex/skills/hypo-workflow",
+      "```",
+      "",
+      "For development, symlink the checkout instead of copying it:",
+      "",
+      "```bash",
+      "mkdir -p ~/.codex/skills",
+      "ln -sfn /absolute/path/to/Hypo-Workflow ~/.codex/skills/hypo-workflow",
+      "```",
+      "",
+      "Then invoke the Hypo-Workflow skills from Codex. In repositories that already expose `/hw:*`, use the canonical `/hw:init`, `/hw:plan`, and `/hw:start` flow.",
+    ];
+  }
+  if (platform === "claude-code") {
+    return [
+      "Validate a local checkout:",
+      "",
+      "```bash",
+      "claude plugin validate /absolute/path/to/Hypo-Workflow",
+      "```",
+      "",
+      "Use the checkout as a development plugin:",
+      "",
+      "```bash",
+      "claude --plugin-dir /absolute/path/to/Hypo-Workflow",
+      "```",
+      "",
+      "For persistent Claude Code installation, add the marketplace source and install the `hw` plugin from Claude Code:",
+      "",
+      "```text",
+      "/plugin marketplace add HypoxanthineOvO/Hypo-Workflow",
+      "/plugin install hw@hypoxanthine-hypo-workflow",
+      "/reload-plugins",
+      "```",
+      "",
+      "Inside a project, generate project-local settings, hooks, agents, monitors, and metadata:",
+      "",
+      "```bash",
+      "hypo-workflow sync --platform claude-code --project .",
+      "```",
+    ];
+  }
+  if (platform === "opencode") {
+    return [
+      "Bootstrap a project with native OpenCode artifacts:",
+      "",
+      "```bash",
+      "hypo-workflow init-project --platform opencode --project . --automation balanced",
+      "```",
+      "",
+      "Refresh an existing project:",
+      "",
+      "```bash",
+      "hypo-workflow sync --platform opencode --project . --repair",
+      "```",
+    ];
+  }
+  if (platform === "cursor") {
+    return [
+      "Generate the Cursor rule file:",
+      "",
+      "```bash",
+      "hypo-workflow sync --platform cursor --project .",
+      "```",
+      "",
+      "Target: `.cursor/rules/hypo-workflow.mdc`.",
+    ];
+  }
+  if (platform === "copilot") {
+    return [
+      "Generate GitHub Copilot repository instructions:",
+      "",
+      "```bash",
+      "hypo-workflow sync --platform copilot --project .",
+      "```",
+      "",
+      "Target: `.github/copilot-instructions.md`.",
+    ];
+  }
+  return [
+    "Generate the Trae project rule:",
+    "",
+    "```bash",
+    "hypo-workflow sync --platform trae --project .",
+    "```",
+    "",
+    "Target: `.trae/rules/project_rules.md`.",
+  ];
+}
+
+function platformFeatureLines(platform) {
+  const common = [
+    "- Reads `.pipeline/` state, config, Cycle, Rules/Habits, prompts, reports, logs, and review artifacts.",
+    "- Uses the canonical `/hw:*` workflow vocabulary: init, plan, start/resume, status/report, sync/docs, rules, patch, release.",
+    "- Preserves protected authority files unless the lifecycle command explicitly owns the write.",
+  ];
+  if (platform === "codex") {
+    return [
+      ...common,
+      "- Uses Codex skills and the Codex plan tool where available.",
+      "- Strongly prefers Codex Subagents for substantial implementation or review work while keeping implementation separate from testing/review.",
+      "- Does not require external model routing; Codex Subagents stay inside the Codex/GPT runtime.",
+    ];
+  }
+  if (platform === "claude-code") {
+    return [
+      ...common,
+      "- Exposes `/hw:*` through the `hw` Claude Code plugin namespace.",
+      "- Generates project-local hooks for SessionStart, Stop, PermissionRequest, compact resume, and progress/status refresh.",
+      "- Generates Claude agents and routing metadata for plan, code, test, review, debug, docs, report, and compact roles.",
+      "- Can optionally use the official OpenAI Codex plugin for implementation delegation after installed capability is detected.",
+    ];
+  }
+  if (platform === "opencode") {
+    return [
+      ...common,
+      "- Generates native `/hw-*` slash command files.",
+      "- Generates OpenCode role agents, plugin runtime files, status sidecars, and TUI/status config.",
+      "- Uses native `question` for required decisions and `todowrite` for visible plan discipline.",
+      "- Supports OpenCode provider/model matrix metadata without turning Hypo-Workflow into a runner.",
+    ];
+  }
+  return [
+    ...common,
+    "- Provides repository-level instructions so the host IDE agent can follow the Hypo-Workflow contract.",
+    "- Carries protected-file, preflight, rules, and implementation/test separation guidance.",
+  ];
+}
+
+function platformBoundaryLines(platform) {
+  const common = [
+    "- Hypo-Workflow is not a runner; the host agent performs implementation, tests, and review.",
+    "- `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/rules.yaml` are protected authority files.",
+    "- External installs, user-level config writes, destructive commands, and network side effects require explicit confirmation.",
+  ];
+  if (["cursor", "copilot", "trae"].includes(platform)) {
+    return [
+      ...common,
+      "- This adapter is an instruction surface only. It does not claim native hooks, lifecycle enforcement, background execution, or automatic recovery.",
+    ];
+  }
+  if (platform === "claude-code") {
+    return [
+      ...common,
+      "- Project settings are merged conservatively; user-owned settings conflicts must not be silently overwritten.",
+      "- Codex plugin installation inside Claude Code is a separate explicit-confirmation flow.",
+    ];
+  }
+  if (platform === "opencode") {
+    return [
+      ...common,
+      "- OpenCode-specific events and plugins are additive; Codex and Claude Code behavior must not depend on them.",
+    ];
+  }
+  return common;
 }
 
 function platformTitle(platform) {

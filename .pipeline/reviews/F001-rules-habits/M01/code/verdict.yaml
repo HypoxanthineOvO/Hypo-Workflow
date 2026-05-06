@@ -1,0 +1,37 @@
+schema_version: 1
+cycle_id: C8
+feature_id: F001
+milestone_id: M01
+stage: code
+round: 1
+reviewer: codex-subagent
+verdict: needs_changes
+final_status: resolved
+reviewed_refs:
+  - core/src/rules/index.js
+  - core/test/rules-authority.test.js
+  - references/rules-spec.md
+  - skills/rules/SKILL.md
+  - rules/template/custom-rule-template.md
+checked_rules:
+  - structured-rules-authority
+  - explicit-global-habits-source
+  - legacy-rules-compatibility
+  - docs-hook-parity
+issues:
+  - id: structured-severity-overrides
+    severity: high
+    status: fixed
+    summary: .pipeline/rules.yaml severity overrides were not applied to structured effective rules.
+  - id: implicit-global-habits
+    severity: high
+    status: fixed
+    summary: Global habits loaded implicitly from user home instead of an explicit source.
+  - id: unchecked-check-kind
+    severity: medium
+    status: fixed
+    summary: enforcement.check_kind needed enum validation.
+  - id: missing-pre-release-doc
+    severity: medium
+    status: fixed
+    summary: pre-release hook was missing from rules documentation.

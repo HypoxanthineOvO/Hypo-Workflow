@@ -22,6 +22,9 @@ Rules do not replace `config.yaml`. Config keeps structured project settings; ru
 | Template | `rules/template/custom-rule-template.md` | Starting point for custom rules |
 | Project config | `.pipeline/rules.yaml` | Extends and severity overrides |
 | Project custom | `.pipeline/rules/custom/*.md` | Natural-language custom rules |
+| Project structured rules | `.pipeline/rules/structured/project/*.yaml` | Project-scoped structured rule authority |
+| Cycle structured rules | `.pipeline/rules/structured/cycle/*.yaml` | Cycle-scoped temporary structured rule authority |
+| Global structured rules | `~/.hypo-workflow/rules/structured/*.yaml` | User-level habit and preference authority |
 | Project packs | `.pipeline/rules/packs/*` | Imported or exported shareable packs |
 | Built-in packs | `rules/packs/*` | Optional distributed rule packs such as `@karpathy/guidelines` |
 
@@ -43,6 +46,7 @@ Supported hooks:
 - `pre-step`
 - `post-step`
 - `pre-commit`
+- `pre-release`
 - `on-fail`
 - `on-evaluate`
 - `always`
@@ -59,6 +63,14 @@ Effective rule state is resolved in this order:
 4. Project custom rule files in `.pipeline/rules/custom/`.
 5. `.pipeline/rules.yaml rules:` overrides.
 6. Command-line `--rule name=severity` overrides when supported.
+
+Structured Rules/Habits authority is an additive C8 layer used for durable user preferences and review evidence. Its scope precedence is:
+
+```text
+cycle > project > global > builtin
+```
+
+Structured records are the authority for generated habits and instruction views. Markdown habits, `AGENTS.md`, Claude/OpenCode/Codex instructions, and adapter snippets are derived views and must not become the canonical source when a structured record exists.
 
 Missing `.pipeline/rules.yaml` is equivalent to:
 
@@ -144,6 +156,45 @@ rules:
 ```
 
 The file name without extension is the rule name. Custom rules override built-in rules with the same name.
+
+## Structured Rules/Habits
+
+Structured rules are YAML records intended for machine-readable merging, conflict reporting, generated habits documents, and Agent Review evidence.
+
+```yaml
+id: user-frontend-layout-density
+scope: project        # builtin | global | project | cycle
+label: frontend
+severity: warn        # off | warn | error
+hooks:
+  - always
+  - on-evaluate
+source:
+  captured_from: chat
+  author: user
+content:
+  instruction: "Front-end tool pages should prioritize dense, scannable operational UI."
+  rationale: "The project targets repeated workflow operations."
+  examples:
+    good:
+      - "compact tables and toolbars"
+    bad:
+      - "large marketing-style hero sections"
+enforcement:
+  check_kind: agent_judgment   # agent_judgment | deterministic | command | checklist
+  evidence_required: true
+```
+
+Rules with the same `id` are merged by scope precedence. The effective summary must include:
+
+- the winning rule id, scope, severity, hooks, and source path;
+- overridden rule ids/scopes/source paths;
+- conflict entries for review reports;
+- active rules that could not be checked automatically.
+
+Project structured records live under `.pipeline/rules/structured/project/*.yaml`; Cycle-local records live under `.pipeline/rules/structured/cycle/*.yaml`. User-level global records may live under `~/.hypo-workflow/rules/structured/*.yaml`, but they are loaded only when that directory is explicitly configured as an external source.
+
+Markdown custom rules remain supported and are normalized into the structured summary with `source.format=markdown`, but they are natural-language compatibility records rather than the preferred authority for newly remembered rules.
 
 ## Runtime Enforcement
 

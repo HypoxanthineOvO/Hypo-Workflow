@@ -85,3 +85,9 @@ Typical report fields:
 - direction
 - validation script
 - conclusion or blocker
+
+## RTL Domain
+
+RTL is a Domain Pack, not a Test Profile. When Discover or task text selects the `rtl` domain, compose it with the existing preset/profile instead of treating `rtl` as a workflow name.
+
+RTL-specific validation should ask for HDL language, combinational/sequential classification, clock/reset assumptions, testbench expectations, and simulator evidence. Tool probes remain metadata-only; they may identify likely local tool names but must not install simulators, fetch remote packs, or execute external pack code.

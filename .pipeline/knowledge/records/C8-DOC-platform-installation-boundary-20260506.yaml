@@ -1,0 +1,58 @@
+id: C8-DOC-platform-installation-boundary-20260506
+schema_version: 1
+type: chat
+source:
+  session_id: C8-docs-release-closeout
+created_at: "2026-05-06T22:14:11+08:00"
+summary: Documentation policy for platform installation, sync responsibilities, and Claude/Codex plugin boundaries.
+details:
+  decisions:
+    - title: README stays platform-neutral
+      rationale: The root README should introduce common Hypo-Workflow capabilities and point to platform guides instead of duplicating installation commands that drift.
+    - title: Platform guides own concrete installation and sync commands
+      rationale: Codex, Claude Code, OpenCode, Cursor, Copilot, and Trae have different install surfaces, supported features, and enforcement limits.
+    - title: Claude Code has two plugin flows
+      rationale: The Hypo-Workflow `hw` plugin exposes `/hw:*`; the official OpenAI Codex plugin is optional delegation infrastructure and must remain a separate confirmed install flow.
+    - title: Third-party IDE adapters must state their limits
+      rationale: Cursor, Copilot, and Trae primarily receive generated instruction files; docs must not imply hook or lifecycle enforcement they do not provide.
+  constraints:
+    - Keep concrete install commands in `docs/platforms/*.md`, not in the root README.
+    - Keep generated docs source in `core/src/docs/index.js` so `/hw:docs repair` preserves platform guidance.
+    - External installs, user-level config writes, marketplace changes, and remote-resource side effects require explicit user confirmation.
+    - Claude Code Codex-plugin installation may be proposed after capability detection, but Hypo-Workflow must not execute slash-command installation automatically.
+  references:
+    - title: Platform capability reference
+      path: references/platform-capabilities.md
+    - title: User guide install shape
+      path: docs/user-guide.md
+    - title: Codex platform guide
+      path: docs/platforms/codex.md
+    - title: Claude Code platform guide
+      path: docs/platforms/claude-code.md
+    - title: OpenCode platform guide
+      path: docs/platforms/opencode.md
+tags:
+  - c8
+  - docs
+  - install
+  - platform-guides
+  - codex
+  - claude-code
+  - opencode
+categories:
+  - decisions
+  - references
+  - pitfalls
+  - config-notes
+refs:
+  files:
+    - README.md
+    - docs/user-guide.md
+    - docs/platforms/codex.md
+    - docs/platforms/claude-code.md
+    - docs/platforms/opencode.md
+    - docs/platforms/cursor.md
+    - docs/platforms/copilot.md
+    - docs/platforms/trae.md
+    - references/platform-capabilities.md
+    - core/src/docs/index.js

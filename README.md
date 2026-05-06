@@ -6,7 +6,7 @@
 
 规划 -> 执行 -> 审查 -> 报告 -> 恢复
 
-[![Version](https://img.shields.io/badge/version-11.1.0-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-12.0.0-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/reference/platforms.md)
 
@@ -14,11 +14,19 @@
 
 Hypo-Workflow 把长周期 AI 编程工作组织成可规划、可恢复、可审查的本地流程。它不是任务运行器，也不是后台服务；实际编码、测试和审查由你当前使用的智能体完成，`.pipeline/` 保存状态、周期、补丁、规则、进度、提示、报告和日志。
 
-## 快速开始
+仓库入口是 `HypoxanthineOvO/Hypo-Workflow`；README 只讲通用快速开始，具体安装命令放在各平台 Guide。
 
-把仓库 `HypoxanthineOvO/Hypo-Workflow`（或 `https://github.com/HypoxanthineOvO/Hypo-Workflow`）交给你的 IDE / 智能体，让它阅读本 README 和对应平台入口完成安装或导入。
+## 快速开始与通用能力
 
-主路径：
+Hypo-Workflow 在所有平台上共享同一套 `.pipeline/` 协议：
+
+- **Cycle / Plan / Start / Resume**：把长任务拆成可恢复的 Feature、Milestone、Prompt 和 Report。
+- **Rules / Habits**：把用户习惯和项目规则保存成结构化 authority，再生成各平台可读的指令视图。
+- **Agent Review**：在计划、测试、实现和收口阶段记录 review artifact，支持多轮 `needs_changes -> repair -> review`。
+- **Domain Packs**：把 RTL 等领域知识做成可选包；外部包只记录 metadata，安装或远程获取必须明确确认。
+- **Sync / Docs / Release**：同步平台适配器、修复文档、执行发布检查，但 Hypo-Workflow 本身不替代宿主 Agent 工作。
+
+主工作流仍然是：
 
 ```text
 /hw:init -> /hw:plan -> /hw:start
@@ -32,14 +40,16 @@ Hypo-Workflow 把长周期 AI 编程工作组织成可规划、可恢复、可�
 
 ## 平台入口
 
-| 平台 | 接入方式 | 入口 |
+README 只列通用入口。每个平台的安装命令、支持能力和限制写在对应 Guide 里。
+
+| 平台 | 最适合的入口 | 详细说明 |
 |---|---|---|
-| Codex | 安装或同步 Skill 后，直接使用 `/hw:*` 指令 | [Codex Guide](docs/platforms/codex.md) |
-| Claude Code | 安装 plugin / skill，使用 `/hw:*` 指令和 Claude Code Hooks | [Claude Code Guide](docs/platforms/claude-code.md) |
-| OpenCode | 在项目中生成原生 commands、agents、plugins | `hypo-workflow init-project --platform opencode --project .` |
-| Cursor | 生成仓库规则 `.cursor/rules/hypo-workflow.mdc` | `hypo-workflow sync --platform cursor --project .` |
-| GitHub Copilot | 生成 `.github/copilot-instructions.md` | `hypo-workflow sync --platform copilot --project .` |
-| Trae | 生成 `.trae/rules/project_rules.md` | `hypo-workflow sync --platform trae --project .` |
+| Codex | Codex Skill / repo skill source | [Codex Guide](docs/platforms/codex.md) |
+| Claude Code | `hw` plugin + Claude hooks/agents | [Claude Code Guide](docs/platforms/claude-code.md) |
+| OpenCode | 原生 commands、agents、plugins、TUI/status | [OpenCode Guide](docs/platforms/opencode.md) |
+| Cursor | 仓库规则文件 | [Cursor Guide](docs/platforms/cursor.md) |
+| GitHub Copilot | 仓库 custom instructions | [GitHub Copilot Guide](docs/platforms/copilot.md) |
+| Trae | 项目规则文件 | [Trae Guide](docs/platforms/trae.md) |
 
 第三方 IDE 的规则文件是仓库指令：它们帮助智能体学会读取 Hypo-Workflow 的 README、命令语义和 `.pipeline/` 文件协议，但不声明平台会自动安装、自动执行钩子或强制生命周期。
 

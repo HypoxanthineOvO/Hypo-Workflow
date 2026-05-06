@@ -1,0 +1,15 @@
+schema_version: 1
+cycle_id: C8
+feature_id: F001
+milestone_id: M02
+stage: code
+round: 1
+reviewer: codex
+verdict: pass
+reviewed_refs:
+  - core/src/rules/index.js
+  - core/test/rules-capture-habits.test.js
+checked_rules:
+  - structured-rules-authority
+  - non-blocking-confirmation
+issues: []

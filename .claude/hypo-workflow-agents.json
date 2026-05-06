@@ -1,6 +1,40 @@
 {
   "source": "model_pool+claude_code",
   "routing": "declaration-first",
+  "codex_plugin": {
+    "configured": false,
+    "profile": "balanced",
+    "capability_status": "missing",
+    "capability_source": "not_detected",
+    "capability_detection": [
+      "installed",
+      "missing",
+      "command_unavailable",
+      "unsupported_version"
+    ],
+    "delegation": {
+      "profile": "balanced",
+      "configured": false,
+      "capability_status": "missing",
+      "planning": {
+        "delegate_to": "claude",
+        "reason": "planning stays in Claude Code"
+      },
+      "review": {
+        "delegate_to": "claude",
+        "reason": "review stays separated from implementation"
+      },
+      "test": {
+        "delegate_to": "claude",
+        "reason": "test validation stays separated from implementation"
+      },
+      "implementation": {
+        "delegate_to": "claude",
+        "requires_capability": "installed",
+        "reason": "codex capability unavailable"
+      }
+    }
+  },
   "dynamic_selection": {
     "task_category": {
       "documentation": "docs",

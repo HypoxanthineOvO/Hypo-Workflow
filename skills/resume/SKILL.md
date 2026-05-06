@@ -44,19 +44,24 @@ Use this skill to continue from `.pipeline/state.yaml` without restarting comple
    - Codex should prefer Codex Subagents for substantial work when available, without external model routing
    - testing/review and implementation should be separated when practical
    - the main agent validates, scores, and updates artifacts
-14. Update `.pipeline/PROGRESS.md`, `.pipeline/log.yaml`, `.pipeline/state.yaml`, and `last_heartbeat` after each meaningful transition.
-15. Before declaring completion, run the Codex preflight/runtime checklist when platform is Codex or hooks are unavailable.
-16. If a derived refresh fails after authority commits, keep the authoritative fact committed, write `.pipeline/derived-refresh.yaml`, and surface repair guidance instead of rolling back the lifecycle write.
-17. After a Milestone report is generated and the Milestone reaches a final state, run `/hw:compact` automatically when `compact.auto=true`; skip it when `compact.auto=false`.
-18. If `.pipeline/feature-queue.yaml` exists, resume batch auto-chain from the saved state:
+14. For resumed review stages, inspect existing `.pipeline/reviews/<feature>/<milestone>/<stage>/` artifacts before creating a new round:
+   - continue from the next retry round when the latest verdict is `needs_changes` and retry budget remains
+   - block when strict policy blocks the latest verdict or the default max of 3 total rounds is exhausted
+   - preserve checked/skipped coverage evidence for Skills, hooks, agents, commands, and generated adapter surfaces
+   - keep full review notes in review artifacts and store only compact pointers in state or progress
+15. Update `.pipeline/PROGRESS.md`, `.pipeline/log.yaml`, `.pipeline/state.yaml`, and `last_heartbeat` after each meaningful transition.
+16. Before declaring completion, run the Codex preflight/runtime checklist when platform is Codex or hooks are unavailable.
+17. If a derived refresh fails after authority commits, keep the authoritative fact committed, write `.pipeline/derived-refresh.yaml`, and surface repair guidance instead of rolling back the lifecycle write.
+18. After a Milestone report is generated and the Milestone reaches a final state, run `/hw:compact` automatically when `compact.auto=true`; skip it when `compact.auto=false`.
+19. If `.pipeline/feature-queue.yaml` exists, resume batch auto-chain from the saved state:
    - honor `gate: confirm` by pausing before the next Feature
    - when a queued Feature uses `just_in_time`, decompose it only after it becomes current
    - sync queue duration, token/cost, and metric summaries from `.pipeline/metrics.yaml`, preserving `n/a` for unavailable telemetry
-19. When Test Profiles are active, do not treat missing profile evidence as a soft warning; block until the required evidence contract is satisfied or an explicit blocker is recorded.
-20. Apply the same `retry` / `deferred` / `stop` decision model on failures.
-21. Before any natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `safe_resume_command: /hw:resume`.
-22. Remove `.pipeline/.lock` when the resume turn completes, stops, blocks, aborts, or finishes.
-23. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
+20. When Test Profiles are active, do not treat missing profile evidence as a soft warning; block until the required evidence contract is satisfied or an explicit blocker is recorded.
+21. Apply the same `retry` / `deferred` / `stop` decision model on failures.
+22. Before any natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `safe_resume_command: /hw:resume`.
+23. Remove `.pipeline/.lock` when the resume turn completes, stops, blocks, aborts, or finishes.
+24. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
 
 ## Safety Rules
 
@@ -83,5 +88,6 @@ Watchdog-triggered resumes follow the same safety rules as user-triggered resume
 - `references/state-contract.md` — resume semantics and required fields
 - `references/commands-spec.md` — command behavior
 - `references/progress-spec.md` — progress summary rules
+- `references/review-artifacts-spec.md` — review artifact schema, retry policy, and coverage checklist
 - `references/config-spec.md` — global/project config fallback rules
 - `SKILL.md` — full execution context if needed

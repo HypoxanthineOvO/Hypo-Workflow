@@ -1,21 +1,32 @@
 pipeline:
-  name: "Codex Service Effectiveness and Workflow Governance"
+  name: "Hypo-Workflow 体验优化：Rules、自审、RTL 与 Codex Plugin"
   source: local
   output: local
   prompts_dir: .pipeline/prompts
   reports_dir: .pipeline/reports
+
+default_workflow_kind: build
 
 plan:
   mode: interactive
   interaction_depth: high
   interactive:
     min_rounds: 5
-    require_explicit_confirm: true
+    require_explicit_confirm: false
 
 execution:
   mode: self
   steps:
     preset: tdd
+  step_overrides:
+    review_tests:
+      executor: subagent
+      subagent_tool: codex
+      strict: false
+    review_code:
+      executor: subagent
+      subagent_tool: codex
+      strict: false
 
 batch:
   decompose_mode: upfront

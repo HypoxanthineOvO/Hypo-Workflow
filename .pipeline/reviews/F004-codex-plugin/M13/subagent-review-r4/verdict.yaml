@@ -1,0 +1,38 @@
+schema_version: 1
+cycle_id: C8
+feature_id: F004
+milestone_id: M13
+stage: subagent-review-r4
+round: 4
+reviewer: codex-subagent
+verdict: needs_changes
+final_status: resolved
+continuation_override: user-requested-no-gate-after-default-max-rounds
+reviewed_refs:
+  - core/src/artifacts/claude.js
+  - core/src/claude-codex/index.js
+  - core/test/claude-codex-plugin.test.js
+  - references/claude-codex-plugin-spec.md
+  - .pipeline/reviews/F004-codex-plugin/M13/subagent-review-r3/verdict.yaml
+checked_rules:
+  - domain-pack-boundary
+  - no-external-install-side-effects
+  - structured-rule-write-path-safety
+  - claude-codex-install-confirmation-boundary
+  - claude-codex-capability-gated-delegation
+  - subagent-worker-ownership-disjointness
+  - review-artifact-consistency
+unchecked_rules:
+  - live-claude-plugin-install-flow
+  - live-claude-code-capability-detection
+  - native-windows-filesystem-smoke
+  - real-remote-domain-pack-install
+issues:
+  - id: claude-routing-synthesized-installed-capability
+    severity: medium
+    status: fixed
+    refs:
+      - core/src/artifacts/claude.js:126
+      - references/claude-codex-plugin-spec.md:48
+      - core/test/claude-codex-plugin.test.js:166
+    summary: Claude routing metadata synthesized an installed Codex capability from enabled=true, allowing generated metadata to delegate implementation to Codex without real capability evidence.

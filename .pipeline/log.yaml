@@ -1,5 +1,231 @@
 entries:
   -
+    id: C8-COMPLETE-20260506T173003+0800
+    type: pipeline_complete
+    ref: C8
+    status: completed
+    timestamp: "2026-05-06T17:30:03+08:00"
+    summary: Completed C8 with structured Rules/Habits, default review artifacts/gates, Domain Pack + RTL reference support, and Claude Code Codex plugin safety/routing support.
+    report: .pipeline/reports/12-c8-agent-review-and-full-regression-readiness.report.md
+    tests: node --test core/test/*.test.js; python3 tests/run_regression.py; bash scripts/validate-config.sh .pipeline/config.yaml; claude plugin validate .; git diff --check
+    trigger: auto
+    related_milestone: M13
+  -
+    id: M13-COMPLETE-C8-20260506T173003+0800
+    type: milestone_complete
+    ref: C8/M13
+    status: completed
+    timestamp: "2026-05-06T17:30:03+08:00"
+    summary: Completed final C8 review and full regression readiness validation.
+    report: .pipeline/reports/12-c8-agent-review-and-full-regression-readiness.report.md
+    tests: node --test core/test/*.test.js; python3 tests/run_regression.py; bash scripts/validate-config.sh .pipeline/config.yaml; claude plugin validate .; git diff --check
+    trigger: auto
+    related_milestone: M13
+  -
+    id: M12-COMPLETE-C8-20260506T173003+0800
+    type: milestone_complete
+    ref: C8/M12
+    status: completed
+    timestamp: "2026-05-06T17:30:03+08:00"
+    summary: Completed confirmed install proposal and multi-worker ownership validation for Claude Code Codex plugin support without executing installation.
+    report: .pipeline/reports/11-confirmed-install-and-multi-worker-support.report.md
+    tests: node --test core/test/claude-codex-plugin.test.js
+    trigger: auto
+    related_milestone: M12
+  -
+    id: M11-COMPLETE-C8-20260506T173003+0800
+    type: milestone_complete
+    ref: C8/M11
+    status: completed
+    timestamp: "2026-05-06T17:30:03+08:00"
+    summary: Completed Claude Code Codex delegation routing and planning profile metadata.
+    report: .pipeline/reports/10-claude-code-codex-delegation-routing.report.md
+    tests: node --test core/test/claude-codex-plugin.test.js core/test/claude-*.test.js
+    trigger: auto
+    related_milestone: M11
+  -
+    id: M10-COMPLETE-C8-20260506T173003+0800
+    type: milestone_complete
+    ref: C8/M10
+    status: completed
+    timestamp: "2026-05-06T17:30:03+08:00"
+    summary: Completed official Claude Code Codex plugin capability detection model using OpenAI codex-plugin-cc naming and no install side effects.
+    report: .pipeline/reports/09-official-codex-plugin-capability-detection.report.md
+    tests: node --test core/test/claude-codex-plugin.test.js
+    trigger: auto
+    related_milestone: M10
+  -
+    id: M09-COMPLETE-C8-20260506T173003+0800
+    type: milestone_complete
+    ref: C8/M09
+    status: completed
+    timestamp: "2026-05-06T17:30:03+08:00"
+    summary: Completed RTL-aware domain selection and checklist integration tests.
+    report: .pipeline/reports/08-rtl-aware-planning-review-and-test-integration.report.md
+    tests: node --test core/test/domain-pack.test.js
+    trigger: auto
+    related_milestone: M09
+  -
+    id: M08-COMPLETE-C8-20260506T173003+0800
+    type: milestone_complete
+    ref: C8/M08
+    status: completed
+    timestamp: "2026-05-06T17:30:03+08:00"
+    summary: Completed built-in RTL domain pack with Verilog/SystemVerilog/SpinalHDL checklist and metadata-only tool probes.
+    report: .pipeline/reports/07-rtl-domain-pack-reference-implementation.report.md
+    tests: node --test core/test/domain-pack.test.js
+    trigger: auto
+    related_milestone: M08
+  -
+    id: M07-COMPLETE-C8-20260506T173003+0800
+    type: milestone_complete
+    ref: C8/M07
+    status: completed
+    timestamp: "2026-05-06T17:30:03+08:00"
+    summary: Completed Domain Pack boundary protocol and external reference safety model.
+    report: .pipeline/reports/06-domain-pack-boundary-protocol-and-knowledge-decision.report.md
+    tests: node --test core/test/domain-pack.test.js
+    trigger: auto
+    related_milestone: M07
+  -
+    id: M06-COMPLETE-C8-20260506T173003+0800
+    type: milestone_complete
+    ref: C8/M06
+    status: completed
+    timestamp: "2026-05-06T17:30:03+08:00"
+    summary: Completed review coverage checklist for Skills, hooks, agents, commands, and generated adapters.
+    report: .pipeline/reports/05-skill-and-platform-artifact-review-coverage.report.md
+    tests: node --test core/test/review-artifacts.test.js
+    trigger: auto
+    related_milestone: M06
+  -
+    id: M05-COMPLETE-C8-20260506T173003+0800
+    type: milestone_complete
+    ref: C8/M05
+    status: completed
+    timestamp: "2026-05-06T17:30:03+08:00"
+    summary: Completed review retry/gate policy helpers and start/resume TDD guidance updates.
+    report: .pipeline/reports/04-plan-test-code-review-gates.report.md
+    tests: node --test core/test/review-artifacts.test.js
+    trigger: auto
+    related_milestone: M05
+  -
+    id: M04-COMPLETE-C8-20260506T173003+0800
+    type: milestone_complete
+    ref: C8/M04
+    status: completed
+    timestamp: "2026-05-06T17:30:03+08:00"
+    summary: Completed review artifact schema, stable paths, verdict validation, and secret-safe evidence handling.
+    report: .pipeline/reports/03-review-artifact-schema-and-directory-structure.report.md
+    tests: node --test core/test/review-artifacts.test.js
+    trigger: auto
+    related_milestone: M04
+  -
+    id: M03-COMPLETE-C8-20260506T173003+0800
+    type: milestone_complete
+    ref: C8/M03
+    status: completed
+    timestamp: "2026-05-06T17:30:03+08:00"
+    summary: Completed generated habits document and cross-platform active rule instruction injection.
+    report: .pipeline/reports/02-habits-documents-and-cross-platform-injection.report.md
+    tests: node --test core/test/rules-capture-habits.test.js core/test/platform-adapters.test.js core/test/commands-rules-artifacts.test.js
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M02-COMPLETE-C8-20260506T173003+0800
+    type: milestone_complete
+    ref: C8/M02
+    status: completed
+    timestamp: "2026-05-06T17:30:03+08:00"
+    summary: Completed remember/candidate/force-write structured rule capture flow.
+    report: .pipeline/reports/01-rules-remember-capture-and-confirmation-flow.report.md
+    tests: node --test core/test/rules-capture-habits.test.js core/test/rules-authority.test.js
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M01-COMPLETE-C8-20260506T165547+0800
+    type: milestone_complete
+    ref: C8/M01
+    status: completed
+    timestamp: "2026-05-06T16:55:47+08:00"
+    summary: Completed structured Rules/Habits authority schema with normalization, scope precedence, conflict reporting, legacy compatibility, docs, and review evidence.
+    report: .pipeline/reports/00-rules-habits-authority-schema.report.md
+    tests: node --test core/test/*.test.js; python3 tests/run_regression.py; bash scripts/validate-config.sh .pipeline/config.yaml; git diff --check
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-REVIEW-CODE-C8-20260506T165547+0800
+    type: step
+    ref: C8/M01/review_code
+    status: completed
+    timestamp: "2026-05-06T16:55:47+08:00"
+    summary: Codex review returned needs_changes for severity overrides, implicit global habits, check_kind validation, and pre-release docs; all findings were fixed before final validation.
+    report: .pipeline/reviews/F001-rules-habits/M01/code/summary.md
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-GREEN-C8-20260506T165547+0800
+    type: step
+    ref: C8/M01/run_tests_green
+    status: completed
+    timestamp: "2026-05-06T16:55:47+08:00"
+    summary: Full M01 validation passed across core tests, regression suite, config validation, and diff whitespace checks.
+    report: .pipeline/reports/00-rules-habits-authority-schema.report.md
+    tests: node --test core/test/*.test.js; python3 tests/run_regression.py; bash scripts/validate-config.sh .pipeline/config.yaml; git diff --check
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-IMPLEMENT-C8-20260506T165210+0800
+    type: step
+    ref: C8/M01/implement
+    status: completed
+    timestamp: "2026-05-06T16:52:10+08:00"
+    summary: Implemented structured rule helpers, authority loading, precedence/conflict resolution, Markdown compatibility, legacy severity overrides, and rules documentation updates.
+    report: core/src/rules/index.js
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-RED-C8-20260506T164610+0800
+    type: step
+    ref: C8/M01/run_tests_red
+    status: completed
+    timestamp: "2026-05-06T16:46:10+08:00"
+    summary: Focused rules authority test failed as expected before structured helper exports and loading behavior were implemented.
+    report: core/test/rules-authority.test.js
+    tests: node --test core/test/rules-authority.test.js
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-REVIEW-TESTS-C8-20260506T164530+0800
+    type: step
+    ref: C8/M01/review_tests
+    status: completed
+    timestamp: "2026-05-06T16:45:30+08:00"
+    summary: Codex test review found missing same-id precedence, conflict detail, and legacy rules compatibility coverage; tests were strengthened before implementation.
+    report: .pipeline/reviews/F001-rules-habits/M01/tests/summary.md
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-WRITE-TESTS-C8-20260506T164205+0800
+    type: step
+    ref: C8/M01/write_tests
+    status: completed
+    timestamp: "2026-05-06T16:42:05+08:00"
+    summary: Added focused rules authority tests for normalization, precedence, conflict reporting, legacy compatibility, severity overrides, and explicit global habit loading.
+    report: core/test/rules-authority.test.js
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-START-C8-20260506T163840+0800
+    type: milestone_start
+    ref: C8/M01
+    status: active
+    timestamp: "2026-05-06T16:38:40+08:00"
+    summary: Started C8/M01 structured Rules and Habits authority schema.
+    report: .pipeline/prompts/00-rules-habits-authority-schema.md
+    trigger: user
+    related_milestone: M01
+  -
     id: CYCLE-ACCEPTED-C7-20260506T150559+0800
     type: cycle_accept
     ref: C7
@@ -3310,3 +3536,54 @@ entries:
     summary: Closed and archived Cycle C7 to .pipeline/archives/C7-codex-service-effectiveness-and-workflow-governance.
     report: .pipeline/archives/C7-codex-service-effectiveness-and-workflow-governance/summary.md
     trigger: user
+  -
+    id: PLAN-GENERATE-C8-20260506T162343+0800
+    type: plan_generate
+    ref: C8
+    status: waiting_confirmation
+    timestamp: "2026-05-06T16:23:43+08:00"
+    summary: Generated C8 batch plan artifacts for Rules/Habits, Default Agent Review, Domain Pack + RTL, and Claude Code Codex Plugin Support.
+    report: .pipeline/confirm-summary.md
+    trigger: user
+  -
+    id: M01-START-C8-20260506T163840+0800
+    type: milestone_start
+    ref: C8/M01
+    status: active
+    timestamp: "2026-05-06T16:38:40+08:00"
+    summary: Started Rules and Habits Authority Schema.
+    report: .pipeline/prompts/00-rules-habits-authority-schema.md
+    trigger: user
+    related_milestone: M01
+  -
+    id: M01-WRITE-TESTS-C8-20260506T164205+0800
+    type: step_complete
+    ref: C8/M01/write_tests
+    status: completed
+    timestamp: "2026-05-06T16:42:05+08:00"
+    summary: Added focused failing tests for structured Rules/Habits authority schema, precedence, conflicts, and Markdown custom rule compatibility.
+    report: core/test/rules-authority.test.js
+    tests: "node --test core/test/rules-authority.test.js: expected failure, missing helper exports"
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-REVIEW-TESTS-C8-20260506T164530+0800
+    type: step_complete
+    ref: C8/M01/review_tests
+    status: revised
+    timestamp: "2026-05-06T16:45:30+08:00"
+    summary: Codex explorer reviewed M01 tests and found critical coverage gaps; tests were strengthened before implementation.
+    report: core/test/rules-authority.test.js
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-IMPLEMENT-C8-20260506T165210+0800
+    type: step_complete
+    ref: C8/M01/implement
+    status: completed
+    timestamp: "2026-05-06T16:52:10+08:00"
+    summary: Implemented structured Rules/Habits authority helpers and updated rules docs/templates.
+    report: core/src/rules/index.js
+    tests: "node --test core/test/rules-authority.test.js core/test/commands-rules-artifacts.test.js: 9/9 passing"
+    trigger: auto
+    related_milestone: M01

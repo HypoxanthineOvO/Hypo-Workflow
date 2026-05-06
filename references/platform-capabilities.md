@@ -41,6 +41,24 @@ V9 must not degrade Codex or Claude Code.
 | Plan discipline | Strengthen prompt instructions to use the available plan tool. | Strengthen prompt instructions and checkpoints. | Bind `/hw-plan*` to `hw-plan` and require `todowrite`. |
 | Auto continue | Respect `evaluation.auto_continue`; limited by host support. | Respect existing hooks and watchdog. | Use OpenCode events with safe default enabled. |
 
+## Installation and Sync Responsibilities
+
+README should stay platform-neutral: it explains shared `.pipeline/` workflow behavior and links to platform guides. Concrete install commands belong in `docs/platforms/*.md` so platform-specific support does not get blurred.
+
+| Platform | Concrete setup lives in | What setup may write |
+|---|---|---|
+| Codex | `docs/platforms/codex.md` | local Codex skill source under `$CODEX_HOME/skills` or a development symlink |
+| Claude Code | `docs/platforms/claude-code.md` | plugin validation/install instructions, project-local `.claude/` settings/hooks/agents/monitors from sync |
+| OpenCode | `docs/platforms/opencode.md` | `.opencode/` commands, agents, plugin/status/TUI files, root `opencode.json`, `AGENTS.md` |
+| Cursor | `docs/platforms/cursor.md` | `.cursor/rules/hypo-workflow.mdc` |
+| GitHub Copilot | `docs/platforms/copilot.md` | `.github/copilot-instructions.md` |
+| Trae | `docs/platforms/trae.md` | `.trae/rules/project_rules.md` |
+
+Claude Code has two distinct plugin flows:
+
+- Hypo-Workflow plugin: exposes the `hw` namespace and `/hw:*` skills.
+- Official OpenAI Codex plugin: optional implementation delegation inside Claude Code. It uses `/plugin marketplace add openai/codex-plugin-cc`, `/plugin install codex@openai-codex`, `/reload-plugins`, and `/codex:setup`; Hypo-Workflow may propose these commands but must not execute them automatically.
+
 ## Third-Party Adapter Targets
 
 | Platform | Target | Contract |

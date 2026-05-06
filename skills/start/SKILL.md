@@ -51,34 +51,40 @@ Use this skill to start execution from a local `.pipeline/` workspace. This is t
    - `run_tests_green`
    - `review_code`
    - report and commit work if the prompt requires it
-14. After every meaningful step, update:
+14. For review stages, create or reference secret-safe artifacts under `.pipeline/reviews/<feature>/<milestone>/<stage>/`:
+   - validate `verdict` and non-empty `reviewed_refs`
+   - record checked/unchecked rules, issues, retry round, and fallback reason when applicable
+   - retry `needs_changes` through repair/review up to 3 total rounds by default
+   - when strict review policy blocks a verdict, stop continuation and summarize the artifact path
+   - for Skill/artifact coverage reviews, record checked/skipped evidence for Skills, hooks, agents, commands, and generated adapter surfaces
+15. After every meaningful step, update:
    - `.pipeline/state.yaml`
    - `.pipeline/log.yaml`
    - `.pipeline/PROGRESS.md`
    - top-level `last_heartbeat`
-15. Before declaring a milestone complete, run the Codex preflight/runtime checklist when platform is Codex or hooks are unavailable: protected authority writes, YAML/JSON/Markdown validity, stale derived artifacts, README freshness, output language, secret markers, and report/progress/log evidence.
-16. After a Milestone report is generated and the Milestone reaches a final state, resolve `compact.auto` from project > global > defaults. If `compact.auto=true`, run the `/hw:compact` generation rules before advancing to the next Milestone.
-17. If `.pipeline/feature-queue.yaml` exists, apply batch auto-chain after a Feature's final Milestone passes:
+16. Before declaring a milestone complete, run the Codex preflight/runtime checklist when platform is Codex or hooks are unavailable: protected authority writes, YAML/JSON/Markdown validity, stale derived artifacts, README freshness, output language, secret markers, and report/progress/log evidence.
+17. After a Milestone report is generated and the Milestone reaches a final state, resolve `compact.auto` from project > global > defaults. If `compact.auto=true`, run the `/hw:compact` generation rules before advancing to the next Milestone.
+18. If `.pipeline/feature-queue.yaml` exists, apply batch auto-chain after a Feature's final Milestone passes:
    - mark the completed Feature `done`
    - advance to the next queued Feature when `auto_chain=true`
    - pause before the next Feature when it has `gate: confirm`
    - when the next Feature uses `just_in_time`, decompose its Milestones before starting execution
    - sync queue metric summaries from `.pipeline/metrics.yaml`, using `n/a` when token/cost telemetry is unavailable
-18. When `execution.test_profiles` or Feature-level Test Profiles are active, require the matching profile evidence before declaring GREEN:
+19. When `execution.test_profiles` or Feature-level Test Profiles are active, require the matching profile evidence before declaring GREEN:
    - `webapp`: E2E + browser interaction + visual evidence
    - `agent-service`: CLI plan + shared core + real CLI run
    - `research`: baseline + script execution + before/after/delta
-19. On failure, the main agent must choose one of:
+20. On failure, the main agent must choose one of:
    - `retry`: revise instructions and rerun the failed step
    - `deferred`: mark the milestone deferred if downstream work can continue safely
    - `stop`: stop and surface the blocking reason to the user
-20. If a derived refresh fails after authority commits, keep the authoritative fact committed, write `.pipeline/derived-refresh.yaml`, and surface repair guidance instead of rolling back the lifecycle write.
-21. If a Feature fails and the resolved `failure_policy=skip_defer`, mark the Feature `deferred`, preserve its report and metrics, then auto-chain to the next queued Feature unless blocked by `gate: confirm`.
-22. Keep moving automatically between milestones while unfinished work remains.
-23. Before any natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `status: active`, `next_action`, `reason`, `updated_at`, `safe_resume_command: /hw:resume`, and focused `context`.
-24. Remove `.pipeline/.lock` when the execution turn completes, stops, blocks, aborts, or finishes.
-25. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
-26. Only allow the turn to end naturally when all milestones are complete or the main agent has explicitly chosen the `stop` outcome.
+21. If a derived refresh fails after authority commits, keep the authoritative fact committed, write `.pipeline/derived-refresh.yaml`, and surface repair guidance instead of rolling back the lifecycle write.
+22. If a Feature fails and the resolved `failure_policy=skip_defer`, mark the Feature `deferred`, preserve its report and metrics, then auto-chain to the next queued Feature unless blocked by `gate: confirm`.
+23. Keep moving automatically between milestones while unfinished work remains.
+24. Before any natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `status: active`, `next_action`, `reason`, `updated_at`, `safe_resume_command: /hw:resume`, and focused `context`.
+25. Remove `.pipeline/.lock` when the execution turn completes, stops, blocks, aborts, or finishes.
+26. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
+27. Only allow the turn to end naturally when all milestones are complete or the main agent has explicitly chosen the `stop` outcome.
 
 ## Continuation And Preflight
 
@@ -127,6 +133,7 @@ All user-visible report and PROGRESS prose must follow `output.language`. Intern
 - `references/evaluation-spec.md` — scoring and continuation gates
 - `references/state-contract.md` — required state fields, including `current.phase`
 - `references/progress-spec.md` — `PROGRESS.md` format and update timing
+- `references/review-artifacts-spec.md` — review artifact schema, retry policy, and coverage checklist
 - `references/commands-spec.md` — exact command semantics
 - `references/config-spec.md` — global/project config fallback rules
 - `SKILL.md` — full system reference if broader pipeline context is needed

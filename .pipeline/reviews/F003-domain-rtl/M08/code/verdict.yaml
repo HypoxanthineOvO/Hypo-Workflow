@@ -1,0 +1,15 @@
+schema_version: 1
+cycle_id: C8
+feature_id: F003
+milestone_id: M08
+stage: code
+round: 1
+reviewer: codex-worker
+verdict: pass
+reviewed_refs:
+  - domains/rtl/manifest.json
+  - domains/rtl/checklist.md
+  - core/test/domain-pack.test.js
+checked_rules:
+  - rtl-reference-pack
+issues: []

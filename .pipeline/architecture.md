@@ -1,195 +1,163 @@
-# Architecture Baseline - C6 Claude Code Adapter Plugin and Full Workflow Takeover
+# Architecture Baseline - C8 Rules, Review, RTL, and Codex Plugin
 
 ## Current Baseline
 
-- Active Cycle: C6, "Claude Code Adapter Plugin and Full Workflow Takeover".
+- Active Cycle: C8, "Hypo-Workflow 体验优化：Rules、自审、RTL 与 Codex Plugin".
 - Workflow kind: build.
 - Preset: tdd.
-- Existing Claude Code support already exists through `.claude-plugin/plugin.json` and the Hypo-Workflow skill tree.
-- C6 is not a rewrite of the existing Claude Code skill surface. It is an enhancement layer around the current plugin/skill model.
-- `.pipeline/` remains the source of truth for Cycle, state, rules, progress, logs, prompts, reports, metrics, Knowledge, patches, and archives.
-- Hypo-Workflow remains a setup, planning, sync, and adapter-generation system. It is not a runner; Claude Code performs the actual project work.
-- Existing OpenCode and Codex behavior must not regress while Claude Code support improves.
+- `.pipeline/` remains the source of truth for Cycle, state, feature queue, rules, reviews, progress, logs, prompts, reports, metrics, Knowledge, patches, and archives.
+- Hypo-Workflow remains a planning, synchronization, adapter-generation, and governance system. It is not a model-calling runner.
+- Codex, OpenCode, and Claude Code behavior must remain host-native. C8 adds guidance, files, checks, and adapters without taking over runtime execution.
+- C8 uses Feature Queue planning with four serial Features and thirteen Milestones.
 
-## Product Direction
+## Architecture Direction
 
-C6 makes Claude Code feel like a first-class Hypo-Workflow host:
+C8 adds four layers above the existing workflow:
 
-1. The user can keep invoking existing `/hypo-workflow:*` skills.
-2. High-frequency `/hw:*` aliases are generated as thin Claude Code skill wrappers.
-3. `hypo-workflow sync --platform claude-code` installs or refreshes project-local Claude Code artifacts.
-4. Existing `.claude/` configuration is preserved through managed blocks, backups, and conflict reporting.
-5. Claude Code hooks reinforce the workflow state machine, especially SessionStart, Stop, compact recovery, permission flow, and progress/status refresh.
-6. Claude subagents/agents are generated from the shared model role contract, with declaration-first and dynamic-selection support.
-7. Status display shows a compact Progress-style view inside Claude Code where possible, with documented fallbacks.
+1. **Rules/Habits Authority Layer**: structured rules are the canonical source, and Markdown/instruction files are generated views.
+2. **Agent Review Layer**: plan, test, and implementation review produce durable `.pipeline/reviews/` evidence and bounded repair proposals.
+3. **Domain Pack Layer**: domain-specific planning/review/test behavior is loaded from packs instead of hardcoded into core.
+4. **Claude Codex Delegation Layer**: Claude Code may delegate implementation work through OpenAI's official Codex plugin when detected and confirmed.
 
-## User Decisions From Discover
+## Source-Of-Truth Rules
 
-- Primary goal is workflow command and lifecycle takeover, not full proxying of every ordinary Claude Code tool call.
-- Ordinary tool hooks should optimize workflow correctness: state sync, progress refresh, protected file guard, compact recovery, Stop enforcement, and permission continuity.
-- Stop gates should be strict for workflow-critical evidence and state updates.
-- `metrics` and derived refresh files are warnings, not hard Stop blockers.
-- Subagent model routing must be first-class.
-- Model defaults:
-  - docs: `deepseek-v4-pro`
-  - code/test: `mimo-v2.5-pro`
-  - report/compact: `deepseek-v4-flash`
-  - plan/review/debug: use model pool or configured Claude Code role overrides.
-- Local developer profile may be permissive. Published defaults should remain conservative for destructive or external side effects.
-- Safety profiles: `developer`, `standard`, and `strict`; published default is `standard`.
-- Status view should show a Progress-like milestone table, basic automation/profile settings, and recent events.
-- If Claude Code monitor or panel APIs are insufficient, C6 must report the limitation and provide validated alternatives.
-- Final acceptance includes a manual Claude Code smoke run in a temporary fixture project, including DeepSeek and Mimo model routing.
+- Built-in rules remain under `rules/builtin/` and `rules/presets/`.
+- Project severity overrides remain in `.pipeline/rules.yaml`.
+- New structured user/project/cycle rules should live under a dedicated rules authority path designed in F001.
+- Generated habits Markdown and platform instruction text are derived artifacts, not authority.
+- Scope precedence is `cycle > project > global > builtin`.
+- Review reports must show active rules, overridden rules, and rules that could not be automatically checked.
 
-## Adapter Layers
+## Review Artifacts
 
-### Plugin And Skill Layer
+Review artifacts are durable evidence, not chat-only commentary.
 
-- `.claude-plugin/plugin.json` remains the package entrypoint.
-- Existing `/hypo-workflow:*` skills stay authoritative.
-- `/hw:*` aliases are thin wrappers that load the matching existing skill and invoke the same semantics.
-- Alias generation must not duplicate or fork command behavior.
-- Marketplace metadata should be complete enough for validation and future publication, but C6 does not perform the actual publish action.
+Expected layout:
 
-### Settings Merge Layer
+```text
+.pipeline/reviews/
+  <feature-slug>/
+    <milestone-id>/
+      plan/
+      tests/
+      code/
+```
 
-- Project-level `.claude/settings.local.json` is the main auto-write target.
-- Existing user settings are preserved.
-- Hypo-Workflow writes only managed blocks or clearly marked entries.
-- First mutation writes a timestamped backup.
-- Re-running sync should be idempotent.
-- Conflicting user-defined hooks, agents, or plugin entries should produce a diff/conflict report rather than overwrite silently.
+Each review should record:
 
-### Hook Runtime Layer
+- reviewed files and prompt/report refs;
+- active rule/habit ids;
+- subagent or local reviewer identity;
+- raw notes or transcript when available;
+- verdict and issue list;
+- repair proposal;
+- retry round and final decision;
+- fallback reason when a host cannot provide a requested reviewer.
 
-Use shared core policy with Claude-specific wrappers.
+Default review loop:
 
-Initial hook events:
+- `pass`: continue.
+- `warn`: continue and record.
+- `needs_changes`: main Agent repairs and repeats review, up to 3 total rounds.
+- `critical`: follow configured strictness; strict profiles block, default mode attempts repair before escalation.
 
-- `SessionStart`
-- `Stop`
-- `PreCompact`
-- `PostCompact`
-- `PostToolUse`
-- `PostToolBatch`
-- `UserPromptSubmit`
-- `PermissionRequest`
-- `FileChanged` for `.pipeline/PROGRESS.md`
+## Domain Pack Boundary
 
-Compact hooks must inject a short recovery packet:
+Domain packs declare reusable domain behavior. Core should consume a manifest and declared assets instead of special-casing one domain.
 
-- current Cycle/Milestone/step
-- next action
-- required `.pipeline` files to re-read
-- warning not to replay completed steps
-- current automation and permission profile
-- recent events
+Candidate load order:
 
-Stop hooks should block when workflow-critical evidence is missing:
+1. project-local packs under `.pipeline/domains/`;
+2. built-in packs under `domains/`;
+3. external packs resolved from a future trusted local path, git ref, or marketplace id.
 
-- `.pipeline/state.yaml` not updated for the current step or transition
-- `.pipeline/log.yaml` missing relevant lifecycle evidence
-- `.pipeline/PROGRESS.md` stale after a lifecycle transition
-- current milestone report missing at the final step
-- Test Profile evidence missing when a profile requires it
+Manifest concepts:
 
-Stop hooks should warn, not block, for:
+- pack id, version, title, description, and trust level;
+- supported languages and file globs;
+- Discover questions;
+- prompt snippets;
+- test profile requirements;
+- review checklists;
+- tool probes;
+- docs and examples;
+- install source and confirmation requirements.
 
-- `metrics.yaml` gaps
-- stale compact/derived views
-- monitor/status refresh failure when the underlying `PROGRESS.md` is correct
+Remote or user-level pack installation requires explicit confirmation. RTL must be implemented as a reference pack, not a hardcoded core behavior.
 
-### Permission And Safety Layer
+## RTL Reference Pack
 
-The effective automation decision comes from Hypo-Workflow configuration:
+The C8 RTL pack should cover the first useful slice:
 
-1. project `.pipeline/config.yaml`
-2. global `~/.hypo-workflow/config.yaml`
-3. defaults
+- Verilog/SystemVerilog/SpinalHDL terminology;
+- combinational and sequential logic distinctions;
+- clock, reset, stimulus, expected behavior, and simulation evidence prompts;
+- testbench and simulator-oriented validation strategy;
+- common tool probes without vendor-specific lock-in.
 
-Claude Code permission settings are the host-level execution boundary.
+Out of scope:
 
-Safety profiles:
+- formal verification;
+- CDC;
+- timing closure and synthesis constraints;
+- vendor-specific FPGA/ASIC flow automation.
 
-- `developer`: permissive local development; prefer progress over friction.
-- `standard`: published default; destructive or external side effects require confirmation.
-- `strict`: team/CI profile; conservative asks and stronger file guard.
+## Claude Code Codex Plugin Layer
 
-### Agent And Model Routing Layer
+C8 must support OpenAI's official `codex-plugin-cc` safely:
 
-- Shared model pool remains the canonical role contract.
-- Claude Code generated agents/subagents map to model roles.
-- Declarations are preferred; dynamic selection refines the declared role when the milestone, Test Profile, retry/failure state, or documentation/code task type justifies it.
-- Model routing must be visible in generated metadata and smoke evidence.
-
-### Status Surface Layer
-
-Preferred order:
-
-1. Claude Code monitor or native status surface if available and validated.
-2. `/hw:status` alias output rendered from the same Progress/status model.
-3. SessionStart/Stop summary injection.
-4. External Hypo-Workflow dashboard link or launch guidance.
-
-The status model should expose:
-
-- C6/Milestone progress table
-- current phase and next action
-- automation/profile settings
-- recent lifecycle events
-- fallback status when monitor APIs are unavailable
+- detect installation and version/path where possible;
+- generate project-local configuration and install guidance;
+- require explicit confirmation before user-level or remote installation;
+- route implementation tasks to Codex when the plugin path is available;
+- keep test and review independent from implementation;
+- allow multiple Codex workers only with disjoint ownership;
+- record fallback reasons when plugin or multi-worker support is unavailable.
 
 ## Expected Code Areas
 
-- `core/src/platform/index.js`
-- `core/src/config/index.js`
-- `core/src/sync/index.js`
-- new Claude artifact helper under `core/src/artifacts/`
-- new Claude hook policy/helper under `core/src/claude-hooks/` or equivalent
-- `core/src/commands/index.js`
-- `.claude-plugin/`
-- generated `.claude/` fixture outputs
-- `hooks/` Claude wrapper scripts where shell entrypoints are needed
-- `docs/platforms/claude-code.md`
-- `references/platform-claude.md`
-- `references/platform-capabilities.md`
-- `references/config-spec.md`
-- `references/external-docs-index.md`
+- `references/rules-spec.md`
+- `skills/rules/SKILL.md`
+- `core/src/rules/`
+- `rules/template/`
+- `core/test/*rules*.test.js`
+- `references/tdd-spec.md`
+- `references/plan-review-spec.md`
+- new review contract references and tests
+- new `.pipeline/reviews/` examples or templates
+- new domain pack reference/spec files
+- new `domains/rtl/` reference pack
+- `core/src/test-profile/`
+- `core/src/progressive-discover/`
+- `core/src/artifacts/claude.js`
+- `core/src/artifacts/opencode.js`
+- Codex/OpenCode/Claude adapter tests and sync output fixtures
+- Knowledge Ledger records and indexes
 
 ## Milestone Strategy
 
-C6 uses one Feature and seven serial Milestones:
+C8 uses thirteen serial Milestones:
 
-1. Claude Adapter Contract and Config.
-2. Plugin Skill Alias and Marketplace Package.
-3. Claude Settings Merge and Sync.
-4. Claude Hook Runtime.
-5. Claude Subagent Model Routing.
-6. Claude Progress Status Surface.
-7. Manual Smoke and Release Readiness.
-
-## Validation Strategy
-
-Each milestone must include focused tests before implementation. The final milestone adds a temporary-project smoke scenario.
-
-Expected validation families:
-
-- config/schema tests
-- artifact rendering tests
-- settings merge and conflict fixture tests
-- Claude hook input/output fixture tests
-- status model tests
-- model routing tests with `deepseek-v4-pro` and `mimo-v2.5-pro`
-- `claude plugin validate .`
-- core regression suite
-- manual Claude Code smoke checklist
+1. Rules and Habits Authority Schema.
+2. Rules Remember Capture and Confirmation Flow.
+3. Habits Documents and Cross-Platform Injection.
+4. Review Artifact Schema and Directory Structure.
+5. Plan Test Code Review Gates.
+6. Skill and Platform Artifact Review Coverage.
+7. Domain Pack Boundary Protocol and Knowledge Decision.
+8. RTL Domain Pack Reference Implementation.
+9. RTL-Aware Planning Review and Test Integration.
+10. Official Codex Plugin Capability Detection.
+11. Claude Code Codex Delegation Routing.
+12. Confirmed Install and Multi-Worker Support.
+13. C8 Agent Review and Full Regression Readiness.
 
 ## Cross-Cutting Constraints
 
-- Do not degrade Codex or OpenCode behavior.
-- Do not turn Hypo-Workflow into a model-calling runner.
-- Do not overwrite user `.claude/` configuration without backup and conflict handling.
-- Keep protected authority in `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/rules.yaml`.
-- Keep durable facts in `.pipeline` files, not in transient chat context.
-- Do not store raw secrets in logs, reports, status surfaces, or Knowledge records.
-- Network, service restart, system dependency installation, destructive commands, and external side effects follow the configured safety profile or require explicit confirmation.
+- Do not degrade existing Codex, OpenCode, Claude Code, Cursor, Copilot, or Trae adapter output.
+- Do not silently mutate user-level Claude or Codex configuration.
+- Do not install remote resources, user-level plugins, or external packs without explicit confirmation.
+- Keep protected authority writes scoped and lifecycle-aware.
+- Keep raw secrets out of logs, reports, Knowledge, review artifacts, and generated instructions.
+- Keep generated Markdown concise enough for agent context while preserving structured authority for checks.
+- Preserve the rule that Hypo-Workflow is not a runner.

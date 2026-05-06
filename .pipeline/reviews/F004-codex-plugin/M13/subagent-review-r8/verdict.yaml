@@ -1,0 +1,54 @@
+schema_version: 1
+cycle_id: C8
+feature_id: F004
+milestone_id: M13
+stage: subagent-review-r8
+round: 8
+reviewer: codex-subagent
+verdict: pass
+final_status: stable
+continuation_override: user-requested-no-gate-after-default-max-rounds
+reviewed_refs:
+  - core/package.json
+  - core/src/claude-codex/index.js
+  - core/src/artifacts/claude.js
+  - core/src/domains/index.js
+  - core/src/rules/index.js
+  - core/test/claude-codex-plugin.test.js
+  - core/test/domain-pack.test.js
+  - core/test/rules-capture-habits.test.js
+  - references/claude-codex-plugin-spec.md
+  - .pipeline/reviews/F004-codex-plugin/M13/self-review/verdict.yaml
+  - .pipeline/reviews/F004-codex-plugin/M13/subagent-review-r2/verdict.yaml
+  - .pipeline/reviews/F004-codex-plugin/M13/subagent-review-r3/verdict.yaml
+  - .pipeline/reviews/F004-codex-plugin/M13/subagent-review-r4/verdict.yaml
+  - .pipeline/reviews/F004-codex-plugin/M13/subagent-review-r5/verdict.yaml
+  - .pipeline/reviews/F004-codex-plugin/M13/subagent-review-r6/verdict.yaml
+  - .pipeline/reviews/F004-codex-plugin/M13/subagent-review-r7/verdict.yaml
+checked_rules:
+  - official-codex-plugin-detection-evidence
+  - claude-codex-capability-gated-delegation
+  - claude-codex-install-confirmation-boundary
+  - subagent-worker-ownership-disjointness
+  - domain-pack-boundary
+  - structured-rule-write-path-safety
+  - review-artifact-consistency
+  - package-test-cross-platform-portability
+unchecked_rules:
+  - live-claude-plugin-install-flow
+  - live-claude-code-capability-detection-against-real-host
+  - native-windows-npm-filesystem-smoke
+  - real-remote-domain-pack-install
+  - live-multi-worker-codex-delegation
+issues: []
+validation:
+  - command: npm test --prefix core
+    result: 311/311 passed
+  - command: node --test core/test
+    result: 311/311 passed
+  - command: python3 tests/run_regression.py
+    result: 63/63 passed
+  - command: bash scripts/validate-config.sh .pipeline/config.yaml
+    result: passed
+  - command: git diff --check
+    result: passed

@@ -1,0 +1,18 @@
+schema_version: 1
+cycle_id: C8
+feature_id: F004
+milestone_id: M13
+stage: regression
+round: 1
+reviewer: codex
+verdict: pass
+reviewed_refs:
+  - core/test/rules-capture-habits.test.js
+  - core/test/review-artifacts.test.js
+  - core/test/domain-pack.test.js
+  - core/test/claude-codex-plugin.test.js
+  - .pipeline/reports/12-c8-agent-review-and-full-regression-readiness.report.md
+checked_rules:
+  - c8-full-regression
+  - no-external-install-side-effects
+issues: []

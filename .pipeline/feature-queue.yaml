@@ -1,0 +1,118 @@
+version: 1
+cycle_id: C8
+current_feature: null
+defaults:
+  decompose_mode: upfront
+  failure_policy: skip_defer
+  auto_chain: true
+  default_gate: auto
+features:
+  - id: F001
+    title: Rules/Habits Authority
+    priority: 10
+    status: done
+    gate: auto
+    decompose_mode: upfront
+    source: plan-discover
+    workflow_kind: build
+    category: agent-service
+    desired_effect: Make structured Rules and Habits the durable authority for user preferences, project rules, Cycle-local rules, and generated instruction surfaces.
+    verification: Rule schema tests, rules summary output, generated habits/instruction artifacts, conflict resolution fixtures, and review evidence that platform adapters consume active rules.
+    dependencies: []
+    milestones:
+      - id: M01
+        status: done
+        title: Rules and Habits Authority Schema
+        prompt_file: 00-rules-habits-authority-schema.md
+      - id: M02
+        status: done
+        title: Rules Remember Capture and Confirmation Flow
+        prompt_file: 01-rules-remember-capture-and-confirmation-flow.md
+      - id: M03
+        status: done
+        title: Habits Documents and Cross-Platform Injection
+        prompt_file: 02-habits-documents-and-cross-platform-injection.md
+  - id: F002
+    title: Default Agent Review
+    priority: 20
+    status: done
+    gate: auto
+    decompose_mode: upfront
+    source: plan-discover
+    workflow_kind: build
+    category: agent-service
+    desired_effect: Make independent Agent Review a default workflow behavior for plan, test, and implementation quality, with bounded repair loops and durable review artifacts.
+    verification: Review artifact schema tests, TDD step integration, needs_changes retry fixtures, hard-gate fixtures, and reports that show rule coverage and final verdicts.
+    dependencies:
+      - F001
+    milestones:
+      - id: M04
+        status: done
+        title: Review Artifact Schema and Directory Structure
+        prompt_file: 03-review-artifact-schema-and-directory-structure.md
+      - id: M05
+        status: done
+        title: Plan Test Code Review Gates
+        prompt_file: 04-plan-test-code-review-gates.md
+      - id: M06
+        status: done
+        title: Skill and Platform Artifact Review Coverage
+        prompt_file: 05-skill-and-platform-artifact-review-coverage.md
+  - id: F003
+    title: Domain Pack Interface + RTL Pack
+    priority: 30
+    status: done
+    gate: auto
+    decompose_mode: upfront
+    source: plan-discover
+    workflow_kind: build
+    category: agent-service
+    desired_effect: Design a general externalizable domain-pack boundary, then ship RTL as the first reference pack for Verilog/SystemVerilog/SpinalHDL planning and review.
+    verification: Domain manifest validation, local/built-in/external source resolution tests, Knowledge decision evidence, RTL checklist output, and RTL-aware test-profile/review fixtures.
+    dependencies:
+      - F001
+      - F002
+    milestones:
+      - id: M07
+        status: done
+        title: Domain Pack Boundary Protocol and Knowledge Decision
+        prompt_file: 06-domain-pack-boundary-protocol-and-knowledge-decision.md
+      - id: M08
+        status: done
+        title: RTL Domain Pack Reference Implementation
+        prompt_file: 07-rtl-domain-pack-reference-implementation.md
+      - id: M09
+        status: done
+        title: RTL-Aware Planning Review and Test Integration
+        prompt_file: 08-rtl-aware-planning-review-and-test-integration.md
+  - id: F004
+    title: Claude Code Codex Plugin Support
+    priority: 40
+    status: done
+    gate: auto
+    decompose_mode: upfront
+    source: plan-discover
+    workflow_kind: build
+    category: agent-service
+    desired_effect: Support the official OpenAI Codex plugin for Claude Code through capability detection, safe configuration, confirmed installation, and Codex implementation delegation.
+    verification: Official-plugin detection fixtures, Claude artifact generation tests, install-confirmation safety tests, Codex worker ownership records, and full adapter regression.
+    dependencies:
+      - F001
+      - F002
+    milestones:
+      - id: M10
+        status: done
+        title: Official Codex Plugin Capability Detection
+        prompt_file: 09-official-codex-plugin-capability-detection.md
+      - id: M11
+        status: done
+        title: Claude Code Codex Delegation Routing
+        prompt_file: 10-claude-code-codex-delegation-routing.md
+      - id: M12
+        status: done
+        title: Confirmed Install and Multi-Worker Support
+        prompt_file: 11-confirmed-install-and-multi-worker-support.md
+      - id: M13
+        status: done
+        title: C8 Agent Review and Full Regression Readiness
+        prompt_file: 12-c8-agent-review-and-full-regression-readiness.md

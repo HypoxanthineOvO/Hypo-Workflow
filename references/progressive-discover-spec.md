@@ -79,6 +79,12 @@ Feature Queue previews should carry category and verification metadata so later 
 - reuse assumption statement and validation criteria
 - do not force the full four-stage interview when the change is clearly incremental
 
+## RTL Domain
+
+Progressive Discover may select or suggest a Domain Pack from task text after the big questions. For RTL work, triggers include Verilog, SystemVerilog, SpinalHDL, HDL, combinational/sequential logic, clock/reset, testbench, simulator, waveform, FPGA, ASIC, or synthesis terms.
+
+If RTL is selected, Discover should confirm the HDL language, whether the design is combinational or sequential, clock/reset assumptions, testbench expectations, and simulator evidence. Non-RTL tasks should not receive RTL checklist text.
+
 ## Karpathy Guidelines Rule Pack
 
 `@karpathy/guidelines` is an optional rule pack. It is not default enabled.

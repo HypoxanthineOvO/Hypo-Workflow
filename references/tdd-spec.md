@@ -75,6 +75,12 @@ Outcome guidance:
 - `needs_changes`: small gaps exist and can be fixed immediately
 - `critical`: the tests are misleading or fundamentally incomplete
 
+Review artifact:
+
+- write or reference a review artifact under `.pipeline/reviews/<feature>/<milestone>/review_tests/`
+- include `verdict`, non-empty `reviewed_refs`, checked and unchecked rules when available, and `fallback_reason` when no independent reviewer is available
+- on `needs_changes`, repair and re-review within the bounded retry policy from `review-artifacts-spec.md`
+
 ## run_tests_red
 
 Goal: confirm that the newly written tests fail before implementation.
@@ -149,3 +155,9 @@ This step produces both:
 - `diff_score`
 
 The main skill consumes those values when computing the final decision.
+
+Review artifact:
+
+- write or reference a review artifact under `.pipeline/reviews/<feature>/<milestone>/review_code/`
+- include the final verdict, reviewed refs, issues, retry round, checked/unchecked rules, and secret-safe evidence pointers
+- strict review policies may block `warn`, `needs_changes`, or `critical`; default policy retries `needs_changes` up to 3 total rounds

@@ -1,6 +1,7 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { renderClaudeStatusMonitorManifest } from "../claude-status/index.js";
+import { planClaudeCodexDelegation } from "../claude-codex/index.js";
 import { commandMap } from "../commands/index.js";
 import { buildModelPoolClaudeAgents, loadConfig } from "../config/index.js";
 
@@ -108,9 +109,29 @@ export async function writeClaudeCodeAgentArtifacts(outDir = ".", options = {}) 
 
 export function buildClaudeAgentRoutingMetadata(config = {}) {
   const agents = buildModelPoolClaudeAgents(config);
+  const codexPluginConfig = config.claude_code?.codex_plugin || {};
+  const codexConfigured = codexPluginConfig.enabled === true;
+  const codexCapability = normalizeCodexPluginCapability(codexPluginConfig);
   return {
     source: "model_pool+claude_code",
     routing: "declaration-first",
+    codex_plugin: {
+      configured: codexConfigured,
+      profile: codexPluginConfig.profile || "balanced",
+      capability_status: codexCapability.status,
+      capability_source: codexCapability.source,
+      capability_detection: [
+        "installed",
+        "missing",
+        "command_unavailable",
+        "unsupported_version",
+      ],
+      delegation: planClaudeCodexDelegation({
+        profile: codexPluginConfig.profile || "balanced",
+        configured: codexConfigured,
+        capability: codexCapability,
+      }),
+    },
     dynamic_selection: {
       task_category: {
         documentation: "docs",
@@ -133,6 +154,26 @@ export function buildClaudeAgentRoutingMetadata(config = {}) {
       },
     },
     agents,
+  };
+}
+
+function normalizeCodexPluginCapability(config = {}) {
+  if (config.capability && typeof config.capability === "object") {
+    return {
+      ...config.capability,
+      status: config.capability.status || "missing",
+      source: config.capability.source || "provided",
+    };
+  }
+  if (config.capability_status) {
+    return {
+      status: config.capability_status,
+      source: "configured_status",
+    };
+  }
+  return {
+    status: "missing",
+    source: "not_detected",
   };
 }
 

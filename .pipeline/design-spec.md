@@ -1,91 +1,168 @@
-# C7 Design Spec - Codex Service Effectiveness and Workflow Governance
+# C8 Design Spec - Rules, Agent Review, RTL Domain Packs, and Codex Plugin
 
 ## Product Scope
 
-C7 upgrades Hypo-Workflow's Codex-facing and shared behavior. The Cycle focuses on stronger subagent discipline, safe automatic execution continuation, Codex-compatible preflight checks, init automation policy, third-party IDE adapter files, and Chinese-first onboarding.
+C8 upgrades Hypo-Workflow from a mostly command-and-adapter workflow into a stronger behavior-governance layer. The Cycle focuses on four independent Features:
 
-## Primary Experience
+1. structured Rules/Habits as the durable authority for user preferences and project rules;
+2. default Agent Review for plan, test, implementation, Skills, and generated platform artifacts;
+3. a general domain-pack boundary, with RTL as the first reference domain pack;
+4. Claude Code support for OpenAI's official Codex plugin, including safe delegation and confirmed installation.
 
-1. A user installs or imports `HypoxanthineOvO/Hypo-Workflow` from any supported host.
-2. The README immediately shows platform install/import paths and a shared `/hw:init -> /hw:plan -> /hw:start` quick start.
-3. `/hw:init` works in non-git folders, asks for an automation level, and stores clear configuration.
-4. Planning confirmations remain explicit user gates.
-5. Ordinary execution continues automatically when the selected automation level allows it.
-6. Codex runs stronger completion checks before ending work and records continuation state when there is more work to do.
-7. Cursor, GitHub Copilot, and Trae receive generated project instruction files that point back to the repository and explain `/hw:*` usage.
+Agent Teams debate frameworks are explicitly deferred. C8 should not depend on an experimental multi-agent discussion surface to deliver useful review behavior.
 
 ## Confirmed Decisions
 
-- Treat Codex guidance as shared/global guidance because Codex primarily consumes `SKILL.md`.
-- Codex must be explicitly encouraged to use Subagents for substantial work.
-- Codex delegation must keep testing/review and implementation separated when practical.
-- Codex subagents should be treated as Codex/GPT runtime workers; do not require external model routing for Codex.
-- Keep planning gates interactive.
-- Add automation levels:
-  - `manual` / 稳妥模式
-  - `balanced` / 自动模式
-  - `full` / 全自动模式
-- Strengthen instructions and add file-backed runtime support instead of relying on instructions only.
-- Preflight checks should cover protected authority files, format/schema contracts, stale derived artifacts, README freshness, output language, secret safety, and release documentation.
-- Normal init must not require git; only `--import-history` remains git-bound.
-- Generate third-party adapter files by default with managed blocks and user-content preservation.
-- README is fully Chinese except stable terms, commands, file paths, and product names.
-- Include a lightweight proposer/challenger quality pass in C7 where it naturally fits; defer a full adversarial debate framework to C8 or later.
+- Use Batch Plan Mode with four Feature Queue entries.
+- Rules/Habits authority is structured data first; Markdown habits and instruction files are generated views.
+- Supported rule scopes are `global`, `project`, and `cycle`.
+- Rule precedence is `cycle > project > global > builtin`.
+- Natural-language "remember this rule" capture should not interrupt a discussion; ordinary candidates are confirmed at the end of the turn or planning checkpoint.
+- Explicit remember commands and force-write forms are supported when the user clearly requests them.
+- Review is default behavior, not only an optional strict profile.
+- Plan, test, and code review stages write durable `.pipeline/reviews/` artifacts.
+- Review default outcome for problems is `needs_changes`; the main Agent may repair and re-review up to 3 rounds.
+- Hard stop behavior is configurable. In strict mode, configured failure levels such as `critical` block the workflow.
+- Skill Markdown, Codex/OpenCode/Claude hooks, generated agents, commands, and adapter instructions must be part of review coverage.
+- RTL is not hardcoded into core. C8 designs a domain-pack interface first and ships RTL as a reference pack.
+- Domain packs must be externalizable to future local paths, repositories, or marketplace-style package ids.
+- Claude Code Codex support targets the official OpenAI `codex-plugin-cc` plugin.
+- Default plugin behavior is detect, configure, and report. Real user-level or remote installation requires explicit confirmation.
+- Codex implementation delegation may use multiple workers only when ownership can be split into disjoint files or modules.
+- Test and review should stay independent from the implementation worker.
 
-## Gate Policy
+## Feature Queue
 
-Must ask:
+| Feature | Title | Dependencies | Validation focus |
+|---|---|---|---|
+| F001 | Rules/Habits Authority | none | schema, conflict resolution, generated habits/instructions |
+| F002 | Default Agent Review | F001 | review artifacts, retry loop, hard-gate behavior |
+| F003 | Domain Pack Interface + RTL Pack | F001, F002 | domain manifest, externalization boundary, RTL checklist/profile integration |
+| F004 | Claude Code Codex Plugin Support | F001, F002 | plugin detection, safe install confirmation, Codex delegation |
 
-- P2 milestone split confirmation.
-- P4 final plan confirmation.
-- Destructive commands and external side effects.
-- Release tag/push unless explicitly confirmed.
+## Review Model
 
-Should continue automatically when safe:
+Review artifacts live under `.pipeline/reviews/` and are grouped by Feature, Milestone, and stage:
 
-- Milestone-to-milestone execution.
-- Resume from continuation state.
-- Safe derived artifact repair.
-- Skip/defer behavior when the configured failure policy allows it.
+```text
+.pipeline/reviews/
+  F002-agent-review/
+    M05/
+      plan/
+      tests/
+      code/
+```
 
-## Third-Party Adapter Targets
+Each review stage should capture:
 
-| Platform | Target file | Strategy |
+- input refs and reviewed files;
+- active rule/habit ids and conflict resolution;
+- transcript or reviewer notes when available;
+- `pass`, `warn`, `needs_changes`, or `critical` verdict;
+- issue list and repair proposals;
+- retry round and final decision;
+- fallback reason when a subagent or plugin path is unavailable.
+
+## Rules And Habits Model
+
+Structured rules should include:
+
+- stable id, scope, label, severity, and hooks;
+- source metadata such as capture command or chat reference;
+- instruction, rationale, examples, and non-goals;
+- enforcement mode such as agent judgment, deterministic check, command, or checklist;
+- evidence requirements for reports and review artifacts.
+
+Generated views should include:
+
+- user-maintained habits Markdown;
+- SessionStart and always-rule injection snippets;
+- AGENTS/Claude/OpenCode/Codex adapter instruction surfaces;
+- summaries that show active, overridden, and disabled rules.
+
+## Domain Pack Boundary
+
+Domain packs are reusable project behavior packages. The boundary protocol must support:
+
+- built-in packs such as `domains/rtl/`;
+- project-local packs such as `.pipeline/domains/rtl/`;
+- future external packs from local paths, git references, or marketplace ids;
+- manifest validation;
+- declared prompts, checklists, test profiles, tool probes, review rules, and docs refs;
+- explicit trust and install boundaries for remote or user-level sources.
+
+The Knowledge Ledger must record the domain-pack externalization decision before implementation proceeds beyond the boundary protocol milestone.
+
+## RTL Reference Pack
+
+The first RTL pack should cover:
+
+- Verilog, SystemVerilog, and SpinalHDL terminology;
+- combinational versus sequential logic review checklist;
+- testbench and simulation strategy guidance;
+- common tool probe interface;
+- Plan Discover prompts for RTL tasks;
+- Review/Test Profile integration that asks for clocking, reset, stimulus, expected waveforms or assertions, and simulator evidence.
+
+Out of scope for C8:
+
+- formal verification frameworks;
+- CDC methodology;
+- synthesis constraints and timing closure;
+- vendor-specific FPGA or ASIC flows beyond generic tool probes.
+
+## Claude Code Codex Plugin Support
+
+C8 should treat the Codex plugin as a host capability, not a Hypo-Workflow runner.
+
+Implementation should:
+
+- detect the official OpenAI `codex-plugin-cc` plugin and record version/path evidence when available;
+- generate project-safe configuration or installation guidance;
+- support confirmed user-level installation only after explicit approval;
+- route implementation work to Codex where supported;
+- keep testing and review independent from the implementation worker;
+- detect whether multiple Codex workers are available through the plugin path;
+- require disjoint ownership before enabling parallel Codex workers;
+- degrade to a single Codex worker or normal host Agent with a clear report.
+
+## Planning Profiles
+
+C8 introduces planning profile guidance:
+
+| Profile | Planning lead | Required review |
 |---|---|---|
-| Cursor | `.cursor/rules/hypo-workflow.mdc` | Project rule with managed content and install/import guidance. |
-| GitHub Copilot | `.github/copilot-instructions.md` | Repository custom instructions with `/hw:*` workflow contract. |
-| Trae | `.trae/rules/project_rules.md` | Conservative Markdown rule file with MCP/rules guidance and repository import path. |
+| `premium` | Claude | Codex/GPT implementation review and DPSK docs/report support |
+| `balanced` | DPSK draft | Codex challenger by default; escalate only for critical risk |
+| `cost_saver` | DPSK | Codex plan review is mandatory before execution |
+
+These profiles are planning guidance until the implementation milestones define config/schema support.
 
 ## Validation Strategy
 
-Every implementation Milestone follows TDD:
+Every implementation milestone follows TDD:
 
-1. write tests
-2. review tests
-3. run red
-4. implement
-5. run green
-6. review code and evidence
-
-For C7, each Milestone should also apply Codex quality discipline:
-
-- Use a Subagent for a focused test, review, docs, or challenger task when available.
-- Keep implementation separate from validation.
-- Record a concise reason when no Subagent is used for substantial work.
-- Treat Codex Subagents as Codex/GPT runtime workers; do not add external model routing requirements for Codex.
-- Use lightweight proposer/challenger checks where the Milestone changes instructions, runtime gates, adapters, or onboarding language.
+1. write tests;
+2. review tests, preferably with a Codex subagent;
+3. run red;
+4. implement;
+5. run green;
+6. review code and rule compliance, preferably with a separate Codex reviewer.
 
 Final validation must include:
 
-- `node --test core/test/*.test.js`
-- `python3 tests/run_regression.py`
-- `bash scripts/validate-config.sh .pipeline/config.yaml`
-- generated adapter checks for Codex/Cursor/Copilot/Trae surfaces
-- README freshness and Chinese entrypoint checks
-- `git diff --check`
+- focused Node tests for rules, review, domain packs, and Claude Codex plugin support;
+- `node --test core/test/*.test.js`;
+- `python3 tests/run_regression.py`;
+- `bash scripts/validate-config.sh .pipeline/config.yaml`;
+- generated adapter smoke for Codex/OpenCode/Claude;
+- `claude plugin validate .` where Claude plugin tooling is available;
+- `git diff --check`;
+- `.pipeline/reviews/` evidence for C8 plan, test, code, and final regression review.
 
 ## Open Risks
 
-- Codex currently lacks Claude-style Stop hooks, so continuation must combine instructions, notification hooks, and file-backed state.
-- Cursor and Copilot adapter targets are well documented; Trae rules behavior is less formally specified and should stay conservative.
-- README full rewrite can invalidate freshness tests unless tests and managed block behavior are updated together.
+- `codex-plugin-cc` behavior may change; C8 must rely on detection and official source references rather than hardcoded assumptions.
+- Claude Code plugin install and user-level settings are external side effects and must remain confirmation-gated.
+- Review loops can become noisy; reports must separate blocking issues from useful suggestions.
+- Domain pack externalization can become too broad; C8 should implement the boundary and RTL reference pack before any separate repository split.

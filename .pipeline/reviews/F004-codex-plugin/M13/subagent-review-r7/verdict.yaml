@@ -1,0 +1,42 @@
+schema_version: 1
+cycle_id: C8
+feature_id: F004
+milestone_id: M13
+stage: subagent-review-r7
+round: 7
+reviewer: codex-subagent
+verdict: warn
+final_status: resolved
+continuation_override: user-requested-no-gate-after-default-max-rounds
+reviewed_refs:
+  - core/package.json
+  - core/src/claude-codex/index.js
+  - core/src/artifacts/claude.js
+  - core/src/domains/index.js
+  - core/src/rules/index.js
+  - core/test/claude-codex-plugin.test.js
+  - core/test/domain-pack.test.js
+  - core/test/rules-capture-habits.test.js
+  - .pipeline/reviews/F004-codex-plugin/M13/subagent-review-r6/verdict.yaml
+checked_rules:
+  - official-codex-plugin-detection-evidence
+  - claude-codex-capability-gated-delegation
+  - claude-codex-install-confirmation-boundary
+  - subagent-worker-ownership-disjointness
+  - domain-pack-boundary
+  - structured-rule-write-path-safety
+  - review-artifact-consistency
+  - package-test-cross-platform-portability
+unchecked_rules:
+  - live-claude-plugin-install-flow
+  - live-claude-code-capability-detection
+  - native-windows-npm-filesystem-smoke
+  - real-remote-domain-pack-install
+  - live-multi-worker-codex-delegation
+issues:
+  - id: core-package-test-script-glob-portability
+    severity: low
+    status: fixed
+    refs:
+      - core/package.json:11
+    summary: The core package test script depended on shell glob expansion, which is less portable across npm shells; it now uses node --test core/test.

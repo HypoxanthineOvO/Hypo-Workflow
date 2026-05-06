@@ -1,0 +1,42 @@
+schema_version: 1
+cycle_id: C8
+feature_id: F004
+milestone_id: M13
+stage: subagent-review-r3
+round: 3
+reviewer: codex-subagent
+verdict: needs_changes
+final_status: resolved
+continuation_override: user-requested-no-gate-after-default-max-rounds
+reviewed_refs:
+  - core/src/claude-codex/index.js
+  - core/test/claude-codex-plugin.test.js
+  - core/src/rules/index.js
+  - core/test/rules-capture-habits.test.js
+  - .pipeline/reviews/F004-codex-plugin/M13/subagent-review-r2/verdict.yaml
+checked_rules:
+  - domain-pack-boundary
+  - no-external-install-side-effects
+  - structured-rule-write-path-safety
+  - claude-codex-install-confirmation-boundary
+  - subagent-worker-ownership-disjointness
+  - review-artifact-consistency
+unchecked_rules:
+  - live-claude-plugin-install-flow
+  - native-windows-filesystem-smoke
+  - real-remote-domain-pack-install
+  - live-claude-code-capability-detection
+issues:
+  - id: windows-worker-ownership-case-normalization
+    severity: medium
+    status: fixed
+    refs:
+      - core/src/claude-codex/index.js:282
+      - core/test/claude-codex-plugin.test.js:132
+    summary: Worker ownership claims normalized separators but not casing, so case variants that overlap on Windows could be accepted as disjoint.
+  - id: dirname-test-source-text-only
+    severity: low
+    status: fixed
+    refs:
+      - core/test/rules-capture-habits.test.js:72
+    summary: The path writer regression test checked source text instead of proving nested parent directory creation for both structured rule and HABITS writers.

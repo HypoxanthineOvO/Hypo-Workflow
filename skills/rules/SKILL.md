@@ -31,7 +31,15 @@ Project-local rules:
 
 - `.pipeline/rules.yaml`
 - `.pipeline/rules/custom/*.md`
+- `.pipeline/rules/structured/project/*.yaml`
+- `.pipeline/rules/structured/cycle/*.yaml`
 - `.pipeline/rules/packs/<pack-name>/`
+
+User-level structured habits:
+
+- `~/.hypo-workflow/rules/structured/*.yaml`
+
+Global habits are user-level authority and should be loaded only when explicitly configured or selected by the active rules command. Do not make project behavior depend silently on whatever exists in the operator's home directory.
 
 ## Severity Model
 
@@ -44,6 +52,47 @@ Use the ESLint-style severity model:
 | `error` | Treat as a hard gate and stop execution until resolved or downgraded. |
 
 The severity decides behavior. Labels are metadata only.
+
+## Structured Rules/Habits Authority
+
+C8 introduces structured Rules/Habits as the preferred authority for durable user preferences and project behavior. Markdown files and adapter instruction text are generated or compatibility views.
+
+Supported scopes, from highest to lowest priority:
+
+1. `cycle`
+2. `project`
+3. `global`
+4. `builtin`
+
+When several records share an `id`, resolve the winner by that scope order and report the overridden scopes/source paths. Do not silently hide conflicts; Agent Review should record which rules were checked and which could not be checked automatically.
+
+Structured rule shape:
+
+```yaml
+id: user-frontend-layout-density
+scope: project
+label: frontend
+severity: warn
+hooks:
+  - always
+  - on-evaluate
+source:
+  captured_from: chat
+  author: user
+content:
+  instruction: "Front-end tool pages should prioritize dense, scannable operational UI."
+  rationale: "The project targets repeated workflow operations."
+  examples:
+    good:
+      - "compact tables and toolbars"
+    bad:
+      - "large marketing-style hero sections"
+enforcement:
+  check_kind: agent_judgment
+  evidence_required: true
+```
+
+Use structured records for new "remember this rule" behavior. Keep `.pipeline/rules.yaml` for preset and severity overrides.
 
 ## Labels
 
@@ -68,6 +117,7 @@ Supported lifecycle hook points:
 - `pre-step`
 - `post-step`
 - `pre-commit`
+- `pre-release`
 - `on-fail`
 - `on-evaluate`
 - `always`
@@ -100,8 +150,9 @@ Build the effective rule table in this priority order, low to high:
 1. Built-in rule metadata from `rules/builtin/`.
 2. Preset severities from `rules/presets/<extends>.yaml`.
 3. Custom rules from `.pipeline/rules/custom/`.
-4. Overrides from `.pipeline/rules.yaml` under `rules:`.
-5. Temporary command overrides from `--rule name=severity` when a command supports them.
+4. Structured Rules/Habits from user, project, and Cycle scopes.
+5. Overrides from `.pipeline/rules.yaml` under `rules:`.
+6. Temporary command overrides from `--rule name=severity` when a command supports them.
 
 When `.pipeline/rules.yaml` is missing, behave as if:
 
@@ -192,6 +243,16 @@ Generated Markdown format:
 ```
 
 Do not auto-create a custom rule without the user's natural-language content.
+
+## Creating Structured Rules
+
+For new remembered preferences, prefer structured YAML over Markdown custom rules. Use this path selection:
+
+- `scope=cycle` -> `.pipeline/rules/structured/cycle/<id>.yaml`
+- `scope=project` -> `.pipeline/rules/structured/project/<id>.yaml`
+- `scope=global` -> `~/.hypo-workflow/rules/structured/<id>.yaml`
+
+Ordinary inferred candidates should be presented for confirmation at the end of the current discussion or checkpoint. Do not interrupt the user's main task just because a possible rule was detected. Explicit force-write wording may write immediately, but must still use the selected scope and log the action.
 
 ## Editing And Deleting Custom Rules
 

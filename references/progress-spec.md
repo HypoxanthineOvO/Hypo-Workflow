@@ -139,3 +139,5 @@ Compact time format:
 It is a summary surface, not a replacement for state or lifecycle logs.
 
 For analysis Milestones, `PROGRESS.md` should mention the current question, outcome/confidence when known, and the ledger path if it helps recovery. Full hypotheses, experiments, observations, and validity discussion belong in the analysis ledger and report, not the progress board.
+
+For Agent Review gates, `PROGRESS.md` should show compact review status only: stage, verdict, retry round when relevant, and the `.pipeline/reviews/<feature>/<milestone>/<stage>/` path. Full issues, transcripts, coverage matrices, and repair proposals belong in review artifacts, not the progress board.

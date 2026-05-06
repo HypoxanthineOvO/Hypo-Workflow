@@ -5,6 +5,11 @@ import { normalizeAnalysisInteraction } from "../analysis/index.js";
 import { commandMap } from "../commands/index.js";
 import { DEFAULT_GLOBAL_CONFIG, buildModelPoolOpenCodeAgents, mergeConfig } from "../config/index.js";
 import { normalizeProfile, selectProfile } from "../profile/index.js";
+import {
+  loadStructuredRulesAuthority,
+  renderStructuredRulesInstructionBlock,
+  writeStructuredHabitsDocument,
+} from "../rules/index.js";
 
 const HW_VERSION = "11.1.0";
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
@@ -127,7 +132,15 @@ export async function writeOpenCodeArtifacts(outDir, options = {}) {
   await writeFile(join(adapterDir, "hypo-workflow.json"), `${JSON.stringify(renderHypoWorkflowMetadata(profile), null, 2)}\n`, "utf8");
   await writeFile(join(projectRoot, "opencode.json"), `${JSON.stringify(rootConfig, null, 2)}\n`, "utf8");
   await writeFile(join(projectRoot, "tui.json"), `${JSON.stringify(tuiConfig, null, 2)}\n`, "utf8");
-  await writeFile(join(projectRoot, "AGENTS.md"), await renderAgentsInstruction(), "utf8");
+  const rulesAuthority = await loadArtifactRulesAuthority(projectRoot, options);
+  if (rulesAuthority) {
+    await writeStructuredHabitsDocument(projectRoot, REPO_ROOT, {
+      ...options,
+      authority: rulesAuthority,
+      title: "Hypo-Workflow Habits",
+    });
+  }
+  await writeFile(join(projectRoot, "AGENTS.md"), await renderAgentsInstruction(projectRoot, { ...options, rulesAuthority }), "utf8");
   await writeFile(join(adapterDir, "package.json"), await renderTemplate("package.json"), "utf8");
   await writeFile(join(adapterDir, "plugins", "hypo-workflow.ts"), await renderPluginTemplate(), "utf8");
   await writeFile(
@@ -327,8 +340,24 @@ function renderableOpenCodeAgents(profile) {
   });
 }
 
-async function renderAgentsInstruction() {
-  return renderTemplate("AGENTS.md");
+async function renderAgentsInstruction(projectRoot, options = {}) {
+  const template = await renderTemplate("AGENTS.md");
+  const ruleBlock = await renderProjectRulesInstructionBlock(projectRoot, options);
+  return ruleBlock ? `${template.trimEnd()}\n\n${ruleBlock}` : template;
+}
+
+async function renderProjectRulesInstructionBlock(projectRoot, options = {}) {
+  const authority = options.rulesAuthority || await loadArtifactRulesAuthority(projectRoot, options);
+  if (!authority) return "";
+  return renderStructuredRulesInstructionBlock(authority);
+}
+
+async function loadArtifactRulesAuthority(projectRoot, options = {}) {
+  try {
+    return options.rulesAuthority || await loadStructuredRulesAuthority(projectRoot, REPO_ROOT, options);
+  } catch {
+    return null;
+  }
 }
 
 async function renderPluginTemplate() {

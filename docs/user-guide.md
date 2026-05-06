@@ -2,6 +2,19 @@
 
 Hypo-Workflow organizes long-running AI coding work around `.pipeline/` state, prompts, reports, logs, and recovery files.
 
+## Install Shape
+
+Start from the platform guide that matches the host agent. The README stays generic; platform pages carry the concrete install or sync commands.
+
+| Platform | Install / sync entry | Guide |
+|---|---|---|
+| Codex | Install or symlink this repo as a Codex Skill source. | `docs/platforms/codex.md` |
+| Claude Code | Install the `hw` plugin or run with `--plugin-dir`; sync project hooks/agents with `hypo-workflow sync --platform claude-code --project .`. | `docs/platforms/claude-code.md` |
+| OpenCode | Generate native commands, agents, plugins, and status artifacts with `hypo-workflow init-project --platform opencode --project .`. | `docs/platforms/opencode.md` |
+| Cursor | Generate `.cursor/rules/hypo-workflow.mdc`. | `docs/platforms/cursor.md` |
+| GitHub Copilot | Generate `.github/copilot-instructions.md`. | `docs/platforms/copilot.md` |
+| Trae | Generate `.trae/rules/project_rules.md`. | `docs/platforms/trae.md` |
+
 ## Common Workflows
 
 - Plan work with `/hw:plan`, then execute with `/hw:start` or `/hw:resume`.

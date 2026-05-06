@@ -1,10 +1,47 @@
 # OpenCode Guide
 
-Commands: native-slash.
-Ask gates: question-tool.
-Plan support: todowrite.
-
 Hypo-Workflow does not run project work itself; the host agent performs the work using `.pipeline/` files.
+
+## Capability Summary
+
+- Commands: native-slash.
+- Ask gates: question-tool.
+- Plan support: todowrite.
+- Subagents: native-agents.
+- Events/hooks: plugin-events.
+- Rules/instructions: AGENTS.md-instructions.
+- Recovery: lease-heartbeat-plugin-events.
+
+## Install / Sync
+
+Bootstrap a project with native OpenCode artifacts:
+
+```bash
+hypo-workflow init-project --platform opencode --project . --automation balanced
+```
+
+Refresh an existing project:
+
+```bash
+hypo-workflow sync --platform opencode --project . --repair
+```
+
+## Supported Features
+
+- Reads `.pipeline/` state, config, Cycle, Rules/Habits, prompts, reports, logs, and review artifacts.
+- Uses the canonical `/hw:*` workflow vocabulary: init, plan, start/resume, status/report, sync/docs, rules, patch, release.
+- Preserves protected authority files unless the lifecycle command explicitly owns the write.
+- Generates native `/hw-*` slash command files.
+- Generates OpenCode role agents, plugin runtime files, status sidecars, and TUI/status config.
+- Uses native `question` for required decisions and `todowrite` for visible plan discipline.
+- Supports OpenCode provider/model matrix metadata without turning Hypo-Workflow into a runner.
+
+## Boundaries
+
+- Hypo-Workflow is not a runner; the host agent performs implementation, tests, and review.
+- `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/rules.yaml` are protected authority files.
+- External installs, user-level config writes, destructive commands, and network side effects require explicit confirmation.
+- OpenCode-specific events and plugins are additive; Codex and Claude Code behavior must not depend on them.
 
 ## Model Matrix
 

@@ -1,5 +1,26 @@
 # Changelog
 
+## v12.0.0 - 2026-05-06
+
+### Features
+
+- Added structured Rules/Habits authority with generated platform instruction views so user preferences can survive context loss and be checked during review.
+- Added Agent Review artifacts and multi-round `needs_changes -> repair -> review` iteration records for plan, test, implementation, and release closeout scrutiny.
+- Added Domain Pack infrastructure with the built-in RTL reference pack and boundary protocol for future local or external language/domain packages.
+- Added Claude Code Codex-plugin support modeling, including explicit-confirmation install boundaries and Codex worker ownership guidance.
+
+### Documentation
+
+- Reworked README around platform-neutral common capabilities instead of per-platform command duplication.
+- Restored concrete install and sync instructions in the generated Codex, Claude Code, OpenCode, Cursor, Copilot, and Trae platform guides.
+- Recorded the platform installation documentation policy in the Knowledge Ledger and platform capability reference.
+
+### Tests
+
+- Core Node suite: 311/311 passing.
+- Scenario regression: 63/63 passing.
+- Config validation, Claude plugin validation, docs repair/checks, sync check-only, and `git diff --check` passing.
+
 ## v11.1.0 - 2026-05-06
 
 ### Features

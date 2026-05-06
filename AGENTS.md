@@ -24,3 +24,14 @@ When `execution.steps.preset=analysis`, read `.opencode/hypo-workflow.json.analy
 - Service restarts require confirmation.
 - System-level dependency installation requires an explicit ask.
 - Network, remote-resource, destructive, and external side-effect boundaries must be honored exactly as configured.
+
+## Active Rules/Habits
+
+Structured Rules/Habits are authority; Markdown habits and platform instructions are derived views.
+
+- conflict-check (builtin/warn/guard): Detect incompatible local agent plugins or hook systems at session start.
+- plan-tool-required (builtin/warn/workflow): Complex planning and execution work must maintain a visible plan/todo state.
+- prefer-chinese-output (project/warn/style): 面向用户的说明、README 更新、PROGRESS 摘要和交互提示优先使用中文。命令名、配置键、文件名和专有英文术语保持英文。
+- progress-timezone (builtin/warn/style): Keep PROGRESS timestamps aligned with output.timezone.
+- report-language (builtin/warn/style): Keep reports and generated summaries aligned with output.language.
+- session-start-context-load (builtin/error/hook): Preserve SessionStart context loading as a rule-level gate.
