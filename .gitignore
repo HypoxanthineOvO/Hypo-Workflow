@@ -38,4 +38,5 @@ node_modules/
 # IDE
 .vscode/
 .idea/
+.claude/settings.local.json
 .claude/settings.local.json.bak.*
