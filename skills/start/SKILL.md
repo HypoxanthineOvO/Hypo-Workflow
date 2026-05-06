@@ -74,17 +74,22 @@ Use this skill to start execution from a local `.pipeline/` workspace. This is t
    - `webapp`: E2E + browser interaction + visual evidence
    - `agent-service`: CLI plan + shared core + real CLI run
    - `research`: baseline + script execution + before/after/delta
-20. On failure, the main agent must choose one of:
+20. When `execution.worker_separation.mode` is `recommended` or `strict`, resolve implement/test/audit role coverage before acceptance:
+   - try to start distinct workers for `implement`, `test`, and `audit`
+   - if roles are missing or collide onto one worker identity, mark the run degraded
+   - `recommended` may continue with explicit degraded-mode confirmation and evidence
+   - `strict` must not treat degraded execution as fully accepted
+21. On failure, the main agent must choose one of:
    - `retry`: revise instructions and rerun the failed step
    - `deferred`: mark the milestone deferred if downstream work can continue safely
    - `stop`: stop and surface the blocking reason to the user
-21. If a derived refresh fails after authority commits, keep the authoritative fact committed, write `.pipeline/derived-refresh.yaml`, and surface repair guidance instead of rolling back the lifecycle write.
-22. If a Feature fails and the resolved `failure_policy=skip_defer`, mark the Feature `deferred`, preserve its report and metrics, then auto-chain to the next queued Feature unless blocked by `gate: confirm`.
-23. Keep moving automatically between milestones while unfinished work remains.
-24. Before any natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `status: active`, `next_action`, `reason`, `updated_at`, `safe_resume_command: /hw:resume`, and focused `context`.
-25. Remove `.pipeline/.lock` when the execution turn completes, stops, blocks, aborts, or finishes.
-26. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
-27. Only allow the turn to end naturally when all milestones are complete or the main agent has explicitly chosen the `stop` outcome.
+22. If a derived refresh fails after authority commits, keep the authoritative fact committed, write `.pipeline/derived-refresh.yaml`, and surface repair guidance instead of rolling back the lifecycle write.
+23. If a Feature fails and the resolved `failure_policy=skip_defer`, mark the Feature `deferred`, preserve its report and metrics, then auto-chain to the next queued Feature unless blocked by `gate: confirm`.
+24. Keep moving automatically between milestones while unfinished work remains.
+25. Before any natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `status: active`, `next_action`, `reason`, `updated_at`, `safe_resume_command: /hw:resume`, and focused `context`.
+26. Remove `.pipeline/.lock` when the execution turn completes, stops, blocks, aborts, or finishes.
+27. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
+28. Only allow the turn to end naturally when all milestones are complete or the main agent has explicitly chosen the `stop` outcome.
 
 ## Continuation And Preflight
 

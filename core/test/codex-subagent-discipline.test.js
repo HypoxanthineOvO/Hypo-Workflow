@@ -39,6 +39,9 @@ test("subagent policy separates implementation from validation and keeps aliases
   assert.match(spec, /Implementation and validation separation/i);
   assert.match(spec, /implementation Subagent/i);
   assert.match(spec, /test\/review Subagent/i);
+  assert.match(spec, /same Subagent instance must not author and certify the same change/i);
+  assert.match(spec, /at least two workers/i);
+  assert.match(spec, /closed-loop evidence/i);
   assert.match(spec, /proposer\/challenger/i);
   assert.match(spec, /non-delegation rationale/i);
 
@@ -52,6 +55,7 @@ test("patch lane preserves lightweight scope while allowing independent review h
 
   assert.match(patch, /Patch fix is a lightweight execution lane/i);
   assert.match(patch, /review\/test Subagent/i);
+  assert.match(patch, /must not be the same delegated worker session/i);
   assert.match(patch, /implementation and validation separated/i);
   assert.match(patch, /must never write `\.pipeline\/state\.yaml`/i);
 });

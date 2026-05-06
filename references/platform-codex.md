@@ -66,6 +66,7 @@ Codex execution guidance should explicitly encourage Subagents for substantial w
 
 - use a test/review Subagent to inspect tests, failure fixtures, or final diffs
 - use an implementation Subagent for scoped edits
+- do not use the same Codex Subagent session to both implement and certify the same non-trivial change
 - keep the main agent responsible for integration, state updates, and final judgment
 - if no Subagent is used for substantial work, record a concise reason in the report
 

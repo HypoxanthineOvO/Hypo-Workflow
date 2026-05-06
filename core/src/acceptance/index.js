@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { DEFAULT_GLOBAL_CONFIG, mergeConfig, parseYaml, writeConfig } from "../config/index.js";
+import { DEFAULT_GLOBAL_CONFIG, loadConfig, mergeConfig, parseYaml, writeConfig } from "../config/index.js";
+import { assessWorkerSeparationStatus, resolveWorkerSeparationPolicy } from "../config/index.js";
 import { appendProgressEvent } from "../progress/index.js";
 import {
   commitWorkflowUpdate,
@@ -49,6 +50,33 @@ export function evaluateAcceptanceStatus(acceptance = {}, policy = {}, options =
     timed_out: true,
     automatic: true,
     reason: "timeout",
+  };
+}
+
+export function evaluateAcceptanceReadiness(context = {}, options = {}) {
+  const workerPolicy = resolveWorkerSeparationPolicy(
+    options.projectConfig || {},
+    options.globalConfig || DEFAULT_GLOBAL_CONFIG,
+  );
+  const workerStatus = assessWorkerSeparationStatus(workerPolicy, {
+    workers: options.workers || [],
+    audit_verdict: options.audit_verdict || acceptanceAuditVerdict(context.acceptance || {}),
+  });
+  const reasons = [];
+
+  if (workerStatus.acceptance_blocked) {
+    if (workerStatus.missing_roles.length || workerStatus.collisions.length) {
+      reasons.push(workerStatus.summary);
+    }
+    if ((options.audit_verdict || acceptanceAuditVerdict(context.acceptance || {})) === "insufficient") {
+      reasons.push("Audit verdict marked test coverage as insufficient.");
+    }
+  }
+
+  return {
+    worker_separation: workerStatus,
+    blocked: reasons.length > 0,
+    reasons,
   };
 }
 
@@ -129,6 +157,22 @@ export async function acceptCycle(projectRoot = ".", options = {}) {
   const context = await loadAcceptanceContext(projectRoot);
   const now = options.now || new Date().toISOString();
   const cycleId = cycleIdentifier(context.cycle);
+  const mergedAcceptance = {
+    ...(context.cycle.cycle?.acceptance || {}),
+    ...(context.state.acceptance || {}),
+  };
+  const readiness = evaluateAcceptanceReadiness(
+    { acceptance: mergedAcceptance },
+    {
+      projectConfig: context.config || {},
+      workers: options.workers || mergedAcceptance.workers || [],
+      audit_verdict: options.audit_verdict || acceptanceAuditVerdict(mergedAcceptance),
+    },
+  );
+  if (readiness.blocked) {
+    const details = readiness.reasons.length ? ` ${readiness.reasons.join(" ")}` : "";
+    throw new Error(`Cycle ${cycleId} acceptance blocked by worker separation policy.${details}`.trim());
+  }
   const policy = resolveCycleLifecyclePolicy(context.cycle);
   const followUp = policy.accept.next === "follow_up_plan"
     ? selectLifecycleContinuation(context.cycle, "follow_up_plan")
@@ -293,13 +337,24 @@ async function loadAcceptanceContext(projectRoot) {
   const pipelineDir = join(projectRoot, ".pipeline");
   return {
     projectRoot,
+    configFile: join(pipelineDir, "config.yaml"),
     cycleFile: join(pipelineDir, "cycle.yaml"),
     stateFile: join(pipelineDir, "state.yaml"),
     logFile: join(pipelineDir, "log.yaml"),
     progressFile: join(pipelineDir, "PROGRESS.md"),
+    config: await readConfig(join(pipelineDir, "config.yaml")),
     cycle: await readYaml(join(pipelineDir, "cycle.yaml")),
     state: await readYaml(join(pipelineDir, "state.yaml")),
   };
+}
+
+async function readConfig(file) {
+  try {
+    return await loadConfig(file);
+  } catch (error) {
+    if (error.code === "ENOENT") return {};
+    throw error;
+  }
 }
 
 async function readYaml(file) {
@@ -382,6 +437,10 @@ function activateContinuation(continuations = [], id) {
 
 function normalizeAcceptanceMode(value) {
   return ["manual", "auto", "timeout", "confirm"].includes(value) ? value : DEFAULT_GLOBAL_CONFIG.acceptance.mode;
+}
+
+function acceptanceAuditVerdict(acceptance = {}) {
+  return acceptance.audit_verdict || acceptance.audit?.verdict || "unknown";
 }
 
 function normalizeAcceptanceState(value) {

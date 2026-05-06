@@ -4,6 +4,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../../../.." && pwd)"
 cd "$ROOT"
 
+tmp_user="${USER:-$(id -un 2>/dev/null || echo unknown)}"
+tmp_log_dir="${TMPDIR:-/tmp}/${tmp_user}"
+mkdir -p "$tmp_log_dir"
+chmod 700 "$tmp_log_dir" 2>/dev/null || true
+
+opencode_debug_log="$(mktemp "$tmp_log_dir/hw-s54-opencode-config.XXXXXX.log")"
+
 test -f plugins/opencode/templates/plugin.ts
 test -f plugins/opencode/templates/AGENTS.md
 test -f plugins/opencode/templates/package.json
@@ -35,8 +42,8 @@ grep -Fq '"compaction"' "$tmp_project/opencode.json"
 grep -Fq '"auto_continue"' "$tmp_project/.opencode/hypo-workflow.json"
 
 if command -v opencode >/dev/null 2>&1; then
-  (cd "$tmp_project" && opencode debug config >/tmp/hw-s54-opencode-config.log 2>&1) || {
-    cat /tmp/hw-s54-opencode-config.log >&2
+  (cd "$tmp_project" && opencode debug config >"$opencode_debug_log" 2>&1) || {
+    cat "$opencode_debug_log" >&2
     exit 1
   }
 fi

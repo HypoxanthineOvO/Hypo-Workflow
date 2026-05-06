@@ -43,6 +43,10 @@ normal `/hw:init` does not require git. Git is required only for `/hw:init --imp
   - 稳妥模式 (`manual`)
   - 自动模式 (`balanced`)
   - 全自动模式 (`full`)
+- ask for project-local worker separation mode in interactive init and store it:
+  - `off`
+  - `recommended`
+  - `strict`
 - use `balanced` for non-interactive init unless `--automation manual|balanced|full` is supplied
 - keep agent platform, default execution mode, subagent provider, dashboard defaults, and plan defaults in `~/.hypo-workflow/config.yaml` unless the project needs an explicit override
 - optionally suggest an initial development direction, but do not decompose milestones here

@@ -4,10 +4,12 @@ import { mkdtemp, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
+  assessWorkerSeparationStatus,
   DEFAULT_GLOBAL_CONFIG,
   loadConfig,
   normalizeAutomationPolicy,
   parseYaml,
+  resolveWorkerSeparationPolicy,
   writeConfig,
 } from "../src/config/index.js";
 
@@ -97,6 +99,7 @@ test("default config exposes automation policy levels and safe gates", () => {
   assert.equal(DEFAULT_GLOBAL_CONFIG.automation.gates.planning, "confirm");
   assert.equal(DEFAULT_GLOBAL_CONFIG.automation.gates.destructive_external, "confirm");
   assert.equal(DEFAULT_GLOBAL_CONFIG.automation.gates.execution, "auto");
+  assert.equal(DEFAULT_GLOBAL_CONFIG.execution.worker_separation.mode, "recommended");
 });
 
 test("normalizeAutomationPolicy preserves planning gates under full automation", () => {
@@ -122,4 +125,34 @@ test("normalizeAutomationPolicy rejects invalid automation levels", () => {
     () => normalizeAutomationPolicy({ level: "reckless" }),
     /Unsupported automation level/,
   );
+});
+
+test("worker separation policy resolves project-local modes and degraded coverage", () => {
+  const policy = resolveWorkerSeparationPolicy({
+    execution: {
+      worker_separation: {
+        mode: "strict",
+        providers: {
+          implement: "codex",
+          test: "claude",
+          audit: "codex",
+        },
+      },
+    },
+  });
+
+  assert.equal(policy.mode, "strict");
+  assert.equal(policy.providers.test, "claude");
+  assert.ok(policy.degradation.options.includes("switch_provider_and_retry"));
+
+  const degraded = assessWorkerSeparationStatus(policy, {
+    workers: [
+      { role: "implement", worker_id: "w1" },
+      { role: "test", worker_id: "w1" },
+    ],
+  });
+  assert.equal(degraded.degraded, true);
+  assert.ok(degraded.collisions.includes("implement_test_shared_worker"));
+  assert.equal(degraded.can_proceed, false);
+  assert.equal(degraded.acceptance_blocked, true);
 });

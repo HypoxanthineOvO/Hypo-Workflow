@@ -43,6 +43,11 @@ const FULL_STAGES = Object.freeze([
     label: "validation criteria",
     guidance: "把需求收束成可验证目标、边界条件和验收方式。",
   },
+  {
+    id: "worker_separation_policy",
+    label: "worker separation policy",
+    guidance: "确认是否启用 implement/test/audit 三权分立，以及降级和验收边界。",
+  },
 ]);
 
 const LIGHTWEIGHT_STAGES = Object.freeze([

@@ -32,6 +32,7 @@ test("init-project bootstraps non-git projects with automation policy", async ()
   assert.equal(effective.automation.gates.destructive_external, "confirm");
   assert.equal(effective.automation.gates.release_publish, "confirm");
   assert.equal(effective.automation.codex.external_model_routing, false);
+  assert.equal(effective.execution.worker_separation.mode, "recommended");
 });
 
 test("init-project defaults automation to balanced and rejects invalid levels", async () => {
@@ -103,6 +104,9 @@ test("init docs separate normal non-git bootstrap from git-bound history import"
   assert.match(combined, /稳妥模式 \(`manual`\)/);
   assert.match(combined, /自动模式 \(`balanced`\)/);
   assert.match(combined, /全自动模式 \(`full`\)/);
+  assert.match(combined, /worker separation mode/i);
+  assert.match(combined, /recommended/);
+  assert.match(combined, /strict/);
   assert.match(combined, /`\/hw:init --import-history`.*requires git/i);
   assert.match(combined, /git rev-parse --is-inside-work-tree/);
   assert.doesNotMatch(combined, /Codex.*external model/i);

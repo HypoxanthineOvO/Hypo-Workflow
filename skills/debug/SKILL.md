@@ -15,6 +15,12 @@ description: Investigate a concrete failure when the user wants symptom-driven r
 
 Use this skill for the five-step debug workflow.
 
+When project `execution.worker_separation.mode` is enabled:
+
+- keep implementation help separate from test reproduction when practical
+- `/hw:audit` remains the canonical audit lane and should not be duplicated inside debug
+- if debug work degrades role separation, record that limitation explicitly
+
 ## Preconditions
 
 - a concrete symptom, failing test, trace, or abnormal behavior is available

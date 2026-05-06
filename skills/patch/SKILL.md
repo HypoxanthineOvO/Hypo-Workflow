@@ -116,6 +116,7 @@ Use `/hw:patch fix P001` to repair one Patch immediately, or `/hw:patch fix P001
 Patch fix is lightweight, but non-trivial Codex repairs should keep implementation and validation separated when Subagents are available:
 
 - prefer a separate review/test Subagent to validate tests, failure evidence, final diffs, or assumptions
+- the implementation worker and review/test worker must not be the same delegated worker session
 - prefer docs-specific assistance for README, guide, or adapter-documentation Patches
 - keep the main agent responsible for the final edit decision, commit, Patch metadata, and lifecycle log
 - if no report is generated, record delegation evidence or a non-delegation rationale in the Patch file or `.pipeline/log.yaml`

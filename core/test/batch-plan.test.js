@@ -127,6 +127,7 @@ test("batch plan artifacts retain explicit milestone slice-quality fixtures", ()
               implementation_scope: ["CLI command", "shared core", "state read", "status output"],
               test_spec: ["node:test plus real CLI validation"],
               validation_commands: ["node --test core/test/opencode-status.test.js"],
+              evidence: ["before/after status output with assertion on persisted lifecycle phase"],
               expected_artifacts: ["core/src/opencode-status/index.js"],
             },
           ],
@@ -179,6 +180,7 @@ test("vertical-slice docs require one-behavior TDD loops, prompt evidence, and s
 
   assert.match(`${planSkill}\n${decomposeSkill}`, /runnable vertical slice/i);
   assert.match(`${planSkill}\n${decomposeSkill}`, /horizontal-only/i);
+  assert.match(`${planSkill}\n${decomposeSkill}`, /closed-loop/i);
   assert.match(`${planSkill}\n${decomposeSkill}`, /database\/API\/UI\/schema/i);
 
   assert.match(tddSpec, /one behavior/i);
@@ -198,6 +200,26 @@ test("vertical-slice docs require one-behavior TDD loops, prompt evidence, and s
 
   assert.match(compactSkill, /stable prompt\/design artifacts/i);
   assert.match(compactSkill, /not.*design authority/i);
+});
+
+test("decompose assessment flags open-loop validation without observable closure", () => {
+  const assessment = assessRunnableVerticalSlice({
+    objective: "Implement cache invalidation path.",
+    implementation_scope: [
+      "cache helper",
+      "command entry",
+    ],
+    test_spec: [
+      "add tests later",
+      "manual smoke if time permits",
+    ],
+    validation_commands: ["npm test"],
+    expected_artifacts: ["src/cache.js"],
+  });
+
+  assert.equal(assessment.status, "needs_evidence");
+  assert.ok(assessment.flags.includes("missing_closed_loop_validation"));
+  assert.equal(assessment.closed_loop_validation, false);
 });
 
 function escapeRegExp(value) {

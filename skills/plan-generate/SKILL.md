@@ -37,6 +37,8 @@ Use this skill for P3 Generate only.
    - verification points
    - test spec
    - constraints
+   - closed-loop validation command or scenario
+   - observable evidence and independent validation owner when applicable
 7. Convert that implementation plan into the final prompt file.
 8. Detect append mode and preserve already executed numbering.
 9. Use the workflow commit helper for any project-cycle write that touches protected lifecycle state so authority facts commit atomically before derived refreshes.
@@ -51,6 +53,8 @@ When a Cycle or Feature has `workflow_kind: analysis`, generated prompts should 
 - `conclude`
 
 Generated analysis prompts should point to `templates/analysis/*`, `references/analysis-spec.md`, and `references/analysis-ledger-spec.md`, and should require an external ledger instead of expanding `state.yaml`.
+
+Generated implementation prompts must not degrade testing into open-loop prose. Carry forward the exact validation command or executable scenario, the observable pass/fail evidence, and the implementation-versus-validation ownership split when the plan called for it.
 
 If derived lifecycle artifacts fail to refresh after a successful authority commit, generated prompts should direct the operator to repair the derived artifact or run `/hw:sync --light` rather than treating the authority write as failed.
 

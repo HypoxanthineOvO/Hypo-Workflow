@@ -28,6 +28,7 @@ Resolve every configurable value in this order:
 | project default workflow kind | `default_workflow_kind` | n/a | `build` |
 | execution mode | `execution.mode` | `execution.default_mode` | `self` |
 | subagent provider | `execution.subagent_tool` | `subagent.provider` | `auto` |
+| worker separation mode | `execution.worker_separation.mode` | `execution.worker_separation.mode` | `recommended` |
 | model pool plan role | `model_pool.roles.plan` | `model_pool.roles.plan` | `primary=gpt-5.5`, fallback `deepseek-v4-pro` |
 | model pool implement role | `model_pool.roles.implement` | `model_pool.roles.implement` | `primary=mimo-v2.5-pro`, fallback `deepseek-v4-pro`, `mimo-v2.5-pro` |
 | model pool review role | `model_pool.roles.review` | `model_pool.roles.review` | `primary=gpt-5.5`, fallback `deepseek-v4-pro` |
@@ -83,6 +84,46 @@ Codex delegation policy under `automation.codex` is instruction-level and runtim
 - `external_model_routing=false`: Codex Subagents are treated as Codex/GPT runtime workers; Hypo-Workflow must not require DeepSeek, Mimo, Claude, or other external model routing for Codex delegation.
 
 `automation.quality_pass.proposer_challenger=true` enables the lightweight C7 proposer/challenger pattern. It is not a full debate framework.
+
+Worker separation policy is project-local execution policy:
+
+- `execution.worker_separation.mode=off`: preserve legacy behavior
+- `execution.worker_separation.mode=recommended`: default to implement/test/audit separation, but allow explicit degraded-mode confirmation
+- `execution.worker_separation.mode=strict`: require implement/test/audit separation before full acceptance
+
+Recommended project-local fields:
+
+```yaml
+execution:
+  worker_separation:
+    mode: recommended
+    ask_on_init_or_first_plan: true
+    roles:
+      implement: { required: true }
+      test: { required: true }
+      audit: { required: true }
+    providers: {}
+    degradation:
+      allow_with_confirmation: true
+      options:
+        - continue_degraded
+        - backfill_missing_roles
+        - switch_provider_and_retry
+        - cancel_execution
+    acceptance:
+      audit_can_block_acceptance: true
+      audit_blocks_execution_by_default: false
+    evidence:
+      log_roles: true
+      report_roles: true
+```
+
+Execution guidance:
+
+- `implement`, `test`, and `audit` are distinct roles.
+- `audit` may ask for re-test or re-implementation without blocking the whole execution by default.
+- acceptance may still be blocked when audit marks coverage as insufficient.
+- degraded mode should record missing roles, shared-worker collisions, and the explicit user decision.
 
 `/hw:init` asks for the project automation level in interactive contexts and writes the stable key to project config:
 

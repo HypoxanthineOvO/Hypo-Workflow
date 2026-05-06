@@ -4,9 +4,16 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../../../.." && pwd)"
 cd "$ROOT"
 
+tmp_user="${USER:-$(id -un 2>/dev/null || echo unknown)}"
+tmp_log_dir="${TMPDIR:-/tmp}/${tmp_user}"
+mkdir -p "$tmp_log_dir"
+chmod 700 "$tmp_log_dir" 2>/dev/null || true
+
+init_log="$(mktemp "$tmp_log_dir/hw-s58-init.XXXXXX.log")"
+
 tmp_project="$(mktemp -d)"
 tmp_home="$(mktemp -d)"
-HOME="$tmp_home" node cli/bin/hypo-workflow init-project --platform opencode --project "$tmp_project" >/tmp/hw-s58-init.log
+HOME="$tmp_home" node cli/bin/hypo-workflow init-project --platform opencode --project "$tmp_project" >"$init_log"
 
 for command in cycle patch patch-fix compact showcase release audit debug check reset log report status guide rules; do
   test -f "$tmp_project/.opencode/commands/hw-$command.md" || {

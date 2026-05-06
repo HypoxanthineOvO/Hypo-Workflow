@@ -40,6 +40,13 @@ Category-specific follow-up:
 - `agent-service`: ask for CLI shape, shared core, and CLI scenario
 - `research`: ask for baseline, expected direction, validation script, and environment constraints
 
+For any testable delivery task, Discover must also pin down the closed-loop test plan:
+
+- what exact command, script, browser path, or scenario will be run
+- what output, screenshot, metric delta, or state change will prove pass or fail
+- who performs the independent validation when the work is non-trivial or delegated
+- what observation would disprove the implementation so the plan is not self-certifying
+
 ## Adaptive Grill-Me
 
 After the broad questions are answered, decide whether the task needs deep Grill-Me design-concept alignment. Use light Discover for low-risk patches, small incremental features, and narrow docs/config requests.
@@ -133,13 +140,16 @@ If `plan.interactive.min_rounds` is set, use it as an additional floor after res
 1. Ask only 2-3 targeted questions per round.
 2. Start broad, then drill into detail.
 3. Start with task category, desired effect, and verification method before implementation-specific detail.
-4. Summarize what has been learned after each round.
-5. Count completed question rounds explicitly in the working notes.
-6. Do not enter P2 until both conditions are true:
+4. Convert the verification answer into a closed-loop validation path before leaving Discover.
+5. Ask who owns implementation and who owns validation when multi-agent or delegated work is expected.
+6. Reject open-loop answers such as "we will add tests" unless the user also defines how the test is run and what evidence closes the loop.
+7. Summarize what has been learned after each round.
+8. Count completed question rounds explicitly in the working notes.
+9. Do not enter P2 until both conditions are true:
    - the configured minimum round count has been met
    - the user explicitly says「够了」「开始吧」「可以了」or an equivalent end signal
-7. If user input is vague, ask follow-up questions instead of silently filling gaps.
-8. If the user says "确认一下" or merely answers the previous questions, summarize and continue asking.
+10. If user input is vague, ask follow-up questions instead of silently filling gaps.
+11. If the user says "确认一下" or merely answers the previous questions, summarize and continue asking.
 
 ## Context Injection
 
