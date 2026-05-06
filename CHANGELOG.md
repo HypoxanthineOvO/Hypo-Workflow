@@ -1,5 +1,18 @@
 # Changelog
 
+## v13.0.0 - 2026-05-07
+
+### Features
+
+- Added worker separation policy controls for `implement`, `test`, and `audit`, including degraded-mode handling and acceptance blocking when strict coverage is required.
+- Tightened planning contracts so Discover, Decompose, and Generate all carry explicit closed-loop validation paths and independent validation ownership.
+- Wired acceptance readiness into the actual cycle acceptance path so worker-separation policy is enforced during lifecycle completion, not just documented.
+
+### Tests
+
+- Isolated scenario regression logs under per-user temp directories with unique `mktemp` outputs to avoid cross-user collisions on shared machines.
+- Re-verified targeted acceptance and scenario flows after the worker-separation and temp-log fixes.
+
 ## v12.0.0 - 2026-05-06
 
 ### Features

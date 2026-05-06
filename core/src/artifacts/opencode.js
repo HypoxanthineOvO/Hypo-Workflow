@@ -11,7 +11,7 @@ import {
   writeStructuredHabitsDocument,
 } from "../rules/index.js";
 
-const HW_VERSION = "11.1.0";
+const HW_VERSION = "13.0.0";
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(MODULE_DIR, "..", "..", "..");
 
