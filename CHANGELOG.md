@@ -1,5 +1,23 @@
 # Changelog
 
+## v12.0.1 - 2026-05-07
+
+### Features
+
+- Merged PR #2 worker separation policy for implement/test/audit ownership, acceptance readiness checks, and closed-loop validation planning guidance.
+- Isolated scenario regression logs under per-user temporary paths without depending on fixed `/tmp/hw-*` files.
+
+### Fixes
+
+- Fixed clean-checkout test behavior by generating Knowledge compact content inside the Knowledge Ledger gate test instead of requiring ignored compact artifacts to exist before tests run.
+- Bumped adapter and package metadata to `12.0.1`, including the OpenCode adapter package metadata.
+
+### Tests
+
+- `npm test --prefix core`: 315/315 passing after sync repair.
+- `python3 tests/run_regression.py`: 63/63 passing after sync repair.
+- Targeted unset-`USER` scenario checks passed for `s55` and `s63`.
+
 ## v12.0.0 - 2026-05-06
 
 ### Features

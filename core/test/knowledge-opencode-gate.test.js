@@ -5,6 +5,7 @@ import {
   decideOpenCodePermission,
   loadKnowledgeRecords,
   parseYaml,
+  renderKnowledgeCompact,
   shouldOpenCodeAutoContinue,
 } from "../src/index.js";
 
@@ -35,7 +36,7 @@ test("F001 gate has a real Knowledge Ledger record and generated context", async
     ".opencode/runtime/hypo-workflow-hooks.js",
   ]);
 
-  const compact = await readFile(".pipeline/knowledge/knowledge.compact.md", "utf8");
+  const { content: compact } = await renderKnowledgeCompact(".", { records });
   assert.match(compact, new RegExp(gateRecord.id));
   assert.match(compact, /F001 Knowledge and OpenCode integration gate/);
 

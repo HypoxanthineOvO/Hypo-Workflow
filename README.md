@@ -6,7 +6,7 @@
 
 规划 -> 执行 -> 审查 -> 报告 -> 恢复
 
-[![Version](https://img.shields.io/badge/version-12.0.0-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-12.0.1-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/reference/platforms.md)
 

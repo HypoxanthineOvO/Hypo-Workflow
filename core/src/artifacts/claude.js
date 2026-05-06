@@ -5,7 +5,7 @@ import { planClaudeCodexDelegation } from "../claude-codex/index.js";
 import { commandMap } from "../commands/index.js";
 import { buildModelPoolClaudeAgents, loadConfig } from "../config/index.js";
 
-const HW_VERSION = "11.1.0";
+const HW_VERSION = "12.0.1";
 
 export async function writeClaudeCodePluginArtifacts(outDir = ".", options = {}) {
   const pluginDir = join(outDir, ".claude-plugin");
