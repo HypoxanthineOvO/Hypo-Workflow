@@ -3,9 +3,9 @@ cycle:
   name: "Hypo-Workflow 配置治理、PR 管理、Explain 命令与 Claude Resume 修复"
   type: feature
   workflow_kind: build
-  status: active
+  status: completed
   started: "2026-05-06T23:49:17+08:00"
-  finished: null
+  finished: "2026-05-07T16:55:00+08:00"
   preset: tdd
   context_sources:
     - previous_cycle
@@ -22,9 +22,15 @@ cycle:
       default_action: continue_current
     gates:
       planning: auto
-      high_risk: auto
+      high_risk: confirm
       execution: auto
-      destructive_external: auto
-      plugin_install: auto
+      destructive_external: confirm
+      plugin_install: confirm
+      pr_remote_write: confirm
+      user_level_config: confirm
+      release_publish: confirm
     auto_continue: true
-  lessons: null
+  lessons:
+    - "Evidence-first commands must redact evidence before both packet storage and human-facing rendering."
+    - "PR/MR local archives are useful for review continuity, but remote writes must remain explicit human gates."
+    - "Claude native command names should not appear as bare Hypo skill names when a namespaced command exists."

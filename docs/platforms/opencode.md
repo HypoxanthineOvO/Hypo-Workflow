@@ -1,8 +1,8 @@
-# OpenCode Guide
+# OpenCode 指南
 
-Hypo-Workflow does not run project work itself; the host agent performs the work using `.pipeline/` files.
+Hypo-Workflow 不直接运行项目工作；宿主 Agent 读取 `.pipeline/` 文件并完成实际实现、测试和审查。
 
-## Capability Summary
+## 能力摘要
 
 - Commands: native-slash.
 - Ask gates: question-tool.
@@ -12,40 +12,41 @@ Hypo-Workflow does not run project work itself; the host agent performs the work
 - Rules/instructions: AGENTS.md-instructions.
 - Recovery: lease-heartbeat-plugin-events.
 
-## Install / Sync
+## 安装 / 同步
 
-Bootstrap a project with native OpenCode artifacts:
+用 native OpenCode artifacts 初始化项目：
 
 ```bash
 hypo-workflow init-project --platform opencode --project . --automation balanced
 ```
 
-Refresh an existing project:
+刷新已有项目：
 
 ```bash
 hypo-workflow sync --platform opencode --project . --repair
 ```
 
-## Supported Features
+## 支持能力
 
-- Reads `.pipeline/` state, config, Cycle, Rules/Habits, prompts, reports, logs, and review artifacts.
-- Uses the canonical `/hw:*` workflow vocabulary: init, plan, start/resume, status/report, sync/docs, rules, patch, release.
-- Preserves protected authority files unless the lifecycle command explicitly owns the write.
-- Generates native `/hw-*` slash command files.
-- Generates OpenCode role agents, plugin runtime files, status sidecars, and TUI/status config.
-- Uses native `question` for required decisions and `todowrite` for visible plan discipline.
-- Supports OpenCode provider/model matrix metadata without turning Hypo-Workflow into a runner.
+- 读取 `.pipeline/` state、config、Cycle、Rules/Habits、prompts、reports、logs 和 review artifacts。
+- 使用 canonical `/hw:*` workflow vocabulary：init、plan、start/resume、status/report、sync/docs、rules、patch、release。
+- 支持 `/hw:explain` 作为只读 evidence-first 问答命令，用于解释代码、配置、命令、报告和近期改动。
+- 除非生命周期命令明确拥有写入权，否则保护 protected authority files。
+- 生成 native `/hw-*` slash command files。
+- 生成 OpenCode role agents、plugin runtime files、status sidecars 和 TUI/status config。
+- 用 native `question` 处理必要决策，用 `todowrite` 保持可见计划纪律。
+- 支持 OpenCode provider/model matrix metadata，但不把 Hypo-Workflow 变成 runner。
 
-## Boundaries
+## 边界
 
-- Hypo-Workflow is not a runner; the host agent performs implementation, tests, and review.
-- `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/rules.yaml` are protected authority files.
-- External installs, user-level config writes, destructive commands, and network side effects require explicit confirmation.
-- OpenCode-specific events and plugins are additive; Codex and Claude Code behavior must not depend on them.
+- Hypo-Workflow 不是 runner；implementation、tests 和 review 由宿主 Agent 执行。
+- `.pipeline/state.yaml`、`.pipeline/cycle.yaml` 和 `.pipeline/rules.yaml` 是 protected authority files。
+- External installs、user-level config writes、destructive commands 和 network side effects 必须显式确认。
+- OpenCode-specific events 和 plugins 是增量能力；Codex 和 Claude Code 行为不得依赖它们。
 
 ## Model Matrix
 
-OpenCode 负责实际模型调用；Hypo-Workflow only writes role-aware agent metadata and config defaults.
+OpenCode 负责实际模型调用；Hypo-Workflow 只写入 role-aware agent metadata 和 config defaults。
 
 ```yaml
 opencode:

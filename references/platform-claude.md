@@ -1,5 +1,9 @@
 # Platform Guide: Claude Code
 
+## 中文主体说明
+
+本规格描述 Hypo-Workflow 在 Claude Code 中的 plugin、hooks、agents、settings merge 和 resume 边界。Claude Code 的 plugin namespace 是 `hw`，因此 Hypo 命令应表现为 `/hw:*`；Claude native `/resume` 仍归 Claude Code 所有，Hypo workflow resume 只使用 `/hw:resume`。本文保留 hook event、SessionStart、PermissionRequest、settings、agent routing 等英文术语，便于和 Claude Code 配置文件精确对应。
+
 Use this reference when the pipeline runs inside Claude Code.
 
 ## Environment Shape
@@ -107,6 +111,8 @@ Key V3 behavior:
 
 - Stop Hook can block premature termination with `decision:block`
 - SessionStart reinjects pipeline state on startup, resume, and compact
+- Claude native `/resume` remains a Claude Code command. Hypo-Workflow resume is `/hw:resume`; the plugin must not expose or document bare `/resume` as a Hypo alias.
+- `hooks/hooks.json` `matcher: resume` is a SessionStart event matcher, not a user slash command.
 - InstructionsLoaded can observe `SKILL.md` loads without changing control flow
 
 Even in Claude Code, hooks should reinforce the state machine, not replace it.

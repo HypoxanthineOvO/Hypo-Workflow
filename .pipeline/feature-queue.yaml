@@ -1,5 +1,5 @@
 version: 1
-cycle_id: C8
+cycle_id: C9
 current_feature: null
 defaults:
   decompose_mode: upfront
@@ -8,111 +8,140 @@ defaults:
   default_gate: auto
 features:
   - id: F001
-    title: Rules/Habits Authority
+    title: 配置治理与默认配置组合
     priority: 10
     status: done
     gate: auto
     decompose_mode: upfront
     source: plan-discover
     workflow_kind: build
-    category: agent-service
-    desired_effect: Make structured Rules and Habits the durable authority for user preferences, project rules, Cycle-local rules, and generated instruction surfaces.
-    verification: Rule schema tests, rules summary output, generated habits/instruction artifacts, conflict resolution fixtures, and review evidence that platform adapters consume active rules.
+    category: docs-and-config
+    desired_effect: 把现有 project/global 配置、自动程度、严格程度、确认边界和平台差异整理成中文主体文档，并提供几组可直接理解的默认配置组合。
+    verification: 配置字段矩阵自检、默认组合 fixture、中文文档审查、配置校验脚本和核心测试。
     dependencies: []
     milestones:
       - id: M01
         status: done
-        title: Rules and Habits Authority Schema
-        prompt_file: 00-rules-habits-authority-schema.md
+        title: 配置字段盘点与严格度矩阵
+        prompt_file: .pipeline/prompts/00-configuration-field-audit-and-strictness-matrix.md
       - id: M02
         status: done
-        title: Rules Remember Capture and Confirmation Flow
-        prompt_file: 01-rules-remember-capture-and-confirmation-flow.md
-      - id: M03
-        status: done
-        title: Habits Documents and Cross-Platform Injection
-        prompt_file: 02-habits-documents-and-cross-platform-injection.md
+        title: 默认配置组合
+        prompt_file: .pipeline/prompts/01-default-configuration-profiles.md
   - id: F002
-    title: Default Agent Review
+    title: PR/MR 管理与本地归档
     priority: 20
     status: done
     gate: auto
     decompose_mode: upfront
     source: plan-discover
     workflow_kind: build
-    category: agent-service
-    desired_effect: Make independent Agent Review a default workflow behavior for plan, test, and implementation quality, with bounded repair loops and durable review artifacts.
-    verification: Review artifact schema tests, TDD step integration, needs_changes retry fixtures, hard-gate fixtures, and reports that show rule coverage and final verdicts.
+    category: collaboration
+    desired_effect: 新增统一的 Change Request 流程来处理已有 GitHub PR 或 GitLab MR，支持只读检查、审查、修复建议、手动合并边界和本地证据归档。
+    verification: PR/MR fixture、无远端写操作测试、本地归档 contract、人工确认门和文档审查。
     dependencies:
       - F001
     milestones:
+      - id: M03
+        status: done
+        title: Change Request 合同与本地归档
+        prompt_file: .pipeline/prompts/02-change-request-contract-and-local-archive.md
       - id: M04
         status: done
-        title: Review Artifact Schema and Directory Structure
-        prompt_file: 03-review-artifact-schema-and-directory-structure.md
+        title: 只读 inspect/review 流程
+        prompt_file: .pipeline/prompts/03-pr-mr-inspect-review-readonly-flow.md
       - id: M05
         status: done
-        title: Plan Test Code Review Gates
-        prompt_file: 04-plan-test-code-review-gates.md
-      - id: M06
-        status: done
-        title: Skill and Platform Artifact Review Coverage
-        prompt_file: 05-skill-and-platform-artifact-review-coverage.md
+        title: fix/merge/close 手动门
+        prompt_file: .pipeline/prompts/04-pr-mr-fix-merge-close-manual-gates.md
   - id: F003
-    title: Domain Pack Interface + RTL Pack
+    title: Evidence-first Explain 命令
     priority: 30
     status: done
     gate: auto
     decompose_mode: upfront
     source: plan-discover
     workflow_kind: build
-    category: agent-service
-    desired_effect: Design a general externalizable domain-pack boundary, then ship RTL as the first reference pack for Verilog/SystemVerilog/SpinalHDL planning and review.
-    verification: Domain manifest validation, local/built-in/external source resolution tests, Knowledge decision evidence, RTL checklist output, and RTL-aware test-profile/review fixtures.
+    category: explainability
+    desired_effect: 新增 `/hw:explain` 作为证据优先、只读、可引用文件/diff/log/report 的问答命令，并支持 `--subagent` 独立取证。
+    verification: 命令解析测试、只读行为测试、证据引用 fixture、Subagent evidence handoff 和中文文档。
     dependencies:
       - F001
-      - F002
     milestones:
+      - id: M06
+        status: done
+        title: Evidence-first Explain 合同
+        prompt_file: .pipeline/prompts/05-evidence-first-explain-contract.md
       - id: M07
         status: done
-        title: Domain Pack Boundary Protocol and Knowledge Decision
-        prompt_file: 06-domain-pack-boundary-protocol-and-knowledge-decision.md
+        title: `--subagent` 取证流程
+        prompt_file: .pipeline/prompts/06-explain-subagent-evidence-handoff.md
       - id: M08
         status: done
-        title: RTL Domain Pack Reference Implementation
-        prompt_file: 07-rtl-domain-pack-reference-implementation.md
-      - id: M09
-        status: done
-        title: RTL-Aware Planning Review and Test Integration
-        prompt_file: 08-rtl-aware-planning-review-and-test-integration.md
+        title: Explain 测试与文档
+        prompt_file: .pipeline/prompts/07-explain-tests-and-docs.md
   - id: F004
-    title: Claude Code Codex Plugin Support
+    title: Claude Resume 命名冲突修复
     priority: 40
     status: done
     gate: auto
     decompose_mode: upfront
     source: plan-discover
     workflow_kind: build
-    category: agent-service
-    desired_effect: Support the official OpenAI Codex plugin for Claude Code through capability detection, safe configuration, confirmed installation, and Codex implementation delegation.
-    verification: Official-plugin detection fixtures, Claude artifact generation tests, install-confirmation safety tests, Codex worker ownership records, and full adapter regression.
+    category: platform-adapter
+    desired_effect: 修复 Claude Code 内置 `/resume` 被自动补全或误路由到 Hypo `/hw:resume` 的冲突，明确 Claude 原生命令和 Hypo namespace 边界。
+    verification: Claude plugin/command alias fixture、生成 artifact 检查、Claude smoke 文档和插件验证。
+    dependencies:
+      - F001
+    milestones:
+      - id: M09
+        status: done
+        title: Claude `/resume` 冲突审计
+        prompt_file: .pipeline/prompts/08-claude-resume-conflict-audit.md
+      - id: M10
+        status: done
+        title: Claude 适配修复与烟测
+        prompt_file: .pipeline/prompts/09-claude-resume-adapter-fix-and-smoke.md
+  - id: F005
+    title: 中文主体文档治理
+    priority: 50
+    status: done
+    gate: auto
+    decompose_mode: upfront
+    source: plan-discover
+    workflow_kind: build
+    category: docs
+    desired_effect: 让给人看的 README 引用链、docs 和主要 references 保持中文主体，同时保留命令名、配置键、文件名和专有英文术语。
+    verification: README 链接遍历、中文主体检查、命令数量新鲜度、平台边界审查和 docs governance 测试。
     dependencies:
       - F001
       - F002
+      - F003
+      - F004
     milestones:
-      - id: M10
-        status: done
-        title: Official Codex Plugin Capability Detection
-        prompt_file: 09-official-codex-plugin-capability-detection.md
       - id: M11
         status: done
-        title: Claude Code Codex Delegation Routing
-        prompt_file: 10-claude-code-codex-delegation-routing.md
+        title: 人读文档中文主体化
+        prompt_file: .pipeline/prompts/10-chinese-human-docs-conversion.md
+  - id: F006
+    title: C9 总体验收
+    priority: 60
+    status: done
+    gate: auto
+    decompose_mode: upfront
+    source: plan-discover
+    workflow_kind: build
+    category: validation
+    desired_effect: 用 Agent Review、Subagent 审计、文档自检、全量回归和平台 smoke 验证 C9 可以交付。
+    verification: Focused tests、full Node tests、Python regression、config validation、sync check、Claude plugin validate、git diff check 和 review artifact。
+    dependencies:
+      - F001
+      - F002
+      - F003
+      - F004
+      - F005
+    milestones:
       - id: M12
         status: done
-        title: Confirmed Install and Multi-Worker Support
-        prompt_file: 11-confirmed-install-and-multi-worker-support.md
-      - id: M13
-        status: done
-        title: C8 Agent Review and Full Regression Readiness
-        prompt_file: 12-c8-agent-review-and-full-regression-readiness.md
+        title: C9 Agent Review 与全量回归
+        prompt_file: .pipeline/prompts/11-c9-agent-review-and-full-regression.md

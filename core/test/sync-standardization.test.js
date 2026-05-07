@@ -18,7 +18,7 @@ test("sync command map, skill, and OpenCode artifact are exposed", async () => {
   const root = await fixtureRoot();
   const result = await runProjectSync(root, { mode: "standard" });
 
-  assert.equal(commandMap("opencode").length, 36);
+  assert.equal(commandMap("opencode").length, 38);
   assert.equal(commandByCanonical("/hw:sync").opencode, "/hw-sync");
   assert.equal(commandByCanonical("/hw:sync").agent, "hw-build");
   assert.match(await readFile("skills/sync/SKILL.md", "utf8"), /--light/);

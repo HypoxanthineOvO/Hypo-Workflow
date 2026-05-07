@@ -1,6 +1,6 @@
-# Commands Reference
+# 命令参考
 
-Generated from `core/src/commands/index.js`. Current user command count: 36.
+本页由 `core/src/commands/index.js` 生成。当前用户命令数量：38。命令名、平台映射和 Skill 路径保留英文/代码格式。阅读时以 Canonical 列为用户入口，以 OpenCode 列为平台映射；新增或删除命令必须先修改 command registry，再刷新本页。
 
 | Canonical | OpenCode | Agent | Skill |
 |---|---|---|---|
@@ -26,6 +26,8 @@ Generated from `core/src/commands/index.js`. Current user command count: 36.
 | `/hw:docs` | `/hw-docs` | `hw-docs` | `skills/docs/SKILL.md` |
 | `/hw:patch` | `/hw-patch` | `hw-build` | `skills/patch/SKILL.md` |
 | `/hw:patch fix` | `/hw-patch-fix` | `hw-build` | `skills/patch/SKILL.md` |
+| `/hw:pr` | `/hw-pr` | `hw-review` | `skills/pr/SKILL.md` |
+| `/hw:explain` | `/hw-explain` | `hw-review` | `skills/explain/SKILL.md` |
 | `/hw:compact` | `/hw-compact` | `hw-compact` | `skills/compact/SKILL.md` |
 | `/hw:knowledge` | `/hw-knowledge` | `hw-compact` | `skills/knowledge/SKILL.md` |
 | `/hw:guide` | `/hw-guide` | `hw-plan` | `skills/guide/SKILL.md` |

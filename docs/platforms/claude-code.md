@@ -1,8 +1,8 @@
-# Claude Code Guide
+# Claude Code 指南
 
-Hypo-Workflow does not run project work itself; the host agent performs the work using `.pipeline/` files.
+Hypo-Workflow 不直接运行项目工作；宿主 Agent 读取 `.pipeline/` 文件并完成实际实现、测试和审查。
 
-## Capability Summary
+## 能力摘要
 
 - Commands: plugin-skill.
 - Ask gates: chat.
@@ -12,21 +12,21 @@ Hypo-Workflow does not run project work itself; the host agent performs the work
 - Rules/instructions: skill-files.
 - Recovery: lease-heartbeat-hooks.
 
-## Install / Sync
+## 安装 / 同步
 
-Validate a local checkout:
+校验本地 checkout：
 
 ```bash
 claude plugin validate /absolute/path/to/Hypo-Workflow
 ```
 
-Use the checkout as a development plugin:
+作为开发插件运行当前 checkout：
 
 ```bash
 claude --plugin-dir /absolute/path/to/Hypo-Workflow
 ```
 
-For persistent Claude Code installation, add the marketplace source and install the `hw` plugin from Claude Code:
+如需持久安装，在 Claude Code 内添加 marketplace source 并安装 `hw` plugin：
 
 ```text
 /plugin marketplace add HypoxanthineOvO/Hypo-Workflow
@@ -34,42 +34,46 @@ For persistent Claude Code installation, add the marketplace source and install 
 /reload-plugins
 ```
 
-Inside a project, generate project-local settings, hooks, agents, monitors, and metadata:
+在项目内生成 project-local settings、hooks、agents、monitors 和 metadata：
 
 ```bash
 hypo-workflow sync --platform claude-code --project .
 ```
 
-## Supported Features
+## 支持能力
 
-- Reads `.pipeline/` state, config, Cycle, Rules/Habits, prompts, reports, logs, and review artifacts.
-- Uses the canonical `/hw:*` workflow vocabulary: init, plan, start/resume, status/report, sync/docs, rules, patch, release.
-- Preserves protected authority files unless the lifecycle command explicitly owns the write.
-- Exposes `/hw:*` through the `hw` Claude Code plugin namespace.
-- Generates project-local hooks for SessionStart, Stop, PermissionRequest, compact resume, and progress/status refresh.
-- Generates Claude agents and routing metadata for plan, code, test, review, debug, docs, report, and compact roles.
-- Can optionally use the official OpenAI Codex plugin for implementation delegation after installed capability is detected.
+- 读取 `.pipeline/` state、config、Cycle、Rules/Habits、prompts、reports、logs 和 review artifacts。
+- 使用 canonical `/hw:*` workflow vocabulary：init、plan、start/resume、status/report、sync/docs、rules、patch、release。
+- 支持 `/hw:explain` 作为只读 evidence-first 问答命令，用于解释代码、配置、命令、报告和近期改动。
+- 除非生命周期命令明确拥有写入权，否则保护 protected authority files。
+- 通过 `hw` Claude Code plugin namespace 暴露 `/hw:*`。
+- 生成 project-local hooks，用于 SessionStart、Stop、PermissionRequest、compact resume 和 progress/status refresh。
+- 为 plan、code、test、review、debug、docs、report、compact 角色生成 Claude agents 和 routing metadata。
+- 检测到官方 OpenAI Codex plugin 已安装后，可选择性用于 implementation delegation。
 
-## Boundaries
+## 边界
 
-- Hypo-Workflow is not a runner; the host agent performs implementation, tests, and review.
-- `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/rules.yaml` are protected authority files.
-- External installs, user-level config writes, destructive commands, and network side effects require explicit confirmation.
-- Project settings are merged conservatively; user-owned settings conflicts must not be silently overwritten.
-- Codex plugin installation inside Claude Code is a separate explicit-confirmation flow.
+- Hypo-Workflow 不是 runner；implementation、tests 和 review 由宿主 Agent 执行。
+- `.pipeline/state.yaml`、`.pipeline/cycle.yaml` 和 `.pipeline/rules.yaml` 是 protected authority files。
+- External installs、user-level config writes、destructive commands 和 network side effects 必须显式确认。
+- Project settings 采用保守 merge；user-owned settings conflicts 不得静默覆盖。
+- Claude Code 内的 Codex plugin installation 是独立的 explicit-confirmation flow。
 
 ## Plugin Namespace
 
-The Claude Code plugin name is intentionally `hw`, so existing workflow skills surface as `/hw:*` commands.
+Claude Code plugin name 有意设为 `hw`，因此现有 workflow skills 以 `/hw:*` 命令暴露。
 
 - The adapter uses the root `skills/` directory and existing workflow skills.
 - It does not generate `skills/hw-*` alias skills.
+- Claude native `/resume` belongs to Claude Code; Hypo workflow resume is `/hw:resume`.
+- `skills/resume/SKILL.md` intentionally omits a bare `name: resume` frontmatter field so metadata does not suggest a `/resume` alias.
+- Hook `matcher: resume` means Claude SessionStart resume event, not a user slash command.
 - Settings are merged through project-local `settings.local_file` policy.
 - DeepSeek and Mimo may be used through Claude Code agent routing when configured; this is separate from Codex Subagents.
 
-## Optional OpenAI Codex Plugin Inside Claude Code
+## Claude Code 内的可选 OpenAI Codex Plugin
 
-This is separate from the Hypo-Workflow `hw` plugin. It enables Claude Code to delegate implementation work to the official OpenAI Codex plugin only after capability detection reports `installed`.
+这和 Hypo-Workflow 的 `hw` plugin 是两件事。只有 capability detection 报告 `installed` 后，Claude Code 才能把实现工作委托给官方 OpenAI Codex plugin。
 
 ```text
 /plugin marketplace add openai/codex-plugin-cc
@@ -78,4 +82,4 @@ This is separate from the Hypo-Workflow `hw` plugin. It enables Claude Code to d
 /codex:setup
 ```
 
-Hypo-Workflow may render this as a confirmation proposal, but it must not execute these slash commands automatically.
+Hypo-Workflow 可以把这些命令渲染成确认提案，但不得自动执行这些 slash commands。

@@ -17,7 +17,7 @@ test("writeClaudeCodePluginArtifacts renders hw namespace plugin metadata", asyn
   const monitors = JSON.parse(await readFile(join(dir, "monitors", "monitors.json"), "utf8"));
   const marketplace = JSON.parse(await readFile(join(dir, ".claude-plugin", "marketplace.json"), "utf8"));
 
-  assert.equal(commands.length, 36);
+  assert.equal(commands.length, 38);
   assert.equal(plugin.name, "hw");
   assert.equal(plugin.skills, "./skills/");
   assert.equal(plugin.monitors, "./monitors/monitors.json");
@@ -52,10 +52,13 @@ test("Claude Code platform docs explain hw namespace without replacing existing 
   const guide = await readFile("docs/platforms/claude-code.md", "utf8");
   const commandSpec = await readFile("references/commands-spec.md", "utf8");
 
-  assert.match(guide, /plugin name is intentionally `hw`/);
-  assert.match(guide, /existing workflow skills/s);
-  assert.match(guide, /root `skills\/` directory/);
-  assert.match(guide, /does not generate `skills\/hw-\*` alias skills/);
+  assert.match(guide, /plugin name .*`hw`|plugin name 有意设为 `hw`/s);
+  assert.match(guide, /existing workflow skills|现有 workflow skills/s);
+  assert.match(guide, /root `skills\/` directory|root `skills\/`/);
+  assert.match(guide, /does not generate `skills\/hw-\*` alias skills|不生成 `skills\/hw-\*`/);
+  assert.match(guide, /Claude native `\/resume`/);
+  assert.match(guide, /Hypo workflow resume is `\/hw:resume`/);
   assert.match(commandSpec, /namespace is `hw`/s);
   assert.match(commandSpec, /existing Hypo-Workflow skill files/s);
+  assert.match(commandSpec, /native `\/resume` remains owned by Claude Code/);
 });

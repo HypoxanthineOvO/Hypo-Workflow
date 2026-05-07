@@ -1,163 +1,102 @@
-# Architecture Baseline - C8 Rules, Review, RTL, and Codex Plugin
+# Architecture Baseline - C9 配置治理、PR/MR、Explain 与 Claude Resume
 
 ## Current Baseline
 
-- Active Cycle: C8, "Hypo-Workflow 体验优化：Rules、自审、RTL 与 Codex Plugin".
-- Workflow kind: build.
-- Preset: tdd.
-- `.pipeline/` remains the source of truth for Cycle, state, feature queue, rules, reviews, progress, logs, prompts, reports, metrics, Knowledge, patches, and archives.
-- Hypo-Workflow remains a planning, synchronization, adapter-generation, and governance system. It is not a model-calling runner.
-- Codex, OpenCode, and Claude Code behavior must remain host-native. C8 adds guidance, files, checks, and adapters without taking over runtime execution.
-- C8 uses Feature Queue planning with four serial Features and thirteen Milestones.
+- Active Cycle: C9, "Hypo-Workflow 配置治理、PR 管理、Explain 命令与 Claude Resume 修复"。
+- Workflow kind: build。
+- Preset: tdd。
+- `.pipeline/` 继续作为 Cycle、state、Feature Queue、rules、progress、logs、prompts、reports、reviews、metrics、Knowledge、patches 和 archives 的 source of truth。
+- Hypo-Workflow 不是 runner；它生成计划、命令协议、文档、adapter、审查证据和恢复指针，实际工作由宿主 Agent 执行。
+- C9 使用 Feature Queue，6 个 Feature，12 个 serial Milestone。
 
 ## Architecture Direction
 
-C8 adds four layers above the existing workflow:
+C9 增加四条用户可见能力线：
 
-1. **Rules/Habits Authority Layer**: structured rules are the canonical source, and Markdown/instruction files are generated views.
-2. **Agent Review Layer**: plan, test, and implementation review produce durable `.pipeline/reviews/` evidence and bounded repair proposals.
-3. **Domain Pack Layer**: domain-specific planning/review/test behavior is loaded from packs instead of hardcoded into core.
-4. **Claude Codex Delegation Layer**: Claude Code may delegate implementation work through OpenAI's official Codex plugin when detected and confirmed.
-
-## Source-Of-Truth Rules
-
-- Built-in rules remain under `rules/builtin/` and `rules/presets/`.
-- Project severity overrides remain in `.pipeline/rules.yaml`.
-- New structured user/project/cycle rules should live under a dedicated rules authority path designed in F001.
-- Generated habits Markdown and platform instruction text are derived artifacts, not authority.
-- Scope precedence is `cycle > project > global > builtin`.
-- Review reports must show active rules, overridden rules, and rules that could not be automatically checked.
-
-## Review Artifacts
-
-Review artifacts are durable evidence, not chat-only commentary.
-
-Expected layout:
-
-```text
-.pipeline/reviews/
-  <feature-slug>/
-    <milestone-id>/
-      plan/
-      tests/
-      code/
-```
-
-Each review should record:
-
-- reviewed files and prompt/report refs;
-- active rule/habit ids;
-- subagent or local reviewer identity;
-- raw notes or transcript when available;
-- verdict and issue list;
-- repair proposal;
-- retry round and final decision;
-- fallback reason when a host cannot provide a requested reviewer.
-
-Default review loop:
-
-- `pass`: continue.
-- `warn`: continue and record.
-- `needs_changes`: main Agent repairs and repeats review, up to 3 total rounds.
-- `critical`: follow configured strictness; strict profiles block, default mode attempts repair before escalation.
-
-## Domain Pack Boundary
-
-Domain packs declare reusable domain behavior. Core should consume a manifest and declared assets instead of special-casing one domain.
-
-Candidate load order:
-
-1. project-local packs under `.pipeline/domains/`;
-2. built-in packs under `domains/`;
-3. external packs resolved from a future trusted local path, git ref, or marketplace id.
-
-Manifest concepts:
-
-- pack id, version, title, description, and trust level;
-- supported languages and file globs;
-- Discover questions;
-- prompt snippets;
-- test profile requirements;
-- review checklists;
-- tool probes;
-- docs and examples;
-- install source and confirmation requirements.
-
-Remote or user-level pack installation requires explicit confirmation. RTL must be implemented as a reference pack, not a hardcoded core behavior.
-
-## RTL Reference Pack
-
-The C8 RTL pack should cover the first useful slice:
-
-- Verilog/SystemVerilog/SpinalHDL terminology;
-- combinational and sequential logic distinctions;
-- clock, reset, stimulus, expected behavior, and simulation evidence prompts;
-- testbench and simulator-oriented validation strategy;
-- common tool probes without vendor-specific lock-in.
-
-Out of scope:
-
-- formal verification;
-- CDC;
-- timing closure and synthesis constraints;
-- vendor-specific FPGA/ASIC flow automation.
-
-## Claude Code Codex Plugin Layer
-
-C8 must support OpenAI's official `codex-plugin-cc` safely:
-
-- detect installation and version/path where possible;
-- generate project-local configuration and install guidance;
-- require explicit confirmation before user-level or remote installation;
-- route implementation tasks to Codex when the plugin path is available;
-- keep test and review independent from implementation;
-- allow multiple Codex workers only with disjoint ownership;
-- record fallback reasons when plugin or multi-worker support is unavailable.
+1. **Configuration Governance**：把散落在 config、Cycle、rules、analysis、automation、review 和 platform profile 中的边界整理为中文可读矩阵。
+2. **Change Request Workflow**：用 `/hw:pr` 处理已有 GitHub PR / GitLab MR，并在 `.pipeline/pr/` 留下本地归档。
+3. **Evidence-first Explain**：用 `/hw:explain` 回答代码、配置、变更和命令问题，默认查证据，支持 `--subagent` 独立取证。
+4. **Claude Resume Namespace Boundary**：修复 Claude Code 原生 `/resume` 和 Hypo `/hw:resume` 的自动补全/路由歧义。
 
 ## Expected Code Areas
 
-- `references/rules-spec.md`
-- `skills/rules/SKILL.md`
-- `core/src/rules/`
-- `rules/template/`
-- `core/test/*rules*.test.js`
-- `references/tdd-spec.md`
-- `references/plan-review-spec.md`
-- new review contract references and tests
-- new `.pipeline/reviews/` examples or templates
-- new domain pack reference/spec files
-- new `domains/rtl/` reference pack
-- `core/src/test-profile/`
-- `core/src/progressive-discover/`
+- `references/config-spec.md`
+- `docs/user-guide.md`
+- `docs/developer.md`
+- `docs/reference/*.md`
+- `docs/platforms/*.md`
+- `references/commands-spec.md`
+- `references/platform-claude.md`
+- `references/platform-capabilities.md`
+- new PR/MR reference contract, likely `references/pr-spec.md`
+- new Explain reference contract, likely `references/explain-spec.md`
+- new or updated skills under `skills/pr/`, `skills/explain/`, `skills/resume/`
+- `.claude-plugin/plugin.json`
+- `core/src/commands/`
+- `core/src/docs/`
 - `core/src/artifacts/claude.js`
-- `core/src/artifacts/opencode.js`
-- Codex/OpenCode/Claude adapter tests and sync output fixtures
-- Knowledge Ledger records and indexes
+- `core/src/claude-*`
+- `core/test/*config*.test.js`
+- `core/test/*pr*.test.js`
+- `core/test/*explain*.test.js`
+- `core/test/*claude*resume*.test.js`
+- `core/test/docs-governance.test.js`
+- `.opencode/commands/` and generated command map when new commands are added
+
+## Source-Of-Truth Boundaries
+
+- `.pipeline/config.yaml` and `~/.hypo-workflow/config.yaml` define effective configuration, but docs must explain project > global > default precedence.
+- `.pipeline/cycle.yaml` defines Cycle-local lifecycle policy and must not be silently overwritten.
+- `.pipeline/pr/` stores PR/MR local evidence. It does not replace GitHub/GitLab as remote source of truth.
+- `/hw:explain` is read-only. It must not update state, create patches, or advance workflow unless a future explicit flag is designed.
+- Claude Code native `/resume` belongs to Claude. Hypo-Workflow owns only `/hw:resume` and exact `hw` namespace entries.
+
+## Review And Evidence
+
+C9 requires durable review artifacts for generated plan and final delivery:
+
+```text
+.pipeline/reviews/
+  C9-plan-generation/
+    subagent-audit/
+  F002-pr/
+    M03/
+  F003-explain/
+    M07/
+  F006-validation/
+    M12/
+```
+
+Every new command contract should record:
+
+- command name and supported flags;
+- read/write side effects;
+- protected file writes;
+- network/remote behavior;
+- user confirmation gates;
+- fixture-based validation;
+- documentation and adapter generation requirements.
 
 ## Milestone Strategy
 
-C8 uses thirteen serial Milestones:
-
-1. Rules and Habits Authority Schema.
-2. Rules Remember Capture and Confirmation Flow.
-3. Habits Documents and Cross-Platform Injection.
-4. Review Artifact Schema and Directory Structure.
-5. Plan Test Code Review Gates.
-6. Skill and Platform Artifact Review Coverage.
-7. Domain Pack Boundary Protocol and Knowledge Decision.
-8. RTL Domain Pack Reference Implementation.
-9. RTL-Aware Planning Review and Test Integration.
-10. Official Codex Plugin Capability Detection.
-11. Claude Code Codex Delegation Routing.
-12. Confirmed Install and Multi-Worker Support.
-13. C8 Agent Review and Full Regression Readiness.
+1. M01 配置字段盘点与严格度矩阵。
+2. M02 默认配置组合。
+3. M03 Change Request 合同与本地归档。
+4. M04 只读 inspect/review 流程。
+5. M05 fix/merge/close 手动门。
+6. M06 Evidence-first Explain 合同。
+7. M07 `--subagent` 取证流程。
+8. M08 Explain 测试与文档。
+9. M09 Claude `/resume` 冲突审计。
+10. M10 Claude 适配修复与烟测。
+11. M11 人读文档中文主体化。
+12. M12 C9 Agent Review 与全量回归。
 
 ## Cross-Cutting Constraints
 
-- Do not degrade existing Codex, OpenCode, Claude Code, Cursor, Copilot, or Trae adapter output.
-- Do not silently mutate user-level Claude or Codex configuration.
-- Do not install remote resources, user-level plugins, or external packs without explicit confirmation.
-- Keep protected authority writes scoped and lifecycle-aware.
-- Keep raw secrets out of logs, reports, Knowledge, review artifacts, and generated instructions.
-- Keep generated Markdown concise enough for agent context while preserving structured authority for checks.
-- Preserve the rule that Hypo-Workflow is not a runner.
+- 不自动安装插件、改 user-level config、push、merge、close、publish 或执行远端写操作。
+- PR/MR live remote 读取受网络/remote boundary 约束，测试默认用 fixture/mock。
+- Explain 输出必须引用证据或声明无法确认。
+- 文档中文化不得改变命令、配置键和 schema field 的精确拼写。
+- 新命令必须更新 command map、help、platform docs、generated artifacts 和 adapter surfaces。
+- 所有用户可见说明按 `output.language=zh-CN`。

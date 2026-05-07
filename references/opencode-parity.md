@@ -23,6 +23,6 @@ V9 OpenCode support targets V8.4 user-facing parity through native slash command
 | Guide | `/hw-guide` | `hw-plan` | Interactive project-aware guide using Ask/question. |
 | Rules | `/hw-rules` | `hw-status` | Rules listing, severity, custom rules, and packs. |
 
-All 36 user-facing commands remain traceable in `references/opencode-command-map.md`.
+All 38 user-facing commands remain traceable in `references/opencode-command-map.md`.
 
 Model matrix routing is additive to V8.4 parity. It changes generated OpenCode agent selection for compact/debug/report roles, but it does not make Hypo-Workflow a runner or move model invocation out of OpenCode.

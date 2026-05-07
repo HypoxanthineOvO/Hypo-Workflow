@@ -78,6 +78,8 @@ See also [`external-docs-index.md`](./external-docs-index.md) for the cross-plat
 | `/hw:docs` | `/hw-docs` | `hw-docs` | Native slash command, generated documentation governance. |
 | `/hw:patch` | `/hw-patch` | `hw-build` | Native slash command group; file lifecycle stays HW-specific. |
 | `/hw:patch fix` | `/hw-patch-fix` | `hw-build` | Native slash command, six-step patch repair lane. |
+| `/hw:pr` | `/hw-pr` | `hw-review` | Native slash command, manual-gated PR/MR Change Request flow. |
+| `/hw:explain` | `/hw-explain` | `hw-review` | Native slash command, evidence-first explanation with unknowns. |
 | `/hw:compact` | `/hw-compact` | `hw-compact` | Native slash command, compact generator. |
 | `/hw:knowledge` | `/hw-knowledge` | `hw-compact` | Native slash command, Knowledge Ledger compact/index inspection. |
 | `/hw:guide` | `/hw-guide` | `hw-plan` | Native slash command, question-driven onboarding. |

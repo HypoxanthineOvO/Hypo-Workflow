@@ -1,12 +1,12 @@
 ---
 name: hypo-workflow
-version: 11.1.0
-description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:plan`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
+version: 12.1.0
+description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:plan`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
 ---
 
-# Hypo-Workflow v11.1.0
+# Hypo-Workflow v12.1.0
 
-> **Claude Code 用户**：请使用 `/hypo-workflow:<command>` 调用具体指令。输入 `/hypo-workflow:help` 查看全部 36 个用户指令。
+> **Claude Code 用户**：请使用 `/hypo-workflow:<command>` 调用具体指令。输入 `/hypo-workflow:help` 查看全部 38 个用户指令。
 >
 > **Codex 用户**：本文件是完整的 Skill 入口，继续使用 `/hw:*` 指令。
 
@@ -36,6 +36,8 @@ description: Run a serialized prompt execution pipeline from a local `.pipeline/
 | `/hw:docs` | Generate, check, repair, and sync documentation |
 | `/hw:patch` | Create, list, close, and `fix` persistent lightweight Patches |
 | `/hw:patch fix` | Execute the lightweight six-step Patch repair lane |
+| `/hw:pr` | Inspect, review, fix, merge, or close existing GitHub PRs / GitLab MRs through local archives |
+| `/hw:explain` | Answer code, config, command, or recent-change questions with cited local evidence |
 | `/hw:compact` | Generate `.compact` context views for large runtime files |
 | `/hw:knowledge` | Inspect Knowledge Ledger records, indexes, compact summaries, and secret references |
 | `/hw:guide` | Start an interactive guide that recommends the next command path |
@@ -190,6 +192,8 @@ Use these bundled files when relevant:
 - [`skills/guide/SKILL.md`](./skills/guide/SKILL.md)
 - [`skills/showcase/SKILL.md`](./skills/showcase/SKILL.md)
 - [`skills/rules/SKILL.md`](./skills/rules/SKILL.md)
+- [`skills/pr/SKILL.md`](./skills/pr/SKILL.md)
+- [`skills/explain/SKILL.md`](./skills/explain/SKILL.md)
 
 ## Supported Commands
 
@@ -237,6 +241,10 @@ Handle these commands directly:
   Load [`skills/sync/SKILL.md`](./skills/sync/SKILL.md). Run light, standard, or deep project sync without executing pipeline milestones. SessionStart may only run light external-change detection.
 - `/hw:patch`
   Load [`skills/patch/SKILL.md`](./skills/patch/SKILL.md). Manage persistent lightweight patches under `.pipeline/patches/`. Support `/hw:patch fix P001 [P...]` for the lightweight six-step fix lane.
+- `/hw:pr`
+  Load [`skills/pr/SKILL.md`](./skills/pr/SKILL.md). Handle existing GitHub PRs or GitLab MRs through a local `.pipeline/pr/` Change Request archive. Support `inspect`, `review`, `fix`, `merge`, and `close`; remote writes require explicit confirmation.
+- `/hw:explain`
+  Load [`skills/explain/SKILL.md`](./skills/explain/SKILL.md). Answer natural-language questions using cited local evidence. Stay read-only and report `unknown` or `needs_context` when evidence is missing.
 - `/hw:compact`
   Load [`skills/compact/SKILL.md`](./skills/compact/SKILL.md). Generate `.compact` context views for PROGRESS, state, log, reports, and closed patches without mutating source files.
 - `/hw:knowledge`
@@ -254,7 +262,7 @@ Handle these commands directly:
 
 If a command starts with `/hw:` and is not listed above, return:
 
-`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:patch, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 
 Slash commands are exact and take precedence over fuzzy natural-language matching. Detailed parsing and option semantics live in [`references/commands-spec.md`](./references/commands-spec.md).
 

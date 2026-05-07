@@ -45,8 +45,8 @@ mapping_count="$(
   ' references/opencode-spec.md
 )"
 
-test "$mapping_count" = "36" || {
-  echo "expected 36 OpenCode command mappings, found $mapping_count" >&2
+test "$mapping_count" = "38" || {
+  echo "expected 38 OpenCode command mappings, found $mapping_count" >&2
   exit 1
 }
 
@@ -55,7 +55,7 @@ for cmd in \
   "/hw:plan" "/hw:plan:discover" "/hw:plan:decompose" "/hw:plan:generate" \
   "/hw:plan:confirm" "/hw:plan:extend" "/hw:plan:review" "/hw:cycle" \
   "/hw:accept" "/hw:reject" "/hw:explore" "/hw:sync" "/hw:docs" \
-  "/hw:patch" "/hw:patch fix" "/hw:compact" "/hw:knowledge" "/hw:guide" "/hw:showcase" \
+  "/hw:patch" "/hw:patch fix" "/hw:pr" "/hw:explain" "/hw:compact" "/hw:knowledge" "/hw:guide" "/hw:showcase" \
   "/hw:rules" "/hw:init" "/hw:check" "/hw:audit" "/hw:release" "/hw:debug" \
   "/hw:help" "/hw:reset" "/hw:log" "/hw:setup"
 do
@@ -84,7 +84,7 @@ for term in "not a runner" "hypo-workflow" "plugins/opencode" "core/"; do
   }
 done
 
-grep -Fq "36 个用户指令" README.md || {
+grep -Fq "38 个用户指令" README.md || {
   echo "README.md missing current command count" >&2
   exit 1
 }

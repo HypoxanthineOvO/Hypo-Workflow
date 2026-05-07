@@ -1,5 +1,5 @@
 pipeline:
-  name: "Hypo-Workflow 体验优化：Rules、自审、RTL 与 Codex Plugin"
+  name: "C9 Hypo-Workflow 配置治理、PR 管理、Explain 命令与 Claude Resume 修复"
   source: local
   output: local
   prompts_dir: .pipeline/prompts

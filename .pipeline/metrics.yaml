@@ -1,95 +1,100 @@
-cycle_id: C8
+cycle_id: C9
 cycles:
-  - id: C8
-    status: done
-    updated_at: "2026-05-06T17:30:03+08:00"
+  - id: C9
+    status: planned
+    updated_at: "2026-05-07T14:38:47+08:00"
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
     currency: telemetry_unavailable
 features:
   - id: F001
-    title: Rules/Habits Authority
-    status: done
+    title: 配置治理与默认配置组合
+    status: planned
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: F002
-    title: Default Agent Review
-    status: done
+    title: PR/MR 管理与本地归档
+    status: planned
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: F003
-    title: Domain Pack Interface + RTL Pack
-    status: done
+    title: Evidence-first Explain 命令
+    status: planned
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: F004
-    title: Claude Code Codex Plugin Support
-    status: done
+    title: Claude Resume 命名冲突修复
+    status: planned
+    token_count: telemetry_unavailable
+    cost: telemetry_unavailable
+  - id: F005
+    title: 中文主体文档治理
+    status: planned
+    token_count: telemetry_unavailable
+    cost: telemetry_unavailable
+  - id: F006
+    title: C9 总体验收
+    status: planned
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
 milestones:
   - id: M01
     feature_id: F001
-    status: done
+    status: pending
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: M02
     feature_id: F001
-    status: done
+    status: pending
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: M03
-    feature_id: F001
-    status: done
+    feature_id: F002
+    status: pending
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: M04
     feature_id: F002
-    status: done
+    status: pending
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: M05
     feature_id: F002
-    status: done
+    status: pending
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: M06
-    feature_id: F002
-    status: done
+    feature_id: F003
+    status: pending
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: M07
     feature_id: F003
-    status: done
+    status: pending
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: M08
     feature_id: F003
-    status: done
+    status: pending
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: M09
-    feature_id: F003
-    status: done
+    feature_id: F004
+    status: pending
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: M10
     feature_id: F004
-    status: done
+    status: pending
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: M11
-    feature_id: F004
-    status: done
+    feature_id: F005
+    status: pending
     token_count: telemetry_unavailable
     cost: telemetry_unavailable
   - id: M12
-    feature_id: F004
-    status: done
-    token_count: telemetry_unavailable
-    cost: telemetry_unavailable
-  - id: M13
-    feature_id: F004
-    status: done
+    feature_id: F006
+    status: pending
     token_count: telemetry_unavailable
     cost: telemetry_unavailable

@@ -11,7 +11,7 @@ import {
   writeStructuredHabitsDocument,
 } from "../rules/index.js";
 
-const HW_VERSION = "12.0.1";
+const HW_VERSION = "12.1.0";
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(MODULE_DIR, "..", "..", "..");
 
@@ -186,6 +186,9 @@ function commandSpecificGuidance(command) {
   }
   if (command.canonical === "/hw:chat") {
     return "\nChat lane:\n- reload `state.yaml + cycle.yaml + PROGRESS.md + recent report`\n- write chat entries instead of Milestone reports\n- keep small edits lightweight\n- suggest `/hw:patch` when scope grows beyond append conversation\n";
+  }
+  if (command.canonical === "/hw:explain") {
+    return "\nExplain lane:\n- stay read-only and evidence-first\n- cite local files, reports, logs, or diff context before answering\n- use `--subagent` for independent evidence collection when available\n- if Subagent support is unavailable, record `fallback_reason` and continue in self evidence-first mode\n- answer unknowns explicitly instead of inventing unsupported details\n";
   }
   if (command.canonical === "/hw:showcase") {
     return "\nShowcase lane: Agent generates showcase artifacts; the plugin only provides context and file guard support.\n";

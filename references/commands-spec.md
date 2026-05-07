@@ -1,5 +1,9 @@
 # Commands Spec
 
+## 中文主体说明
+
+本规格定义 Hypo-Workflow 的命令命名空间、解析规则和各命令的行为边界。用户可见的 Hypo 命令必须使用 `/hw:` 前缀；Claude Code 原生 `/resume` 属于 Claude Code，不是 Hypo `/hw:resume` 的别名。本文保留 command、flag、config key、file path 等英文术语，便于 Agent 和测试精确引用。
+
 Use this reference when the user's message starts with `/hw:` or when exact command parsing matters more than fuzzy natural-language intent matching.
 
 ## Namespace
@@ -7,7 +11,8 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 - all explicit Hypo-Workflow commands use the `/hw:` prefix
 - Claude Code exposes canonical commands through a plugin whose namespace is `hw`; the existing workflow skills remain authoritative and must not be duplicated into a second implementation
 - Claude Code `/hw:*` entries are plugin-skill entrypoints for the existing Hypo-Workflow skill files
-- V10.1 canonical namespace contains 36 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, and Utility groups, plus an internal cron-only watchdog skill
+- Claude Code native `/resume` remains owned by Claude Code; Hypo-Workflow must never register or document bare `/resume` as an alias for `/hw:resume`
+- V12 canonical namespace contains 38 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups, plus an internal cron-only watchdog skill
 - slash commands are exact and namespace-scoped
 - slash commands take precedence over fuzzy natural-language matching
 - natural-language commands remain valid for backward compatibility
@@ -51,10 +56,12 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
    - `/hw:sync`
    - `/hw:docs`
    - `/hw:patch`
+   - `/hw:pr`
+   - `/hw:explain`
 3. parse remaining tokens as command arguments
 4. flags are order-independent
 5. if a command is unknown, return exactly:
-   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:docs, /hw:patch, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 6. if a known command receives an unsupported flag, stop and report the unsupported flag explicitly instead of guessing
 7. if a prompt selector is ambiguous, list the candidates and stop
 8. plan and review commands load `plan/PLAN-SKILL.md` before execution
@@ -230,7 +237,7 @@ Supported forms:
 Behavior:
 
 - read `SKILL.md` command tables as the source of truth
-- `/hw:help` lists all 36 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, and Utility
+- `/hw:help` lists all 38 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility
 - `/hw:help --quick` returns a compact cheat sheet
 - `/hw:help <cmd>` returns detailed usage, flags, and examples for the requested command
 
@@ -595,6 +602,47 @@ Behavior:
 - keep Patches outside Cycle archives
 - close patches by updating status without deleting notes
 - fix patches through the six-step lightweight lane in `skills/patch/SKILL.md`; never write `state.yaml` or generate `report.md` for Patch fix
+
+### `/hw:pr`
+
+Supported forms:
+
+- `/hw:pr inspect <url|id>`
+- `/hw:pr review <url|id>`
+- `/hw:pr fix <url|id>`
+- `/hw:pr merge <url|id>`
+- `/hw:pr close <url|id>`
+
+Behavior:
+
+- load `skills/pr/SKILL.md`
+- normalize GitHub Pull Request and GitLab Merge Request inputs into one Change Request shape
+- store local archives under `.pipeline/pr/PR-YYYYMMDD-NNN/`
+- write `request.yaml`, `summary.md`, `review-notes.md`, `changes.md`, `decisions.yaml`, and `evidence/`
+- keep `.pipeline/pr/` as local evidence, not the remote source of truth
+- `inspect` and `review` are remote-readonly except for local archive writes
+- `fix` may record local changes and tests, but must not push
+- `merge` and `close` require explicit confirmation before remote writes
+- `/hw:pr create` is reserved for future design
+
+### `/hw:explain`
+
+Supported forms:
+
+- `/hw:explain [question]`
+- `/hw:explain --file <path> [question]`
+- `/hw:explain --diff [question]`
+- `/hw:explain --report M<N> [question]`
+
+Behavior:
+
+- load `skills/explain/SKILL.md`
+- build an evidence packet before answering
+- read explicit local targets first, then relevant source/test/docs/pipeline context
+- cite files, reports, diffs, logs, or reviews used as evidence
+- default to read-only and never advance Cycle, create Patch, mutate state/log, or write remote state
+- if evidence is missing, answer with `needs_context` or `unknown` instead of inventing a cause
+- `--subagent` requests independent read-only evidence collection; when unavailable, record `fallback_reason` and continue in evidence-first self mode
 
 ### `/hw:compact`
 

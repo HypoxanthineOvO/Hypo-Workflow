@@ -65,7 +65,7 @@ test("setup and help do not route Codex Subagents to external providers", async 
   const setup = await readFile(SETUP_SKILL, "utf8");
   const combined = `${help}\n${setup}`;
 
-  assert.match(help, /36 user-facing Hypo-Workflow commands/i);
+  assert.match(help, /38 user-facing Hypo-Workflow commands/i);
   assert.match(combined, /Codex Subagents are Codex\/GPT runtime workers/i);
   assert.doesNotMatch(combined, /Codex can configure Claude as the subagent provider/i);
   assert.doesNotMatch(combined, /configure Claude as a subagent/i);

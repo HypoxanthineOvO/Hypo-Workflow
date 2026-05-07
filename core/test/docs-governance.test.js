@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
   checkDocs,
+  checkDocsLanguage,
   checkNarrativeDocsForRelease,
   commandByCanonical,
   commandMap,
@@ -13,7 +14,7 @@ import {
 } from "../src/index.js";
 
 test("docs command is exposed and mapped to OpenCode", async () => {
-  assert.equal(commandMap("opencode").length, 36);
+  assert.equal(commandMap("opencode").length, 38);
   assert.equal(commandByCanonical("/hw:docs").opencode, "/hw-docs");
   assert.equal(commandByCanonical("/hw:docs").agent, "hw-docs");
   assert.equal(commandByCanonical("/hw:docs").skill, "skills/docs/SKILL.md");
@@ -25,6 +26,7 @@ test("docs map defines ownership, generated references, and narrative policy", (
   const readme = map.documents.find((doc) => doc.path === "README.md");
   const commands = map.documents.find((doc) => doc.path === "docs/reference/commands.md");
   const userGuide = map.documents.find((doc) => doc.path === "docs/user-guide.md");
+  const configuration = map.documents.find((doc) => doc.path === "docs/reference/configuration.md");
 
   assert.equal(readme.role, "concise_user_entrypoint");
   assert.equal(readme.narrative_update_policy, "explicit_repair");
@@ -32,6 +34,8 @@ test("docs map defines ownership, generated references, and narrative policy", (
   assert.equal(commands.update_class, "generated_reference");
   assert.ok(commands.sources.includes("core/src/commands/index.js"));
   assert.equal(userGuide.role, "full_user_guide");
+  assert.equal(configuration.role, "configuration_governance_reference");
+  assert.ok(configuration.sources.includes("references/config-spec.md"));
 });
 
 test("docs check rejects README internals, stale commands, and missing license links", async () => {
@@ -64,12 +68,53 @@ test("docs repair writes docs IA and generated references without silently rewri
   const result = await repairDocs(root, { write: true });
 
   assert.ok(result.generated.includes("docs/reference/commands.md"));
+  assert.ok(result.generated.includes("docs/reference/configuration.md"));
   assert.ok(result.generated.includes("docs/user-guide.md"));
   assert.ok(result.generated.includes("docs/platforms/opencode.md"));
   assert.ok(result.managed_blocks.includes("command-count"));
   assert.match(await readFile(join(root, "README.md"), "utf8"), /Manual README/);
-  assert.match(await readFile(join(root, "README.md"), "utf8"), /36 个用户指令/);
+  assert.match(await readFile(join(root, "README.md"), "utf8"), /38 个用户指令/);
   assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:docs/);
+  assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:pr/);
+  assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:explain/);
+  assert.match(await readFile(join(root, "docs/user-guide.md"), "utf8"), /\/hw:explain --subagent/);
+  assert.match(await readFile(join(root, "docs/reference/configuration.md"), "utf8"), /automation\.gates\.destructive_external/);
+});
+
+test("configuration governance reference covers automation, strictness, and hard gates", async () => {
+  const content = await readFile("docs/reference/configuration.md", "utf8");
+  const required = [
+    "automation.level",
+    "automation.gates.planning",
+    "automation.gates.destructive_external",
+    "automation.gates.release_publish",
+    "execution.worker_separation.mode",
+    "execution.analysis.interaction_mode",
+    "execution.analysis.boundaries.code_changes",
+    "acceptance.mode",
+    "evaluation.auto_continue",
+    "batch.auto_chain",
+    "opencode.auto_continue",
+    "PR/MR remote write",
+    "plugin install",
+    "user-level config write",
+    "Codex",
+    "Claude Code",
+    "OpenCode",
+  ];
+  for (const item of required) {
+    assert.match(content, new RegExp(escapeRegExp(item)), `missing ${item}`);
+  }
+  assert.match(content, /Hypo-Workflow 不是后台 runner/);
+  assert.doesNotMatch(content, /Hypo-Workflow\s+会自动执行实际编码/);
+});
+
+test("human-facing docs and key references stay Chinese-body", async () => {
+  const result = await checkDocsLanguage(".");
+
+  assert.equal(result.ok, true, JSON.stringify(result.failures, null, 2));
+  assert.ok(result.checked.some((item) => item.path === "docs/platforms/claude-code.md"));
+  assert.ok(result.checked.some((item) => item.path === "references/commands-spec.md"));
 });
 
 test("release narrative fact check blocks stale docs claims", async () => {
@@ -89,4 +134,8 @@ async function fixtureRoot() {
   await mkdir(join(root, "docs"), { recursive: true });
   await writeFile(join(root, "README.md"), "# Demo\n\n[License](LICENSE)\n", "utf8");
   return root;
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

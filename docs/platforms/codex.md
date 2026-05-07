@@ -1,8 +1,8 @@
-# Codex Guide
+# Codex 指南
 
-Hypo-Workflow does not run project work itself; the host agent performs the work using `.pipeline/` files.
+Hypo-Workflow 不直接运行项目工作；宿主 Agent 读取 `.pipeline/` 文件并完成实际实现、测试和审查。
 
-## Capability Summary
+## 能力摘要
 
 - Commands: skill.
 - Ask gates: chat.
@@ -12,34 +12,35 @@ Hypo-Workflow does not run project work itself; the host agent performs the work
 - Rules/instructions: skill-files.
 - Recovery: lease-heartbeat.
 
-## Install / Sync
+## 安装 / 同步
 
-For a local checkout:
+本地 checkout 安装：
 
 ```bash
 git clone https://github.com/HypoxanthineOvO/Hypo-Workflow.git ~/.codex/skills/hypo-workflow
 ```
 
-For development, symlink the checkout instead of copying it:
+开发时建议 symlink 当前 checkout，而不是复制一份：
 
 ```bash
 mkdir -p ~/.codex/skills
 ln -sfn /absolute/path/to/Hypo-Workflow ~/.codex/skills/hypo-workflow
 ```
 
-Then invoke the Hypo-Workflow skills from Codex. In repositories that already expose `/hw:*`, use the canonical `/hw:init`, `/hw:plan`, and `/hw:start` flow.
+随后在 Codex 中调用 Hypo-Workflow skills。若项目已经暴露 `/hw:*`，使用 canonical `/hw:init`、`/hw:plan` 和 `/hw:start` 流程。
 
-## Supported Features
+## 支持能力
 
-- Reads `.pipeline/` state, config, Cycle, Rules/Habits, prompts, reports, logs, and review artifacts.
-- Uses the canonical `/hw:*` workflow vocabulary: init, plan, start/resume, status/report, sync/docs, rules, patch, release.
-- Preserves protected authority files unless the lifecycle command explicitly owns the write.
-- Uses Codex skills and the Codex plan tool where available.
-- Strongly prefers Codex Subagents for substantial implementation or review work while keeping implementation separate from testing/review.
-- Does not require external model routing; Codex Subagents stay inside the Codex/GPT runtime.
+- 读取 `.pipeline/` state、config、Cycle、Rules/Habits、prompts、reports、logs 和 review artifacts。
+- 使用 canonical `/hw:*` workflow vocabulary：init、plan、start/resume、status/report、sync/docs、rules、patch、release。
+- 支持 `/hw:explain` 作为只读 evidence-first 问答命令，用于解释代码、配置、命令、报告和近期改动。
+- 除非生命周期命令明确拥有写入权，否则保护 protected authority files。
+- 使用 Codex skills，并在可用时使用 Codex plan tool。
+- 对非平凡实现或审查工作优先使用 Codex Subagents，同时保持 implementation 与 testing/review 分离。
+- 不要求外部模型路由；Codex Subagents 留在 Codex/GPT runtime。
 
-## Boundaries
+## 边界
 
-- Hypo-Workflow is not a runner; the host agent performs implementation, tests, and review.
-- `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/rules.yaml` are protected authority files.
-- External installs, user-level config writes, destructive commands, and network side effects require explicit confirmation.
+- Hypo-Workflow 不是 runner；implementation、tests 和 review 由宿主 Agent 执行。
+- `.pipeline/state.yaml`、`.pipeline/cycle.yaml` 和 `.pipeline/rules.yaml` 是 protected authority files。
+- External installs、user-level config writes、destructive commands 和 network side effects 必须显式确认。

@@ -1,5 +1,775 @@
 entries:
   -
+    id: RELEASE-v12.1.0-20260507T200700+0800
+    type: release
+    ref: v12.1.0
+    status: completed
+    timestamp: "2026-05-07T20:07:00+08:00"
+    summary: Released Hypo-Workflow v12.1.0 with configuration governance, PR/MR Change Request handling, evidence-first Explain, Claude resume namespace safety, Chinese human-facing docs, local distribution refresh, and full regression validation.
+    trigger: user
+    details:
+      tests:
+        -
+          "npm test --prefix core: 349/349 passing"
+        -
+          "python3 tests/run_regression.py: 63/63 passing"
+        -
+          "bash scripts/validate-config.sh .pipeline/config.yaml: passing"
+        -
+          "claude plugin validate .: passing"
+        -
+          "node cli/bin/hypo-workflow sync --check-only --platform opencode --project .: derived=fresh"
+        -
+          "git diff --check: passing"
+  -
+    id: CYCLE-COMPLETE-C9-20260507T165500+0800
+    type: cycle_complete
+    ref: C9
+    status: completed
+    timestamp: "2026-05-07T16:55:00+08:00"
+    summary: Completed C9 with configuration governance, PR/MR management, evidence-first Explain, Claude resume namespace fix, Chinese human docs, Subagent audit, and full regression.
+    report: .pipeline/reports/11-c9-agent-review-and-full-regression.report.md
+    trigger: auto
+  -
+    id: M12-COMPLETE-C9-20260507T165500+0800
+    type: milestone_complete
+    ref: C9/M12
+    status: completed
+    timestamp: "2026-05-07T16:55:00+08:00"
+    summary: Completed final C9 Agent Review and full regression; fixed Subagent audit blockers for Explain/PR secret redaction, PR local archive id support, and 38-command OpenCode scenario freshness.
+    report: .pipeline/reports/11-c9-agent-review-and-full-regression.report.md
+    tests: node --test focused Explain/PR tests: 25/25 passing; npm test --prefix core: 349/349 passing; python3 tests/run_regression.py: 63/63 passing; bash scripts/validate-config.sh .pipeline/config.yaml: passing; node cli/bin/hypo-workflow sync --check-only --project .: derived=fresh; claude plugin validate .: passed; git diff --check: passed
+    trigger: auto
+    related_milestone: M12
+  -
+    id: M12-AUDIT-FIX-C9-20260507T164900+0800
+    type: step_complete
+    ref: C9/M12/implement
+    status: completed
+    timestamp: "2026-05-07T16:49:00+08:00"
+    summary: Repaired Subagent audit findings by redacting Explain evidence and PR review findings, supporting PR-YYYYMMDD-NNN archive ids, and refreshing OpenCode 38-command regression expectations.
+    report: .pipeline/reviews/C9-final-validation/subagent-audit/summary.md
+    trigger: auto
+    related_milestone: M12
+  -
+    id: M12-AUDIT-C9-20260507T164500+0800
+    type: step_complete
+    ref: C9/M12/subagent_audit
+    status: revised
+    timestamp: "2026-05-07T16:45:00+08:00"
+    summary: Subagent audit found blocking secret-redaction gaps in Explain/PR human-facing outputs plus non-blocking archive id and command-count freshness issues.
+    report: .pipeline/reviews/C9-final-validation/subagent-audit/summary.md
+    trigger: auto
+    related_milestone: M12
+  -
+    id: M12-START-C9-20260507T164000+0800
+    type: milestone_start
+    ref: C9/M12
+    status: active
+    timestamp: "2026-05-07T16:40:00+08:00"
+    summary: Auto-continued to final C9 Agent Review, Subagent audit, and full regression after Chinese documentation governance passed validation.
+    report: .pipeline/prompts/11-c9-agent-review-and-full-regression.md
+    trigger: auto
+    related_milestone: M12
+  -
+    id: M11-COMPLETE-C9-20260507T164000+0800
+    type: milestone_complete
+    ref: C9/M11
+    status: completed
+    timestamp: "2026-05-07T16:40:00+08:00"
+    summary: Completed Chinese-body documentation governance with language self-checks, generated docs source updates, and key reference summaries.
+    report: .pipeline/reports/10-chinese-human-docs-conversion.report.md
+    tests: node --test core/test/docs-governance.test.js core/test/readme-spec.test.js core/test/readme-update.test.js core/test/claude-plugin-alias.test.js; npm test --prefix core; bash scripts/validate-config.sh .pipeline/config.yaml; node cli/bin/hypo-workflow sync --check-only --project .; git diff --check
+    trigger: auto
+    related_milestone: M11
+  -
+    id: M11-GREEN-C9-20260507T163950+0800
+    type: step_complete
+    ref: C9/M11/run_tests_green
+    status: completed
+    timestamp: "2026-05-07T16:39:50+08:00"
+    summary: Full core regression passed after docs language self-check and Chinese-body documentation updates.
+    report: .pipeline/reports/10-chinese-human-docs-conversion.report.md
+    tests: npm test --prefix core: 345/345 passing
+    trigger: auto
+    related_milestone: M11
+  -
+    id: M11-IMPLEMENT-C9-20260507T163700+0800
+    type: step_complete
+    ref: C9/M11/implement
+    status: completed
+    timestamp: "2026-05-07T16:37:00+08:00"
+    summary: Added checkDocsLanguage helper, Chineseized generated docs source, regenerated docs, and added Chinese summaries to key references.
+    report: core/src/docs/index.js
+    trigger: auto
+    related_milestone: M11
+  -
+    id: M11-RED-C9-20260507T163600+0800
+    type: step_complete
+    ref: C9/M11/run_tests_red
+    status: completed
+    timestamp: "2026-05-07T16:36:00+08:00"
+    summary: Confirmed docs language self-check failed before generated docs and key references received Chinese-body summaries.
+    report: core/test/docs-governance.test.js
+    tests: node --test core/test/docs-governance.test.js: expected failure before docs conversion
+    trigger: auto
+    related_milestone: M11
+  -
+    id: M11-WRITE-TESTS-C9-20260507T163500+0800
+    type: step_complete
+    ref: C9/M11/write_tests
+    status: completed
+    timestamp: "2026-05-07T16:35:00+08:00"
+    summary: Added docs language self-check coverage for README, linked docs, platform guides, docs references, and key C9 references.
+    report: core/test/docs-governance.test.js
+    trigger: auto
+    related_milestone: M11
+  -
+    id: M11-START-C9-20260507T163400+0800
+    type: milestone_start
+    ref: C9/M11
+    status: active
+    timestamp: "2026-05-07T16:34:00+08:00"
+    summary: Auto-continued to Chinese human documentation governance after Claude resume namespace fix passed smoke validation.
+    report: .pipeline/prompts/10-chinese-human-docs-conversion.md
+    trigger: auto
+    related_milestone: M11
+  -
+    id: M10-COMPLETE-C9-20260507T163400+0800
+    type: milestone_complete
+    ref: C9/M10
+    status: completed
+    timestamp: "2026-05-07T16:34:00+08:00"
+    summary: Completed Claude resume namespace fix by removing bare resume skill metadata, preserving /hw:resume, and documenting native /resume boundaries.
+    report: .pipeline/reports/09-claude-resume-adapter-fix-and-smoke.report.md
+    tests: node --test core/test/*claude*resume*.test.js core/test/claude-plugin-alias.test.js core/test/platform-adapters.test.js core/test/skill-quality.test.js; claude plugin validate .; node cli/bin/hypo-workflow sync --check-only --project .; npm test --prefix core; git diff --check
+    trigger: auto
+    related_milestone: M10
+  -
+    id: M10-GREEN-C9-20260507T163350+0800
+    type: step_complete
+    ref: C9/M10/run_tests_green
+    status: completed
+    timestamp: "2026-05-07T16:33:50+08:00"
+    summary: Full core regression passed after Claude resume metadata and docs fix.
+    report: .pipeline/reports/09-claude-resume-adapter-fix-and-smoke.report.md
+    tests: npm test --prefix core: 344/344 passing
+    trigger: auto
+    related_milestone: M10
+  -
+    id: M10-IMPLEMENT-C9-20260507T163200+0800
+    type: step_complete
+    ref: C9/M10/implement
+    status: completed
+    timestamp: "2026-05-07T16:32:00+08:00"
+    summary: Removed bare name from resume skill frontmatter, updated namespace audit expectations, regenerated docs, and refreshed adapter artifacts.
+    report: skills/resume/SKILL.md
+    trigger: auto
+    related_milestone: M10
+  -
+    id: M10-RED-C9-20260507T163100+0800
+    type: step_complete
+    ref: C9/M10/run_tests_red
+    status: completed
+    timestamp: "2026-05-07T16:31:00+08:00"
+    summary: Confirmed updated namespace expectations failed before docs regeneration and resume metadata repair.
+    report: core/test/claude-resume-namespace.test.js
+    tests: node --test core/test/*claude*resume*.test.js core/test/claude-plugin-alias.test.js: expected failure before repair/docs regeneration
+    trigger: auto
+    related_milestone: M10
+  -
+    id: M10-WRITE-TESTS-C9-20260507T163030+0800
+    type: step_complete
+    ref: C9/M10/write_tests
+    status: completed
+    timestamp: "2026-05-07T16:30:30+08:00"
+    summary: Updated tests to require current Claude resume metadata to be autocomplete-safe while preserving a legacy fixture that catches bare name: resume.
+    report: core/test/claude-resume-namespace.test.js
+    trigger: auto
+    related_milestone: M10
+  -
+    id: M10-START-C9-20260507T163010+0800
+    type: milestone_start
+    ref: C9/M10
+    status: active
+    timestamp: "2026-05-07T16:30:10+08:00"
+    summary: Auto-continued to Claude resume adapter fix and smoke validation after namespace audit completed.
+    report: .pipeline/prompts/09-claude-resume-adapter-fix-and-smoke.md
+    trigger: auto
+    related_milestone: M10
+  -
+    id: M09-COMPLETE-C9-20260507T163010+0800
+    type: milestone_complete
+    ref: C9/M09
+    status: completed
+    timestamp: "2026-05-07T16:30:10+08:00"
+    summary: Completed Claude /resume conflict audit, confirming exact command registry and identifying resume skill frontmatter as the main autocomplete collision risk.
+    report: .pipeline/reports/08-claude-resume-conflict-audit.report.md
+    tests: node --test core/test/*claude*resume*.test.js core/test/claude-plugin-alias.test.js core/test/commands-rules-artifacts.test.js; claude plugin validate .; npm test --prefix core; bash scripts/validate-config.sh .pipeline/config.yaml; node cli/bin/hypo-workflow sync --check-only --project .; git diff --check
+    trigger: auto
+    related_milestone: M09
+  -
+    id: M09-GREEN-C9-20260507T162950+0800
+    type: step_complete
+    ref: C9/M09/run_tests_green
+    status: completed
+    timestamp: "2026-05-07T16:29:50+08:00"
+    summary: Full core regression passed after adding Claude resume namespace audit helper and tests.
+    report: .pipeline/reports/08-claude-resume-conflict-audit.report.md
+    tests: npm test --prefix core: 343/343 passing
+    trigger: auto
+    related_milestone: M09
+  -
+    id: M09-IMPLEMENT-C9-20260507T162850+0800
+    type: step_complete
+    ref: C9/M09/implement
+    status: completed
+    timestamp: "2026-05-07T16:28:50+08:00"
+    summary: Implemented auditClaudeResumeNamespace, Chinese audit rendering, commands-spec namespace boundary, and namespace audit review artifact.
+    report: core/src/claude-resume/index.js
+    trigger: auto
+    related_milestone: M09
+  -
+    id: M09-RED-C9-20260507T162750+0800
+    type: step_complete
+    ref: C9/M09/run_tests_red
+    status: completed
+    timestamp: "2026-05-07T16:27:50+08:00"
+    summary: Added Claude resume namespace audit fixture expectations before implementation to capture bare /resume registry and skill-name collision evidence.
+    report: core/test/claude-resume-namespace.test.js
+    tests: node --test core/test/claude-resume-namespace.test.js: expected failure before audit helper existed
+    trigger: auto
+    related_milestone: M09
+  -
+    id: M09-WRITE-TESTS-C9-20260507T162700+0800
+    type: step_complete
+    ref: C9/M09/write_tests
+    status: completed
+    timestamp: "2026-05-07T16:27:00+08:00"
+    summary: Added tests for exact /hw:resume registry ownership, Claude native /resume boundary, plugin manifest safety, and resume skill-name collision detection.
+    report: core/test/claude-resume-namespace.test.js
+    trigger: auto
+    related_milestone: M09
+  -
+    id: M09-START-C9-20260507T162530+0800
+    type: milestone_start
+    ref: C9/M09
+    status: active
+    timestamp: "2026-05-07T16:25:30+08:00"
+    summary: Auto-continued to Claude /resume conflict audit after Explain tests and docs passed validation.
+    report: .pipeline/prompts/08-claude-resume-conflict-audit.md
+    trigger: auto
+    related_milestone: M09
+  -
+    id: M08-COMPLETE-C9-20260507T162530+0800
+    type: milestone_complete
+    ref: C9/M08
+    status: completed
+    timestamp: "2026-05-07T16:25:30+08:00"
+    summary: Completed Explain fixture coverage, Chinese user guide updates, OpenCode /hw-explain guidance, and fresh generated artifacts.
+    report: .pipeline/reports/07-explain-tests-and-docs.report.md
+    tests: node --test core/test/explain-contract.test.js core/test/explain-subagent.test.js; node --test core/test/docs-governance.test.js core/test/commands-rules-artifacts.test.js; focused explain/docs/platform/claude tests; npm test --prefix core; bash scripts/validate-config.sh .pipeline/config.yaml; node cli/bin/hypo-workflow sync --check-only --project .; git diff --check
+    trigger: auto
+    related_milestone: M08
+  -
+    id: M08-GREEN-C9-20260507T162500+0800
+    type: step_complete
+    ref: C9/M08/run_tests_green
+    status: completed
+    timestamp: "2026-05-07T16:25:00+08:00"
+    summary: Full core regression passed after adding Explain fixture inference and docs/adapter guidance.
+    report: .pipeline/reports/07-explain-tests-and-docs.report.md
+    tests: npm test --prefix core: 340/340 passing
+    trigger: auto
+    related_milestone: M08
+  -
+    id: M08-IMPLEMENT-C9-20260507T162300+0800
+    type: step_complete
+    ref: C9/M08/implement
+    status: completed
+    timestamp: "2026-05-07T16:23:00+08:00"
+    summary: Implemented Explain target inference for framework/config/recent-change questions and refreshed generated user/platform docs plus OpenCode command guidance.
+    report: core/src/explain/index.js
+    trigger: auto
+    related_milestone: M08
+  -
+    id: M08-RED-C9-20260507T162200+0800
+    type: step_complete
+    ref: C9/M08/run_tests_red
+    status: completed
+    timestamp: "2026-05-07T16:22:00+08:00"
+    summary: Added fixture expectations for framework and recent-change Explain evidence plus OpenCode /hw-explain guidance before implementation.
+    report: core/test/explain-contract.test.js
+    tests: node --test core/test/explain-contract.test.js core/test/commands-rules-artifacts.test.js: expected failure before helper/docs updates
+    trigger: auto
+    related_milestone: M08
+  -
+    id: M08-WRITE-TESTS-C9-20260507T162100+0800
+    type: step_complete
+    ref: C9/M08/write_tests
+    status: completed
+    timestamp: "2026-05-07T16:21:00+08:00"
+    summary: Added tests for Explain framework questions, recent-change diff_refs, docs repair /hw:explain --subagent coverage, and OpenCode hw-explain guidance.
+    report: core/test/explain-contract.test.js
+    trigger: auto
+    related_milestone: M08
+  -
+    id: M08-START-C9-20260507T162000+0800
+    type: milestone_start
+    ref: C9/M08
+    status: active
+    timestamp: "2026-05-07T16:20:00+08:00"
+    summary: Auto-continued to Explain tests and documentation after --subagent evidence handoff passed validation.
+    report: .pipeline/prompts/07-explain-tests-and-docs.md
+    trigger: auto
+    related_milestone: M08
+  -
+    id: M07-COMPLETE-C9-20260507T162000+0800
+    type: milestone_complete
+    ref: C9/M07
+    status: completed
+    timestamp: "2026-05-07T16:20:00+08:00"
+    summary: Completed /hw:explain --subagent read-only evidence handoff, required packet schema, self fallback prompt, and platform guidance.
+    report: .pipeline/reports/06-explain-subagent-evidence-handoff.report.md
+    tests: node --test core/test/explain-subagent.test.js core/test/explain-contract.test.js; node --test core/test/explain-subagent.test.js core/test/explain-contract.test.js core/test/codex-subagent-discipline.test.js core/test/platform-adapters.test.js; node --test core/test/skill-quality.test.js core/test/commands-rules-artifacts.test.js; npm test --prefix core; bash scripts/validate-config.sh .pipeline/config.yaml; node cli/bin/hypo-workflow sync --check-only --project .; git diff --check
+    trigger: auto
+    related_milestone: M07
+  -
+    id: M07-GREEN-C9-20260507T161900+0800
+    type: step_complete
+    ref: C9/M07/run_tests_green
+    status: completed
+    timestamp: "2026-05-07T16:19:00+08:00"
+    summary: Full core regression passed after adding Explain Subagent evidence handoff helpers.
+    report: .pipeline/reports/06-explain-subagent-evidence-handoff.report.md
+    tests: npm test --prefix core: 338/338 passing
+    trigger: auto
+    related_milestone: M07
+  -
+    id: M07-IMPLEMENT-C9-20260507T161700+0800
+    type: step_complete
+    ref: C9/M07/implement
+    status: completed
+    timestamp: "2026-05-07T16:17:00+08:00"
+    summary: Implemented Subagent handoff prompt builder, evidence packet validator, fallback prompt, and answer rendering from Subagent evidence.
+    report: core/src/explain/index.js
+    trigger: auto
+    related_milestone: M07
+  -
+    id: M07-RED-C9-20260507T161500+0800
+    type: step_complete
+    ref: C9/M07/run_tests_red
+    status: completed
+    timestamp: "2026-05-07T16:15:00+08:00"
+    summary: Confirmed failing Explain Subagent tests before implementation because handoff, schema validation, and fallback helpers were absent.
+    report: core/test/explain-subagent.test.js
+    tests: node --test core/test/explain-subagent.test.js: expected failure
+    trigger: auto
+    related_milestone: M07
+  -
+    id: M07-WRITE-TESTS-C9-20260507T161400+0800
+    type: step_complete
+    ref: C9/M07/write_tests
+    status: completed
+    timestamp: "2026-05-07T16:14:00+08:00"
+    summary: Added tests for read-only Subagent handoff, self fallback reason, packet schema requirements, and cited answers from Subagent evidence.
+    report: core/test/explain-subagent.test.js
+    trigger: auto
+    related_milestone: M07
+  -
+    id: M07-START-C9-20260507T161229+0800
+    type: milestone_start
+    ref: C9/M07
+    status: active
+    timestamp: "2026-05-07T16:12:29+08:00"
+    summary: Auto-continued to Explain --subagent evidence handoff after Evidence-first Explain contract passed validation.
+    report: .pipeline/prompts/06-explain-subagent-evidence-handoff.md
+    trigger: auto
+    related_milestone: M07
+  -
+    id: M06-COMPLETE-C9-20260507T161229+0800
+    type: milestone_complete
+    ref: C9/M06
+    status: completed
+    timestamp: "2026-05-07T16:12:29+08:00"
+    summary: Completed /hw:explain command contract with read-only evidence packets, cited local files, needs_context unknowns, and command/docs/skill count updates.
+    report: .pipeline/reports/05-evidence-first-explain-contract.report.md
+    tests: node --test core/test/explain-contract.test.js; focused command/docs/skill/readme/sync tests; npm test --prefix core; bash scripts/validate-config.sh .pipeline/config.yaml; node cli/bin/hypo-workflow sync --check-only --project .; git diff --check
+    trigger: auto
+    related_milestone: M06
+  -
+    id: M06-GREEN-C9-20260507T161229+0800
+    type: step_complete
+    ref: C9/M06/run_tests_green
+    status: completed
+    timestamp: "2026-05-07T16:12:29+08:00"
+    summary: Full core regression passed after adding /hw:explain evidence-first contract.
+    report: .pipeline/reports/05-evidence-first-explain-contract.report.md
+    tests: npm test --prefix core: 334/334 passing
+    trigger: auto
+    related_milestone: M06
+  -
+    id: M06-IMPLEMENT-C9-20260507T161000+0800
+    type: step_complete
+    ref: C9/M06/implement
+    status: completed
+    timestamp: "2026-05-07T16:10:00+08:00"
+    summary: Implemented Explain evidence packet helpers, /hw:explain command registration, skill/spec/docs updates, and command count migration to 38.
+    report: core/src/explain/index.js
+    trigger: auto
+    related_milestone: M06
+  -
+    id: M06-RED-C9-20260507T160800+0800
+    type: step_complete
+    ref: C9/M06/run_tests_red
+    status: completed
+    timestamp: "2026-05-07T16:08:00+08:00"
+    summary: Confirmed failing Explain contract tests before implementation because Explain helpers and command metadata were absent.
+    report: core/test/explain-contract.test.js
+    tests: node --test core/test/explain-contract.test.js: expected failure
+    trigger: auto
+    related_milestone: M06
+  -
+    id: M06-WRITE-TESTS-C9-20260507T160700+0800
+    type: step_complete
+    ref: C9/M06/write_tests
+    status: completed
+    timestamp: "2026-05-07T16:07:00+08:00"
+    summary: Added tests for /hw:explain command metadata, explicit file evidence, read-only state/log behavior, and needs_context unknowns.
+    report: core/test/explain-contract.test.js
+    trigger: auto
+    related_milestone: M06
+  -
+    id: M06-START-C9-20260507T160420+0800
+    type: milestone_start
+    ref: C9/M06
+    status: active
+    timestamp: "2026-05-07T16:04:20+08:00"
+    summary: Auto-continued to Evidence-first Explain command contract after F002 PR/MR management milestones passed validation.
+    report: .pipeline/prompts/05-evidence-first-explain-contract.md
+    trigger: auto
+    related_milestone: M06
+  -
+    id: M05-COMPLETE-C9-20260507T160420+0800
+    type: milestone_complete
+    ref: C9/M05
+    status: completed
+    timestamp: "2026-05-07T16:04:20+08:00"
+    summary: Completed PR/MR fix, merge, and close manual gates with local fix records, merge blockers, close reasons, and confirmation-required decisions.
+    report: .pipeline/reports/04-pr-mr-fix-merge-close-manual-gates.report.md
+    tests: node --test core/test/pr-manual-gates.test.js core/test/pr-readonly-flow.test.js core/test/pr-contract.test.js; npm test --prefix core; bash scripts/validate-config.sh .pipeline/config.yaml; git diff --check
+    trigger: auto
+    related_milestone: M05
+  -
+    id: M05-GREEN-C9-20260507T160420+0800
+    type: step_complete
+    ref: C9/M05/run_tests_green
+    status: completed
+    timestamp: "2026-05-07T16:04:20+08:00"
+    summary: Full core regression passed after adding PR/MR manual gate helpers.
+    report: .pipeline/reports/04-pr-mr-fix-merge-close-manual-gates.report.md
+    tests: npm test --prefix core: 330/330 passing
+    trigger: auto
+    related_milestone: M05
+  -
+    id: M05-IMPLEMENT-C9-20260507T160200+0800
+    type: step_complete
+    ref: C9/M05/implement
+    status: completed
+    timestamp: "2026-05-07T16:02:00+08:00"
+    summary: Implemented fix planning, merge proposal blocker checks, close proposal reason handling, and decisions.yaml confirmation records.
+    report: core/src/pr/index.js
+    trigger: auto
+    related_milestone: M05
+  -
+    id: M05-RED-C9-20260507T160100+0800
+    type: step_complete
+    ref: C9/M05/run_tests_red
+    status: completed
+    timestamp: "2026-05-07T16:01:00+08:00"
+    summary: Confirmed failing manual gate tests before implementation because fix/merge/close proposal helpers were absent.
+    report: core/test/pr-manual-gates.test.js
+    tests: node --test core/test/pr-manual-gates.test.js: expected failure
+    trigger: auto
+    related_milestone: M05
+  -
+    id: M05-WRITE-TESTS-C9-20260507T160000+0800
+    type: step_complete
+    ref: C9/M05/write_tests
+    status: completed
+    timestamp: "2026-05-07T16:00:00+08:00"
+    summary: Added tests for local fix records, push confirmation, merge blockers, ready merge confirmation, and close reason confirmation.
+    report: core/test/pr-manual-gates.test.js
+    trigger: auto
+    related_milestone: M05
+  -
+    id: M05-START-C9-20260507T155951+0800
+    type: milestone_start
+    ref: C9/M05
+    status: active
+    timestamp: "2026-05-07T15:59:51+08:00"
+    summary: Auto-continued to PR/MR fix, merge, and close manual gates after remote-readonly inspect/review passed validation.
+    report: .pipeline/prompts/04-pr-mr-fix-merge-close-manual-gates.md
+    trigger: auto
+    related_milestone: M05
+  -
+    id: M04-COMPLETE-C9-20260507T155951+0800
+    type: milestone_complete
+    ref: C9/M04
+    status: completed
+    timestamp: "2026-05-07T15:59:51+08:00"
+    summary: Completed remote-readonly PR/MR inspect and review helpers with fixture provider evidence, local archive updates, and no remote write calls.
+    report: .pipeline/reports/03-pr-mr-inspect-review-readonly-flow.report.md
+    tests: node --test core/test/pr-readonly-flow.test.js core/test/pr-contract.test.js; node --test core/test/pr-readonly-flow.test.js core/test/pr-contract.test.js core/test/commands-rules-artifacts.test.js; npm test --prefix core; bash scripts/validate-config.sh .pipeline/config.yaml; node cli/bin/hypo-workflow sync --check-only --project .; git diff --check
+    trigger: auto
+    related_milestone: M04
+  -
+    id: M04-GREEN-C9-20260507T155951+0800
+    type: step_complete
+    ref: C9/M04/run_tests_green
+    status: completed
+    timestamp: "2026-05-07T15:59:51+08:00"
+    summary: Full core regression passed after adding remote-readonly inspect/review flow.
+    report: .pipeline/reports/03-pr-mr-inspect-review-readonly-flow.report.md
+    tests: npm test --prefix core: 326/326 passing
+    trigger: auto
+    related_milestone: M04
+  -
+    id: M04-IMPLEMENT-C9-20260507T155800+0800
+    type: step_complete
+    ref: C9/M04/implement
+    status: completed
+    timestamp: "2026-05-07T15:58:00+08:00"
+    summary: Implemented inspectChangeRequest and reviewChangeRequest with fixture-provider reads, archive summary updates, review notes, and provider contract docs.
+    report: core/src/pr/index.js
+    trigger: auto
+    related_milestone: M04
+  -
+    id: M04-RED-C9-20260507T155700+0800
+    type: step_complete
+    ref: C9/M04/run_tests_red
+    status: completed
+    timestamp: "2026-05-07T15:57:00+08:00"
+    summary: Confirmed failing readonly PR flow test before implementation because inspect/review helpers were absent.
+    report: core/test/pr-readonly-flow.test.js
+    tests: node --test core/test/pr-readonly-flow.test.js: expected failure
+    trigger: auto
+    related_milestone: M04
+  -
+    id: M04-WRITE-TESTS-C9-20260507T155600+0800
+    type: step_complete
+    ref: C9/M04/write_tests
+    status: completed
+    timestamp: "2026-05-07T15:56:00+08:00"
+    summary: Added tests for remote-readonly inspect/review provider calls, local archive updates, failed checks, review comments, and no push/merge/close calls.
+    report: core/test/pr-readonly-flow.test.js
+    trigger: auto
+    related_milestone: M04
+  -
+    id: M04-START-C9-20260507T155535+0800
+    type: milestone_start
+    ref: C9/M04
+    status: active
+    timestamp: "2026-05-07T15:55:35+08:00"
+    summary: Auto-continued to remote-readonly PR/MR inspect and review flow after M03 Change Request contract passed validation.
+    report: .pipeline/prompts/03-pr-mr-inspect-review-readonly-flow.md
+    trigger: auto
+    related_milestone: M04
+  -
+    id: M03-COMPLETE-C9-20260507T155535+0800
+    type: milestone_complete
+    ref: C9/M03
+    status: completed
+    timestamp: "2026-05-07T15:55:35+08:00"
+    summary: Completed /hw:pr Change Request command contract, GitHub PR and GitLab MR normalization, local archive schema, and secret-safe evidence writing.
+    report: .pipeline/reports/02-change-request-contract-and-local-archive.report.md
+    tests: node --test core/test/pr-contract.test.js; focused command/docs/skill/readme/sync tests; npm test --prefix core; bash scripts/validate-config.sh .pipeline/config.yaml; node cli/bin/hypo-workflow sync --check-only --project .; git diff --check
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M03-GREEN-C9-20260507T155535+0800
+    type: step_complete
+    ref: C9/M03/run_tests_green
+    status: completed
+    timestamp: "2026-05-07T15:55:35+08:00"
+    summary: Full core regression passed after adding /hw:pr and refreshing derived artifacts.
+    report: .pipeline/reports/02-change-request-contract-and-local-archive.report.md
+    tests: npm test --prefix core: 323/323 passing
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M03-IMPLEMENT-C9-20260507T155000+0800
+    type: step_complete
+    ref: C9/M03/implement
+    status: completed
+    timestamp: "2026-05-07T15:50:00+08:00"
+    summary: Implemented Change Request helpers, /hw:pr command registration, PR skill, PR spec, command counts, and generated/reference docs updates.
+    report: core/src/pr/index.js
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M03-RED-C9-20260507T154700+0800
+    type: step_complete
+    ref: C9/M03/run_tests_red
+    status: completed
+    timestamp: "2026-05-07T15:47:00+08:00"
+    summary: Confirmed failing PR contract test before implementation because Change Request helpers and /hw:pr command metadata were absent.
+    report: core/test/pr-contract.test.js
+    tests: node --test core/test/pr-contract.test.js: expected failure
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M03-WRITE-TESTS-C9-20260507T154600+0800
+    type: step_complete
+    ref: C9/M03/write_tests
+    status: completed
+    timestamp: "2026-05-07T15:46:00+08:00"
+    summary: Added focused tests for /hw:pr command metadata, GitHub PR and GitLab MR normalization, local archive schema, stable ids, and secret redaction.
+    report: core/test/pr-contract.test.js
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M03-START-C9-20260507T154400+0800
+    type: milestone_start
+    ref: C9/M03
+    status: active
+    timestamp: "2026-05-07T15:44:00+08:00"
+    summary: Auto-continued to Change Request contract and local PR/MR archive design after F001 passed validation.
+    report: .pipeline/prompts/02-change-request-contract-and-local-archive.md
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M02-COMPLETE-C9-20260507T154400+0800
+    type: milestone_complete
+    ref: C9/M02
+    status: completed
+    timestamp: "2026-05-07T15:44:00+08:00"
+    summary: Completed four default configuration profiles with conservative high-risk confirmation gates and generated Chinese configuration reference snippets.
+    report: .pipeline/reports/01-default-configuration-profiles.report.md
+    tests: node --test core/test/profile-platform.test.js; node --test core/test/docs-governance.test.js; node --test core/test/init-automation-contract.test.js core/test/global-config-registry.test.js core/test/config.test.js core/test/profile-platform.test.js; npm test --prefix core; bash scripts/validate-config.sh .pipeline/config.yaml; git diff --check
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M02-REVIEW-CODE-C9-20260507T154400+0800
+    type: step_complete
+    ref: C9/M02/review_code
+    status: completed
+    timestamp: "2026-05-07T15:44:00+08:00"
+    summary: Reviewed M02 implementation for generated-doc stability, high-risk gate preservation, and regression coverage.
+    report: .pipeline/reports/01-default-configuration-profiles.report.md
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M02-GREEN-C9-20260507T154400+0800
+    type: step_complete
+    ref: C9/M02/run_tests_green
+    status: completed
+    timestamp: "2026-05-07T15:44:00+08:00"
+    summary: Focused and full validation passed after adding configuration profiles and generated configuration documentation.
+    report: .pipeline/reports/01-default-configuration-profiles.report.md
+    tests: npm test --prefix core: 319/319 passing
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M02-IMPLEMENT-C9-20260507T154000+0800
+    type: step_complete
+    ref: C9/M02/implement
+    status: completed
+    timestamp: "2026-05-07T15:40:00+08:00"
+    summary: Implemented configuration profile defaults, YAML rendering, generated docs integration, and Chinese configuration reference snippets.
+    report: core/src/profile/index.js
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M02-RED-C9-20260507T153900+0800
+    type: step_complete
+    ref: C9/M02/run_tests_red
+    status: completed
+    timestamp: "2026-05-07T15:39:00+08:00"
+    summary: Confirmed failing default profile tests before implementation because configuration profile exports and generated docs were missing.
+    report: core/test/profile-platform.test.js
+    tests: node --test core/test/profile-platform.test.js: expected failure
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M02-WRITE-TESTS-C9-20260507T153800+0800
+    type: step_complete
+    ref: C9/M02/write_tests
+    status: completed
+    timestamp: "2026-05-07T15:38:00+08:00"
+    summary: Added focused tests for four default configuration profiles, conservative gates, YAML snippets, and configuration reference coverage.
+    report: core/test/profile-platform.test.js
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M02-START-C9-20260507T153740+0800
+    type: milestone_start
+    ref: C9/M02
+    status: active
+    timestamp: "2026-05-07T15:37:40+08:00"
+    summary: Started M02 default configuration profiles.
+    report: .pipeline/prompts/01-default-configuration-profiles.md
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M01-COMPLETE-C9-20260507T153740+0800
+    type: milestone_complete
+    ref: C9/M01
+    status: completed
+    timestamp: "2026-05-07T15:37:40+08:00"
+    summary: Completed configuration governance reference with automation, strictness, analysis, legacy auto, and platform boundary matrix.
+    report: .pipeline/reports/00-configuration-field-audit-and-strictness-matrix.report.md
+    tests: node --test core/test/docs-governance.test.js; node --test core/test/*config*.test.js core/test/docs-governance.test.js; npm test --prefix core; bash scripts/validate-config.sh .pipeline/config.yaml; git diff --check
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-START-C9-20260507T153014+0800
+    type: milestone_start
+    ref: C9/M01
+    status: active
+    timestamp: "2026-05-07T15:30:14+08:00"
+    summary: Started M01 configuration field audit and strictness matrix.
+    report: .pipeline/prompts/00-configuration-field-audit-and-strictness-matrix.md
+    trigger: user
+    related_milestone: M01
+  -
+    id: M01-WRITE-TESTS-C9-20260507T153014+0800
+    type: step
+    ref: C9/M01/write_tests
+    status: active
+    timestamp: "2026-05-07T15:30:14+08:00"
+    summary: Starting focused configuration governance documentation checks.
+    report: core/test/docs-governance.test.js
+    trigger: auto
+    related_milestone: M01
+  -
+    id: C9-PLAN-AUDIT-REPAIR-R2-20260507T144000+0800
+    type: plan_review
+    ref: C9/P3
+    status: completed
+    timestamp: "2026-05-07T14:40:00+08:00"
+    summary: Subagent re-review requested explicit C9 marker in pipeline.name; updated project config and state names to include C9.
+    report: .pipeline/reviews/C9-plan-generation/subagent-audit/summary.md
+    trigger: user
+  -
+    id: C9-PLAN-AUDIT-REPAIR-20260507T143900+0800
+    type: plan_review
+    ref: C9/P3
+    status: completed
+    timestamp: "2026-05-07T14:39:00+08:00"
+    summary: Subagent audit returned needs_changes; repaired high-risk gates, C9 config name, generic plan-state compatibility views, and PR/MR remote-readonly wording.
+    report: .pipeline/reviews/C9-plan-generation/subagent-audit/summary.md
+    trigger: user
+  -
+    id: C9-PLAN-GENERATE-20260507T143847+0800
+    type: plan_generate
+    ref: C9
+    status: completed
+    timestamp: "2026-05-07T14:38:47+08:00"
+    summary: Generated C9 batch Feature Queue, design spec, architecture baseline, 12 Milestone prompts, compact views, and plan-state artifacts.
+    report: .pipeline/confirm-summary.md
+    trigger: user
+  -
     id: C8-COMPLETE-20260506T173003+0800
     type: pipeline_complete
     ref: C8

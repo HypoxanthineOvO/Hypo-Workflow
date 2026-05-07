@@ -1,8 +1,8 @@
-# Cursor Guide
+# Cursor 指南
 
-Hypo-Workflow does not run project work itself; the host agent performs the work using `.pipeline/` files.
+Hypo-Workflow 不直接运行项目工作；宿主 Agent 读取 `.pipeline/` 文件并完成实际实现、测试和审查。
 
-## Capability Summary
+## 能力摘要
 
 - Commands: repository-instructions.
 - Ask gates: chat.
@@ -12,9 +12,9 @@ Hypo-Workflow does not run project work itself; the host agent performs the work
 - Rules/instructions: .cursor/rules/hypo-workflow.mdc.
 - Recovery: pipeline-files.
 
-## Install / Sync
+## 安装 / 同步
 
-Generate the Cursor rule file:
+生成 Cursor rule file：
 
 ```bash
 hypo-workflow sync --platform cursor --project .
@@ -22,25 +22,26 @@ hypo-workflow sync --platform cursor --project .
 
 Target: `.cursor/rules/hypo-workflow.mdc`.
 
-## Supported Features
+## 支持能力
 
-- Reads `.pipeline/` state, config, Cycle, Rules/Habits, prompts, reports, logs, and review artifacts.
-- Uses the canonical `/hw:*` workflow vocabulary: init, plan, start/resume, status/report, sync/docs, rules, patch, release.
-- Preserves protected authority files unless the lifecycle command explicitly owns the write.
-- Provides repository-level instructions so the host IDE agent can follow the Hypo-Workflow contract.
-- Carries protected-file, preflight, rules, and implementation/test separation guidance.
+- 读取 `.pipeline/` state、config、Cycle、Rules/Habits、prompts、reports、logs 和 review artifacts。
+- 使用 canonical `/hw:*` workflow vocabulary：init、plan、start/resume、status/report、sync/docs、rules、patch、release。
+- 支持 `/hw:explain` 作为只读 evidence-first 问答命令，用于解释代码、配置、命令、报告和近期改动。
+- 除非生命周期命令明确拥有写入权，否则保护 protected authority files。
+- 提供 repository-level instructions，让宿主 IDE Agent 可以遵循 Hypo-Workflow contract。
+- 携带 protected-file、preflight、rules 和 implementation/test separation 指导。
 
-## Boundaries
+## 边界
 
-- Hypo-Workflow is not a runner; the host agent performs implementation, tests, and review.
-- `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/rules.yaml` are protected authority files.
-- External installs, user-level config writes, destructive commands, and network side effects require explicit confirmation.
-- This adapter is an instruction surface only. It does not claim native hooks, lifecycle enforcement, background execution, or automatic recovery.
+- Hypo-Workflow 不是 runner；implementation、tests 和 review 由宿主 Agent 执行。
+- `.pipeline/state.yaml`、`.pipeline/cycle.yaml` 和 `.pipeline/rules.yaml` 是 protected authority files。
+- External installs、user-level config writes、destructive commands 和 network side effects 必须显式确认。
+- 这个 adapter 只是 instruction surface，不声明 native hooks、lifecycle enforcement、background execution 或 automatic recovery。
 
-## Repository Instructions
+## 仓库指令文件
 
 Adapter target: `.cursor/rules/hypo-workflow.mdc`.
 
-These adapters are repository instruction files. They tell the host IDE Agent to read `HypoxanthineOvO/Hypo-Workflow` and follow README Quick Start guidance; they do not provide native Hook or lifecycle enforcement.
+这些 adapters 是仓库级 instruction files。它们告诉宿主 IDE Agent 阅读 `HypoxanthineOvO/Hypo-Workflow` 并遵循 README 快速入口；它们不提供 native Hook 或 lifecycle enforcement。
 
-Keep protected files guarded, run preflight checks before completion, and keep implementation separate from testing/review when the host supports delegated work.
+继续保护 protected files，在完成前执行 preflight checks；当宿主支持 delegated work 时，尽量把 implementation 与 testing/review 分离。

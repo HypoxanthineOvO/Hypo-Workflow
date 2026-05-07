@@ -1,4 +1,6 @@
-# Platforms Reference
+# 平台参考
+
+本页汇总各平台的 command、Ask、Plan 和事件能力。第三方 IDE adapter 只提供仓库指令，不代表 native hook 或自动执行能力。平台能力表用于避免夸大自动化边界，也方便用户判断当前宿主 Agent 能支持哪些 Hypo-Workflow 行为。
 
 | Platform | Commands | Ask | Plan | Events |
 |---|---|---|---|---|

@@ -1,6 +1,7 @@
 ---
-name: resume
-description: Resume Hypo-Workflow execution from the saved state when the user wants to continue an interrupted or stopped pipeline.
+description: Resume Hypo-Workflow execution only through the `/hw:resume` namespace from saved `.pipeline/` state; do not use for Claude Code native `/resume`.
+disable-model-invocation: true
+argument-hint: "[optional context]"
 ---
 
 # /hypo-workflow:resume

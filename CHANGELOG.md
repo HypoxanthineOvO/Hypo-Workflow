@@ -1,5 +1,27 @@
 # Changelog
 
+## v12.1.0 - 2026-05-07
+
+### Features
+
+- Added configuration governance docs for automation levels, strictness, confirmation boundaries, platform differences, and default profiles such as solo-auto, manual-review, team-strict, and analysis-hybrid.
+- Added `/hw:pr` for existing GitHub PR and GitLab MR handling, including remote-readonly inspect/review, local `.pipeline/pr/` archives, manual-gated fix/merge/close proposals, and local archive id reuse.
+- Added `/hw:explain` as an evidence-first read-only explanation command, including `--subagent` evidence packet handoff for independent context collection.
+- Fixed Claude Code `/resume` namespace ambiguity by keeping Claude native `/resume` separate from Hypo `/hw:resume` and removing bare resume skill metadata.
+- Converted the human-facing README/docs/reference chain to Chinese-body documentation while keeping command names, config keys, file paths, and platform terms literal.
+
+### Fixes
+
+- Redacted secret-like text before Explain evidence excerpts, Subagent-rendered explanations, PR review findings, and PR review notes.
+- Refreshed OpenCode command maps and regression scenarios for the 38-command surface, including `/hw:pr` and `/hw:explain`.
+- Distributed refreshed project adapters and local skill copies for Codex, Claude Code, OpenCode, Cursor, Copilot, and Trae.
+
+### Tests
+
+- `npm test --prefix core`: 349/349 passing.
+- `python3 tests/run_regression.py`: 63/63 passing.
+- Docs Chinese-body checks, release narrative checks, config validation, Claude plugin validation, sync check-only, and `git diff --check` passing.
+
 ## v12.0.1 - 2026-05-07
 
 ### Features

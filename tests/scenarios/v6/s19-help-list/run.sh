@@ -12,9 +12,9 @@ count="$(awk '
   in_table && /^When the user types/ {print c; exit}
 ' SKILL.md)"
 
-test "$count" = "36"
-rg -q '36 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, and Utility groups' references/commands-spec.md
-rg -q 'lists all 36 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, and Utility' references/commands-spec.md
+test "$count" = "38"
+rg -q '38 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups' references/commands-spec.md
+rg -q 'lists all 38 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility' references/commands-spec.md
 rg -q '\| `/hw:cycle` \|' SKILL.md
 rg -q '\| `/hw:accept` \|' SKILL.md
 rg -q '\| `/hw:reject` \|' SKILL.md
@@ -22,6 +22,8 @@ rg -q '\| `/hw:explore` \|' SKILL.md
 rg -q '\| `/hw:sync` \|' SKILL.md
 rg -q '\| `/hw:docs` \|' SKILL.md
 rg -q '\| `/hw:patch` \|' SKILL.md
+rg -q '\| `/hw:pr` \|' SKILL.md
+rg -q '\| `/hw:explain` \|' SKILL.md
 rg -q '\| `/hw:compact` \|' SKILL.md
 rg -q '\| `/hw:knowledge` \|' SKILL.md
 rg -q '\| `/hw:guide` \|' SKILL.md
