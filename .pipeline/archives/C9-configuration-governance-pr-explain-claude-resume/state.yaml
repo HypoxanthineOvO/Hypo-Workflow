@@ -1,0 +1,186 @@
+pipeline:
+  name: "C9 Hypo-Workflow 配置治理、PR 管理、Explain 命令与 Claude Resume 修复"
+  status: completed
+  prompts_total: 12
+  prompts_completed: 12
+  started: "2026-05-07T15:30:14+08:00"
+  finished: "2026-05-07T16:55:00+08:00"
+
+last_heartbeat: "2026-05-07T16:55:00+08:00"
+
+current:
+  phase: completed
+  prompt_index: 11
+  prompt_file: .pipeline/prompts/11-c9-agent-review-and-full-regression.md
+  prompt_name: M12 / F006 - C9 Agent Review 与全量回归
+  step: completed
+  step_index: 5
+
+milestones:
+  - id: M01
+    feature_id: F001
+    name: 配置字段盘点与严格度矩阵
+    prompt_file: .pipeline/prompts/00-configuration-field-audit-and-strictness-matrix.md
+    status: done
+  - id: M02
+    feature_id: F001
+    name: 默认配置组合
+    prompt_file: .pipeline/prompts/01-default-configuration-profiles.md
+    status: done
+  - id: M03
+    feature_id: F002
+    name: Change Request 合同与本地归档
+    prompt_file: .pipeline/prompts/02-change-request-contract-and-local-archive.md
+    status: done
+  - id: M04
+    feature_id: F002
+    name: 只读 inspect/review 流程
+    prompt_file: .pipeline/prompts/03-pr-mr-inspect-review-readonly-flow.md
+    status: done
+  - id: M05
+    feature_id: F002
+    name: fix/merge/close 手动门
+    prompt_file: .pipeline/prompts/04-pr-mr-fix-merge-close-manual-gates.md
+    status: done
+  - id: M06
+    feature_id: F003
+    name: Evidence-first Explain 合同
+    prompt_file: .pipeline/prompts/05-evidence-first-explain-contract.md
+    status: done
+  - id: M07
+    feature_id: F003
+    name: "`--subagent` 取证流程"
+    prompt_file: .pipeline/prompts/06-explain-subagent-evidence-handoff.md
+    status: done
+  - id: M08
+    feature_id: F003
+    name: Explain 测试与文档
+    prompt_file: .pipeline/prompts/07-explain-tests-and-docs.md
+    status: done
+  - id: M09
+    feature_id: F004
+    name: Claude `/resume` 冲突审计
+    prompt_file: .pipeline/prompts/08-claude-resume-conflict-audit.md
+    status: done
+  - id: M10
+    feature_id: F004
+    name: Claude 适配修复与烟测
+    prompt_file: .pipeline/prompts/09-claude-resume-adapter-fix-and-smoke.md
+    status: done
+  - id: M11
+    feature_id: F005
+    name: 人读文档中文主体化
+    prompt_file: .pipeline/prompts/10-chinese-human-docs-conversion.md
+    status: done
+  - id: M12
+    feature_id: F006
+    name: C9 Agent Review 与全量回归
+    prompt_file: .pipeline/prompts/11-c9-agent-review-and-full-regression.md
+    status: done
+
+history:
+  completed_prompts:
+    - id: M01
+      prompt_index: 0
+      prompt_file: .pipeline/prompts/00-configuration-field-audit-and-strictness-matrix.md
+      result: pass
+      report: .pipeline/reports/00-configuration-field-audit-and-strictness-matrix.report.md
+      finished_at: "2026-05-07T15:37:40+08:00"
+    - id: M02
+      prompt_index: 1
+      prompt_file: .pipeline/prompts/01-default-configuration-profiles.md
+      result: pass
+      report: .pipeline/reports/01-default-configuration-profiles.report.md
+      finished_at: "2026-05-07T15:44:00+08:00"
+    - id: M03
+      prompt_index: 2
+      prompt_file: .pipeline/prompts/02-change-request-contract-and-local-archive.md
+      result: pass
+      report: .pipeline/reports/02-change-request-contract-and-local-archive.report.md
+      finished_at: "2026-05-07T15:55:35+08:00"
+    - id: M04
+      prompt_index: 3
+      prompt_file: .pipeline/prompts/03-pr-mr-inspect-review-readonly-flow.md
+      result: pass
+      report: .pipeline/reports/03-pr-mr-inspect-review-readonly-flow.report.md
+      finished_at: "2026-05-07T15:59:51+08:00"
+    - id: M05
+      prompt_index: 4
+      prompt_file: .pipeline/prompts/04-pr-mr-fix-merge-close-manual-gates.md
+      result: pass
+      report: .pipeline/reports/04-pr-mr-fix-merge-close-manual-gates.report.md
+      finished_at: "2026-05-07T16:04:20+08:00"
+    - id: M06
+      prompt_index: 5
+      prompt_file: .pipeline/prompts/05-evidence-first-explain-contract.md
+      result: pass
+      report: .pipeline/reports/05-evidence-first-explain-contract.report.md
+      finished_at: "2026-05-07T16:12:29+08:00"
+    - id: M07
+      prompt_index: 6
+      prompt_file: .pipeline/prompts/06-explain-subagent-evidence-handoff.md
+      result: pass
+      report: .pipeline/reports/06-explain-subagent-evidence-handoff.report.md
+      finished_at: "2026-05-07T16:20:00+08:00"
+    - id: M08
+      prompt_index: 7
+      prompt_file: .pipeline/prompts/07-explain-tests-and-docs.md
+      result: pass
+      report: .pipeline/reports/07-explain-tests-and-docs.report.md
+      finished_at: "2026-05-07T16:25:30+08:00"
+    - id: M09
+      prompt_index: 8
+      prompt_file: .pipeline/prompts/08-claude-resume-conflict-audit.md
+      result: pass
+      report: .pipeline/reports/08-claude-resume-conflict-audit.report.md
+      finished_at: "2026-05-07T16:30:10+08:00"
+    - id: M10
+      prompt_index: 9
+      prompt_file: .pipeline/prompts/09-claude-resume-adapter-fix-and-smoke.md
+      result: pass
+      report: .pipeline/reports/09-claude-resume-adapter-fix-and-smoke.report.md
+      finished_at: "2026-05-07T16:34:00+08:00"
+    - id: M11
+      prompt_index: 10
+      prompt_file: .pipeline/prompts/10-chinese-human-docs-conversion.md
+      result: pass
+      report: .pipeline/reports/10-chinese-human-docs-conversion.report.md
+      finished_at: "2026-05-07T16:40:00+08:00"
+    - id: M12
+      prompt_index: 11
+      prompt_file: .pipeline/prompts/11-c9-agent-review-and-full-regression.md
+      result: pass
+      report: .pipeline/reports/11-c9-agent-review-and-full-regression.report.md
+      finished_at: "2026-05-07T16:55:00+08:00"
+
+prompt_state:
+  started_at: "2026-05-07T16:40:00+08:00"
+  updated_at: "2026-05-07T16:55:00+08:00"
+  result: pass
+  diff_score: 1.0
+  code_quality: pass
+  steps:
+    - name: write_tests
+      status: completed
+      executor: self
+      started_at: "2026-05-07T16:40:00+08:00"
+      notes: Starting M12 by running final C9 focused tests, Subagent audit, full regression, and delivery readiness checks.
+      finished_at: "2026-05-07T16:45:00+08:00"
+    - name: implement
+      status: completed
+      executor: self
+      started_at: "2026-05-07T16:45:00+08:00"
+      finished_at: "2026-05-07T16:49:00+08:00"
+      notes: Fixed Subagent audit blockers for Explain/PR secret redaction, PR archive id support, and OpenCode command-count drift.
+    - name: run_tests_green
+      status: completed
+      executor: self
+      started_at: "2026-05-07T16:49:00+08:00"
+      finished_at: "2026-05-07T16:54:00+08:00"
+      notes: Focused tests, full core tests, Python regression, config validation, sync check, Claude plugin validate, and git diff check passed.
+    - name: report
+      status: completed
+      executor: self
+      started_at: "2026-05-07T16:54:00+08:00"
+      finished_at: "2026-05-07T16:55:00+08:00"
+      notes: Wrote final validation report and Subagent audit archive.

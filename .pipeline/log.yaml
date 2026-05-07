@@ -1,5 +1,14 @@
 entries:
   -
+    id: CYCLE-CLOSED-C9-20260507T201700+0800
+    type: cycle_close
+    ref: C9
+    status: closed
+    timestamp: "2026-05-07T20:17:00+08:00"
+    summary: Closed and archived Cycle C9 after v12.1.0 local distribution and remote release.
+    report: .pipeline/archives/C9-configuration-governance-pr-explain-claude-resume/summary.md
+    trigger: user
+  -
     id: RELEASE-v12.1.0-20260507T200700+0800
     type: release
     ref: v12.1.0
