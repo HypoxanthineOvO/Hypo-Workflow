@@ -39,6 +39,8 @@ Resolve `compact.*` from project config > global config > defaults:
 ```yaml
 compact:
   auto: true
+  end_of_run: true
+  refresh_policy: dirty_only
   progress_recent: 15
   state_history_full: 1
   log_recent: 20
@@ -151,11 +153,16 @@ Full raw knowledge records are not loaded by default. SessionStart loads `.pipel
 
 When `compact.auto: true`:
 
-- regenerate compact views after each Milestone report is generated and the Milestone reaches a final state
+- regenerate dirty compact views after `/hw:start` or `/hw:resume` finishes successfully, after validation, report, state, log, and progress updates have all passed
+- do not compact repeatedly during ordinary step execution; keep full authoritative files available while development and validation are still in progress
 - regenerate `.pipeline/knowledge/knowledge.compact.md` when Knowledge Ledger records or indexes changed
 - regenerate compact views during `/hw:cycle close` before or immediately after archive summary generation
 
 When `compact.auto: false`, do not generate compact files unless the user explicitly invokes `/hw:compact`.
+
+End-of-run automatic compact is dirty-only: refresh only compact targets whose full authoritative sources are newer or whose compact target is missing. Each refreshed compact target must be regenerated from the full source file or source directory, never from the previous `.compact` output.
+
+`compact.refresh_policy=always` may be used by explicit maintenance commands when a full derived rebuild is desired. The default end-of-run policy is `dirty_only`.
 
 ## Git Tracking
 

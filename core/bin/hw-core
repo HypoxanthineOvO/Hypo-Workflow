@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
-import { commandMap, loadRulesSummary, writeOpenCodeArtifacts } from "../src/index.js";
+import { commandMap, loadRulesSummary, runEndOfRunCompact, writeOpenCodeArtifacts } from "../src/index.js";
 
 const [, , command, ...args] = process.argv;
 
@@ -19,6 +19,16 @@ try {
     await mkdir(outDir, { recursive: true });
     await writeOpenCodeArtifacts(outDir, { profile: valueAfter(args, "--profile") || "standard" });
     process.stdout.write(`Generated OpenCode artifacts in ${outDir}\n`);
+  } else if (command === "compact-end-of-run") {
+    const project = resolve(valueAfter(args, "--project") || ".");
+    const result = await runEndOfRunCompact(project, {
+      success: args.includes("--success"),
+      status: valueAfter(args, "--status"),
+      compact: {
+        ...(args.includes("--always") ? { refresh_policy: "always" } : {}),
+      },
+    });
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   } else {
     usage();
     process.exit(command ? 1 : 0);
@@ -34,5 +44,5 @@ function valueAfter(args, flag) {
 }
 
 function usage() {
-  process.stdout.write(`hw-core deterministic helper (not a runner)\n\nCommands:\n  hw-core commands --platform opencode\n  hw-core rules --project <dir>\n  hw-core artifact opencode --out <dir> [--profile standard]\n`);
+  process.stdout.write(`hw-core deterministic helper (not a runner)\n\nCommands:\n  hw-core commands --platform opencode\n  hw-core rules --project <dir>\n  hw-core artifact opencode --out <dir> [--profile standard]\n  hw-core compact-end-of-run --project <dir> --success [--always]\n`);
 }

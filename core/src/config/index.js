@@ -163,6 +163,15 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
     language: "zh-CN",
     timezone: "Asia/Shanghai",
   },
+  compact: {
+    auto: true,
+    progress_recent: 15,
+    state_history_full: 1,
+    log_recent: 20,
+    reports_summary_lines: 3,
+    end_of_run: true,
+    refresh_policy: "dirty_only",
+  },
   opencode: {
     auto_continue: true,
     profile: "standard",

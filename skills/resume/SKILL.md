@@ -53,16 +53,17 @@ Use this skill to continue from `.pipeline/state.yaml` without restarting comple
 15. Update `.pipeline/PROGRESS.md`, `.pipeline/log.yaml`, `.pipeline/state.yaml`, and `last_heartbeat` after each meaningful transition.
 16. Before declaring completion, run the Codex preflight/runtime checklist when platform is Codex or hooks are unavailable.
 17. If a derived refresh fails after authority commits, keep the authoritative fact committed, write `.pipeline/derived-refresh.yaml`, and surface repair guidance instead of rolling back the lifecycle write.
-18. After a Milestone report is generated and the Milestone reaches a final state, run `/hw:compact` automatically when `compact.auto=true`; skip it when `compact.auto=false`.
+18. During resume execution, keep full authoritative runtime files available for development and validation; track compact source changes instead of compacting after every step.
 19. If `.pipeline/feature-queue.yaml` exists, resume batch auto-chain from the saved state:
    - honor `gate: confirm` by pausing before the next Feature
    - when a queued Feature uses `just_in_time`, decompose it only after it becomes current
    - sync queue duration, token/cost, and metric summaries from `.pipeline/metrics.yaml`, preserving `n/a` for unavailable telemetry
 20. When Test Profiles are active, do not treat missing profile evidence as a soft warning; block until the required evidence contract is satisfied or an explicit blocker is recorded.
 21. Apply the same `retry` / `deferred` / `stop` decision model on failures.
-22. Before any natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `safe_resume_command: /hw:resume`.
-23. Remove `.pipeline/.lock` when the resume turn completes, stops, blocks, aborts, or finishes.
-24. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
+22. After the complete `/hw:resume` run has finished successfully and validation/report/state updates have all passed, run end-of-run dirty-only compact refresh when `compact.auto=true` and `compact.end_of_run=true`; skip it when disabled. Refresh compact targets from full authoritative sources, not from older compact files.
+23. Before any natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `safe_resume_command: /hw:resume`.
+24. Remove `.pipeline/.lock` when the resume turn completes, stops, blocks, aborts, or finishes.
+25. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
 
 ## Safety Rules
 
