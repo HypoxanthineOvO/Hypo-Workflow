@@ -1,0 +1,33 @@
+schema_version: 1
+archive_id: PR-20260509-003
+provider: github
+kind: pull_request
+host: github.com
+owner: HypoxanthineOvO
+repository: Hypo-Workflow
+number: 5
+url: https://github.com/HypoxanthineOvO/Hypo-Workflow/pull/5
+title: "Harden worker separation acceptance"
+author: Heaticy
+source_branch: dev/lichf
+source_owner: Heaticy
+target_branch: main
+head_ref_oid: 1cf54f168fd64b3aea1bd337b1ceda23ee77bacc
+status_snapshot:
+  state: OPEN
+  draft: false
+  mergeable: CONFLICTING
+  merge_state_status: DIRTY
+  review_decision: ""
+  checks: none_reported
+  changed_files: 104
+  additions: 3399
+  deletions: 1216
+created_at: "2026-05-09T11:10:16Z"
+updated_at: "2026-05-09T11:10:16Z"
+inspected_at: "2026-05-09T19:15:00+08:00"
+related_closed_pr:
+  number: 3
+  title: "Add worker separation policy and bump workflow to v13.0.0"
+  commit: 57877f805f9d55294c8b36add9085313f4367a46
+

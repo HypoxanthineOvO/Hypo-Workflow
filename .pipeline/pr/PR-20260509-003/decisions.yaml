@@ -1,0 +1,30 @@
+schema_version: 1
+archive_id: PR-20260509-003
+remote_write_gate: confirm
+readonly_operations_completed:
+  - inspect
+  - review
+  - local_archive_write
+remote_operations_requiring_confirmation:
+  - push
+  - merge
+  - close
+  - reviewer_write
+  - label_write
+  - target_branch_write
+proposed_operation: none
+merge_recommendation: block_direct_merge
+reasons:
+  - merge_conflict
+  - stale_version_bump_commit
+  - remote_checks_missing
+  - stale_pipeline_runtime_artifacts
+final_status: needs_rebase_or_integration
+confirmation_required: true
+integration_advice:
+  preferred: rebase_or_clean_integration_branch
+  drop_commits:
+    - 57877f805f9d55294c8b36add9085313f4367a46
+  keep_candidate_commit:
+    - 1cf54f168fd64b3aea1bd337b1ceda23ee77bacc
+
