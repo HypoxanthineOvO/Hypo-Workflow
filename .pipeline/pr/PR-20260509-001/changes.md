@@ -28,5 +28,5 @@ Validation:
 
 Remote writes:
 
-- None.
-- Merge/push/reviewer/label/target branch writes still require explicit confirmation.
+- Pushed integrated `main` to GitHub and GitLab after explicit user confirmation.
+- GitHub marked PR `#4` as merged.

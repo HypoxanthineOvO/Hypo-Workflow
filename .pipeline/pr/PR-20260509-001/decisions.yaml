@@ -18,9 +18,14 @@ reasons:
   - integration_fix_applied
   - local_validation_passed
   - remote_checks_missing
-final_status: waiting_remote_merge_confirmation
-confirmation_required: true
+final_status: merged
+confirmation_required: false
 integration_branch: integrate/pr-4-end-of-run-compact
+remote_merge:
+  status: completed
+  merged_at: "2026-05-09T10:56:33Z"
+  merge_commit: 1aedf6913bb59e8702fe5676cb130429ab7ea93a
+  pushed_head: 694713d95ffa9d23a1a066bab72a1b87d332b384
 validation:
   core_tests: "pass 369/369"
   regression: "pass 63/63"

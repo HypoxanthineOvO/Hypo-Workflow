@@ -51,7 +51,9 @@ Validation was run in a temporary worktree on `github/main` merged with PR `#4`.
 
 ## Current Recommendation
 
-The original PR branch should not be merged as-is, but the local integration branch is now ready after a follow-up fix. `integrate/pr-4-end-of-run-compact` merges PR `#4`, adapts the regression test to the new end-of-run compact contract, and fixes the implementation consistency issues found during review.
+The original PR branch was accepted through a local integration path instead of a direct GitHub button merge. `integrate/pr-4-end-of-run-compact` merged PR `#4`, adapted the regression test to the new end-of-run compact contract, and fixed the implementation consistency issues found during review.
+
+Remote status: GitHub marks PR `#4` as `MERGED` at `2026-05-09T10:56:33Z`.
 
 ## Partial Merge Assessment
 
