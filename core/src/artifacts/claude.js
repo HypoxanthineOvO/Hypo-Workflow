@@ -235,7 +235,7 @@ export function renderClaudeCodePluginManifest(options = {}) {
       "tdd",
       "prompt-engineering",
       "ai-agent",
-      "dashboard",
+      "status",
       "claude-code",
       "codex",
       "opencode",

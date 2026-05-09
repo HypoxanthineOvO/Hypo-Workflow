@@ -34,6 +34,13 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
         },
       },
       providers: {},
+      backend: {},
+      authorization: {
+        status: "unknown",
+        scope: [],
+        downgrade_requires_confirmation: true,
+        confirmed_by_user: false,
+      },
       degradation: {
         allow_with_confirmation: true,
         options: [
@@ -434,9 +441,12 @@ export function resolveWorkerSeparationPolicy(projectConfig = {}, globalConfig =
   return {
     ...merged,
     mode,
+    platform: normalizeWorkerSeparationPlatform(projectConfig, globalConfig, merged),
     ask_on_init_or_first_plan: merged.ask_on_init_or_first_plan !== false,
     roles,
     providers: isPlainObject(merged.providers) ? merged.providers : {},
+    backend: isPlainObject(merged.backend) ? merged.backend : {},
+    authorization: normalizeWorkerAuthorization(merged.authorization),
     degradation,
     acceptance: {
       audit_can_block_acceptance: merged.acceptance?.audit_can_block_acceptance !== false,
@@ -453,6 +463,7 @@ export function assessWorkerSeparationStatus(policyInput = {}, runtime = {}) {
   const policy = resolveWorkerSeparationPolicy({ execution: { worker_separation: policyInput } });
   const workers = Array.isArray(runtime.workers) ? runtime.workers : [];
   const roleMap = new Map(workers.map((worker) => [worker.role, worker]));
+  const roleAvailability = normalizeRoleAvailability(runtime.role_availability || runtime.roleAvailability || {});
   const requiredRoles = Object.entries(policy.roles)
     .filter(([, config]) => config.required)
     .map(([role]) => role);
@@ -461,36 +472,61 @@ export function assessWorkerSeparationStatus(policyInput = {}, runtime = {}) {
   const testWorker = roleMap.get("test");
   const auditWorker = roleMap.get("audit");
   const collisions = [];
+  const lifecycleBlocked = requiredRoles
+    .filter((role) => roleMap.get(role))
+    .flatMap((role) => workerLifecycleIssues(role, roleMap.get(role)));
+  const authorizationBlocked = workerAuthorizationIssues(policy.authorization, policy.mode, policy.platform);
 
   if (sameWorkerIdentity(implementWorker, testWorker)) {
     collisions.push("implement_test_shared_worker");
   }
-  if (sameWorkerIdentity(implementWorker, auditWorker)) {
+  if (sameWorkerIdentity(implementWorker, auditWorker) && shouldCountAuditCollision(policy, roleAvailability.audit)) {
     collisions.push("implement_audit_shared_worker");
   }
-  if (sameWorkerIdentity(testWorker, auditWorker)) {
+  if (sameWorkerIdentity(testWorker, auditWorker) && shouldCountAuditCollision(policy, roleAvailability.audit)) {
     collisions.push("test_audit_shared_worker");
   }
 
-  const degraded = missingRoles.length > 0 || collisions.length > 0;
+  const workerEvidenceObserved = workers.length > 0;
+  const degraded = missingRoles.length > 0 || collisions.length > 0 || lifecycleBlocked.length > 0 || authorizationBlocked.length > 0;
+  const implementTestBlocking = hasImplementTestBlockingIssue(missingRoles, collisions);
+  const auditBlocking = hasAuditBlockingIssue(missingRoles, collisions);
+  const implementTestUnavailable = implementTestIssueUnavailable(missingRoles, collisions, roleAvailability);
+  const auditUnavailable = !auditBlocking || roleUnavailable(roleAvailability.audit);
+  const auditInsufficient = runtime.audit_verdict === "insufficient";
+  const hardBlocked = lifecycleBlocked.length > 0 || authorizationBlocked.length > 0;
   const canProceed = policy.mode === "off"
     ? true
     : policy.mode === "recommended"
-      ? (!degraded || policy.degradation.allow_with_confirmation)
-      : !degraded;
+      ? (
+        !hardBlocked
+        && (!implementTestBlocking || implementTestUnavailable)
+        && (!auditBlocking || auditUnavailable)
+      )
+      : (!degraded && !auditInsufficient);
 
   return {
     policy,
     workers,
+    role_availability: roleAvailability,
     missing_roles: missingRoles,
     collisions,
+    lifecycle_blocked: lifecycleBlocked,
+    authorization_blocked: authorizationBlocked,
     degraded,
     can_proceed: canProceed,
     requires_confirmation: degraded && policy.mode !== "off" && policy.degradation.allow_with_confirmation,
-    acceptance_blocked: policy.mode === "strict"
-      ? degraded
-      : policy.acceptance.audit_can_block_acceptance && runtime.audit_verdict === "insufficient",
-    summary: buildWorkerSeparationSummary(policy, missingRoles, collisions),
+    acceptance_blocked: policy.mode === "off"
+      ? false
+      : policy.mode === "strict"
+        ? (degraded || auditInsufficient)
+        : (
+          hardBlocked
+          || (implementTestBlocking && !implementTestUnavailable)
+          || (auditBlocking && !auditUnavailable)
+          || (policy.acceptance.audit_can_block_acceptance && auditInsufficient)
+        ),
+    summary: buildWorkerSeparationSummary(policy, missingRoles, collisions, roleAvailability, lifecycleBlocked, authorizationBlocked),
   };
 }
 
@@ -617,6 +653,37 @@ function normalizeDegradationOptions(input) {
   return values.filter((value) => allowed.has(value));
 }
 
+function normalizeWorkerAuthorization(input = {}) {
+  if (!isPlainObject(input)) {
+    return DEFAULT_GLOBAL_CONFIG.execution.worker_separation.authorization;
+  }
+  const allowedStatuses = new Set([
+    "authorized",
+    "not_authorized",
+    "blocked_until_authorized",
+    "downgraded_off",
+    "unknown",
+  ]);
+  const allowedFallbacks = new Set([
+    "block_start",
+    "block_start_resume",
+    "fastest_single_agent_off",
+  ]);
+  const status = String(input.status || "unknown").trim().toLowerCase();
+  const fallback = input.fallback_when_declined
+    ? String(input.fallback_when_declined).trim()
+    : undefined;
+  return {
+    ...input,
+    status: allowedStatuses.has(status) ? status : "unknown",
+    scope: Array.isArray(input.scope) ? input.scope.filter(Boolean).map(String) : [],
+    ...(input.granted_by ? { granted_by: String(input.granted_by) } : {}),
+    ...(allowedFallbacks.has(fallback) ? { fallback_when_declined: fallback } : {}),
+    downgrade_requires_confirmation: input.downgrade_requires_confirmation !== false,
+    confirmed_by_user: Boolean(input.confirmed_by_user),
+  };
+}
+
 function findP0Decision(question, sources, order) {
   for (const source of order) {
     const bucket = source === "cycle_explicit"
@@ -653,11 +720,11 @@ function workerIdentity(worker = {}) {
   return worker.session_id || worker.worker_id || worker.id || worker.name || null;
 }
 
-function buildWorkerSeparationSummary(policy, missingRoles, collisions) {
+function buildWorkerSeparationSummary(policy, missingRoles, collisions, roleAvailability = {}, lifecycleBlocked = [], authorizationBlocked = []) {
   if (policy.mode === "off") {
     return "Worker separation disabled for this project.";
   }
-  if (!missingRoles.length && !collisions.length) {
+  if (!missingRoles.length && !collisions.length && !lifecycleBlocked.length && !authorizationBlocked.length) {
     return `Worker separation ${policy.mode} satisfied with implement/test/audit split.`;
   }
   const parts = [];
@@ -667,7 +734,134 @@ function buildWorkerSeparationSummary(policy, missingRoles, collisions) {
   if (collisions.length) {
     parts.push(`shared workers: ${collisions.join(", ")}`);
   }
+  if (lifecycleBlocked.length) {
+    parts.push(`worker lifecycle blocked: ${lifecycleBlocked.join(", ")}`);
+  }
+  if (authorizationBlocked.length) {
+    parts.push(`authorization blocked: ${authorizationBlocked.join(", ")}`);
+  }
   return `Worker separation ${policy.mode} degraded: ${parts.join("; ")}.`;
+}
+
+function workerLifecycleIssues(role, worker = {}) {
+  const lifecycle = isPlainObject(worker.lifecycle) ? worker.lifecycle : worker;
+  const requested = normalizeLifecycleValue(lifecycle.requested ?? lifecycle.requested_status ?? lifecycle.requestedStatus);
+  const started = normalizeLifecycleValue(lifecycle.started ?? lifecycle.started_status ?? lifecycle.startedStatus);
+  const terminal = normalizeLifecycleValue(
+    lifecycle.terminal
+    ?? lifecycle.result
+    ?? lifecycle.status
+    ?? lifecycle.completed
+    ?? lifecycle.completed_status
+    ?? lifecycle.completedStatus,
+  );
+  const close = normalizeLifecycleValue(
+    lifecycle.close
+    ?? lifecycle.closed
+    ?? lifecycle.close_status
+    ?? lifecycle.closeStatus,
+  );
+  const issues = [];
+  if (!isLifecyclePresent(requested)) issues.push(`${role}_lifecycle_missing_requested`);
+  if (!isLifecyclePresent(started)) issues.push(`${role}_lifecycle_missing_started`);
+  if (terminal !== "completed") issues.push(`${role}_lifecycle_${terminal || "missing_terminal"}`);
+  if (close !== "closed") issues.push(`${role}_lifecycle_${close || "missing_close"}`);
+  return issues;
+}
+
+function normalizeLifecycleValue(value) {
+  if (value === true) return "completed";
+  if (value === false || value == null) return "";
+  return String(value).trim().toLowerCase().replace(/-/g, "_");
+}
+
+function isLifecyclePresent(value) {
+  return ["requested", "started", "completed", "true", "yes", "ok"].includes(value);
+}
+
+function workerAuthorizationIssues(authorization = {}, mode = "recommended", platform = "codex") {
+  if (mode === "off") return [];
+  if (!requiresCodexWorkerAuthorization(platform)) return [];
+  const status = String(authorization?.status || "unknown").trim().toLowerCase();
+  if (status === "authorized") {
+    const scope = Array.isArray(authorization.scope) ? authorization.scope : [];
+    if (scope.length > 0 && scope.includes("/hw:start") && scope.includes("/hw:resume")) return [];
+    return ["worker_authorization_missing_start_resume_scope"];
+  }
+  if (status === "downgraded_off") return [];
+  if (status === "blocked_until_authorized") return ["worker_authorization_blocked_until_authorized"];
+  if (status === "not_authorized") return ["worker_authorization_not_authorized"];
+  return ["worker_authorization_unknown"];
+}
+
+function normalizeRoleAvailability(input = {}) {
+  if (!isPlainObject(input)) return {};
+  const result = {};
+  for (const [role, value] of Object.entries(input)) {
+    if (!isPlainObject(value)) continue;
+    const status = String(value.status || "unknown").trim().toLowerCase();
+    const reason = String(value.reason || "").trim().toLowerCase();
+    result[role] = {
+      status,
+      reason,
+    };
+  }
+  return result;
+}
+
+function hasImplementTestBlockingIssue(missingRoles, collisions) {
+  return missingRoles.includes("implement")
+    || missingRoles.includes("test")
+    || collisions.includes("implement_test_shared_worker");
+}
+
+function hasAuditBlockingIssue(missingRoles, collisions) {
+  return missingRoles.includes("audit")
+    || collisions.includes("implement_audit_shared_worker")
+    || collisions.includes("test_audit_shared_worker");
+}
+
+function implementTestIssueUnavailable(missingRoles, collisions, roleAvailability) {
+  if (missingRoles.includes("implement") && !roleUnavailable(roleAvailability.implement)) return false;
+  if (missingRoles.includes("test") && !roleUnavailable(roleAvailability.test)) return false;
+  if (collisions.includes("implement_test_shared_worker")) {
+    return false;
+  }
+  return true;
+}
+
+function roleUnavailable(value = {}) {
+  if (!value || value.status !== "unavailable") return false;
+  return allowedWorkerDegradeReasons().has(value.reason);
+}
+
+function shouldCountAuditCollision(policy, auditAvailability) {
+  if (policy.mode !== "recommended") return true;
+  return !roleUnavailable(auditAvailability);
+}
+
+function allowedWorkerDegradeReasons() {
+  return new Set([
+    "tool_unavailable",
+    "command_unavailable",
+    "platform_unsupported",
+    "capability_missing",
+    "permission_denied",
+    "spawn_failed",
+    "exec_nonzero",
+  ]);
+}
+
+function normalizeWorkerSeparationPlatform(projectConfig = {}, globalConfig = {}, workerSeparation = {}) {
+  const configured = workerSeparation.platform
+    || projectConfig?.agent?.platform
+    || globalConfig?.agent?.platform
+    || DEFAULT_GLOBAL_CONFIG.agent.platform;
+  return String(configured || "codex").trim().toLowerCase().replace(/[_\s]+/g, "-");
+}
+
+function requiresCodexWorkerAuthorization(platform = "codex") {
+  return String(platform || "codex").trim().toLowerCase().replace(/[_\s]+/g, "-") === "codex";
 }
 
 function firstModel(role, fallback) {
@@ -830,6 +1024,7 @@ function nextMeaningful(lines, start) {
 function parseYamlKeyValue(text) {
   const match = /^([^:]+):(.*)$/.exec(text);
   if (!match) return null;
+  if (match[2] && !/^\s/.test(match[2])) return null;
   return {
     key: match[1].trim(),
     rawValue: match[2].trim(),

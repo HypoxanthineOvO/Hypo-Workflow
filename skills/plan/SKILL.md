@@ -29,11 +29,56 @@ Before P1 starts, run or explicitly reuse the Cycle-level `P0 Configure` pre-dis
 
 When a project has not yet declared `execution.worker_separation.mode`, Discover should also ask whether the project wants `off`, `recommended`, or `strict` implement/test/audit separation and persist that decision during Generate.
 
+If degraded mode is selected for worker separation, it requires explicit user confirmation and must record the non-delegation rationale, missing roles, degraded reason, validation owner, and downstream acceptance impact.
+
+P1 Discover has a mandatory execution subworker authorization gate before decomposition. Apply it even when the project already declares `execution.worker_separation.mode=recommended` or `strict`.
+
+- Codex: if there is no persisted authorization whose scope explicitly includes `/hw:start` and `/hw:resume` or execution/start-resume roles, ask whether the user authorizes execution subworkers for `/hw:start` and `/hw:resume`; if authorized, choose `recommended` or `strict`
+- Codex: if the user declines execution subworkers, either block start/resume until authorization or explicitly confirm the fastest single-agent lane, persisted as `execution.worker_separation.mode=off`
+- Claude Code: no extra authorization gate is needed for configured subworkers; ask whether execution subworkers should use `subcodex` or `subclaude`, then choose `recommended` or `strict`
+- OpenCode: no extra authorization gate is needed for configured native agents/subagents; choose `recommended` or `strict`, or explicit `off`
+
+The mode still governs implement/test/audit separation: `recommended` separates implement and test when possible, while `strict` requires implement/test/audit to be distinct.
+
+For Codex only: do not treat missing authorization as `recommended`, and do not silently downgrade to `off`. `recommended` and `strict` require either explicit execution subworker authorization or an explicit blocking gate that prevents `/hw:start` and `/hw:resume` until authorization is granted; `off` requires explicit user-confirmed fast single-agent downgrade. This Codex authorization gate does not apply to Claude Code or OpenCode.
+
+Plan-time Subagents, reviewers, challengers, and validators have the same lifecycle contract as execution workers:
+
+- the main agent may open them only after authorization, role, scope, and expected evidence are explicit
+- each worker must be recorded as `requested`, `started`, `completed|failed|blocked`, and `closed|close_failed`
+- the main agent must wait for role evidence before using it to pass a checkpoint, then close/release the worker when it is no longer needed
+- a planning reviewer/challenger worker must not become the later execution `test`, `implement`, or `audit` worker unless a new authorization and scope explicitly assigns that role
+- if lifecycle closure is missing or failed, P4 Confirm must surface it as a blocking or degraded evidence item instead of treating the worker as cleanly completed
+
+P1 must not enter P2 until the Codex authorization gate has one explicit outcome:
+
+- authorized `recommended`
+- authorized `strict`
+- not authorized and start/resume must be blocked until authorization
+- not authorized and explicitly downgraded to fastest single-agent `off`
+
+If the user has completed the normal requirement interview but this authorization decision is still missing, stay in P1 and ask only this gate question next. Do not generate milestones, prompts, or architecture artifacts before the gate is resolved.
+
+The verification answer must be captured as a 真实测试方法 / real test method contract: exact command or scenario, observable pass/fail signal, independent validator, and whether audit must reject pseudo tests. Example: for a Heaticy-style agent-service project, the real method may be "use NapCat to simulate the main account sending a message to the agent"; if the test worker only runs unit mocks or a fake message path, the audit worker must reject it.
+
 Then continue through assumption statement, ambiguity resolution, tradeoff review, and validation criteria as needed. Keep this structure strong, but do not turn it into a rigid questionnaire.
 
 Test Profiles sit on top of presets. Keep `preset` for step order, but collect category-specific validation policy through `execution.test_profiles` or inferred Discover context.
 
 For testable delivery, planning must design a closed-loop verification path and independent validation ownership before decomposition. Do not accept open-loop plans that only describe code-writing or "run something later" behavior.
+
+P3 Generate must always assign subworker tasks in the generated prompt whenever `execution.worker_separation.mode` is `recommended` or `strict`, or when the feature is non-trivial enough to need independent implementation and validation. This assignment is a prompt contract, not optional runtime improvisation:
+
+- include a `Subworker Assignment Plan` section in every generated implementation prompt
+- pre-assign exactly three worker roles: `test`, `implement`, and `audit`, with each role's scope, forbidden overlap, expected evidence, and handoff artifact path
+- bind `test` to the real test method contract collected in P1, including command/scenario, pass/fail signal, and pseudo-test rejection rule
+- state that `test` owns red-test/reproduction/test fixture/assertion/snapshot edits and that `implement` must not create, edit, or rewrite those test assets
+- state that `implement` must not spawn, impersonate, or satisfy `test` or `audit`; only the main agent orchestrates worker creation and lifecycle
+- require the `audit` worker to inspect final diff, test evidence, worker identity separation, and acceptance risks; `review_code` is the review step/artifact stage, not a worker role
+- state that the main agent orchestrates and integrates but must not satisfy both implementation and validation roles
+- include worker lifecycle evidence requirements: requested, started, completed/failed/blocked, and closed/close_failed for each role before completion can claim worker-separated evidence
+- on Codex, if execution subworkers are not authorized yet, still generate the `Subworker Assignment Plan`, but mark it `blocked_until_authorized` and write a start/resume gate; `/hw:start` must Ask for authorization before role-sensitive work instead of deleting the subworker assignment
+- on Claude Code and OpenCode, generate the assignment against configured native subworkers/agents without an extra authorization gate
 
 Use `/hw:plan --batch` only when the user wants to plan multiple Features in one conversation and create a Feature Queue.
 
@@ -60,7 +105,7 @@ Use `/hw:plan --insert <natural language>` to edit an existing Feature Queue. Co
   - if `plan.interactive.require_explicit_confirm` is missing, treat it as `true`
 - `plan.mode=auto`
   - Claude completes P1-P4 without stopping for user answers unless blocked by missing critical information
-  - P4 Confirm becomes a summary pass-through, not a hard gate
+  - P4 Confirm becomes a summary pass-through only when `automation.gates.planning=auto`; the default `confirm` gate remains a hard stop even in auto plan mode
 
 ## Batch Plan Mode
 
@@ -131,6 +176,8 @@ Interactive planning is a hard conversational gate, not a suggestion.
 🚨 P1 -> P2 的唯一过渡条件：
 用户明确表示「够了」「开始吧」「可以了」等结束信号。用户只是回答问题、补充信息、或说「确认一下」时，继续 P1 追问，不得进入 P2。
 
+Codex execution subworker authorization is also part of the P1 -> P2 gate. If the current platform is Codex and `/hw:start` + `/hw:resume` execution subworker authorization has not been explicitly authorized, explicitly blocked, or explicitly downgraded to fastest single-agent `off`, P1 is not complete even if the user says “可以了”. Ask the authorization gate before P2.
+
 When `--context` is present, injected context can sharpen the first questions but must not skip the required interaction rounds.
 
 ## Plan Tool Discipline
@@ -155,7 +202,12 @@ The `plan-tool-required` built-in rule is active for Plan Mode unless disabled i
 9. Run P1 Discover:
    - collect goals, constraints, stack, users, and architecture expectations
    - start by asking task category, desired effect, and verification method
-   - turn verification into a closed-loop test story: exact command or scenario, observable pass/fail signal, and independent validator ownership
+   - when platform is Codex, check whether persisted execution subworker authorization scope explicitly includes `/hw:start` and `/hw:resume` or execution/start-resume roles
+   - when platform is Codex and that authorization is missing, ask the hard gate before P2: `authorized recommended`, `authorized strict`, `not authorized block start/resume`, or `not authorized explicit fastest single-agent off`
+   - when platform is Codex and the gate is unresolved, do not enter P2, do not generate milestones, and do not generate prompts
+   - when platform is Claude Code, ask whether execution subworkers should use `subcodex` or `subclaude`; no separate authorization gate is required
+   - when platform is OpenCode, use configured native agents/subagents without a separate authorization gate
+   - turn verification into a closed-loop real test contract: exact command or scenario, observable pass/fail signal, independent validator ownership, and pseudo-test rejection policy
    - after the big questions, drive assumption statement, ambiguity resolution, tradeoff review, and validation criteria as needed
    - if context sources were resolved, load them first, present the injected findings to the user, then start interactive questioning
    - when `--batch` is present, collect multiple Feature candidates, priorities, gates, dependencies, acceptance boundaries, category, and verification requirements before leaving Discover
@@ -166,7 +218,19 @@ The `plan-tool-required` built-in rule is active for Plan Mode unless disabled i
    - when `--batch` and `batch.decompose_mode=upfront`, decompose all Features; when `just_in_time`, create Feature scaffolds only
 11. Run P3 Generate:
    - generate `.pipeline/` artifacts and architecture baseline
-   - preserve closed-loop validation commands, evidence expectations, and validator separation in generated prompts
+   - preserve closed-loop validation commands, real test method, evidence expectations, validator separation, and audit pseudo-test rejection rules in generated prompts
+   - generate a `Subworker Assignment Plan` inside each prompt before implementation steps, assigning at minimum:
+     - `test`: owns `write_tests` and `review_tests`; independently validates the planned real test method, failure evidence, final test run, and pseudo-test rejection rule
+     - `implement`: owns implementation edits within the milestone scope
+     - `audit`: reviews final diff, evidence quality, worker identity separation, and acceptance risks
+   - define each subworker role's input context, output artifact, allowed files or scope, and explicit non-overlap rule
+   - make the main agent responsible for orchestration, integration, lifecycle writes, and final decision, but never writing tests or implementation locally before the independent `test` and `implement` workers are authorized or assigned and never satisfying any of the three worker roles itself
+   - persist the execution subworker authorization decision:
+     - Codex authorized: record scope for `/hw:start` and `/hw:resume`, roles, and worker-separation mode
+     - Codex not authorized + explicitly confirmed fastest lane: set `execution.worker_separation.mode=off` and record the user's explicit downgrade confirmation plus single-agent rationale
+     - Codex not authorized + separation required: keep the generated `Subworker Assignment Plan`, mark it `blocked_until_authorized`, and write a start-blocking authorization gate so `/hw:start` and `/hw:resume` Ask or stop before role-sensitive work
+     - Claude Code: record selected execution subworker backend as `subcodex` or `subclaude`
+     - OpenCode: record configured native agent/subagent execution path
    - when `--batch`, generate Feature Queue, Markdown table, Mermaid graph, and batch architecture notes
 12. Run P4 Confirm:
    - interactive mode waits for user confirmation

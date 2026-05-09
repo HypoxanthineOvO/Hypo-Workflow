@@ -31,6 +31,18 @@ Before diving into details, start with three broad questions:
 
 Only after these are clear should the Agent go deeper into assumptions, ambiguities, tradeoffs, and validation criteria.
 
+The verification question must ask for the 真实测试方法 / real test method, not just "what tests should run". Capture the exact command, tool, scenario, observable pass/fail signal, independent validator, and whether audit must reject pseudo tests.
+
+Discover must also ask for the worker separation / 三权分立 policy before decomposition. Apply platform-specific behavior:
+
+- Codex: ask whether the user authorizes execution subworkers for `/hw:start` and `/hw:resume` whenever persisted authorization scope is missing, even if `execution.worker_separation.mode` is already `recommended` or `strict`
+- Codex authorized: ask whether implement/test/audit separation should be `recommended` or `strict`, what objective unavailability evidence allows degradation, and whether audit can block acceptance when the test worker violates the real test contract
+- Codex not authorized: ask whether the plan should block `/hw:start` until authorization is granted, or explicitly confirm switching to the fastest single-agent lane by setting `execution.worker_separation.mode=off`
+- Claude Code: do not ask for subworker authorization; ask whether execution subworkers should use `subcodex` or `subclaude`, then ask for `recommended`, `strict`, or explicit `off`
+- OpenCode: do not ask for subworker authorization; use configured native agents/subagents, then ask for `recommended`, `strict`, or explicit `off`
+
+For Codex only: do not default missing authorization to `recommended`, and do not silently downgrade to `off`. Missing authorization must produce one explicit P1 outcome before decomposition: `authorized recommended`, `authorized strict`, `start-blocking gate`, or explicit user-confirmed fast/off single-agent mode. P1 must not enter P2 while the Codex execution subworker authorization gate is unresolved.
+
 Also classify the workflow lane in structured notes:
 
 - `workflow_kind: build | analysis | showcase`
@@ -50,6 +62,9 @@ For any testable delivery task, Discover must also pin down the closed-loop test
 - what output, screenshot, metric delta, or state change will prove pass or fail
 - who performs the independent validation when the work is non-trivial or delegated
 - what observation would disprove the implementation so the plan is not self-certifying
+- whether the audit worker must reject pseudo tests, mocks, or shortcuts that do not execute the user-declared real scenario
+
+For agent-service work, the real scenario may be outside the repository. If the user says the only valid test is "use NapCat to simulate the main account sending a message to the agent", persist that exact method. A test worker that only runs unit mocks, synthetic fake messages, or a non-user-equivalent path has produced pseudo evidence; the audit worker should reject it.
 
 ## Adaptive Grill-Me
 

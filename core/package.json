@@ -8,6 +8,8 @@
     "hw-core": "./bin/hw-core"
   },
   "scripts": {
-    "test": "cd .. && node --test core/test"
+    "test": "cd .. && node --test core/test/*.test.js",
+    "test:scenario-smoke": "cd .. && bash tests/scenarios/v9/s59-v9-regression-bundle/run.sh",
+    "test:smoke": "npm run test && npm run test:scenario-smoke"
   }
 }

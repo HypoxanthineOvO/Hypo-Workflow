@@ -63,7 +63,7 @@ The first implementation lives in `cli/bin/hypo-workflow` with non-interactive f
 
 | Component | Output | Responsibility |
 |---|---|---|
-| Command generator | `.opencode/commands/hw-*.md` | Map all 32 HW user commands to OpenCode slash commands. |
+| Command generator | `.opencode/commands/hw-*.md` | Map all 36 HW user commands to OpenCode slash commands. |
 | Agent generator | `.opencode/agents/hw-*.md` | Bind plan/build/status/compact/test/code/debug/report/review/explore roles with optional model frontmatter. |
 | Plugin | `.opencode/plugins/hypo-workflow.ts` | Event hooks, context injection, file guard, auto-continue, command context capture. |
 | Instruction exporter | `AGENTS.md` or config instructions | Export stable HW guidance and active always-rules. |

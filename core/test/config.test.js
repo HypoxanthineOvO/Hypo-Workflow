@@ -13,6 +13,13 @@ import {
   writeConfig,
 } from "../src/config/index.js";
 
+const DONE = Object.freeze({
+  requested: "requested",
+  started: "started",
+  status: "completed",
+  closed: "closed",
+});
+
 test("parseYaml reads nested objects and arrays", () => {
   const parsed = parseYaml(`
 agent:
@@ -23,11 +30,15 @@ output:
 items:
   - one
   - two
+commands:
+  - "/hw:start"
+  - "/hw:resume"
 `);
 
   assert.equal(parsed.agent.platform, "opencode");
   assert.equal(parsed.output.language, "zh-CN");
   assert.deepEqual(parsed.items, ["one", "two"]);
+  assert.deepEqual(parsed.commands, ["/hw:start", "/hw:resume"]);
 });
 
 test("loadConfig merges defaults and writeConfig persists yaml", async () => {
@@ -137,22 +148,181 @@ test("worker separation policy resolves project-local modes and degraded coverag
           test: "claude",
           audit: "codex",
         },
+        backend: {
+          claude_code: "subclaude",
+        },
+        authorization: {
+          status: "authorized",
+          scope: ["/hw:start", "/hw:resume"],
+          granted_by: "user",
+          fallback_when_declined: "block_start_resume",
+          downgrade_requires_confirmation: true,
+        },
       },
     },
   });
 
   assert.equal(policy.mode, "strict");
   assert.equal(policy.providers.test, "claude");
+  assert.equal(policy.backend.claude_code, "subclaude");
+  assert.equal(policy.authorization.status, "authorized");
+  assert.deepEqual(policy.authorization.scope, ["/hw:start", "/hw:resume"]);
+  assert.equal(policy.authorization.fallback_when_declined, "block_start_resume");
   assert.ok(policy.degradation.options.includes("switch_provider_and_retry"));
 
   const degraded = assessWorkerSeparationStatus(policy, {
     workers: [
-      { role: "implement", worker_id: "w1" },
-      { role: "test", worker_id: "w1" },
+      { role: "implement", worker_id: "w1", lifecycle: DONE },
+      { role: "test", worker_id: "w1", lifecycle: DONE },
     ],
   });
   assert.equal(degraded.degraded, true);
   assert.ok(degraded.collisions.includes("implement_test_shared_worker"));
   assert.equal(degraded.can_proceed, false);
   assert.equal(degraded.acceptance_blocked, true);
+});
+
+test("config schema documents worker separation authorization and backend fields", async () => {
+  const schema = await readFile("config.schema.yaml", "utf8");
+
+  assert.match(schema, /worker_separation_policy:/);
+  assert.match(schema, /authorization:/);
+  assert.match(schema, /blocked_until_authorized/);
+  assert.match(schema, /downgraded_off/);
+  assert.match(schema, /backend:/);
+  assert.match(schema, /block_start_resume/);
+});
+
+test("recommended mode blocks implement-test degradation unless subworker capability is explicitly unavailable", () => {
+  const policy = resolveWorkerSeparationPolicy({
+    execution: {
+      worker_separation: {
+        mode: "recommended",
+        authorization: {
+          status: "authorized",
+          scope: ["/hw:start", "/hw:resume"],
+        },
+      },
+    },
+  });
+
+  const blocked = assessWorkerSeparationStatus(policy, {
+    workers: [
+      { role: "implement", worker_id: "self" },
+      { role: "test", worker_id: "self", lifecycle: DONE },
+      { role: "audit", worker_id: "audit-1", lifecycle: DONE },
+    ],
+  });
+  assert.equal(blocked.can_proceed, false);
+  assert.equal(blocked.acceptance_blocked, true);
+
+  const stillBlocked = assessWorkerSeparationStatus(policy, {
+    workers: [
+      { role: "implement", worker_id: "self", lifecycle: DONE },
+      { role: "test", worker_id: "self", lifecycle: DONE },
+      { role: "audit", worker_id: "audit-1", lifecycle: DONE },
+    ],
+    role_availability: {
+      implement: { status: "unavailable", reason: "tool_unavailable" },
+      test: { status: "unavailable", reason: "tool_unavailable" },
+    },
+  });
+  assert.equal(stillBlocked.can_proceed, false);
+  assert.equal(stillBlocked.acceptance_blocked, true);
+
+  const off = assessWorkerSeparationStatus({
+    mode: "off",
+  }, {
+    workers: [
+      { role: "implement", worker_id: "self", lifecycle: DONE },
+      { role: "test", worker_id: "self", lifecycle: DONE },
+      { role: "audit", worker_id: "audit-1", lifecycle: DONE },
+    ],
+    role_availability: {
+      implement: { status: "unavailable", reason: "tool_unavailable" },
+      test: { status: "unavailable", reason: "tool_unavailable" },
+    },
+  });
+  assert.equal(off.can_proceed, true);
+  assert.equal(off.acceptance_blocked, false);
+});
+
+test("recommended mode requires explicit audit evidence before audit degradation", () => {
+  const policy = resolveWorkerSeparationPolicy({
+    execution: {
+      worker_separation: {
+        mode: "recommended",
+        authorization: {
+          status: "authorized",
+          scope: ["/hw:start", "/hw:resume"],
+        },
+      },
+    },
+  });
+
+  const blocked = assessWorkerSeparationStatus(policy, {
+    workers: [
+      { role: "implement", worker_id: "impl-1", lifecycle: DONE },
+      { role: "test", worker_id: "test-1", lifecycle: DONE },
+    ],
+  });
+  assert.equal(blocked.can_proceed, false);
+  assert.equal(blocked.acceptance_blocked, true);
+
+  const allowed = assessWorkerSeparationStatus(policy, {
+    workers: [
+      { role: "implement", worker_id: "impl-1", lifecycle: DONE },
+      { role: "test", worker_id: "test-1", lifecycle: DONE },
+    ],
+    role_availability: {
+      audit: { status: "unavailable", reason: "command_unavailable" },
+    },
+  });
+  assert.equal(allowed.can_proceed, true);
+  assert.equal(allowed.acceptance_blocked, false);
+});
+
+test("Codex worker authorization unknown or missing start resume scope blocks separated workers", () => {
+  const workers = [
+    { role: "implement", worker_id: "impl-1", lifecycle: DONE },
+    { role: "test", worker_id: "test-1", lifecycle: DONE },
+    { role: "audit", worker_id: "audit-1", lifecycle: DONE },
+  ];
+
+  const unknown = assessWorkerSeparationStatus({
+    mode: "recommended",
+    platform: "codex",
+    authorization: { status: "unknown" },
+  }, { workers });
+  assert.equal(unknown.can_proceed, false);
+  assert.equal(unknown.acceptance_blocked, true);
+  assert.deepEqual(unknown.authorization_blocked, ["worker_authorization_unknown"]);
+
+  const missingScope = assessWorkerSeparationStatus({
+    mode: "strict",
+    platform: "codex",
+    authorization: { status: "authorized", scope: ["/hw:start"] },
+  }, { workers });
+  assert.equal(missingScope.can_proceed, false);
+  assert.equal(missingScope.acceptance_blocked, true);
+  assert.deepEqual(missingScope.authorization_blocked, ["worker_authorization_missing_start_resume_scope"]);
+});
+
+test("OpenCode and Claude do not require Codex-only worker authorization gate", () => {
+  const workers = [
+    { role: "implement", worker_id: "impl-1", lifecycle: DONE },
+    { role: "test", worker_id: "test-1", lifecycle: DONE },
+    { role: "audit", worker_id: "audit-1", lifecycle: DONE },
+  ];
+
+  for (const platform of ["opencode", "claude_code", "claude"]) {
+    const status = assessWorkerSeparationStatus({
+      mode: "recommended",
+      platform,
+      authorization: { status: "unknown" },
+    }, { workers });
+    assert.equal(status.can_proceed, true);
+    assert.equal(status.acceptance_blocked, false);
+    assert.deepEqual(status.authorization_blocked, []);
+  }
 });

@@ -41,6 +41,20 @@
 - List any manual review expectations that remain after automated checks.
 - Name the independent validation owner when implementation and validation should be separated.
 
+## Subworker Assignment Plan
+
+- `test`: owns `write_tests` and `review_tests`; independently designs or edits red tests, validates the real test method, checks failure evidence, final test run, and pseudo-test rejection rule.
+- `implement`: owns scoped implementation edits for this milestone.
+- `audit`: reviews final diff, evidence quality, worker identity separation, and acceptance risks.
+- Record input context, output artifact path, allowed scope, and non-overlap rule for each role.
+- Declare write scope in every spawned worker prompt:
+  - spawned workers may edit only `.pipeline/` files and explicitly scoped root-level non-project documentation such as `README.md`, `CHANGELOG.md`, and `PROJECT-SUMMARY.md`.
+  - spawned workers must not edit project source, tests, fixtures, runtime code, package manifests, generated adapters, rules, skills, templates, or config outside `.pipeline/` unless the user grants a separate explicit local-execution scope outside the spawned worker contract.
+  - `audit`: read-only; no file edits.
+- If a worker needs an out-of-scope file, it must stop and report the requested path and owning role. Workers must not revert or overwrite another worker's changes unless explicitly authorized in their prompt scope.
+- The main agent orchestrates only; it must not write red tests or implementation locally before the `test` and `implement` workers are authorized or assigned, and it must not satisfy any of the three worker roles itself.
+- On Codex without `/hw:start` and `/hw:resume` execution subworker authorization, keep this plan with `status: blocked_until_authorized` and require start/resume authorization before role-sensitive work.
+
 ## 预期产出
 
 - List the files or artifacts expected from this milestone.

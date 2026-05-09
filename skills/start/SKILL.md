@@ -41,9 +41,25 @@ Use this skill to start execution from a local `.pipeline/` workspace. This is t
    - the main agent coordinates the current step
    - the main agent delegates concrete sub-work to serial Subagent tasks when appropriate
    - Codex should prefer Codex Subagents for substantial work when available, without external model routing
-   - testing/review and implementation should be separated when practical
+   - when worker separation is `off`, testing/review and implementation should still be separated when practical; when `recommended` or `strict`, follow the mandatory role ownership below
    - the main agent verifies results, updates state, logging, and progress artifacts
-13. Execute the active milestone serially:
+13. Before role-sensitive worker-separated work begins, resolve platform-specific Subagent/delegation authorization:
+   - on Codex, if the host requires explicit authorization before spawning Subagents, Ask before starting `write_tests`, `review_tests`, `implement`, `review_code`, or audit-like validation workers
+   - when `execution.worker_separation.mode` is `recommended` or `strict`, `write_tests` and `review_tests` belong to the independent `test` worker; the main agent must not write red tests locally first and then ask a subworker to review them
+   - when `execution.worker_separation.mode` is `recommended` or `strict`, `implement` belongs to the independent implementation worker; the main agent must not implement locally first and then ask a subworker to review or certify it
+   - on Codex, plan-time authorization is valid only when its saved scope explicitly includes `/hw:start` or execution/start-resume roles
+   - on Codex, if authorization is absent or declined and worker separation is `recommended` or `strict`, stop before role-sensitive work unless the generated plan explicitly selected the fastest single-agent `execution.worker_separation.mode=off` lane with user-confirmed downgrade evidence
+   - on Codex, if the plan selected fast/off mode, continue locally only after that explicit downgrade confirmation is present, and record that worker-separation gates are intentionally disabled for speed
+   - on Claude Code and OpenCode, no extra subworker authorization gate is required; use the configured backend/agents, with Claude Code honoring the saved `subcodex` or `subclaude` choice
+   - every spawned worker prompt must declare role-specific explicit scope: default spawned workers may edit only `.pipeline/` files and explicitly scoped root-level non-project documentation such as `README.md`, `CHANGELOG.md`, and `PROJECT-SUMMARY.md`; `test` may edit only named test/fixture/snapshot/assertion paths in its explicit scope; `implement` may edit only named production/runtime/documentation paths in its explicit scope; `audit` is read-only
+   - `test` worker owns reproduction, red tests, validation commands, fixtures, snapshots, assertions, and test evidence before implementation begins
+   - `implement` worker owns only production/runtime/documentation implementation; it must not create, edit, or rewrite tests, fixtures, snapshots, assertions, or validation evidence, and it must not spawn or impersonate `test` or `audit`
+   - if a worker needs to touch an out-of-scope path, stop that worker and report the path and owning role; do not let the worker edit first and explain later
+   - spawned workers must not revert or overwrite another worker's changes unless that exact action is explicitly authorized in the worker prompt scope
+   - do not perform the work locally first and explain missing independent worker evidence afterward
+   - record every worker lifecycle as `requested`, `started`, `completed|failed|blocked`, and `closed|close_failed`; wait for the worker whose evidence gates the next step, then close/release it when its result is integrated
+   - when `/hw:start` stops, blocks, aborts, or completes, close/release any workers it opened or record `close_failed` with the worker id and reason
+14. Execute the active milestone serially:
    - `write_tests`
    - `review_tests`
    - `run_tests_red`
@@ -51,48 +67,49 @@ Use this skill to start execution from a local `.pipeline/` workspace. This is t
    - `run_tests_green`
    - `review_code`
    - report and commit work if the prompt requires it
-14. For review stages, create or reference secret-safe artifacts under `.pipeline/reviews/<feature>/<milestone>/<stage>/`:
+15. For review stages, create or reference secret-safe artifacts under `.pipeline/reviews/<feature>/<milestone>/<stage>/`:
    - validate `verdict` and non-empty `reviewed_refs`
    - record checked/unchecked rules, issues, retry round, and fallback reason when applicable
    - retry `needs_changes` through repair/review up to 3 total rounds by default
    - when strict review policy blocks a verdict, stop continuation and summarize the artifact path
    - for Skill/artifact coverage reviews, record checked/skipped evidence for Skills, hooks, agents, commands, and generated adapter surfaces
-15. After every meaningful step, update:
+16. After every meaningful step, update:
    - `.pipeline/state.yaml`
-   - `.pipeline/log.yaml`
-   - `.pipeline/PROGRESS.md`
-   - top-level `last_heartbeat`
-16. Before declaring a milestone complete, run the Codex preflight/runtime checklist when platform is Codex or hooks are unavailable: protected authority writes, YAML/JSON/Markdown validity, stale derived artifacts, README freshness, output language, secret markers, and report/progress/log evidence.
-17. During execution, do not compact after every step. Track which compact source files changed (`PROGRESS.md`, `state.yaml`, `log.yaml`, `metrics.yaml`, `reports/`, `patches/`, and Knowledge records) while keeping full authoritative files available for development and validation. After the complete `/hw:start` run has finished successfully and validation/report/state updates have all passed, run end-of-run dirty-only compact refresh when `compact.auto=true` and `compact.end_of_run=true`; default `compact.refresh_policy=dirty_only`.
-18. If `.pipeline/feature-queue.yaml` exists, apply batch auto-chain after a Feature's final Milestone passes:
+- `.pipeline/log.yaml`
+- `.pipeline/PROGRESS.md`
+- top-level `last_heartbeat`
+17. Before declaring a milestone complete, run the Codex preflight/runtime checklist when platform is Codex or hooks are unavailable: protected authority writes, YAML/JSON/Markdown validity, stale derived artifacts, README freshness, output language, secret markers, and report/progress/log evidence.
+18. During execution, do not compact after every step. Track which compact source files changed (`PROGRESS.md`, `state.yaml`, `log.yaml`, `metrics.yaml`, `reports/`, `patches/`, and Knowledge records) while keeping full authoritative files available for development and validation. After the complete `/hw:start` run has finished successfully and validation/report/state updates have all passed, run end-of-run dirty-only compact refresh when `compact.auto=true` and `compact.end_of_run=true`; default `compact.refresh_policy=dirty_only`.
+19. If `.pipeline/feature-queue.yaml` exists, apply batch auto-chain after a Feature's final Milestone passes:
    - mark the completed Feature `done`
    - advance to the next queued Feature when `auto_chain=true`
    - pause before the next Feature when it has `gate: confirm`
    - when the next Feature uses `just_in_time`, decompose its Milestones before starting execution
    - sync queue metric summaries from `.pipeline/metrics.yaml`, using `n/a` when token/cost telemetry is unavailable
-19. When `execution.test_profiles` or Feature-level Test Profiles are active, require the matching profile evidence before declaring GREEN:
+20. When `execution.test_profiles` or Feature-level Test Profiles are active, require the matching profile evidence before declaring GREEN:
    - `webapp`: E2E + browser interaction + visual evidence
    - `agent-service`: CLI plan + shared core + real CLI run
    - `research`: baseline + script execution + before/after/delta
-20. When `execution.worker_separation.mode` is `recommended` or `strict`, resolve implement/test/audit role coverage before acceptance:
-   - try to start distinct workers for `implement`, `test`, and `audit`
-   - if roles are missing or collide onto one worker identity, mark the run degraded
+21. When `execution.worker_separation.mode` is `recommended` or `strict`, resolve implement/test/audit role coverage before acceptance:
+   - start distinct workers for `test`, `implement`, and `audit` only after authorization is resolved
+   - `write_tests` and `review_tests` are steps owned by the `test` worker, and that worker must be distinct from the `implement` worker for non-trivial changes
    - implementation Subagent workers must not read test source, fixtures, snapshots, or assertion details; provide only requirements, public interfaces, allowed edit scope, test command, pass/fail status, and sanitized failure summary
-   - if this role isolation cannot be preserved, stop before delegated execution and request explicit user confirmation for degraded mode
-   - record role isolation degradation, missing roles, worker collisions, unavailable boundaries, and the user decision in the report/log/state notes
-   - `recommended` may continue with explicit degraded-mode confirmation and evidence
+   - the main agent may integrate returned changes and resolve conflicts, but it must not be the primary `test`, `implement`, or `audit` worker when worker separation is enabled
+   - if `implement` and `test` collapse onto one worker identity, `recommended` must block; objective subworker-unavailable evidence may justify `retry`, `deferred`, `stop`, or an explicit user-confirmed downgrade to `off`, but it must not count as accepted worker-separated completion
+   - in `recommended`, `audit` may degrade with explicit evidence when subworker capability is unavailable
    - `strict` must not treat degraded execution as fully accepted
-21. On failure, the main agent must choose one of:
+   - incomplete, missing, or `close_failed` worker lifecycle evidence blocks worker-separated completion until repaired or explicitly downgraded where policy allows
+22. On failure, the main agent must choose one of:
    - `retry`: revise instructions and rerun the failed step
    - `deferred`: mark the milestone deferred if downstream work can continue safely
    - `stop`: stop and surface the blocking reason to the user
-22. If a derived refresh fails after authority commits, keep the authoritative fact committed, write `.pipeline/derived-refresh.yaml`, and surface repair guidance instead of rolling back the lifecycle write.
-23. If a Feature fails and the resolved `failure_policy=skip_defer`, mark the Feature `deferred`, preserve its report and metrics, then auto-chain to the next queued Feature unless blocked by `gate: confirm`.
-24. Keep moving automatically between milestones while unfinished work remains.
-25. Before any natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `status: active`, `next_action`, `reason`, `updated_at`, `safe_resume_command: /hw:resume`, and focused `context`.
-26. Remove `.pipeline/.lock` when the execution turn completes, stops, blocks, aborts, or finishes.
-27. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
-28. Only allow the turn to end naturally when all milestones are complete or the main agent has explicitly chosen the `stop` outcome.
+23. If a derived refresh fails after authority commits, keep the authoritative fact committed, write `.pipeline/derived-refresh.yaml`, and surface repair guidance instead of rolling back the lifecycle write.
+24. If a Feature fails and the resolved `failure_policy=skip_defer`, mark the Feature `deferred`, preserve its report and metrics, then auto-chain to the next queued Feature unless blocked by `gate: confirm`.
+25. Keep moving automatically between milestones while unfinished work remains.
+26. Before any natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `status: active`, `next_action`, `reason`, `updated_at`, `safe_resume_command: /hw:resume`, and focused `context`.
+27. Remove `.pipeline/.lock` when the execution turn completes, stops, blocks, aborts, or finishes.
+28. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
+29. Only allow the turn to end naturally when all milestones are complete or the main agent has explicitly chosen the `stop` outcome.
 
 ## Continuation And Preflight
 

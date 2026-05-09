@@ -18,6 +18,8 @@ The Agent should ask these early for both ordinary `/hw:plan` and `/hw:plan --ba
 
 Before those P1 questions, a new Cycle should run or explicitly reuse `P0 Configure`. The stage runs after `cycle new` and before `P1 Discover`; it confirms automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation. Reuse must preserve its source order: `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, `built_in_default`.
 
+The verification answer must become a real test contract, not a vague testing note. Ask for the 真实测试方法 / real test method, the exact scenario or command, the observable pass/fail signal, and the independent validator. For example, an agent-service project may require "use NapCat to simulate the main account sending a message to the agent"; unit mocks or pseudo tests do not satisfy that contract unless the user explicitly defined them as the real acceptance method.
+
 ## Progressive Stages
 
 After the big questions, the default full structure is:
@@ -64,6 +66,10 @@ Batch Discover still runs one unified interview, but every Feature candidate sho
 - task category
 - desired effect
 - verification method
+- real test scenario
+- observable pass/fail signal
+- independent validator
+- audit policy for rejecting pseudo tests
 - gate preference
 - decompose mode
 - acceptance boundary

@@ -42,7 +42,9 @@ Then turn that into a closed-loop validation plan before decomposition:
 - define the exact command, scenario, or procedure that proves the behavior
 - define the observable pass/fail signal, not just the code path being touched
 - define who performs independent validation when the work is non-trivial or delegated
+- preserve the user-declared real test method so test and audit workers cannot substitute pseudo tests
 - reject open-loop plans that only describe implementation steps or "add tests later"
+- reject pseudo tests when the plan declares a real external scenario, for example NapCat simulating a main account message to an agent
 
 Then apply category-specific follow-up:
 
@@ -75,6 +77,8 @@ Requirements:
 - CLI and human-facing UI must share the same core interface
 - validation must execute the real CLI scenario
 - validation must include the exact CLI command and the expected observable output or state change
+- validation must follow the plan's real test method when the user names one, such as NapCat sending a real-account-equivalent message to the agent
+- audit must reject unit mocks, fake messages, or other pseudo tests when they do not execute the declared real scenario
 - for non-trivial delegated work, the implementation worker and CLI validation worker must not be the same worker
 - split core logic between CLI and UI is not acceptable
 

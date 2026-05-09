@@ -190,6 +190,9 @@ async function fixtureRoot(prefix) {
 async function acceptanceRoot(prefix, cycle) {
   const root = await mkdtemp(join(tmpdir(), prefix));
   await mkdir(join(root, ".pipeline"), { recursive: true });
+  await writeConfig(join(root, ".pipeline", "config.yaml"), {
+    execution: { worker_separation: { mode: "off" } },
+  });
   await writeConfig(join(root, ".pipeline", "cycle.yaml"), { cycle });
   await writeConfig(join(root, ".pipeline", "state.yaml"), {
     pipeline: { name: "Acceptance Regression", status: "pending_acceptance", prompts_total: 1, prompts_completed: 1 },

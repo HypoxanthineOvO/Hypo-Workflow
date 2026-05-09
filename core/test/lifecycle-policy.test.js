@@ -7,6 +7,7 @@ import {
   acceptCycle,
   buildOpenCodeStatusModel,
   deriveWorkflowPreset,
+  parseYaml,
   rejectCycle,
   resolveCycleLifecyclePolicy,
   resolveCycleStatusPhase,
@@ -146,6 +147,54 @@ test("accepting a cycle with a planned continuation routes to follow_up_planning
   assert.match(model.sidebar.sections.find((section) => section.title === "Current").items.join("\n"), /Next: start_follow_up_plan/);
 });
 
+test("completed follow-up continuation does not override pending acceptance phase", async () => {
+  const root = await fixtureRoot();
+  await writeConfig(join(root, ".pipeline", "cycle.yaml"), {
+    cycle: {
+      number: 11,
+      name: "Completed Follow-up",
+      workflow_kind: "build",
+      type: "feature",
+      status: "pending_acceptance",
+      lifecycle_policy: {
+        accept: { next: "follow_up_plan" },
+      },
+      continuations: [
+        {
+          id: "C11-follow-up",
+          kind: "follow_up_plan",
+          title: "Completed follow-up",
+          status: "completed",
+        },
+      ],
+      acceptance: { mode: "manual", state: "pending" },
+    },
+  });
+  await writeConfig(join(root, ".pipeline", "state.yaml"), {
+    pipeline: { name: "Completed Follow-up", status: "pending_acceptance", prompts_total: 1, prompts_completed: 1 },
+    current: { phase: "pending_acceptance", prompt_name: "M01 / Follow-up", step: null },
+    acceptance: { scope: "cycle", state: "pending", cycle_id: "C11" },
+    continuation: {
+      id: "C11-follow-up",
+      kind: "follow_up_plan",
+      status: "completed",
+      title: "Completed follow-up",
+    },
+  });
+
+  const phase = resolveCycleStatusPhase({
+    cycle: parseYaml(await readFile(join(root, ".pipeline", "cycle.yaml"), "utf8")).cycle,
+    state: parseYaml(await readFile(join(root, ".pipeline", "state.yaml"), "utf8")),
+  });
+  assert.equal(phase.phase, "pending_acceptance");
+  assert.equal(phase.next_action, "accept_or_reject");
+
+  const model = await buildOpenCodeStatusModel(root);
+  assert.equal(model.lifecycle.phase, "pending_acceptance");
+  assert.equal(model.lifecycle.next_action, "accept_or_reject");
+  assert.match(model.footer.text, /phase:pending_acceptance/);
+});
+
 test("active execution phase wins over stale accepted acceptance mirrors", async () => {
   const phase = resolveCycleStatusPhase({
     cycle: {
@@ -187,6 +236,9 @@ test("workflow lifecycle contracts are documented for skills and references", as
 async function fixtureRoot() {
   const root = await mkdtemp(join(tmpdir(), "hw-lifecycle-policy-"));
   await mkdir(join(root, ".pipeline"), { recursive: true });
+  await writeConfig(join(root, ".pipeline", "config.yaml"), {
+    execution: { worker_separation: { mode: "off" } },
+  });
   await writeFile(join(root, ".pipeline", "PROGRESS.md"), "# Demo\n\n## 时间线\n\n| 时间 | 类型 | 事件 | 结果 |\n|---|---|---|---|\n", "utf8");
   return root;
 }

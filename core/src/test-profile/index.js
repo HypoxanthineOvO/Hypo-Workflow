@@ -115,8 +115,9 @@ export function buildTestProfileContract(input = {}) {
 export function assessTestProfileEvidence(input = {}, evidence = {}) {
   const selection = normalizeTestProfileSelection(input);
   const results = selection.profiles.map((profile) => evaluateProfile(profile, evidence));
-  const missing = dedupe(flatten(results.map((item) => item.missing)));
-  const violations = dedupe(flatten(results.map((item) => item.violations)));
+  const contract = evaluateRealTestContract(input.verification || input.real_test_contract || input.realTestContract, evidence);
+  const missing = dedupe(flatten(results.map((item) => item.missing)).concat(contract.missing));
+  const violations = dedupe(flatten(results.map((item) => item.violations)).concat(contract.violations));
   return {
     preset: selection.preset,
     profiles: selection.profiles,
@@ -124,6 +125,7 @@ export function assessTestProfileEvidence(input = {}, evidence = {}) {
     missing,
     violations,
     profile_results: results,
+    real_test_contract: contract.contract,
     summary: summarizeEvidenceStatus(selection, results, missing, violations),
   };
 }
@@ -174,6 +176,50 @@ function evaluateProfile(profile, evidence) {
   }
 
   return { profile, missing: [], violations: [] };
+}
+
+function evaluateRealTestContract(verification = {}, evidence = {}) {
+  const contract = normalizeRealTestContract(verification);
+  if (!contract.method && !contract.scenario && !contract.pass_signal) {
+    return { contract, missing: [], violations: [] };
+  }
+
+  const missing = [];
+  const violations = [];
+  const actualMethod = String(evidence.actual_method || evidence.method || "").trim();
+
+  if (!truthy(evidence.scenario_executed) && !truthy(evidence.real_scenario_executed)) {
+    missing.push("scenario_executed");
+  }
+  if (contract.method && !actualMethod) {
+    missing.push("actual_method");
+  }
+  if (contract.pass_signal && !hasValue(evidence.observable_pass_signal)) {
+    missing.push("observable_pass_signal");
+  }
+  if (contract.audit_policy.reject_pseudo_tests && truthy(evidence.pseudo_test)) {
+    violations.push("pseudo_test");
+  }
+  if (contract.method && actualMethod && normalizeComparable(actualMethod) !== normalizeComparable(contract.method)) {
+    violations.push("real_test_method_mismatch");
+  }
+
+  return { contract, missing, violations };
+}
+
+function normalizeRealTestContract(verification = {}) {
+  return {
+    method: String(verification.method || verification.type || "").trim(),
+    scenario: String(verification.scenario || verification.procedure || "").trim(),
+    pass_signal: String(verification.pass_signal || verification.passSignal || "").trim(),
+    audit_policy: {
+      reject_pseudo_tests: verification.audit_policy?.reject_pseudo_tests !== false,
+    },
+  };
+}
+
+function normalizeComparable(value) {
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
 }
 
 function summarizeEvidenceStatus(selection, results, missing, violations) {

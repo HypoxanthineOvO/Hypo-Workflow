@@ -74,6 +74,9 @@ Each appended prompt must include:
 - objective
 - implementation scope
 - test or validation spec
+- `Subworker Assignment Plan` when worker separation is `recommended` or `strict`, or the appended work needs independent validation
+- exactly three worker roles in that plan: `test`, `implement`, and `audit`, with scope, expected evidence, non-overlap rules, and lifecycle requirements
+- `blocked_until_authorized` plus a start/resume authorization gate when Codex execution subworkers are not authorized
 - expected artifacts
 - dependencies on previous milestones
 - Patch IDs or deferred items it resolves, when relevant

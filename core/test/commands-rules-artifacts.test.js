@@ -42,6 +42,10 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
   const explainCommand = await readFile(join(dir, ".opencode", "commands", "hw-explain.md"), "utf8");
   const prCreateCommand = await readFile(join(dir, ".opencode", "commands", "hw-pr-create.md"), "utf8");
   const chatCommand = await readFile(join(dir, ".opencode", "commands", "hw-chat.md"), "utf8");
+  const patchFixCommand = await readFile(join(dir, ".opencode", "commands", "hw-patch-fix.md"), "utf8");
+  const startCommand = await readFile(join(dir, ".opencode", "commands", "hw-start.md"), "utf8");
+  const resumeCommand = await readFile(join(dir, ".opencode", "commands", "hw-resume.md"), "utf8");
+  const debugCommand = await readFile(join(dir, ".opencode", "commands", "hw-debug.md"), "utf8");
   const command = await readFile(join(dir, ".opencode", "commands", "hw-plan.md"), "utf8");
   const agent = await readFile(join(dir, ".opencode", "agents", "hw-plan.md"), "utf8");
   const plugin = await readFile(join(dir, ".opencode", "plugins", "hypo-workflow.ts"), "utf8");
@@ -62,6 +66,19 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
   assert.match(chatCommand, /\/hw:chat/);
   assert.match(chatCommand, /state\.yaml \+ cycle\.yaml \+ PROGRESS\.md \+ recent report/);
   assert.match(chatCommand, /chat entries instead of Milestone reports/);
+  assert.match(patchFixCommand, /Authorize\/resolve worker separation/);
+  assert.match(patchFixCommand, /Start `test` worker first for reproduction, test design/);
+  assert.match(patchFixCommand, /`implement` must not write tests or spawn validation roles/);
+  assert.match(patchFixCommand, /requested\/started\/completed-or-blocked\/closed-or-close_failed/);
+  assert.match(patchFixCommand, /configured native agents\/subagents without an extra subworker authorization gate/);
+  assert.match(patchFixCommand, /distinct `implement`, `test`, and `audit` worker identities before auto-close/);
+  assert.match(patchFixCommand, /do not leave opened subworkers without wait\/close lifecycle evidence/);
+  assert.match(patchFixCommand, /Step 8: Close or gate pending acceptance/);
+  assert.doesNotMatch(patchFixCommand, /`test_review` worker/);
+  for (const generatedCommand of [startCommand, resumeCommand, debugCommand, patchFixCommand]) {
+    assert.match(generatedCommand, /Load the corresponding Hypo-Workflow skill instructions/);
+    assert.match(generatedCommand, /not a separate runner/);
+  }
   assert.match(agent, /todowrite/);
   assert.match(agent, /permission:/);
   assert.match(agent, /^model: openai\/gpt-5\.5$/m);

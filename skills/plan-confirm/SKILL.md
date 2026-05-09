@@ -21,7 +21,7 @@ Use this skill for P4 Confirm only.
 
 ## Execution Flow
 
-1. Resolve plan mode as project `plan.mode` > global `plan.default_mode` > `interactive`.
+1. Resolve plan mode as project `plan.mode` > global `plan.default_mode` > `interactive`, and resolve `automation.gates.planning` as project > global > default `confirm`.
 2. Summarize:
    - project name
    - stack
@@ -29,15 +29,15 @@ Use this skill for P4 Confirm only.
    - milestone count
    - generated files
    - greenfield vs append mode
-3. In `plan.mode=interactive`, treat Confirm as a hard gate and wait for explicit approval before execution.
-4. In `plan.mode=auto`, treat confirm as a summary checkpoint and continue without requiring approval.
+3. If `automation.gates.planning=confirm`, treat Confirm as a hard gate and wait for explicit approval before execution, even when `plan.mode=auto`.
+4. If `automation.gates.planning=auto`, `plan.mode=auto` may treat confirm as a summary checkpoint and continue without requiring approval.
 5. Set `current.phase=plan_confirm` while this checkpoint is active.
 
 ## Interactive Hard Gate
 
 Interactive Confirm must not be collapsed into a passive summary. The agent must stop and wait until the user explicitly says「确认」or an unambiguous equivalent approval such as「确认，开始执行」. A vague acknowledgement, a request to "check once more", or silence is not approval.
 
-When `plan.interactive.require_explicit_confirm=true` or the field is missing, this gate is mandatory.
+When `automation.gates.planning=confirm`, or when `plan.interactive.require_explicit_confirm=true` or the field is missing in interactive mode, this gate is mandatory. Automation level must not silently downgrade the planning confirm gate.
 
 ## Reference Files
 

@@ -105,7 +105,7 @@ Behavior:
 - do not run success compact while validation is incomplete, failed, blocked, or stopped
 - before natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `safe_resume_command: /hw:resume`
 - before declaring completion in Codex or hook-limited environments, run preflight checks for protected writes, format validity, derived artifacts, README freshness, output language, secret markers, and required evidence
-- when worker separation is enabled, required evidence should include implement/test/audit role coverage or an explicit degraded-mode decision
+- when worker separation is enabled, required evidence should include implement/test/audit role coverage; in `recommended`, implement/test degradation is valid only with objective subworker-unavailable evidence, while audit may degrade with explicit evidence
 
 ### `/hw:resume`
 
@@ -491,7 +491,7 @@ Behavior:
 - summarize generated artifacts
 - include project name, stack, preset, milestone count, test point count, and generated files
 - in interactive mode, treat Confirm as a hard gate and wait for explicit `确认` or equivalent before `/hw:start`
-- in auto mode, treat confirm as a summary checkpoint rather than a hard stop
+- in auto mode, treat confirm as a summary checkpoint only when `automation.gates.planning=auto`; the default `confirm` gate remains mandatory and waits for explicit approval
 
 ### `/hw:plan:extend`
 
@@ -596,6 +596,14 @@ Supported forms:
 - `/hw:patch list [--open] [--severity critical|normal|minor]`
 - `/hw:patch close P{NNN}`
 - `/hw:patch fix P{NNN} [P{NNN} ...]`
+- `/hw:patch accept P{NNN}`
+- `/hw:patch reject P{NNN} "feedback"`
+
+OpenCode mapping:
+
+- `/hw:patch accept P{NNN}` is invoked as `/hw-patch accept P{NNN}`.
+- `/hw:patch reject P{NNN} "feedback"` is invoked as `/hw-patch reject P{NNN} "feedback"`.
+- `accept` and `reject` are `/hw-patch` argument subcommands, not first-class OpenCode commands. Do not generate `/hw-patch-accept` or `/hw-patch-reject`.
 
 Behavior:
 
@@ -604,7 +612,8 @@ Behavior:
 - assign global monotonically increasing IDs `P001`, `P002`, ...
 - keep Patches outside Cycle archives
 - close patches by updating status without deleting notes
-- fix patches through the six-step lightweight lane in `skills/patch/SKILL.md`; never write `state.yaml` or generate `report.md` for Patch fix
+- fix patches through the worker-separated lightweight lane in `skills/patch/SKILL.md`; never write `state.yaml` or generate `report.md` for Patch fix
+- accept/reject patches by updating Patch metadata and `.pipeline/patches/feedback/`; Patch acceptance must never write `.pipeline/state.yaml`
 
 ### `/hw:pr`
 

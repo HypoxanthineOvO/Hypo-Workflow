@@ -156,6 +156,10 @@ test("commitWorkflowUpdate allows revision-phase step pointers outside executing
 
 test("acceptCycle and rejectCycle use workflow commit warnings for derived refresh failures", async () => {
   const root = await fixtureRoot("hw-workflow-commit-acceptance-");
+  await writeConfig(join(root, ".pipeline", "config.yaml"), {
+    acceptance: { mode: "manual", require_user_confirm: true },
+    execution: { worker_separation: { mode: "off" } },
+  });
   await writeConfig(join(root, ".pipeline", "cycle.yaml"), {
     cycle: {
       number: 11,

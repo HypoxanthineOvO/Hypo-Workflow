@@ -112,6 +112,7 @@ export async function writeOpenCodeArtifacts(outDir, options = {}) {
   await mkdir(join(adapterDir, "plugins"), { recursive: true });
   await mkdir(join(adapterDir, "runtime"), { recursive: true });
   await mkdir(join(adapterDir, "tui"), { recursive: true });
+  await rm(join(adapterDir, "plugins", "hypo-workflow.js"), { force: true });
   await rm(join(adapterDir, "plugins", "hypo-workflow-status.js"), { force: true });
   await rm(join(adapterDir, "plugins", "hypo-workflow-tui.tsx"), { force: true });
   await rm(join(adapterDir, "commands", "hw-dashboard.md"), { force: true });
@@ -173,7 +174,7 @@ export function renderCommand(command) {
 
 function commandSpecificGuidance(command) {
   if (command.canonical === "/hw:patch fix") {
-    return "\nPatch Fix lane:\n- Step 1: Read Patch\n- Step 2: Locate Code\n- Step 3: Apply Minimal Fix\n- Step 4: Run Tests\n- Step 5: Commit\n- Step 6: Close Patch\n\ndo not run Plan Discover, do not enter full TDD pipeline, and do not mutate `state.yaml` for Patch Fix.\n";
+    return "\nPatch Fix lane:\n- Step 1: Read Patch\n- Step 2: Locate Code\n- Step 3: Authorize/resolve worker separation\n- Step 4: Start `test` worker first for reproduction, test design, and test/fixture/assertion/snapshot edits when needed\n- Step 5: Apply the minimal production/runtime/documentation fix through `implement`; `implement` must not write tests or spawn validation roles\n- Step 6: Run tests and obtain independent `test` worker validation plus `audit` closure review\n- Step 7: Commit\n- Step 8: Close or gate pending acceptance only after worker lifecycle is recorded as requested/started/completed-or-blocked/closed-or-close_failed\n\nOpenCode uses configured native agents/subagents without an extra subworker authorization gate, but code/test Patch fixes still need distinct `implement`, `test`, and `audit` worker identities before auto-close. `review_tests` is a TDD step name, not a Patch worker role.\n\ndo not run Plan Discover, do not enter full TDD pipeline, do not mutate `state.yaml` for Patch Fix, and do not leave opened subworkers without wait/close lifecycle evidence.\n";
   }
   if (command.canonical === "/hw:release") {
     return "\nRelease lane:\n- run `claude plugin validate .`\n- run the regression suite\n- update versioned files\n- run `update_readme` after version updates and before the release commit\n- run `readme-freshness` before commit/tag/push gates\n- perform a dirty check before release mutations\n- require an Ask gate before tag or push\n- use `git tag` and `git push` only after confirmation\n";

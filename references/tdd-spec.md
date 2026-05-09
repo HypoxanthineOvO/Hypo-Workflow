@@ -43,6 +43,12 @@ Built-in presets:
 
 Goal: translate `预期测试` into concrete automated checks.
 
+Worker-separation rule:
+
+- when `execution.worker_separation.mode` is `recommended` or `strict`, `write_tests` must be owned by the independent `test` worker before red tests are written
+- the main agent may prepare context and acceptance boundaries, but must not create or edit the red tests locally first and then request independent review afterward
+- if the host cannot authorize or start the test worker, stop before writing tests unless the plan explicitly selected the fastest single-agent `off` lane with user-confirmed downgrade evidence
+
 Design principles:
 
 - Cover the happy path first.
@@ -100,6 +106,12 @@ Record at minimum:
 ## implement
 
 Goal: make the intended tests pass with the smallest reasonable implementation.
+
+Worker-separation rule:
+
+- when `execution.worker_separation.mode` is `recommended` or `strict`, `implement` must be owned by the independent implementation worker before implementation edits are made
+- the main agent may prepare context, integrate returned changes, and resolve merge conflicts, but must not create the implementation locally first and then request review or certification
+- if the host cannot authorize or start the implementation worker, stop before implementation edits unless the plan explicitly selected the fastest single-agent `off` lane with user-confirmed downgrade evidence
 
 Implementation rules:
 

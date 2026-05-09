@@ -99,6 +99,8 @@ Discover should use a two-pass discussion shape:
    - task category
    - desired effect
    - verification method
+   - real test method
+   - pseudo-test rejection policy
    - target users
    - delivery artifact
    - constraints
@@ -120,7 +122,13 @@ Interactive questioning rules:
 - move from broad framing to detailed drilling
 - start with task category, desired effect, and verification method before implementation detail
 - summarize what was learned after each round
-- convert "verification method" into a closed-loop test story before leaving Discover: exact command or scenario, observable pass/fail signal, and who independently validates it
+- convert "verification method" into a closed-loop real test contract before leaving Discover: exact command or scenario, observable pass/fail signal, who independently validates it, and whether audit rejects pseudo tests
+- before leaving Discover on Codex, capture execution subworker authorization for `/hw:start` and `/hw:resume` even when `execution.worker_separation.mode` already exists; without one explicit outcome, P1 must not enter P2
+- valid Codex P1 authorization outcomes are `authorized recommended`, `authorized strict`, `start/resume blocked until authorization`, or explicit user-confirmed fastest single-agent `execution.worker_separation.mode=off`
+- before leaving Discover on Claude Code, choose execution subworker backend `subcodex` or `subclaude`; no separate subworker authorization gate is required
+- before leaving Discover on OpenCode, use configured native agents/subagents; no separate subworker authorization gate is required
+- Generate must pre-assign subworker tasks in each prompt instead of leaving role boundaries for `/hw:start` to invent later. Use a `Subworker Assignment Plan` with exactly three worker roles: `test`, `implement`, and `audit`, concrete scope, non-overlap rules, evidence outputs, and artifact paths. `review_tests` is a TDD step name owned by the `test` role, not a worker role; `review_code` is an audit/review step or artifact stage, not a worker role.
+- Each generated subworker assignment must declare write scope: spawned workers can edit only `.pipeline/` files and explicitly scoped root-level non-project documentation such as `README.md`, `CHANGELOG.md`, and `PROJECT-SUMMARY.md`; `audit` is read-only and must not edit files. Out-of-scope needs must stop and report the path instead of editing, and no worker may revert or overwrite another worker's changes without explicit prompt-scope authorization.
 - do not leave Discover until the configured minimum question rounds are complete and the user signals that the requirement interview is sufficient
 - never treat "确认一下" or a plain answer as permission to enter Decompose
 
@@ -174,6 +182,9 @@ Decompose output rules:
   - a closed-loop validation path with exact command or executable scenario
   - observable pass/fail evidence
   - independent validation ownership when non-trivial or delegated
+  - Codex execution subworker authorization scope for start/resume, or a recorded explicit user-confirmed fast/off single-agent downgrade decision
+  - Claude Code execution subworker backend choice: `subcodex` or `subclaude`
+  - the user-declared real test method and audit pseudo-test rejection policy
 - implementation milestones should include a slice quality note:
   - runnable behavior
   - touched layers
@@ -234,7 +245,10 @@ Preset selection rules:
 - for each milestone, write a concrete implementation plan with ordered steps, dependencies, verification points, test spec, and constraints before rendering the prompt file
 - convert that implementation plan into the final prompt file format instead of freehand summary text
 - preserve the validation intent from the milestone plan in the generated prompt's `预期测试` and constraints sections
-- preserve closed-loop validation commands, evidence expectations, and implementation-versus-validation ownership in the generated prompt
+- preserve closed-loop validation commands, real test method, scenario, pass/fail signal, evidence expectations, audit pseudo-test rejection rule, and implementation-versus-validation ownership in the generated prompt
+- include a `Subworker Assignment Plan` in each generated implementation prompt whenever worker separation is enabled or independent validation is required; assign exactly `test`, `implement`, and `audit` before any implementation steps. `review_tests` remains only the TDD step for checking tests, owned by the `test` worker.
+- include each role's write boundary in the generated prompt: spawned workers edit only `.pipeline/` files and explicitly scoped root-level non-project documentation such as `README.md`, `CHANGELOG.md`, and `PROJECT-SUMMARY.md`; `audit` is read-only. Generated prompts must say that scope violations stop the worker and that workers may not revert or overwrite another worker's edits unless explicitly authorized by the orchestrator.
+- on Codex without execution subworker authorization, keep the assignment but mark it `blocked_until_authorized` and write the start/resume authorization gate; do not remove the subworker plan unless the user explicitly confirmed fastest single-agent `off`
 - generated implementation prompts must carry Objective, Boundaries, Non-Goals, Validation Commands, Evidence, and Human QA sections when applicable
 
 Required Generate outputs:

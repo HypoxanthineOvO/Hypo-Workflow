@@ -46,6 +46,7 @@ OpenCode uses dash-style native slash commands. Each command remains traceable t
 
 Agent policy:
 
+- OpenCode exposes `/hw:patch accept PNNN` and `/hw:patch reject PNNN "feedback"` as argument subcommands of `/hw-patch`; they are not first-class `/hw-patch-accept` or `/hw-patch-reject` commands.
 - `/hw-plan*`, `/hw:init`, and `/hw:guide` use `hw-plan` to maximize Ask/question and todowrite discipline.
 - Execution and mutation-heavy commands use `hw-build`.
 - Compact, debug, and report commands use `hw-compact`, `hw-debug`, and `hw-report` so the OpenCode model matrix can tune those roles independently.

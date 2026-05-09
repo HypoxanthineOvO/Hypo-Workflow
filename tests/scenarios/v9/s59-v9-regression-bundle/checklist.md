@@ -2,7 +2,7 @@
 
 Validate that the V9 smoke suite is registered and remains offline/static.
 
-- s51-s60 are present.
-- `tests/run_regression.py` registers all V9 scenarios.
+- Registered V9-era scenarios have scenario directories and `run.sh` files, including s61/s62/s63 even when their directories live under later version folders.
+- Existing `tests/scenarios/v9/s*` directories have `run.sh` files and are registered in `tests/run_regression.py`.
 - V9 scenario scripts avoid real OpenCode/OpenAI network/runtime dependencies.
-- README documents the current 37-command docs IA and command overview.
+- README documents the current 36-command docs IA and command overview.

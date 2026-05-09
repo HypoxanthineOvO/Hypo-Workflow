@@ -569,7 +569,7 @@ function renderFeatureTable(features, mode, dag = resolveFeatureDagBoard({ featu
           return quality ? `${milestone.id} (${quality})` : milestone.id;
         }).join(", ")
       : "JIT decomposition pending";
-    const verification = feature.verification?.method || "TBD";
+    const verification = formatVerification(feature.verification);
     const profiles = feature.test_profiles?.length ? feature.test_profiles.join("+") : "preset-only";
     if (dag.visible) {
       lines.push(`| ${feature.id} ${feature.title} | ${feature.priority} | ${feature.gate} | ${feature.decompose_mode} | ${dagFeature.status} | ${formatList(dagFeature.depends_on)} | ${dagFeature.ready ? "yes" : "no"} | ${dagFeature.execution_hint || dagFeature.handoff_hint || "n/a"} | ${milestones} | ${feature.workflow_kind || "build"} | ${feature.analysis_kind || "n/a"} | ${feature.category || "other"} | ${verification} | ${profiles} |`);
@@ -578,6 +578,16 @@ function renderFeatureTable(features, mode, dag = resolveFeatureDagBoard({ featu
     }
   }
   return `${lines.join("\n")}\n`;
+}
+
+function formatVerification(verification = {}) {
+  const method = verification.method || "TBD";
+  const parts = [method];
+  if (verification.scenario) parts.push(`scenario: ${verification.scenario}`);
+  if (verification.pass_signal) parts.push(`pass: ${verification.pass_signal}`);
+  if (verification.independent_validator) parts.push(`validator: ${verification.independent_validator}`);
+  if (verification.audit_policy?.reject_pseudo_tests) parts.push("audit: reject pseudo tests");
+  return parts.join("<br>");
 }
 
 function collectMilestoneText(milestone) {

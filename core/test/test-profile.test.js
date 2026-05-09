@@ -48,7 +48,9 @@ test("test profile spec defines compose model and three scenario contracts", asy
   assert.match(configSpec, /execution\.test_profiles/);
   assert.match(evaluationSpec, /Test Profile Evidence/i);
   assert.match(planSkill, /test profile/i);
+  assert.match(planSkill, /真实测试方法|real test method/i);
   assert.match(discoverSkill, /research/i);
+  assert.match(discoverSkill, /伪测试|pseudo/i);
 });
 
 test("test profile selection composes with preset and preserves legacy preset-only behavior", () => {
@@ -161,6 +163,55 @@ test("agent-service profile requires CLI planning, shared core, and real CLI run
     { preset: "implement-only", profiles: ["agent-service"] },
     { cli_planned: true, cli_run: true, shared_core_interface: true },
   );
+  assert.equal(passed.status, "pass");
+});
+
+test("agent-service audit rejects pseudo tests when plan requires a real user scenario", () => {
+  const blocked = assessTestProfileEvidence(
+    {
+      preset: "tdd",
+      profiles: ["agent-service"],
+      verification: {
+        method: "NapCat real QQ message",
+        scenario: "Use NapCat to simulate the main account sending a message to the agent.",
+        pass_signal: "Agent replies with expected action.",
+        audit_policy: { reject_pseudo_tests: true },
+      },
+    },
+    {
+      cli_planned: true,
+      shared_core_interface: true,
+      cli_run: true,
+      pseudo_test: true,
+      actual_method: "unit mock",
+    },
+  );
+
+  assert.equal(blocked.status, "block");
+  assert.ok(blocked.violations.includes("pseudo_test"));
+  assert.ok(blocked.violations.includes("real_test_method_mismatch"));
+
+  const passed = assessTestProfileEvidence(
+    {
+      preset: "tdd",
+      profiles: ["agent-service"],
+      verification: {
+        method: "NapCat real QQ message",
+        scenario: "Use NapCat to simulate the main account sending a message to the agent.",
+        pass_signal: "Agent replies with expected action.",
+        audit_policy: { reject_pseudo_tests: true },
+      },
+    },
+    {
+      cli_planned: true,
+      shared_core_interface: true,
+      cli_run: true,
+      actual_method: "NapCat real QQ message",
+      scenario_executed: true,
+      observable_pass_signal: "Agent replies with expected action.",
+    },
+  );
+
   assert.equal(passed.status, "pass");
 });
 

@@ -2,7 +2,7 @@
 
 Validate the full OpenCode slash command mapping.
 
-- 37 command files are generated.
+- 36 command files are generated.
 - Each command file references its canonical `/hw:*` command.
 - Plan commands bind `hw-plan`.
 - Execution/fix/release commands bind `hw-build`.

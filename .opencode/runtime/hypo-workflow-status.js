@@ -437,7 +437,7 @@ function lifecycleFromSources(cycle, state, acceptance) {
   if (
     state.current?.phase === "follow_up_planning" ||
     cycleNode.status === "follow_up_planning" ||
-    state.continuation?.kind === "follow_up_plan" ||
+    isRunnableStatusContinuation(state.continuation) ||
     (acceptance?.state === "accepted" && policy.accept.next === "follow_up_plan" && continuation)
   ) {
     return {
@@ -541,8 +541,12 @@ function selectStatusContinuation(value = {}) {
   const continuations = normalizeStatusContinuations(Array.isArray(value) ? value : value.continuations || []);
   return continuations.find((item) => item.kind === "follow_up_plan" && item.status === "active")
     || continuations.find((item) => item.kind === "follow_up_plan" && ["planned", "queued", "pending"].includes(item.status))
-    || continuations.find((item) => item.kind === "follow_up_plan")
     || null;
+}
+
+function isRunnableStatusContinuation(value) {
+  const continuation = normalizeStatusContinuation(value);
+  return continuation?.kind === "follow_up_plan" && ["active", "planned", "queued", "pending"].includes(continuation.status);
 }
 
 function normalizeStatusContinuations(value) {
@@ -708,7 +712,7 @@ function renderSidebarModel(model) {
         title: "Models",
         items: [
           `Current: ${formatAgentModel(model.models.current)}`,
-          `Active subagent: ${formatAgentModel(model.models.active_subagent)}`,
+          `Active subagent (runtime only): ${formatAgentModel(model.models.active_subagent)}`,
           ...model.models.subagents.slice(0, 5).map(formatAgentModel),
         ],
       },
@@ -1024,6 +1028,8 @@ function normalizeRuntimeAgentModel(value) {
   return {
     agent: value.agent || NA,
     model: model || NA,
+    evidence_scope: "runtime_observation",
+    worker_evidence: false,
   };
 }
 

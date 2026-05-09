@@ -19,6 +19,12 @@ Use this skill when the user invokes `/hw:accept`.
 
 - Read `.pipeline/cycle.yaml` and `.pipeline/state.yaml`.
 - Require Cycle acceptance state `pending_acceptance` or `acceptance.state: pending`.
+- Evaluate worker separation readiness before final acceptance:
+  - read `state.runtime_workers`, prompt step evidence, review artifacts, and lifecycle log pointers when present
+  - `recommended` requires distinct `test` and `implement` evidence unless objective unavailability plus an explicit allowed degradation is recorded
+  - `strict` requires distinct `test`, `implement`, and `audit` evidence
+  - each required worker must have lifecycle evidence for requested, started, terminal `completed`, and closed/released state
+  - any missing worker, failed/blocked worker, `close_failed`, runtime-only subtask observation, or missing Codex `/hw:start` + `/hw:resume` authorization scope blocks acceptance
 - If project worker separation policy requires audit-backed acceptance, ensure audit did not mark test coverage as insufficient before final acceptance.
 - Mark `cycle.status: completed`.
 - Mark `cycle.acceptance.state: accepted` and store `accepted_at`.

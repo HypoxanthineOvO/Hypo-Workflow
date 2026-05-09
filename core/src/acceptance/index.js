@@ -59,13 +59,19 @@ export function evaluateAcceptanceReadiness(context = {}, options = {}) {
     options.globalConfig || DEFAULT_GLOBAL_CONFIG,
   );
   const workerStatus = assessWorkerSeparationStatus(workerPolicy, {
-    workers: options.workers || [],
+    workers: filterAcceptanceWorkerEvidence(options.workers || []),
+    role_availability: options.role_availability || options.roleAvailability || {},
     audit_verdict: options.audit_verdict || acceptanceAuditVerdict(context.acceptance || {}),
   });
   const reasons = [];
 
   if (workerStatus.acceptance_blocked) {
-    if (workerStatus.missing_roles.length || workerStatus.collisions.length) {
+    if (
+      workerStatus.missing_roles.length
+      || workerStatus.collisions.length
+      || workerStatus.lifecycle_blocked.length
+      || workerStatus.authorization_blocked.length
+    ) {
       reasons.push(workerStatus.summary);
     }
     if ((options.audit_verdict || acceptanceAuditVerdict(context.acceptance || {})) === "insufficient") {
@@ -161,11 +167,13 @@ export async function acceptCycle(projectRoot = ".", options = {}) {
     ...(context.cycle.cycle?.acceptance || {}),
     ...(context.state.acceptance || {}),
   };
+  const runtimeEvidence = deriveWorkerRuntimeEvidence(context.state, options);
   const readiness = evaluateAcceptanceReadiness(
     { acceptance: mergedAcceptance },
     {
       projectConfig: context.config || {},
-      workers: options.workers || mergedAcceptance.workers || [],
+      workers: options.workers || mergedAcceptance.workers || runtimeEvidence.workers,
+      role_availability: options.role_availability || mergedAcceptance.role_availability || runtimeEvidence.role_availability,
       audit_verdict: options.audit_verdict || acceptanceAuditVerdict(mergedAcceptance),
     },
   );
@@ -214,8 +222,13 @@ export async function acceptCycle(projectRoot = ".", options = {}) {
       cycle_id: cycleId,
       updated_at: now,
     }),
-    ...(enteringFollowUp ? { continuation: compactContinuationState(followUp, now) } : {}),
+    ...(enteringFollowUp
+      ? { continuation: compactContinuationState(followUp, now) }
+      : { continuation: undefined }),
   };
+  if (!enteringFollowUp) {
+    delete state.continuation;
+  }
 
   const logEntry = {
     id: `CYCLE-ACCEPTED-${cycleId}-${compactTimestamp(now)}`,
@@ -441,6 +454,101 @@ function normalizeAcceptanceMode(value) {
 
 function acceptanceAuditVerdict(acceptance = {}) {
   return acceptance.audit_verdict || acceptance.audit?.verdict || "unknown";
+}
+
+function deriveWorkerRuntimeEvidence(state = {}, options = {}) {
+  if (options.workers || options.role_availability || options.roleAvailability) {
+    return {
+      workers: filterAcceptanceWorkerEvidence(options.workers || []),
+      role_availability: options.role_availability || options.roleAvailability || {},
+    };
+  }
+
+  if (Array.isArray(state.runtime_workers?.workers) || state.runtime_workers?.role_availability) {
+    return {
+      workers: filterAcceptanceWorkerEvidence(state.runtime_workers?.workers),
+      role_availability: state.runtime_workers?.role_availability || {},
+    };
+  }
+
+  const steps = Array.isArray(state.prompt_state?.steps) ? state.prompt_state.steps : [];
+  const workers = [];
+  const roleAvailability = {};
+
+  for (const mapping of [
+    { role: "implement", step: "implement" },
+    { role: "test", step: "review_tests" },
+    { role: "audit", step: "review_code" },
+  ]) {
+    const step = steps.find((item) => item?.name === mapping.step);
+    if (!step) continue;
+    const worker = deriveWorkerFromStep(mapping.role, step);
+    if (worker) workers.push(worker);
+    const availability = deriveRoleAvailabilityFromStep(step);
+    if (availability) roleAvailability[mapping.role] = availability;
+  }
+
+  return {
+    workers,
+    role_availability: roleAvailability,
+  };
+}
+
+export function buildRuntimeWorkerMirrorFromState(state = {}, options = {}) {
+  const evidence = deriveWorkerRuntimeEvidence(state, options);
+  return {
+    workers: filterAcceptanceWorkerEvidence(evidence.workers),
+    role_availability: evidence.role_availability,
+    updated_at: options.updated_at || options.updatedAt || new Date().toISOString(),
+  };
+}
+
+function deriveWorkerFromStep(role, step = {}) {
+  if (!step.executor) return null;
+  if (step.executor === "self") {
+    return { role, worker_id: "self", ...deriveWorkerLifecycleFromStep(step) };
+  }
+  if (step.executor === "subagent") {
+    return {
+      role,
+      worker_id: step.subagent_result?.worker_id || step.subagent_result?.session_id || step.subagent_tool || "subagent",
+      ...deriveWorkerLifecycleFromStep(step),
+    };
+  }
+  return null;
+}
+
+function deriveWorkerLifecycleFromStep(step = {}) {
+  const lifecycle = step.worker_lifecycle || step.lifecycle || step.subagent_result?.lifecycle;
+  return lifecycle ? { lifecycle } : {};
+}
+
+function deriveRoleAvailabilityFromStep(step = {}) {
+  const reason = String(step.reason || extractStepReason(step.notes || "")).trim().toLowerCase();
+  if (!reason) return null;
+  return {
+    status: "unavailable",
+    reason,
+  };
+}
+
+function extractStepReason(notes = "") {
+  const match = String(notes).match(/\breason=([a-z_]+)/i);
+  return match ? match[1] : "";
+}
+
+function filterAcceptanceWorkerEvidence(workers = []) {
+  return (Array.isArray(workers) ? workers : []).filter((worker) => !isRuntimeObservationWorker(worker));
+}
+
+function isRuntimeObservationWorker(worker = {}) {
+  const scope = String(worker.evidence_scope || worker.evidenceScope || "").trim().toLowerCase();
+  const source = String(worker.source || worker.source_type || worker.sourceType || "").trim().toLowerCase();
+  return scope === "runtime_observation"
+    || source === "opencode_active_subtask"
+    || source === "codex_internal_subtask"
+    || source === "codex_subcodex"
+    || source === "subtask_part";
 }
 
 function normalizeAcceptanceState(value) {

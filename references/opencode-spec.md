@@ -77,7 +77,7 @@ See also [`external-docs-index.md`](./external-docs-index.md) for the cross-plat
 | `/hw:sync` | `/hw-sync` | `hw-build` | Native slash command, adapter and derived-context synchronization. |
 | `/hw:docs` | `/hw-docs` | `hw-docs` | Native slash command, generated documentation governance. |
 | `/hw:patch` | `/hw-patch` | `hw-build` | Native slash command group; file lifecycle stays HW-specific. |
-| `/hw:patch fix` | `/hw-patch-fix` | `hw-build` | Native slash command, six-step patch repair lane. |
+| `/hw:patch fix` | `/hw-patch-fix` | `hw-build` | Native slash command, lightweight Patch repair lane with native `test`, `implement`, and `audit` worker evidence plus lifecycle closure before auto-close. |
 | `/hw:pr` | `/hw-pr` | `hw-review` | Native slash command, manual-gated PR/MR Change Request flow. |
 | `/hw:pr create` | `/hw-pr-create` | `hw-build` | Native slash command, guided GitHub PR / GitLab MR creation flow. |
 | `/hw:explain` | `/hw-explain` | `hw-review` | Native slash command, evidence-first explanation with unknowns. |
@@ -261,6 +261,7 @@ Required output fields:
 - duration, token/cost summary
 - current OpenCode agent/model from TUI session state when available
 - latest active subagent/model from `subtask` parts when available
+- active subagent/model from `subtask` parts must be labeled runtime-only and must not become acceptance worker evidence
 - configured primary/subagent role model matrix from `.opencode/hypo-workflow.json`
 - lease action/reason and repair hint when present
 - derived health status, stale count, error count, and stale artifacts

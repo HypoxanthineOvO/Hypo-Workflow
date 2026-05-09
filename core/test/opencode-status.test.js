@@ -61,18 +61,43 @@ test("OpenCode status model reads active state, queue, events, metrics, and late
   assert.equal(model.models.current.model, "mimo/mimo-v2.5-pro");
   assert.equal(model.models.active_subagent.agent, "hw-test");
   assert.equal(model.models.active_subagent.model, "deepseek/deepseek-v4-pro");
+  assert.equal(model.models.active_subagent.evidence_scope, "runtime_observation");
   assert.ok(model.models.subagents.some((agent) => agent.agent === "hw-code-a" && agent.model === "mimo/mimo-v2.5-pro"));
   assert.match(model.sidebar.summary, /M08/);
   assert.ok(model.sidebar.sections.some((section) => section.title === "Feature Queue"));
   assert.ok(model.sidebar.sections.some((section) => section.title === "Milestones"));
   assert.match(model.sidebar.sections.find((section) => section.title === "Models").items.join("\n"), /Current: hw-build -> mimo\/mimo-v2\.5-pro/);
-  assert.match(model.sidebar.sections.find((section) => section.title === "Models").items.join("\n"), /Active subagent: hw-test -> deepseek\/deepseek-v4-pro/);
+  assert.match(model.sidebar.sections.find((section) => section.title === "Models").items.join("\n"), /Active subagent \(runtime only\): hw-test -> deepseek\/deepseek-v4-pro/);
   assert.ok(model.sidebar.sections.some((section) => section.title === "Blocked \/ Deferred"));
   assert.match(model.sidebar.sections.find((section) => section.title === "Feature Queue").items.join("\n"), /F003.*OpenCode status panels/);
   assert.match(model.sidebar.sections.find((section) => section.title === "Milestones").items.join("\n"), /M09/);
   assert.equal(model.sidebar.sections.find((section) => section.title === "Recent").items.length, 10);
   assert.match(model.footer.text, /C2/);
   assert.match(model.footer.text, /M08/);
+});
+
+test("OpenCode active subtask is runtime-only and not worker evidence", async () => {
+  const root = await fixtureRoot();
+  await writePipeline(root, {
+    "state.yaml": activeStateYaml(),
+  });
+
+  const model = await buildOpenCodeStatusModel(root, {
+    opencode: {
+      current: { agent: "hw-build", model: "openai/gpt-5.5" },
+      active_subagent: {
+        agent: "codex-subcodex",
+        model: "openai/gpt-5.5-mini",
+        source: "codex_internal_subtask",
+      },
+    },
+  });
+
+  assert.equal(model.models.active_subagent.agent, "codex-subcodex");
+  assert.equal(model.models.active_subagent.evidence_scope, "runtime_observation");
+  assert.equal(model.models.active_subagent.worker_evidence, false);
+  assert.equal("runtime_workers" in model, false);
+  assert.match(model.sidebar.sections.find((section) => section.title === "Models").items.join("\n"), /runtime only/);
 });
 
 test("OpenCode status model surfaces confirm gates without an active current feature", async () => {

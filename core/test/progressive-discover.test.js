@@ -35,6 +35,7 @@ test("progressive discover spec defines big questions, stages, and command cover
     "task category",
     "desired effect",
     "verification method",
+    "真实测试方法",
     "assumption statement",
     "ambiguity resolution",
     "tradeoff review",
@@ -46,9 +47,31 @@ test("progressive discover spec defines big questions, stages, and command cover
   }
 
   assert.match(planSkill, /Progressive Discover/i);
+  assert.match(planSkill, /真实测试方法|real test method/i);
+  assert.match(planSkill, /off.*recommended.*strict/is);
+  assert.match(planSkill, /implement\/test\/audit|三权分立/i);
+  assert.match(planSkill, /Codex.*authorizes execution subworkers|Codex.*authorize.*\/hw:start.*\/hw:resume/is);
+  assert.match(planSkill, /even when.*execution\.worker_separation\.mode.*already.*recommended.*strict/is);
+  assert.match(planSkill, /P1 must not enter P2.*authorization gate.*unresolved/is);
+  assert.match(planSkill, /Claude Code.*subcodex.*subclaude/is);
+  assert.match(planSkill, /OpenCode.*no extra authorization gate/is);
+  assert.match(planSkill, /For Codex only.*missing authorization.*`recommended`/is);
+  assert.match(planSkill, /explicitly confirm.*fastest single-agent/is);
   assert.match(discoverSkill, /Big Questions First/i);
+  assert.match(discoverSkill, /伪测试|pseudo/i);
+  assert.match(discoverSkill, /worker separation|三权分立/i);
+  assert.match(discoverSkill, /start-blocking gate/i);
+  assert.match(discoverSkill, /P1 must not enter P2.*Codex execution subworker authorization gate is unresolved/is);
+  assert.match(discoverSkill, /Claude Code.*do not ask for subworker authorization/is);
+  assert.match(discoverSkill, /explicit user-confirmed fast\/off single-agent mode|explicitly confirm switching to the fastest single-agent/is);
+  assert.match(discoverSkill, /do not silently downgrade to `off`/i);
   assert.match(extendSkill, /lightweight Progressive Discover/i);
   assert.match(planReference, /task category.*desired effect.*verification method/is);
+  assert.match(planReference, /real test contract|真实测试方法/i);
+  assert.match(planReference, /Codex.*explicit user-confirmed fastest single-agent/is);
+  assert.match(planReference, /before leaving Discover on Codex.*even when `execution\.worker_separation\.mode` already exists/is);
+  assert.match(planReference, /without one explicit outcome, P1 must not enter P2/i);
+  assert.match(planReference, /Claude Code.*subcodex.*subclaude/is);
   assert.match(commandsSpec, /task category.*desired effect.*verification method/is);
 });
 
@@ -112,6 +135,42 @@ test("batch feature artifacts carry category, desired effect, and verification r
   assert.equal(artifacts.queue.features[0].verification.method, "Playwright E2E");
   assert.match(artifacts.markdown, /Category/);
   assert.match(artifacts.markdown, /Verification/);
+});
+
+test("discover carries real test contract into batch artifacts for audit", () => {
+  const feature = normalizeDiscoverFeature({
+    id: "F202",
+    title: "Heaticy agent message flow",
+    category: "agent-service",
+    desired_effect: "Agent responds correctly to a real account message.",
+    verification: {
+      method: "NapCat real QQ message",
+      scenario: "Use NapCat to simulate the main account sending a message to the agent.",
+      pass_signal: "Agent replies with the expected action and persisted state change.",
+      evidence: ["NapCat transcript", "agent log", "state diff"],
+      independent_validator: "test worker",
+      audit_policy: { reject_pseudo_tests: true },
+    },
+  });
+
+  assert.equal(feature.verification.method, "NapCat real QQ message");
+  assert.match(feature.verification.scenario, /main account/);
+  assert.match(feature.verification.pass_signal, /persisted state change/);
+  assert.equal(feature.verification.independent_validator, "test worker");
+  assert.equal(feature.verification.audit_policy.reject_pseudo_tests, true);
+
+  const artifacts = renderBatchPlanArtifacts(
+    {
+      cycle_id: "C9",
+      features: [feature],
+    },
+    { decompose_mode: "upfront" },
+  );
+
+  assert.match(artifacts.markdown, /NapCat real QQ message/);
+  assert.match(artifacts.markdown, /reject pseudo tests/i);
+  assert.equal(artifacts.queue.features[0].verification.method, "NapCat real QQ message");
+  assert.equal(artifacts.queue.features[0].verification.audit_policy.reject_pseudo_tests, true);
 });
 
 test("@karpathy/guidelines is an optional rule pack and not enabled by default", async () => {

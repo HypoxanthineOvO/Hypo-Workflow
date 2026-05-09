@@ -391,6 +391,46 @@ $defs:
         additionalProperties:
           type: string
           minLength: 1
+      backend:
+        type: object
+        default: {}
+        additionalProperties:
+          type: string
+          minLength: 1
+      authorization:
+        type: object
+        additionalProperties: false
+        properties:
+          status:
+            type: string
+            enum:
+              - authorized
+              - not_authorized
+              - blocked_until_authorized
+              - downgraded_off
+              - unknown
+            default: unknown
+          scope:
+            type: array
+            items:
+              type: string
+              minLength: 1
+            default: []
+          granted_by:
+            type: string
+            minLength: 1
+          fallback_when_declined:
+            type: string
+            enum:
+              - block_start
+              - block_start_resume
+              - fastest_single_agent_off
+          downgrade_requires_confirmation:
+            type: boolean
+            default: true
+          confirmed_by_user:
+            type: boolean
+            default: false
       degradation:
         type: object
         additionalProperties: false
@@ -443,6 +483,12 @@ $defs:
         audit:
           required: true
       providers: {}
+      backend: {}
+      authorization:
+        status: unknown
+        scope: []
+        downgrade_requires_confirmation: true
+        confirmed_by_user: false
       degradation:
         allow_with_confirmation: true
         options:

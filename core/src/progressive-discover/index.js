@@ -147,7 +147,15 @@ function normalizeVerification(verification, feature) {
   if (verification && typeof verification === "object" && !Array.isArray(verification)) {
     return {
       method: verification.method || verification.type || "",
+      scenario: verification.scenario || verification.procedure || verification.test_scenario || verification.testScenario || "",
+      pass_signal: verification.pass_signal || verification.passSignal || verification.expected_signal || verification.expectedSignal || "",
+      independent_validator:
+        verification.independent_validator ||
+        verification.independentValidator ||
+        verification.validator ||
+        "",
       evidence: normalizeEvidence(verification.evidence || verification.outputs || []),
+      audit_policy: normalizeAuditPolicy(verification.audit_policy || verification.auditPolicy || {}),
     };
   }
 
@@ -157,7 +165,17 @@ function normalizeVerification(verification, feature) {
       feature.acceptance_boundary ||
       feature.acceptance ||
       "",
+    scenario: feature.verification_scenario || feature.test_scenario || feature.real_test_scenario || "",
+    pass_signal: feature.pass_signal || feature.expected_signal || feature.observable_pass_signal || "",
+    independent_validator: feature.independent_validator || feature.validator || "",
     evidence: normalizeEvidence(feature.verification_evidence || []),
+    audit_policy: normalizeAuditPolicy(feature.audit_policy || feature.auditPolicy || {}),
+  };
+}
+
+function normalizeAuditPolicy(value = {}) {
+  return {
+    reject_pseudo_tests: value.reject_pseudo_tests !== false,
   };
 }
 

@@ -99,8 +99,17 @@ The inheritance order is `cycle_explicit -> previous_cycle_snapshot -> project_c
 Worker separation policy is project-local execution policy:
 
 - `execution.worker_separation.mode=off`: preserve legacy behavior
-- `execution.worker_separation.mode=recommended`: default to implement/test/audit separation, but allow explicit degraded-mode confirmation
+- `execution.worker_separation.mode=recommended`: require distinct `test` and `implement` workers for role-sensitive work; objective subworker-unavailable evidence may justify `retry`, `deferred`, `stop`, or explicit downgrade to `off`, but it cannot be accepted as worker-separated completion. `audit` may degrade only with explicit evidence.
 - `execution.worker_separation.mode=strict`: require implement/test/audit separation before full acceptance
+
+Plan-time authorization is separate from the mode and is Codex-specific:
+
+- On Codex, `/hw:plan` P1 Discover must ask for execution subworker authorization before P2 whenever persisted authorization scope for `/hw:start` and `/hw:resume` is missing, even if `execution.worker_separation.mode` is already `recommended` or `strict`.
+- On Codex, `recommended` and `strict` require explicit execution subworker authorization for `/hw:start` and `/hw:resume`, or a persisted blocking gate that prevents execution before role-sensitive work.
+- On Codex, if the user declines execution subworkers and explicitly confirms the fastest path, persist `execution.worker_separation.mode=off`; do not silently keep `recommended` or silently downgrade.
+- On Codex, if authorization is missing, `/hw:start` and `/hw:resume` must stop and ask instead of degrading in place; downgrade to fast/off always requires explicit user confirmation.
+- On Claude Code and OpenCode, no extra subworker authorization gate is required; Claude Code should record whether execution subworkers use `subcodex` or `subclaude`.
+- Plan Generate should still write prompt-level subworker assignments before execution. Missing Codex authorization changes the assignment status to `blocked_until_authorized`; Missing Codex authorization must not remove the `test` / `implement` / `audit` role plan unless the user explicitly chose `execution.worker_separation.mode=off`. `review_tests` is a TDD step name owned by the `test` role, not a worker role.
 
 Recommended project-local fields:
 
@@ -109,11 +118,21 @@ execution:
   worker_separation:
     mode: recommended
     ask_on_init_or_first_plan: true
+    authorization:
+      status: authorized
+      scope:
+        - /hw:start
+        - /hw:resume
+      granted_by: user
+      fallback_when_declined: block_start
+      downgrade_requires_confirmation: true
     roles:
       implement: { required: true }
       test: { required: true }
       audit: { required: true }
     providers: {}
+    backend:
+      claude_code: subclaude
     degradation:
       allow_with_confirmation: true
       options:
@@ -132,6 +151,8 @@ execution:
 Execution guidance:
 
 - `implement`, `test`, and `audit` are distinct roles.
+- in `recommended`, `implement` and `test` sharing one worker is blocking unless the runtime records objective unavailability such as `tool_unavailable`, `command_unavailable`, `platform_unsupported`, `capability_missing`, `permission_denied`, `spawn_failed`, or `exec_nonzero`
+- in `recommended`, `audit` may degrade when unavailable, but the reason must be recorded explicitly
 - `audit` may ask for re-test or re-implementation without blocking the whole execution by default.
 - acceptance may still be blocked when audit marks coverage as insufficient.
 - degraded mode should record missing roles, shared-worker collisions, and the explicit user decision.

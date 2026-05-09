@@ -15,6 +15,8 @@ description: Run a preventive code audit when the user wants graded findings acr
 
 Use this skill for deep project auditing.
 
+When an audit is used as acceptance or worker-separation evidence, resolve Subagent/delegation authorization before scanning starts. The audit worker must be independent from the worker that implemented the audited change. If authorization is absent, declined, or unavailable, stop or record a degraded audit that cannot satisfy acceptance gates; do not audit locally first and then claim independent review was missing.
+
 ## Preconditions
 
 - source code and architecture baseline should be available
@@ -27,13 +29,14 @@ Use this skill for deep project auditing.
    - `--since <milestone>`
 2. Read the architecture baseline first.
 3. Resolve `output.language` and `output.timezone`.
-4. Scan the six audit dimensions.
-5. Grade findings as `Critical`, `Warning`, or `Info`.
-6. Write the report to `.pipeline/audits/audit-NNN.md` in `output.language`.
-7. Render report timestamps in `output.timezone`.
-8. Apply the shared secret-safe evidence redaction helper before durable writes; do not store raw API keys, tokens, Authorization headers, cookies, passwords, or private keys.
-9. Append a lifecycle log entry.
-10. Set `current.phase=lifecycle_audit` when state tracking is used.
+4. If the audit will count as acceptance evidence, confirm the independent audit worker is authorized and distinct from implementation before scanning.
+5. Scan the six audit dimensions.
+6. Grade findings as `Critical`, `Warning`, or `Info`.
+7. Write the report to `.pipeline/audits/audit-NNN.md` in `output.language`.
+8. Render report timestamps in `output.timezone`.
+9. Apply the shared secret-safe evidence redaction helper before durable writes; do not store raw API keys, tokens, Authorization headers, cookies, passwords, or private keys.
+10. Append a lifecycle log entry.
+11. Set `current.phase=lifecycle_audit` when state tracking is used.
 
 ## Reference Files
 

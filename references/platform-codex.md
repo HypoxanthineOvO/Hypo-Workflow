@@ -62,15 +62,42 @@ Preferred order:
 2. experimental `.codex/agents/` conventions when available
 3. self execution fallback
 
-Codex execution guidance should explicitly encourage Subagents for substantial work. Codex should strongly prefer concrete Subagent delegation when available. Testing/review and implementation should be separated when practical:
+Codex execution guidance should explicitly encourage Subagents for substantial work. Codex should strongly prefer concrete Subagent delegation when available. When worker separation is enabled, the formal execution roles are exactly `test`, `implement`, and `audit`; `review_tests` remains a TDD step name, not a worker role. Testing/review and implementation should be separated when practical:
 
-- use a test/review Subagent to inspect tests, failure fixtures, or final diffs
+- use a `test` Subagent for `write_tests`, `review_tests`, failure fixtures, and test evidence
 - use an implementation Subagent for scoped edits
+- use an `audit` Subagent for final diff and evidence review when audit is required
+- include a role-specific explicit scope declaration in every Codex Subagent prompt: default spawned workers may write only `.pipeline/` files and explicitly scoped root-level non-project documentation such as `README.md`, `CHANGELOG.md`, and `PROJECT-SUMMARY.md`; `test` may write only named test/fixture/snapshot/assertion paths; `implement` may write only named production/runtime/documentation paths; `audit` is read-only
+- if a Codex Subagent needs an out-of-scope path, it must stop and report the path and owning role instead of editing
+- Codex Subagents must not revert or overwrite another worker's changes unless the prompt explicitly authorizes that exact action
 - do not use the same Codex Subagent session to both implement and certify the same non-trivial change
 - keep the main agent responsible for integration, state updates, and final judgment
 - if no Subagent is used for substantial work, record a concise reason in the report
 
 Use the lightweight proposer/challenger quality pass when changing contracts, runtime gates, adapter instructions, or onboarding language. Do not turn this into a full debate framework inside the Codex platform contract.
+
+## Developer Instruction Authorization Gate
+
+Codex runtime developer instructions may restrict Subagent creation to cases where the user explicitly asks for sub-agents, delegation, or parallel agent work. Hypo-Workflow commands must honor that higher-priority rule.
+
+When a Hypo-Workflow command needs an independent worker role, the command must resolve authorization before role-sensitive work begins:
+
+- `/hw:patch fix`: when code/test changes are needed, Codex must Ask for explicit `test`, `implement`, and `audit` subworker authorization before editing; the `test` worker owns test assets/evidence first, the `implement` worker must not write tests or spawn validation roles, and all worker lifecycles must be closed or recorded before auto-close
+- `/hw:plan` and `/hw:plan:*`: independent challenger, domain validator, or reviewer roles need authorization before spawning
+- `/hw:debug`: root-cause reproduction, fix implementation, and validation must not all be certified by the same worker when independent validation is required
+- `/hw:audit`: an audit used as acceptance evidence must not be performed by the same worker that implemented the audited change
+- `/hw:plan`, `/hw:start`, `/hw:resume`, `/hw:debug`, and `/hw:patch fix`: any worker they open must have a lifecycle record (`requested`, `started`, `completed|failed|blocked`, `closed|close_failed`); missing or failed closure cannot count as worker-separated evidence
+- `/hw:start` and `/hw:resume`: delegated `test`, `implement`, and `audit` roles must Ask or block before silently falling back when worker separation is required. The `test` worker owns test evidence before implementation, the `implement` worker must not write tests or spawn validation roles, and `review_tests` / `review_code` are execution steps/artifact stages, not worker roles.
+- Plan-time execution authorization may satisfy `/hw:start` and `/hw:resume` only when the saved plan explicitly grants subworker/delegation scope for those commands; plan-only challenger/reviewer authorization does not carry into execution. This authorization gate is Codex-specific and must not be imposed on Claude Code or OpenCode.
+- Missing Codex execution authorization must not default to `recommended` or silently downgrade to `off`; it must block start/resume or use `off` only with explicit user-confirmed downgrade evidence.
+
+Allowed outcomes:
+
+- authorized: spawn or invoke the distinct worker and record its identity
+- not authorized or unavailable: stop before role-sensitive work, or continue only when the plan explicitly selected the fastest single-agent `off` lane with user-confirmed downgrade evidence; this lane cannot satisfy worker-separation gates
+- local-only safe lane: continue locally only for read-only, docs/metadata-only, or explicitly single-agent work, and record the rationale
+
+Do not perform the work locally first and explain missing independent review afterward. That is a failed gate, not valid worker-separation evidence.
 
 ## Recommended Project Guardrails
 

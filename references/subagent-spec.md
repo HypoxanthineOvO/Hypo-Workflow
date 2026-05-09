@@ -23,17 +23,69 @@ Implementation and validation separation is mandatory for non-trivial delegated 
 - an implementation Subagent must not read test source, test files, fixtures, snapshots, or assertion details; it may receive requirements, public interfaces, allowed edit scope, the test command, pass/fail status, and a sanitized failure summary
 - test/review/audit Subagent roles may read test source and the final diff when their role is explicitly validation-oriented, but they must not be the same worker identity that authored the production change
 - non-trivial testable delivery should plan at least two workers when tooling allows: one implementation worker and one validation worker
-- if only one delegated worker is available, the main agent must personally run the adversarial validation pass and record that limitation explicitly as role isolation degradation
-- if strict worker separation cannot preserve implementation/test-source isolation, stop before execution, request explicit user confirmation for degraded mode, and record the missing roles, collisions, degraded boundaries, user decision, degraded reason, and role evidence in the report, log, or state notes
-- degraded mode requires explicit user confirmation before continuing, and every report should include role coverage, degraded status, degraded reason, and the validation owner
+- if only one delegated worker is available and worker separation is `off`, the main agent must personally run the adversarial validation pass and record that limitation explicitly; this fallback does not apply when `execution.worker_separation.mode` is `recommended` or `strict`
+- if `recommended` or `strict` cannot preserve implementation/test-source isolation, stop before role-sensitive execution or acceptance; retry, defer, stop, or request explicit user-confirmed downgrade to `off` instead of counting the run as worker-separated
+- degraded mode requires explicit user confirmation before continuing when worker-separated evidence is required
+- record any role isolation degradation explicitly before continuing or accepting the work
+- degraded or downgraded mode must record missing roles, collisions, degraded boundaries, user decision, degraded reason, role evidence, and validation owner in the report, log, or state notes
 - validation must try to falsify the change with closed-loop evidence such as a real command, scenario replay, before/after output, screenshot, metric delta, or failure fixture
 - the main agent remains responsible for integration, state/log/report updates, and final judgment
 - use a lightweight proposer/challenger pass for contract, runtime-gate, adapter, or onboarding changes
 
+## Authorization Before Role-Sensitive Work
+
+In hosts such as Codex, higher-priority runtime instructions may forbid automatic Subagent creation unless the user explicitly asks for sub-agents, delegation, or parallel agent work. Hypo-Workflow must not treat a command name by itself as permission to spawn.
+
+Before role-sensitive work starts, resolve whether the independent worker is authorized:
+
+1. If the user explicitly authorized Subagents/delegation for this command, proceed and record the worker identity.
+2. If authorization is absent but the command requires independent worker evidence, Ask the user for authorization or stop with a clear blocking reason.
+3. If the user declines or the worker is unavailable, continue only in a documented degraded mode that cannot satisfy worker-separation gates, or leave the Patch/Milestone/Review pending.
+
+Codex plan-time authorization can carry into execution only when its saved scope explicitly includes `/hw:start` and `/hw:resume`. `/hw:plan` P1 must ask for execution subworker authorization before P2 whenever that saved scope is missing, even if `execution.worker_separation.mode` already says `recommended` or `strict`. If Plan collected only planning reviewer/challenger authorization, Start and Resume must Ask again. If the user declines execution subworkers during Plan, generated artifacts must either block Start/Resume until authorization is granted or set the fastest single-agent `execution.worker_separation.mode=off` only after explicit user downgrade confirmation; they must not default to `recommended` or silently downgrade to `off`.
+
+Claude Code and OpenCode do not use this extra authorization gate for configured subworkers. Claude Code planning should choose whether execution subworkers use `subcodex` or `subclaude`; OpenCode should use configured native agents/subagents.
+
+Planning artifacts should pre-assign worker-separated execution tasks. Generated prompts must include a `Subworker Assignment Plan` for exactly three worker roles: `test`, `implement`, and `audit`, including scope, expected evidence, non-overlap rules, and artifact paths. `write_tests` and `review_tests` belong to the `test` worker role whenever worker separation is `recommended` or `strict`; implementation edits belong to the `implement` worker role; final evidence/diff review belongs to the `audit` worker role. The main agent orchestrates but must not write red tests or implementation locally before the independent test and implementation workers are authorized or assigned. On Codex, lack of execution subworker authorization marks this assignment `blocked_until_authorized`; it does not justify removing the assignment from the prompt. Missing Codex authorization must not remove the `test` / `implement` / `audit` role plan.
+
+Every spawned worker prompt must declare its role and write scope before work starts. Default spawned-worker write scope is intentionally narrow, but role-specific prompts may grant explicit project paths when the role requires them:
+
+- default spawned workers may write only `.pipeline/` files and root-level non-project documentation such as `README.md`, `CHANGELOG.md`, and `PROJECT-SUMMARY.md` when that documentation path is explicitly included in the prompt scope.
+- role-specific explicit scope may authorize the `test` worker to write named test, fixture, snapshot, or assertion paths, and may authorize the `implement` worker to write named production/runtime/documentation paths.
+- spawned workers must not edit project source, tests, fixtures, runtime code, package manifests, generated adapters, rules, skills, templates, or config outside `.pipeline/` unless that exact path is included in the role-specific explicit scope.
+- `test` worker: owns failure reproduction, red-test design, validation commands, fixtures, snapshots, assertions, and test evidence. When worker separation is enabled, tests must be authored or approved by this role before implementation begins.
+- `implement` worker: owns production/runtime/documentation implementation only. It must not create, edit, or rewrite tests, fixtures, snapshots, assertions, or validation evidence, and it must not spawn or impersonate `test` or `audit` workers.
+- `audit` worker: read-only. It must not modify any file, including `.pipeline/`, documentation, reports, tests, production code, or generated artifacts; it returns findings and evidence pointers only.
+- if a worker needs a file outside its declared scope, it must stop and report the requested path, reason, and owning role instead of editing locally.
+- a spawned worker must not revert, overwrite, or "clean up" another worker's changes unless that exact action is explicitly included in its declared write scope and confirmed by the orchestrating main agent.
+
+The main agent must not implement, write tests, review tests, debug, audit, or plan locally first and then report that the independent worker was missing. That reverses the gate and invalidates the evidence.
+
+## Worker Lifecycle
+
+The main agent owns worker lifecycle orchestration for `/hw:plan`, `/hw:start`, `/hw:resume`, `/hw:debug`, `/hw:patch fix`, and any command that creates role-sensitive workers.
+
+For each required worker role, record the lifecycle in the relevant prompt report, Patch file, review artifact, or `.pipeline/log.yaml`:
+
+- `requested`: role, scope, write permissions, expected evidence, and authorization source
+- `started`: worker id/session id and start time
+- `completed`, `failed`, or `blocked`: verdict, evidence path, and reason
+- `closed` or `close_failed`: release/close outcome after the worker is no longer needed
+
+Lifecycle rules:
+
+- create workers only after authorization and scope are resolved
+- do not leave obsolete workers running after their result is consumed
+- wait for the worker whose evidence gates the next step before moving past that gate
+- close/release workers once their result has been integrated or once the command stops, blocks, aborts, or completes
+- if a worker cannot be closed, record `close_failed` with the worker id and reason; unresolved lifecycle state cannot satisfy acceptance or Patch auto-close evidence
+- never reuse a still-open worker for another role unless the original prompt explicitly allowed that role and worker separation mode permits it
+- command summaries must distinguish `completed`, `blocked`, `failed`, and `close_failed`; "spawned" alone is not evidence
+
 ## Mode Switch
 
 - `execution.mode=self`
-  Always execute locally in the main agent.
+  Execute locally in the main agent only when `execution.worker_separation.mode=off`; `recommended` and `strict` worker-separation gates override `self` for role-sensitive `test`, `implement`, and `audit` work.
 - `execution.mode=subagent`
   Allow per-step delegation based on normalized step overrides.
 
@@ -102,16 +154,21 @@ When delegation succeeds:
 - store the parsed payload in `subagent_result`
 - copy key values such as `verdict`, `issues`, `code_quality`, or `diff_score` into step notes or prompt scores
 
+Codex internal subcodex/subtask events are not enough by themselves. They are runtime observations unless the Hypo-Workflow step record explicitly persists `executor=subagent` plus the parsed `subagent_result`. Status adapters may display active subtask model data, but acceptance worker evidence must ignore runtime-only subtask metadata.
+
 When parsing fails:
 
 - treat it as delegation failure
-- fall back to self execution for the same step
+- for non-gated steps, fall back to self execution for the same step
+- for role-sensitive worker-separation steps, do not run the same step locally; choose `retry`, `stop`, or `deferred`, or obtain explicit user-confirmed downgrade to `execution.worker_separation.mode=off` before any local edit
 
 ## Fallback Policy
 
-Delegation failure alone must not block the pipeline.
+Delegation failure alone must not block the pipeline for non-gated work.
 
-Required fallback behavior:
+This fallback rule does not override worker-separation acceptance gates. On Codex, when `execution.worker_separation.mode` is `recommended` or `strict` and execution subworker authorization is missing, declined, or a required worker fails, `/hw:start` and `/hw:resume` must block before role-sensitive work unless the plan explicitly selected the user-confirmed fastest single-agent `off` lane. For `write_tests`, `review_tests`, `implement`, and required audit/review work, delegation failure must stop, retry, or defer; the main agent must not run the same step locally as fallback. A local fallback may be logged only for non-gated work or after an explicit user-confirmed downgrade to `off`, and it cannot satisfy required implement/test/audit separation evidence.
+
+Required fallback behavior for non-gated work:
 
 1. switch the effective executor to `self`
 2. run the same step locally

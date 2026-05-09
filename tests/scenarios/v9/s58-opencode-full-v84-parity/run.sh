@@ -23,7 +23,8 @@ for command in cycle patch patch-fix compact showcase release audit debug check 
 done
 
 grep -Fq 'Step 1: Read Patch' "$tmp_project/.opencode/commands/hw-patch-fix.md"
-grep -Fq 'Step 6: Close Patch' "$tmp_project/.opencode/commands/hw-patch-fix.md"
+grep -Fq 'Step 8: Close or gate pending acceptance' "$tmp_project/.opencode/commands/hw-patch-fix.md"
+grep -Fq 'implement` must not write tests or spawn validation roles' "$tmp_project/.opencode/commands/hw-patch-fix.md"
 grep -Fq 'do not run Plan Discover' "$tmp_project/.opencode/commands/hw-patch-fix.md"
 
 grep -Fq 'claude plugin validate .' "$tmp_project/.opencode/commands/hw-release.md"

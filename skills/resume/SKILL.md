@@ -43,27 +43,50 @@ Use this skill to continue from `.pipeline/state.yaml` without restarting comple
    - the main agent coordinates
    - Subagent tasks execute concrete work
    - Codex should prefer Codex Subagents for substantial work when available, without external model routing
-   - testing/review and implementation should be separated when practical
+   - when worker separation is `off`, testing/review and implementation should still be separated when practical; when `recommended` or `strict`, follow the mandatory role ownership below
    - the main agent validates, scores, and updates artifacts
-14. For resumed review stages, inspect existing `.pipeline/reviews/<feature>/<milestone>/<stage>/` artifacts before creating a new round:
+14. Before resuming role-sensitive worker-separated work, resolve platform-specific Subagent/delegation authorization:
+   - on Codex, if the host requires explicit authorization before spawning Subagents, Ask before starting or retrying `write_tests`, `review_tests`, `implement`, `review_code`, or audit-like validation workers
+   - when `execution.worker_separation.mode` is `recommended` or `strict`, `write_tests` and `review_tests` belong to the independent `test` worker; the main agent must not write red tests locally first and then ask a subworker to review them
+   - when `execution.worker_separation.mode` is `recommended` or `strict`, `implement` belongs to the independent implementation worker; the main agent must not implement locally first and then ask a subworker to review or certify it
+   - on Codex, plan-time authorization is valid only when its saved scope explicitly includes `/hw:resume` or execution/start-resume roles
+   - on Codex, if authorization is absent or declined and worker separation is `recommended` or `strict`, stop before role-sensitive work unless the generated plan explicitly selected the fastest single-agent `execution.worker_separation.mode=off` lane with user-confirmed downgrade evidence
+   - on Codex, if the plan selected fast/off mode, continue locally only after that explicit downgrade confirmation is present, and record that worker-separation gates are intentionally disabled for speed
+   - on Claude Code and OpenCode, no extra subworker authorization gate is required; use the configured backend/agents, with Claude Code honoring the saved `subcodex` or `subclaude` choice
+   - every spawned worker prompt must declare role-specific explicit scope: default spawned workers may edit only `.pipeline/` files and explicitly scoped root-level non-project documentation such as `README.md`, `CHANGELOG.md`, and `PROJECT-SUMMARY.md`; `test` may edit only named test/fixture/snapshot/assertion paths in its explicit scope; `implement` may edit only named production/runtime/documentation paths in its explicit scope; `audit` is read-only
+   - `test` worker owns reproduction, red tests, validation commands, fixtures, snapshots, assertions, and test evidence before implementation resumes
+   - `implement` worker owns only production/runtime/documentation implementation; it must not create, edit, or rewrite tests, fixtures, snapshots, assertions, or validation evidence, and it must not spawn or impersonate `test` or `audit`
+   - if a worker needs to touch an out-of-scope path, stop that worker and report the path and owning role; do not let the worker edit first and explain later
+   - spawned workers must not revert or overwrite another worker's changes unless that exact action is explicitly authorized in the worker prompt scope
+   - do not perform the resumed work locally first and explain missing independent worker evidence afterward
+   - record every worker lifecycle as `requested`, `started`, `completed|failed|blocked`, and `closed|close_failed`; wait for the worker whose evidence gates the next step, then close/release it when its result is integrated
+   - when `/hw:resume` stops, blocks, aborts, or completes, close/release any workers it opened or record `close_failed` with the worker id and reason
+15. For resumed review stages, inspect existing `.pipeline/reviews/<feature>/<milestone>/<stage>/` artifacts before creating a new round:
    - continue from the next retry round when the latest verdict is `needs_changes` and retry budget remains
    - block when strict policy blocks the latest verdict or the default max of 3 total rounds is exhausted
    - preserve checked/skipped coverage evidence for Skills, hooks, agents, commands, and generated adapter surfaces
    - keep full review notes in review artifacts and store only compact pointers in state or progress
-15. Update `.pipeline/PROGRESS.md`, `.pipeline/log.yaml`, `.pipeline/state.yaml`, and `last_heartbeat` after each meaningful transition.
-16. Before declaring completion, run the Codex preflight/runtime checklist when platform is Codex or hooks are unavailable.
-17. If a derived refresh fails after authority commits, keep the authoritative fact committed, write `.pipeline/derived-refresh.yaml`, and surface repair guidance instead of rolling back the lifecycle write.
-18. During resume execution, keep full authoritative runtime files available for development and validation; track compact source changes instead of compacting after every step.
-19. If `.pipeline/feature-queue.yaml` exists, resume batch auto-chain from the saved state:
+16. Update `.pipeline/PROGRESS.md`, `.pipeline/log.yaml`, `.pipeline/state.yaml`, and `last_heartbeat` after each meaningful transition.
+17. Before declaring completion, run the Codex preflight/runtime checklist when platform is Codex or hooks are unavailable.
+18. If a derived refresh fails after authority commits, keep the authoritative fact committed, write `.pipeline/derived-refresh.yaml`, and surface repair guidance instead of rolling back the lifecycle write.
+19. During resume execution, keep full authoritative runtime files available for development and validation; track compact source changes instead of compacting after every step.
+20. If `.pipeline/feature-queue.yaml` exists, resume batch auto-chain from the saved state:
    - honor `gate: confirm` by pausing before the next Feature
    - when a queued Feature uses `just_in_time`, decompose it only after it becomes current
    - sync queue duration, token/cost, and metric summaries from `.pipeline/metrics.yaml`, preserving `n/a` for unavailable telemetry
-20. When Test Profiles are active, do not treat missing profile evidence as a soft warning; block until the required evidence contract is satisfied or an explicit blocker is recorded.
-21. Apply the same `retry` / `deferred` / `stop` decision model on failures.
-22. After the complete `/hw:resume` run has finished successfully and validation/report/state updates have all passed, run end-of-run dirty-only compact refresh when `compact.auto=true` and `compact.end_of_run=true`; skip it when disabled. Refresh compact targets from full authoritative sources, not from older compact files.
-23. Before any natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `safe_resume_command: /hw:resume`.
-24. Remove `.pipeline/.lock` when the resume turn completes, stops, blocks, aborts, or finishes.
-25. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
+21. When Test Profiles are active, do not treat missing profile evidence as a soft warning; block until the required evidence contract is satisfied or an explicit blocker is recorded.
+22. When `execution.worker_separation.mode` is `recommended` or `strict`, resolve `test` / `implement` / `audit` worker coverage before completion or acceptance:
+   - `write_tests` and `review_tests` are steps owned by the `test` worker
+   - `implement` must be owned by a distinct implementation worker
+   - `audit` must be owned by a distinct audit worker when required; `review_code` is a step/artifact stage owned by `audit`, not a worker role
+   - if `implement` and `test` collapse onto one worker identity, `recommended` must block; objective subworker-unavailable evidence may justify `retry`, `deferred`, `stop`, or explicit user-confirmed downgrade to `off`, but it must not count as accepted worker-separated completion
+   - the main agent may integrate returned changes and resolve conflicts, but it must not be the primary `test`, `implement`, or `audit` worker when worker separation is enabled
+   - incomplete, missing, or `close_failed` worker lifecycle evidence blocks worker-separated completion until repaired or explicitly downgraded where policy allows
+23. Apply the same `retry` / `deferred` / `stop` decision model on failures.
+24. After the complete `/hw:resume` run has finished successfully and validation/report/state updates have all passed, run end-of-run dirty-only compact refresh when `compact.auto=true` and `compact.end_of_run=true`; skip it when disabled. Refresh compact targets from full authoritative sources, not from older compact files.
+25. Before any natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `safe_resume_command: /hw:resume`.
+26. Remove `.pipeline/.lock` when the resume turn completes, stops, blocks, aborts, or finishes.
+27. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
 
 ## Safety Rules
 

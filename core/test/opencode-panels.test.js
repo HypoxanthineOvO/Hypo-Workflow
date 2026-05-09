@@ -69,14 +69,40 @@ test("writeOpenCodeArtifacts emits separate server and TUI plugin files", async 
 });
 
 test("generated OpenCode plugins are importable and expose OpenCode module entrypoints", async (t) => {
+  const dir = await mkdtemp(join(tmpdir(), "hw-opencode-plugin-import-"));
+  await writeOpenCodeArtifacts(dir, { profile: "standard" });
+  const serverSource = await readFile(join(dir, ".opencode", "plugins", "hypo-workflow.ts"), "utf8");
+  assert.match(serverSource, /\.\.\/runtime\/hypo-workflow-hooks\.js/);
+  const serverModulePath = join(dir, ".opencode", "plugins", "hypo-workflow-node-import.mjs");
+  await writeFile(serverModulePath, serverSource, "utf8");
+
+  const server = await import(serverModulePath);
+  assert.equal(typeof server.default, "function");
+  const module = await server.default({ client: { log() {} } });
+  for (const hook of [
+    "event",
+    "command.execute.before",
+    "tool.execute.before",
+    "tool.execute.after",
+    "permission.ask",
+    "experimental.session.compacting",
+    "experimental.compaction.autocontinue",
+  ]) {
+    assert.equal(typeof module[hook], "function", `missing server hook ${hook}`);
+  }
+  const compacting = { context: [] };
+  await module["experimental.session.compacting"]({}, compacting);
+  assert.match(compacting.context[0], /\.pipeline\/state\.yaml/);
+  const permission = {};
+  await module["permission.ask"]({ args: { filePath: ".pipeline/state.yaml" } }, permission);
+  assert.ok(permission.status);
+
   const bun = spawnSync("bun", ["--version"], { encoding: "utf8" });
   if (bun.error || bun.status !== 0) {
-    t.skip("bun is not available to import OpenCode TypeScript plugins");
+    t.skip("bun is not available to import OpenCode TUI TSX plugin");
     return;
   }
 
-  const dir = await mkdtemp(join(tmpdir(), "hw-opencode-plugin-import-"));
-  await writeOpenCodeArtifacts(dir, { profile: "standard" });
   await mkdir(join(dir, ".opencode", "node_modules", "@opencode-ai", "plugin"), { recursive: true });
   await mkdir(join(dir, ".opencode", "node_modules", "@opentui", "solid"), { recursive: true });
   await mkdir(join(dir, ".opencode", "node_modules", "solid-js"), { recursive: true });
@@ -119,9 +145,7 @@ test("generated OpenCode plugins are importable and expose OpenCode module entry
   );
 
   const script = `
-    const server = await import(${JSON.stringify(join(dir, ".opencode", "plugins", "hypo-workflow.ts"))});
     const tui = await import(${JSON.stringify(join(dir, ".opencode", "tui", "hypo-workflow-tui.tsx"))});
-    if (typeof server.default !== "function") throw new Error("missing default server export");
     if (typeof tui.tui !== "function") throw new Error("missing tui export");
     if (typeof tui.HypoWorkflowTuiPlugin !== "function") throw new Error("missing compatibility export");
     if (typeof tui.default?.tui !== "function") throw new Error("missing default tui module export");
@@ -133,14 +157,17 @@ test("generated OpenCode plugins are importable and expose OpenCode module entry
 
 test("writeOpenCodeArtifacts removes legacy plugin-side status helper", async () => {
   const dir = await mkdtemp(join(tmpdir(), "hw-opencode-panels-cleanup-"));
+  const legacyPlugin = join(dir, ".opencode", "plugins", "hypo-workflow.js");
   const legacy = join(dir, ".opencode", "plugins", "hypo-workflow-status.js");
   await mkdir(join(dir, ".opencode", "plugins"), { recursive: true });
   await mkdir(join(dir, ".opencode", "tui"), { recursive: true });
+  await writeFile(legacyPlugin, "export default {};\n", "utf8");
   await writeFile(legacy, "export const legacy = true;\n", "utf8");
   await writeFile(join(dir, ".opencode", "plugins", "hypo-workflow-tui.tsx"), "export const legacyTui = true;\n", "utf8");
 
   await writeOpenCodeArtifacts(dir, { profile: "standard" });
 
+  await assert.rejects(readFile(legacyPlugin, "utf8"));
   await assert.rejects(readFile(legacy, "utf8"));
   await assert.rejects(readFile(join(dir, ".opencode", "plugins", "hypo-workflow-tui.tsx"), "utf8"));
   assert.match(await readFile(join(dir, ".opencode", "tui", "hypo-workflow-tui.tsx"), "utf8"), /export const tui/);

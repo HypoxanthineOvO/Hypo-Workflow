@@ -6,12 +6,11 @@ V9 OpenCode support targets V8.4 user-facing parity through native slash command
 |---|---|---|---|
 | Cycle | `/hw-cycle` | `hw-status` | Supports new/list/view/close through canonical `skills/cycle/SKILL.md`. |
 | Patch | `/hw-patch` | `hw-build` | Supports create/list/close through canonical Patch skill. |
-| Patch Fix | `/hw-patch-fix` | `hw-build` | Preserves six-step lightweight fix lane and avoids Plan Discover/full TDD. |
+| Patch Fix | `/hw-patch-fix` | `hw-build` | Preserves the lightweight fix lane, uses configured native subagents for independent `test`, `implement`, and `audit` workers, requires lifecycle closure before auto-close, and avoids Plan Discover/full TDD. |
 | Compact | `/hw-compact` | `hw-compact` | Generates compact files and pairs with OpenCode `session.compacted`. |
 | Knowledge | `/hw-knowledge` | `hw-compact` | Inspects Knowledge Ledger compact summaries, indexes, records, and redacted secret references. |
 | Showcase | `/hw-showcase` | `hw-build` | Agent generates docs/slides/poster artifacts; plugin supplies context/guard. |
 | Release | `/hw-release` | `hw-build` | Requires validate, regression, dirty check, Ask gate, tag, and push controls. |
-| Dashboard | `/hw-dashboard` | `hw-status` | Launches existing WebUI dashboard capability. |
 | Audit | `/hw-audit` | `hw-review` | Preventive audit through canonical audit skill. |
 | Debug | `/hw-debug` | `hw-debug` | Symptom-driven debug through canonical debug skill. |
 | Check | `/hw-check` | `hw-status` | Health check through canonical check skill. |

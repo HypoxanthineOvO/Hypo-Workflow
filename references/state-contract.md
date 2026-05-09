@@ -35,6 +35,7 @@ history:
 chat: {}
 acceptance: {}
 continuation: {}
+runtime_workers: {}
 ```
 
 ## Cycle Workflow Metadata
@@ -116,6 +117,38 @@ Each `prompt_state.steps[]` item may contain:
 - `finished_at`
 - `duration_seconds`
 - `notes`
+
+## Runtime Worker Mirror
+
+`runtime_workers:` is optional and stores a compact execution-time mirror of worker separation evidence derived from step execution. It exists so acceptance and status surfaces do not need to reconstruct the same facts repeatedly from raw step notes.
+
+Suggested shape:
+
+```yaml
+runtime_workers:
+  workers:
+    - role: implement
+      worker_id: self
+    - role: test
+      worker_id: codex
+    - role: audit
+      worker_id: self
+  role_availability:
+    audit:
+      status: unavailable
+      reason: command_unavailable
+  updated_at: 2026-05-07T10:00:00+08:00
+```
+
+Rules:
+
+- `runtime_workers` is a compact mirror, not the authority; step records remain the underlying evidence.
+- `runtime_workers.workers` must not include Codex/OpenCode runtime-only subtask observations as acceptance evidence.
+- `workers[*].role` should use `implement`, `test`, or `audit`.
+- `role_availability.<role>.status` currently supports `unavailable` or omission.
+- `reason` should be a machine-readable token such as `tool_unavailable`, `command_unavailable`, `platform_unsupported`, `capability_missing`, `permission_denied`, `spawn_failed`, or `exec_nonzero`.
+- The mirror should be refreshed when a relevant execution step finishes or when fallback evidence changes.
+- Entries marked with `evidence_scope: runtime_observation` or sources such as `opencode_active_subtask`, `codex_internal_subtask`, `codex_subcodex`, or `subtask_part` are UI/runtime observations only. They may be shown on status surfaces but must be ignored by acceptance and worker separation gates.
 
 ## Analysis State Summary
 

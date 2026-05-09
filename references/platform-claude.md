@@ -88,7 +88,12 @@ Typical flow:
 3. verify that the plugin namespace is `hw` and that `skills/plan/SKILL.md` resolves as `/hw:plan`
 4. run `/hw:setup` to create `~/.hypo-workflow/config.yaml`
 
-To use Codex for delegated steps, install `@openai/codex`, configure `OPENAI_API_KEY`, and set global `subagent.provider=codex` through setup.
+Codex-related delegation has two separate paths:
+
+- Codex CLI delegation: install `@openai/codex`, configure `OPENAI_API_KEY`, and set global `subagent.provider=codex` through setup. This is a CLI-backed delegation path.
+- Official OpenAI Codex plugin for Claude Code: optional plugin-assisted delegation inside Claude Code. It uses `/plugin marketplace add openai/codex-plugin-cc`, `/plugin install codex@openai-codex`, `/reload-plugins`, and `/codex:setup`; Hypo-Workflow may propose these commands but must not execute them automatically.
+
+Do not conflate these paths in generated setup guidance. If neither path is configured, fall back to Claude Code native subagents or stop before worker-separated role-sensitive work when policy requires independent evidence.
 
 ## Subagent Paths
 

@@ -198,7 +198,7 @@ export function resolveCycleStatusPhase(input = {}) {
   if (
     state.current?.phase === "follow_up_planning" ||
     cycle.status === "follow_up_planning" ||
-    state.continuation?.kind === "follow_up_plan" ||
+    isRunnableContinuation(state.continuation) ||
     (acceptanceState === "accepted" && policy.accept.next === "follow_up_plan" && continuation)
   ) {
     return {
@@ -283,9 +283,13 @@ export function selectLifecycleContinuation(value = {}, kind = "follow_up_plan")
   return (
     continuations.find((item) => item.kind === kind && item.status === "active") ||
     continuations.find((item) => item.kind === kind && ["planned", "queued", "pending"].includes(item.status)) ||
-    continuations.find((item) => item.kind === kind) ||
     null
   );
+}
+
+function isRunnableContinuation(value) {
+  const continuation = normalizeContinuation(value);
+  return continuation?.kind === "follow_up_plan" && ["active", "planned", "queued", "pending"].includes(continuation.status);
 }
 
 export function normalizeLifecycleContinuation(value = {}) {
