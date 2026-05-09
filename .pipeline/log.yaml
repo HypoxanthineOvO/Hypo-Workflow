@@ -1,5 +1,25 @@
 entries:
   -
+    id: RELEASE-v12.3.0-20260509T194733+0800
+    type: release
+    ref: v12.3.0
+    status: completed
+    timestamp: "2026-05-09T19:47:33+08:00"
+    summary: Released Hypo-Workflow v12.3.0 with worker-separation acceptance hardening, end-of-run dirty-only compact refresh, PR #5 clean integration, refreshed version metadata, and full regression validation.
+    trigger: user
+    details:
+      tests:
+        -
+          "npm test --prefix core: 398/398 passing"
+        -
+          "python3 tests/run_regression.py: 63/63 passing"
+        -
+          "bash scripts/validate-config.sh .pipeline/config.yaml: passing"
+        -
+          "checkDocs/readme freshness/claude plugin validate: passing"
+        -
+          "git diff --check: passing"
+  -
     id: RELEASE-v12.2.0-20260509T140109+0800
     type: release
     ref: v12.2.0

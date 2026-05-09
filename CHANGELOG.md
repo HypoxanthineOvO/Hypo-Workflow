@@ -1,5 +1,27 @@
 # Changelog
 
+## v12.3.0 - 2026-05-09
+
+### Features
+
+- 新增 worker-separation acceptance hardening：`/hw:accept` 现在会检查 `test` / `implement` / `audit` worker 证据、身份碰撞、Codex 授权、role availability 和 worker lifecycle，避免把运行时观测误当成验收证据。
+- 强化 `/hw:plan`、`/hw:start`、`/hw:resume`、`/hw:patch fix`、`/hw:debug`、`/hw:audit` 的 Subworker 规范，明确 `test`、`implement`、`audit` 三个角色的授权、作用域、生命周期和 degraded/downgrade 边界。
+- 新增运行结束后的 dirty-only compact refresh：成功完成 `/hw:start` 或 `/hw:resume` 后按需刷新 compact 派生上下文，避免每步执行都压缩 authoritative runtime 文件。
+- 更新 OpenCode status/runtime 展示，将 active subagent 标记为 runtime-only，避免把 OpenCode/Codex 运行态信息误用为持久 worker evidence。
+
+### Fixes
+
+- 干净集成 GitHub PR `#5`，保留 `feat: harden worker separation acceptance` 的功能内容，丢弃旧 PR `#3` 的 `13.0.0` 版本 bump 和过期 `.pipeline/` 运行态。
+- 修复新增 worker-separation 回归测试对外部 `rg -g` 行为的依赖，改为纯 Node 文件扫描，保证场景回归里的 `tests/bin/rg` 环境也稳定。
+- 收紧 Cycle acceptance 的 follow-up continuation 清理逻辑，避免非 follow-up 接受路径残留旧 continuation。
+
+### Tests
+
+- `npm test --prefix core`: 398/398 passing.
+- `python3 tests/run_regression.py`: 63/63 passing.
+- `bash scripts/validate-config.sh .pipeline/config.yaml`: passing.
+- `git diff --check`: passing.
+
 ## v12.2.0 - 2026-05-09
 
 ### Features
