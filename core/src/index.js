@@ -41,3 +41,4 @@ export * from "./docs/index.js";
 export * from "./metrics/index.js";
 export * from "./continuation/index.js";
 export * from "./preflight/index.js";
+export * from "./compact/index.js";

@@ -179,6 +179,8 @@ Workflow lifecycle policy is Cycle metadata. Project config may define `default_
 | compact full state history | `compact.state_history_full` | `compact.state_history_full` | `1` |
 | compact recent log events | `compact.log_recent` | `compact.log_recent` | `20` |
 | compact report summary lines | `compact.reports_summary_lines` | `compact.reports_summary_lines` | `3` |
+| compact end-of-run refresh | `compact.end_of_run` | `compact.end_of_run` | `true` |
+| compact refresh policy | `compact.refresh_policy` | `compact.refresh_policy` | `dirty_only` |
 | knowledge enabled | `knowledge.enabled` | `knowledge.enabled` | `true` |
 | knowledge SessionStart loading | `knowledge.loading.session_start` | `knowledge.loading.session_start` | `true` |
 | knowledge compact loading | `knowledge.loading.compact` | `knowledge.loading.compact` | `true` |

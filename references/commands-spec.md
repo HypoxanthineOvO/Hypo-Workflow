@@ -100,6 +100,9 @@ Behavior:
 - update top-level `last_heartbeat` whenever state is persisted
 - if `watchdog.enabled=true`, register cron for `scripts/watchdog.sh`
 - create `.pipeline/.lock` as a structured execution lease with heartbeat and expiry fields
+- after the full run succeeds and validation/report/state/log/progress writes have passed, run end-of-run compact when `compact.auto=true` and `compact.end_of_run=true`
+- end-of-run compact uses `compact.refresh_policy`, defaulting to `dirty_only`, and regenerates compact targets from full authoritative sources rather than previous `.compact` files
+- do not run success compact while validation is incomplete, failed, blocked, or stopped
 - before natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `safe_resume_command: /hw:resume`
 - before declaring completion in Codex or hook-limited environments, run preflight checks for protected writes, format validity, derived artifacts, README freshness, output language, secret markers, and required evidence
 - when worker separation is enabled, required evidence should include implement/test/audit role coverage or an explicit degraded-mode decision
@@ -664,6 +667,7 @@ Behavior:
 - generate `.pipeline/PROGRESS.compact.md`, `.pipeline/state.compact.yaml`, `.pipeline/log.compact.yaml`, `.pipeline/reports.compact.md`, and `.pipeline/patches.compact.md` when source files exist
 - never mutate source files while compacting
 - obey `compact.*`, `output.language`, and `output.timezone`
+- automatic start/resume compact is end-of-run and dirty-only by default; explicit `/hw:compact` may rebuild all supported compact targets
 
 ### `/hw:knowledge`
 

@@ -233,6 +233,30 @@ export function buildDerivedArtifactMap() {
       refresh: renderProgressCompact,
     },
     {
+      id: "state_compact",
+      path: ".pipeline/state.compact.yaml",
+      authority: [".pipeline/state.yaml"],
+      derived_from: [".pipeline/state.yaml"],
+      protected_authorities: [],
+      writer_commands: ["/hw:compact", "/hw:sync --repair", "/hw:sync --deep"],
+      refresh_triggers: ["state_update", "compact_refresh", "sync_repair"],
+      staleness_severity: "warning",
+      repair_behavior: "safe_refresh",
+      refresh: renderStateCompact,
+    },
+    {
+      id: "log_compact",
+      path: ".pipeline/log.compact.yaml",
+      authority: [".pipeline/log.yaml"],
+      derived_from: [".pipeline/log.yaml"],
+      protected_authorities: [],
+      writer_commands: ["/hw:compact", "/hw:sync --repair", "/hw:sync --deep"],
+      refresh_triggers: ["log_update", "compact_refresh", "sync_repair"],
+      staleness_severity: "warning",
+      repair_behavior: "safe_refresh",
+      refresh: renderLogCompact,
+    },
+    {
       id: "metrics_compact",
       path: ".pipeline/metrics.compact.yaml",
       authority: [".pipeline/metrics.yaml"],
@@ -255,6 +279,18 @@ export function buildDerivedArtifactMap() {
       staleness_severity: "warning",
       repair_behavior: "safe_refresh",
       refresh: renderReportsCompact,
+    },
+    {
+      id: "patches_compact",
+      path: ".pipeline/patches.compact.md",
+      authority: [".pipeline/patches"],
+      derived_from: [".pipeline/patches"],
+      protected_authorities: [],
+      writer_commands: ["/hw:compact", "/hw:sync --repair", "/hw:sync --deep"],
+      refresh_triggers: ["patch_closed", "compact_refresh", "sync_repair"],
+      staleness_severity: "warning",
+      repair_behavior: "safe_refresh",
+      refresh: renderPatchesCompact,
     },
     {
       id: "project_summary",
@@ -811,6 +847,60 @@ async function renderProgressCompact(root) {
   return `${source.split(/\r?\n/).slice(0, 80).join("\n").trimEnd()}\n`;
 }
 
+async function renderStateCompact(root) {
+  const source = await readOptionalText(join(root, ".pipeline", "state.yaml"));
+  if (!source) return null;
+  const state = parseYaml(source);
+  const compact = {};
+  for (const key of ["pipeline", "current", "last_heartbeat", "acceptance", "continuation"]) {
+    if (state[key] !== undefined) compact[key] = state[key];
+  }
+  if (Array.isArray(state.milestones)) {
+    compact.milestones = state.milestones.map((milestone) => ({
+      ...(milestone.id ? { id: milestone.id } : {}),
+      ...(milestone.name ? { name: milestone.name } : {}),
+      ...(milestone.feature_id ? { feature_id: milestone.feature_id } : {}),
+      ...(milestone.status ? { status: milestone.status } : {}),
+    }));
+  }
+  if (state.history?.completed_prompts) {
+    const completed = state.history.completed_prompts;
+    const recent = completed.slice(-1);
+    const older = completed.slice(0, -1).map((entry) => ({
+      prompt: entry.prompt || entry.prompt_name || entry.name,
+      status: entry.status || entry.result,
+      score_summary: entry.score_summary || entry.scores || entry.score || null,
+    }));
+    compact.history = {
+      completed_prompts: [...older, ...recent],
+    };
+  }
+  return `${stringifyYaml(compact).trimEnd()}\n`;
+}
+
+async function renderLogCompact(root) {
+  const source = await readOptionalText(join(root, ".pipeline", "log.yaml"));
+  if (!source) return null;
+  const log = parseYaml(source);
+  const entries = Array.isArray(log.entries) ? log.entries : [];
+  if (!entries.length) return null;
+  const recent = entries.slice(0, 20);
+  const older = entries.slice(20);
+  const compact = { entries: recent };
+  if (older.length) {
+    const timestamps = older.map((entry) => entry.timestamp).filter(Boolean).sort();
+    const counts = {};
+    for (const entry of older) counts[entry.type || "unknown"] = (counts[entry.type || "unknown"] || 0) + 1;
+    compact.older = {
+      count: older.length,
+      earliest: timestamps[0] || null,
+      latest: timestamps[timestamps.length - 1] || null,
+      summary: Object.entries(counts).map(([type, count]) => `${type}:${count}`).join(", "),
+    };
+  }
+  return `${stringifyYaml(compact).trimEnd()}\n`;
+}
+
 async function renderMetricsCompact(root) {
   const source = await readOptionalText(join(root, ".pipeline", "metrics.yaml"));
   if (!source) return null;
@@ -835,6 +925,29 @@ async function renderReportsCompact(root) {
   }
   if (!reports.length) return null;
   return `# Reports Compact\n\n${reports.join("\n")}\n`;
+}
+
+async function renderPatchesCompact(root) {
+  const patchDir = join(root, ".pipeline", "patches");
+  let entries = [];
+  try {
+    entries = await readdir(patchDir);
+  } catch {
+    return null;
+  }
+  const patches = [];
+  for (const entry of entries.filter((name) => /^P\d+.*\.md$/.test(name)).sort()) {
+    const source = await readOptionalText(join(patchDir, entry));
+    if (!source) continue;
+    if (!/^- (状态|Status|status):\s*(closed|done|resolved|已关闭)/im.test(source)) continue;
+    const title = source.split(/\r?\n/).find((line) => /^#\s+/.test(line))?.replace(/^#\s+/, "") || entry;
+    const change = /^- (改动|Change|Summary):\s*(.+)$/im.exec(source)?.[2]
+      || /^- commit:\s*(.+)$/im.exec(source)?.[1]
+      || "closed";
+    patches.push(`- ${title}: ${change}`);
+  }
+  if (!patches.length) return null;
+  return `# Patches Compact\n\n${patches.join("\n")}\n`;
 }
 
 async function renderProjectSummary(root) {
