@@ -13,18 +13,35 @@ remote_operations_requiring_confirmation:
   - label_write
   - target_branch_write
 proposed_operation: none
-merge_recommendation: block_direct_merge
+merge_recommendation: clean_local_integration_completed
 reasons:
   - merge_conflict
   - stale_version_bump_commit
   - remote_checks_missing
   - stale_pipeline_runtime_artifacts
-final_status: needs_rebase_or_integration
-confirmation_required: true
+final_status: integrated_locally
+confirmation_required: false
 integration_advice:
   preferred: rebase_or_clean_integration_branch
   drop_commits:
     - 57877f805f9d55294c8b36add9085313f4367a46
   keep_candidate_commit:
     - 1cf54f168fd64b3aea1bd337b1ceda23ee77bacc
-
+integration_result:
+  commit: fb70480
+  branch: integrate/pr-5-worker-separation
+  integrated_at: 2026-05-09T19:40:03+0800
+  direct_remote_merge: false
+  stale_version_bump_dropped: true
+  stale_pipeline_runtime_artifacts_dropped: true
+  tests:
+    - command: npm test --prefix core
+      result: pass
+      summary: 398/398
+    - command: python3 tests/run_regression.py
+      result: pass
+      summary: 63/63
+    - command: bash scripts/validate-config.sh .pipeline/config.yaml
+      result: pass
+    - command: git diff --check
+      result: pass

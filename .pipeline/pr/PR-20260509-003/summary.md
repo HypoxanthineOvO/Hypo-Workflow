@@ -49,11 +49,23 @@ Conclusion: I found a GitHub PR `#5`; I did not find a usable GitLab MR for the 
 
 ## Current Recommendation
 
-Do not merge PR `#5` directly. It is valuable, but it needs a clean integration:
+Direct remote merge was intentionally skipped. The PR was valuable, but its branch also carried stale release metadata and old `.pipeline/` runtime artifacts, so it was integrated locally instead.
 
-1. rebase or cherry-pick the feature commit onto current `main`
-2. drop the obsolete `v13.0.0` metadata bump from PR `#3`
-3. avoid merging stale `.pipeline/` runtime artifacts wholesale
-4. resolve worker-separation changes against the already-landed C10/P0/Subagent governance and end-of-run compact work
-5. run focused worker-separation tests plus full regression before merge
+Clean integration result:
 
+- Integration commit: `fb70480 feat: harden worker separation acceptance`
+- Kept feature commit content from `1cf54f168fd64b3aea1bd337b1ceda23ee77bacc`
+- Dropped obsolete PR `#3` version bump commit `57877f805f9d55294c8b36add9085313f4367a46`
+- Restored current mainline version metadata instead of accepting stale `13.x` values
+- Restored current `.pipeline/` runtime state instead of merging stale prompt/archive artifacts
+- Resolved worker-separation guidance against current P0, PR/MR, and end-of-run compact behavior
+- Replaced a brittle `rg -g` test dependency with pure Node scanning so scenario regression works with `tests/bin/rg`
+
+Validation:
+
+- `npm test --prefix core` -> 398/398 passed
+- `python3 tests/run_regression.py` -> 63/63 passed
+- `bash scripts/validate-config.sh .pipeline/config.yaml` -> passed
+- `git diff --check` -> passed
+
+Remote PR `#5` may still appear open because the accepted work was integrated through a clean local commit rather than a direct GitHub merge commit.
