@@ -16,6 +16,8 @@ WORKING_DIR
 # 执行要求
 1. 在工作目录中执行步骤指令
 2. 完成后输出结构化结果
+3. 如果你是 implementation Subagent，must not read test source、test files、fixtures、snapshot 或 assertion 细节；只允许接收需求、公开接口、允许编辑范围、test command、pass/fail 结果和 sanitized failure summary
+4. 如果当前任务需要读取测试源码、fixtures、snapshot 或 assertion 细节，必须切换为 test/review/audit 角色，或报告 degraded mode 让主 Agent 获取 explicit user confirmation
 
 # 输出格式（必须是 JSON）
 ```json

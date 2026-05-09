@@ -33,7 +33,7 @@ fi
 
 grep -Fq 'opencode debug config' tests/scenarios/v9/s54-opencode-plugin-scaffold/run.sh
 
-grep -Fq '38 个用户指令' README.md
+grep -Fq '39 个用户指令' README.md
 grep -Fq '[Commands Reference](docs/reference/commands.md)' README.md
 grep -Fq '[OpenCode Command Map](references/opencode-command-map.md)' README.md
 grep -Fq '/hw:docs' README.md

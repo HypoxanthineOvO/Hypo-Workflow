@@ -1,12 +1,12 @@
 ---
 name: hypo-workflow
-version: 12.1.0
-description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:plan`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
+version: 12.2.0
+description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:plan`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
 ---
 
-# Hypo-Workflow v12.1.0
+# Hypo-Workflow v12.2.0
 
-> **Claude Code 用户**：请使用 `/hypo-workflow:<command>` 调用具体指令。输入 `/hypo-workflow:help` 查看全部 38 个用户指令。
+> **Claude Code 用户**：请使用 `/hypo-workflow:<command>` 调用具体指令。输入 `/hypo-workflow:help` 查看全部 39 个用户指令。
 >
 > **Codex 用户**：本文件是完整的 Skill 入口，继续使用 `/hw:*` 指令。
 
@@ -37,6 +37,7 @@ description: Run a serialized prompt execution pipeline from a local `.pipeline/
 | `/hw:patch` | Create, list, close, and `fix` persistent lightweight Patches |
 | `/hw:patch fix` | Execute the lightweight six-step Patch repair lane |
 | `/hw:pr` | Inspect, review, fix, merge, or close existing GitHub PRs / GitLab MRs through local archives |
+| `/hw:pr create` | Guide GitHub PR / GitLab MR creation from existing worktree changes or a plan-first PR-sized task |
 | `/hw:explain` | Answer code, config, command, or recent-change questions with cited local evidence |
 | `/hw:compact` | Generate `.compact` context views for large runtime files |
 | `/hw:knowledge` | Inspect Knowledge Ledger records, indexes, compact summaries, and secret references |

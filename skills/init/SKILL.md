@@ -15,6 +15,8 @@ description: Initialize or rescan a Hypo-Workflow project when the user wants ar
 
 Use this skill to bootstrap `.pipeline/` and the architecture baseline. normal `/hw:init` does not require git. V8.1 also lets init import pre-Workflow Git history into a closed Legacy Cycle.
 
+Interactive init should prepare the project for the Cycle-level `P0 Configure` pre-discover stage. `P0 Configure` runs after `cycle new` and before `P1 Discover`; it may reuse existing settings from `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, or `built_in_default`, and it covers automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation.
+
 ## Preconditions
 
 - the repo is either empty, already contains source code, or already contains a partial pipeline
@@ -54,8 +56,9 @@ Use this skill to bootstrap `.pipeline/` and the architecture baseline. normal `
    - `off`
    - `recommended`
    - `strict`
-7. Generate architecture in single-file or folder mode based on project size unless forced.
-8. Initialize rules configuration unless the user explicitly skips it:
+7. If an active Cycle will proceed into planning, hand off to `P0 Configure` before `P1 Discover`; otherwise record that project defaults are ready for later reuse. `P0 Configure` runs after `cycle new` and before `P1 Discover`, asks about automation, Subagent authorization, acceptance mode, PR/MR remote write confirmation, full regression, analysis boundaries, and worker separation, and can reuse values from `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default`.
+8. Generate architecture in single-file or folder mode based on project size unless forced.
+9. Initialize rules configuration unless the user explicitly skips it:
    - show the preset choice in interactive contexts:
      ```text
      📏 Rules 配置
@@ -67,9 +70,9 @@ Use this skill to bootstrap `.pipeline/` and the architecture baseline. normal `
    - create `.pipeline/rules.yaml` with `extends: recommended` by default
    - create `.pipeline/rules/custom/` for future custom rules
    - do not create explicit Cycle metadata during init
-9. After creating `.pipeline/` directories and before initializing `state.yaml`, branch into History Import if `--import-history` is present.
-10. Use `--rescan` to refresh architecture for an existing pipeline.
-11. Set `current.phase=lifecycle_init` when tracking this command through state.
+10. After creating `.pipeline/` directories and before initializing `state.yaml`, branch into History Import if `--import-history` is present.
+11. Use `--rescan` to refresh architecture for an existing pipeline.
+12. Set `current.phase=lifecycle_init` when tracking this command through state.
 
 ## History Import
 

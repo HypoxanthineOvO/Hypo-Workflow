@@ -6,9 +6,11 @@
 
 规划 -> 执行 -> 审查 -> 报告 -> 恢复
 
-[![Version](https://img.shields.io/badge/version-12.1.0-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-12.2.0-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/reference/platforms.md)
+
+**语言 / Language：中文 | [English](README.en.md)**
 
 </div>
 
@@ -21,8 +23,10 @@ Hypo-Workflow 把长周期 AI 编程工作组织成可规划、可恢复、可�
 Hypo-Workflow 在所有平台上共享同一套 `.pipeline/` 协议：
 
 - **Cycle / Plan / Start / Resume**：把长任务拆成可恢复的 Feature、Milestone、Prompt 和 Report。
+- **P0 Configure**：每个新 Cycle 在 `P1 Discover` 前确认或沿用自动化程度、Subagent 授权、验收、PR/MR 远端写确认、完整回归和 worker separation。
 - **Rules / Habits**：把用户习惯和项目规则保存成结构化 authority，再生成各平台可读的指令视图。
 - **Agent Review**：在计划、测试、实现和收口阶段记录 review artifact，支持多轮 `needs_changes -> repair -> review`。
+- **PR/MR Create**：`/hw:pr create` 支持 GitHub PR 与 GitLab MR 的问答式创建，已有本地改动和 plan-first 工作分开处理，远端写一次性确认。
 - **Domain Packs**：把 RTL 等领域知识做成可选包；外部包只记录 metadata，安装或远程获取必须明确确认。
 - **Sync / Docs / Release**：同步平台适配器、修复文档、执行发布检查，但 Hypo-Workflow 本身不替代宿主 Agent 工作。
 
@@ -56,11 +60,11 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 ## 工作原则
 
 - `.pipeline/state.yaml`、`.pipeline/cycle.yaml`、`.pipeline/rules.yaml` 是受保护 authority 文件。
-- Codex Subagents 优先用于非平凡 Codex 工作；实现与测试/审查要尽量分离，Codex Subagents 保持在 Codex/GPT 运行时内。
+- Codex Subagents 优先用于非平凡 Codex 工作；实现与测试/审查要尽量分离，implementation Subagent 不读取测试源码/fixtures/snapshots/assertion 细节，无法隔离时记录 degraded mode。
 - 完成前做交付前检查：格式、派生产物、README/文档新鲜度、secret marker、测试证据和报告证据。
 - 自动化等级由 `.pipeline/config.yaml` 的 `automation.level` 决定；发布、破坏性操作和外部副作用仍按配置确认点执行。
 
-当前版本提供 **38 个用户指令**，另有 **1 个内部 watchdog** skill。
+当前版本提供 **39 个用户指令**，另有 **1 个内部 watchdog** skill。
 
 ## 常用命令
 
@@ -75,6 +79,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | 带证据解释代码/配置/改动 | `/hw:explain "为什么这样设计"` |
 | 小修复不进完整 Milestone | `/hw:patch` / `/hw:patch fix P001` |
 | 处理已有 PR/MR | `/hw:pr inspect|review|fix|merge|close <url|id>` |
+| 创建 PR/MR | `/hw:pr create` / `/hw:pr create --from-worktree` / `/hw:pr create --plan` |
 | 修复派生上下文 | `/hw:sync --repair` |
 | 检查或修复文档 | `/hw:docs check` / `/hw:docs repair` |
 | 压缩长上下文 | `/hw:compact` |
@@ -90,7 +95,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | Pipeline | `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat` |
 | Plan | `/hw:plan`, `/hw:plan:discover`, `/hw:plan:decompose`, `/hw:plan:generate`, `/hw:plan:confirm`, `/hw:plan:extend`, `/hw:plan:review` |
 | Lifecycle | `/hw:init`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:patch`, `/hw:patch fix`, `/hw:release` |
-| Analysis/Review | `/hw:check`, `/hw:audit`, `/hw:debug`, `/hw:pr`, `/hw:explain` |
+| Analysis/Review | `/hw:check`, `/hw:audit`, `/hw:debug`, `/hw:pr`, `/hw:pr create`, `/hw:explain` |
 | Utility | `/hw:sync`, `/hw:docs`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:help`, `/hw:reset`, `/hw:log`, `/hw:setup`, `/hw:explore` |
 
 完整映射见 [Commands Reference](docs/reference/commands.md) 和 [OpenCode Command Map](references/opencode-command-map.md)。
@@ -101,7 +106,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 |---|---|
 | [User Guide](docs/user-guide.md) | 常见流程、恢复、Feature Queue |
 | [Developer Guide](docs/developer.md) | 核心 helper、权限边界、派生产物和测试约定 |
-| [Commands Reference](docs/reference/commands.md) | 38 个标准命令和 OpenCode 映射 |
+| [Commands Reference](docs/reference/commands.md) | 39 个标准命令和 OpenCode 映射 |
 | [Platforms Reference](docs/reference/platforms.md) | 六个平台能力表 |
 | [Generated Artifacts](docs/reference/generated-artifacts.md) | OpenCode、第三方适配、压缩视图和文档引用的生成来源 |
 | [OpenCode Guide](docs/platforms/opencode.md) | OpenCode 指令、智能体角色、模型矩阵和边界 |

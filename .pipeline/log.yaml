@@ -1,5 +1,25 @@
 entries:
   -
+    id: RELEASE-v12.2.0-20260509T140109+0800
+    type: release
+    ref: v12.2.0
+    status: completed
+    timestamp: "2026-05-09T14:01:09+08:00"
+    summary: Released Hypo-Workflow v12.2.0 with P0 Configure, PR/MR Create, Subagent separation governance, English README/docs, refreshed adapters, and full regression validation.
+    trigger: user
+    details:
+      tests:
+        -
+          "npm test --prefix core: 365/365 passing"
+        -
+          "python3 tests/run_regression.py: 63/63 passing"
+        -
+          "bash scripts/validate-config.sh .pipeline/config.yaml: passing"
+        -
+          "checkDocs/readme freshness/sync check-only: passing"
+        -
+          "git diff --check: passing"
+  -
     id: CYCLE-CLOSED-C9-20260507T201700+0800
     type: cycle_close
     ref: C9
@@ -4366,3 +4386,27 @@ entries:
     tests: "node --test core/test/rules-authority.test.js core/test/commands-rules-artifacts.test.js: 9/9 passing"
     trigger: auto
     related_milestone: M01
+  -
+    id: M4-COMPLETE-C10-20260509T003030+0800
+    type: milestone_complete
+    ref: C10/M4
+    status: completed
+    timestamp: "2026-05-09T00:30:30+08:00"
+    summary: Completed command/docs/adapter coverage for P0 Configure, /hw:pr create, and Subagent strict/degraded governance; full validation passed.
+    report: .pipeline/reports/04-commands-docs-adapters-full-regression.report.md
+    trigger: auto
+    related_milestone: M4
+    tests:
+      - "npm test --prefix core: 365/365 passing"
+      - "bash scripts/validate-config.sh .pipeline/config.yaml: passing"
+      - "python3 tests/run_regression.py: 63/63 passing"
+      - "git diff --check: passing"
+  -
+    id: CYCLE-COMPLETE-C10-20260509T003030+0800
+    type: cycle_complete
+    ref: C10
+    status: completed
+    timestamp: "2026-05-09T00:30:30+08:00"
+    summary: Completed C10 experience optimization Cycle with PR Create, P0 Configure, Subagent governance, docs/adapters, and regression evidence.
+    report: .pipeline/reports/04-commands-docs-adapters-full-regression.report.md
+    trigger: auto

@@ -18,7 +18,7 @@ test("sync command map, skill, and OpenCode artifact are exposed", async () => {
   const root = await fixtureRoot();
   const result = await runProjectSync(root, { mode: "standard" });
 
-  assert.equal(commandMap("opencode").length, 38);
+  assert.equal(commandMap("opencode").length, 39);
   assert.equal(commandByCanonical("/hw:sync").opencode, "/hw-sync");
   assert.equal(commandByCanonical("/hw:sync").agent, "hw-build");
   assert.match(await readFile("skills/sync/SKILL.md", "utf8"), /--light/);
@@ -91,8 +91,10 @@ test("standard and deep sync share core logic with CLI sync", async () => {
   assert.match(deep.architecture_hint, /rescan/i);
 
   const cliRoot = await fixtureRoot();
+  const cliHome = await mkdtemp(join(tmpdir(), "hw-sync-cli-home-"));
   const lightOutput = execFileSync(process.execPath, ["cli/bin/hypo-workflow", "sync", "--light", "--project", cliRoot], {
     cwd: ".",
+    env: { ...process.env, HOME: cliHome },
     encoding: "utf8",
   });
   assert.match(lightOutput, /mode=light/);
@@ -100,6 +102,7 @@ test("standard and deep sync share core logic with CLI sync", async () => {
 
   const standardOutput = execFileSync(process.execPath, ["cli/bin/hypo-workflow", "sync", "--project", cliRoot], {
     cwd: ".",
+    env: { ...process.env, HOME: cliHome },
     encoding: "utf8",
   });
   assert.match(standardOutput, /mode=standard/);

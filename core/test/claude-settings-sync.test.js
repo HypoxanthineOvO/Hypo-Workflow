@@ -266,8 +266,10 @@ test("claude-code settings replaces previously managed main model", () => {
 
 test("hypo-workflow sync CLI supports --platform claude-code", async () => {
   const root = await fixtureRoot();
+  const home = await mkdtemp(join(tmpdir(), "hw-claude-cli-home-"));
   const output = execFileSync(process.execPath, ["cli/bin/hypo-workflow", "sync", "--platform", "claude-code", "--project", root], {
     cwd: ".",
+    env: { ...process.env, HOME: home },
     encoding: "utf8",
   });
 

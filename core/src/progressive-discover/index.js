@@ -22,6 +22,22 @@ export const DISCOVER_BIG_QUESTIONS = Object.freeze([
   },
 ]);
 
+export const P0_CONFIGURE_STAGE = Object.freeze({
+  id: "p0_configure",
+  label: "P0 Configure",
+  trigger: "cycle_new_before_discover",
+  guidance: "在 P1 Discover 前确认自动化程度、Subagent 授权、验收模式、PR/MR 远端写确认策略、完整回归、analysis 边界和 worker separation；用户可以沿用上次配置。",
+  questions: [
+    "automation_level",
+    "subagent_authorization",
+    "acceptance_mode",
+    "pr_remote_write_policy",
+    "full_regression",
+    "analysis_boundaries",
+    "worker_separation",
+  ],
+});
+
 const FULL_STAGES = Object.freeze([
   {
     id: "assumption_statement",
@@ -61,7 +77,7 @@ export function buildProgressiveDiscoverPlan(input = {}, options = {}) {
   const coverage = mode === "extend" || risk.mode === "light_discover" ? "lightweight" : "full";
   const stages = coverage === "lightweight" ? LIGHTWEIGHT_STAGES : FULL_STAGES;
   const minRounds = options.minRounds ?? (coverage === "lightweight" ? 1 : 3);
-  const requiredOutputs = [".pipeline/design-spec.md", ".plan-state/discover.yaml"];
+  const requiredOutputs = [".plan-state/p0-configure.yaml", ".pipeline/design-spec.md", ".plan-state/discover.yaml"];
 
   if (mode === "batch") {
     requiredOutputs.push(".plan-state/batch-discover.yaml");
@@ -75,6 +91,7 @@ export function buildProgressiveDiscoverPlan(input = {}, options = {}) {
     coverage,
     grill_me: risk,
     min_rounds: minRounds,
+    pre_discover_stage: { ...P0_CONFIGURE_STAGE, questions: [...P0_CONFIGURE_STAGE.questions] },
     big_questions: DISCOVER_BIG_QUESTIONS.map((item) => ({ ...item })),
     stages: stages.map((item) => ({ ...item })),
     required_outputs: requiredOutputs,

@@ -1,156 +1,47 @@
-# C9 Design Spec - 配置治理、PR/MR、Explain、Claude Resume 与中文文档
+# C10 Design Spec - 体验优化：PR Create、P0 Configure 与 Subagent 隔离
 
-## Product Scope
+## Goal
 
-C9 把 Hypo-Workflow 的用户可理解性和协作能力补齐到可交付状态。Cycle 目标不是增加一个后台 runner，而是继续强化 `.pipeline/` 作为本地 workflow authority 的设计：让用户能看懂配置，能让 Agent 处理已有 PR/MR，能要求 Agent 证据优先地解释代码和决策，并修复 Claude Code 原生 `/resume` 与 Hypo `/hw:resume` 的命名冲突。
+C10 要把 Hypo-Workflow 的协作体验向前推进一层：用户可以通过 `/hw:pr create` 被问答式引导完成 PR/MR 创建；每个 Cycle 在进入 Discover 前都有独立的 `P0 Configure` 阶段确认自动化、授权和执行边界；Subagent 的使用从“鼓励”升级为有明确授权、角色隔离和降级记录的执行契约。
 
-本 Cycle 使用 Batch Plan Mode，包含 6 个 Feature 和 12 个 Milestone。
+## Project Shape
 
-## Confirmed Decisions
+- Project type: Hypo-Workflow core / skills / docs / adapter workflow project。
+- Primary deliverable: 命令契约、core helper、skill/spec/docs、测试和回归场景。
+- Target platform: Codex、OpenCode、Claude Code 共享 `.pipeline/` 协议。
+- Expected users: 不熟悉 PR/MR 细节但希望 Agent 引导完成开发、提交和审查流程的用户。
 
-- 配置治理文档必须整理不同自动程度、严格程度、确认边界和平台差异。
-- 默认配置组合至少包含 `solo-auto`、`manual-review`、`team-strict`、`analysis-hybrid`。
-- PR/MR 抽象为平台中立的 Change Request；GitHub 映射为 Pull Request，GitLab 映射为 Merge Request。
-- `/hw:pr` 第一版以处理已有 PR/MR 为主：`inspect`、`review`、`fix`、`merge`、`close`。
-- 后续创建入口预留为 `/hw:pr create`，但 C9 不要求完整创建实现。
-- PR/MR 远端写操作永远是高风险手动门，包括 `push`、`merge`、`close`、修改 reviewer、label、target branch。
-- `/hw:pr` 必须写本地归档，记录来源、状态快照、Agent 审查、修改、测试、确认和最终结果。
-- `/hw:explain` 是证据优先的只读问答命令，不是 `/hw:status` 的替代。
-- Explain 默认读取相关代码、diff、`.pipeline` 状态、日志、报告和文档证据，避免凭空回答。
-- Explain 支持 `--subagent`，由独立 Subagent 先整理上下文和证据，主 Agent 再回答。
-- Claude 修复重点是避免 Claude Code 内置 `/resume` 被自动补全或误路由到 Hypo `/hw:resume`。
-- 给人看的主文档和 README 引用链必须中文主体；命令名、配置键、文件名、平台名和专有英文术语保留英文。
+## Constraints
 
-## Feature Queue
+- Hypo-Workflow 不是 runner；实际命令由宿主 Agent 执行。
+- `.pipeline/` 仍是 state、Cycle、prompts、reports、progress、logs 和 archives 的 source of truth。
+- PR/MR remote write 是 high-risk gate。一次性确认可以覆盖整套 create 流程，但确认摘要必须列出 push、create、reviewer/label/target branch 等具体远端写动作。
+- 测试不能依赖真实 GitHub/GitLab 网络；provider 写操作用 fixture/mock。
+- Implement Subagent 不能读取测试源码、fixtures、snapshot 或断言细节，只能接收测试命令、pass/fail 和精简错误摘要。
 
-| Feature | Title | Dependencies | Validation focus |
-|---|---|---|---|
-| F001 | 配置治理与默认配置组合 | none | config 矩阵、默认 profile、确认边界 |
-| F002 | PR/MR 管理与本地归档 | F001 | Change Request contract、只读 fixture、高风险门 |
-| F003 | Evidence-first Explain 命令 | F001 | 只读问答、证据引用、Subagent handoff |
-| F004 | Claude Resume 命名冲突修复 | F001 | exact namespace、alias/autocomplete fixture、Claude smoke |
-| F005 | 中文主体文档治理 | F001-F004 | README 引用链、docs/references 中文主体、命令新鲜度 |
-| F006 | C9 总体验收 | F001-F005 | Subagent 审计、文档自检、全量回归 |
+## Functional Requirements
 
-## Configuration Governance
+1. `P0 Configure`：在 `cycle new` 后、`P1 Discover` 前触发；Guide/Init/Plan 进入规划前也应引导到该阶段。支持沿用配置，继承优先级为当前 Cycle 显式配置、上一个 Cycle 快照、项目配置、全局配置、内置默认。
+2. `/hw:pr create`：默认先问用户是否已有改动；`--from-worktree` 处理已有本地改动；`--plan` 先进入一组 Plan，完成后回到 create。
+3. PR/MR 创建引导：检查 dirty worktree、文件范围、分支、commit、push、title/body、target branch、reviewer/label，并输出一次性确认摘要。
+4. GitLab：优先支持 `gitlab.com`；self-hosted GitLab 至少保留 host/base_url/provider 扩展点，复杂 live API 可后置。
+5. Subagent：P0 中请求授权；执行中区分 implement/test/audit；strict 不可满足时告知用户并请求 degraded mode。
 
-配置治理文档必须从用户视角解释以下层次：
+## Testing Expectations
 
-- project config `.pipeline/config.yaml`；
-- global config `~/.hypo-workflow/config.yaml`；
-- Cycle metadata `.pipeline/cycle.yaml`；
-- `automation.*`、legacy auto fields 和 hard gates 的关系；
-- `plan.mode`、`plan.interaction_depth`、`plan.interactive.*`；
-- `execution.mode`、`execution.worker_separation.mode`、`execution.step_overrides.*`；
-- `execution.analysis.interaction_mode` 和 analysis boundary；
-- `review strict`、`evaluation.*` 和 Agent Review blocking policy；
-- platform profile，如 Codex、Claude Code、OpenCode、team-strict。
+- Focused Node tests 覆盖 config/init/guide/discover、PR create contract、PR manual gates、Subagent discipline。
+- 最终 M4 必须运行 `npm test --prefix core`、`bash scripts/validate-config.sh .pipeline/config.yaml`、`python3 tests/run_regression.py` 和 `git diff --check`。
+- 每个 Milestone 报告必须记录验证命令、通过/失败证据、Subagent 隔离或降级情况。
 
-默认配置组合必须以稳定 key 表示，中文解释面向用户：
+## Milestone Strategy
 
-- `solo-auto`：个人全自动开发，普通执行自动推进，高风险外部动作确认；
-- `manual-review`：手动检查，规划和关键阶段都更频繁停顿；
-- `team-strict`：团队严格，worker separation、review、CI/PR 边界更保守；
-- `analysis-hybrid`：分析优先，代码变更前确认，允许证据收集和只读检查。
+- M0: `P0 Configure` 契约、状态与继承模型。
+- M1: `/hw:pr create` 向导契约与本地归档模型。
+- M2: PR Create 远端执行适配与教学式流程。
+- M3: Subagent 授权、隔离与降级治理。
+- M4: 命令、文档、适配器与完整回归。
 
-## PR/MR Change Request Model
+## Open Questions
 
-`/hw:pr` 的核心对象是 Change Request。它必须支持 GitHub PR 和 GitLab MR 的平台差异，但用户命令保持统一。
-
-第一版本地归档建议：
-
-```text
-.pipeline/pr/
-  PR-YYYYMMDD-001/
-    request.yaml
-    summary.md
-    review-notes.md
-    changes.md
-    evidence/
-    decisions.yaml
-```
-
-归档记录：
-
-- provider、URL、编号、源分支、目标分支、作者；
-- 标题、描述、CI/checks、review/approval、冲突状态；
-- Agent 风险评估和关键 diff；
-- 本地修复 diff、commit、测试命令和结果；
-- 人工确认记录；
-- final status：merged、closed、abandoned、deferred。
-
-远端动作规则：
-
-- `inspect` 和 `review` 默认只读；
-- `fix` 可改本地代码，push 前必须确认；
-- `merge` 和 `close` 必须确认；
-- live remote 读取也应按网络/remote boundary 处理，测试默认用 fixture/mock。
-
-## Explain Model
-
-`/hw:explain` 回答自然语言问题，例如：
-
-- “这个新项目代码框架是什么？”
-- “为什么刚才这样写？”
-- “这个配置为什么是 strict？”
-- “这个命令会做什么？”
-
-Explain 默认只读，并应先收集证据再回答。它可以读取：
-
-- 用户指定文件；
-- `git diff`、recent changes；
-- `.pipeline/cycle.yaml`、`state.yaml`、`PROGRESS.md`、`log.yaml`；
-- 近期 report 和 review artifact；
-- README、docs、references；
-- relevant source/test files。
-
-`--subagent` 模式要求独立 Subagent 生成 evidence packet，主 Agent 基于该 packet 和必要的复核回答。报告中要标明证据来源和无法确认的部分。
-
-## Claude Resume Boundary
-
-Claude Code 原生 `/resume` 是宿主平台能力，Hypo-Workflow 的 `/hw:resume` 是 workflow command。两者不能因为自动补全、别名、plugin 命名或 generated instruction 混在一起。
-
-C9 必须审计：
-
-- `.claude-plugin/plugin.json`；
-- `skills/resume/SKILL.md`；
-- Claude command/skill generation；
-- `core/src/artifacts/claude.js`；
-- Claude alias/autocomplete tests；
-- docs/platforms/claude-code.md；
-- references/platform-claude.md 和 commands spec。
-
-## Documentation Language Policy
-
-给人看的文档必须中文主体，包括 README 引用链、`docs/**` 和主要 `references/**`。历史 showcase/release 文档可以低优先级，但入口和仍被 README 引用的文档必须中文。
-
-保留英文的内容：
-
-- 命令名；
-- 配置键；
-- 文件名和路径；
-- 平台名；
-- API、PR/MR 等专有术语；
-- 代码、测试名和 schema field。
-
-## Validation Strategy
-
-每个实现 Milestone 走 TDD：写测试、审查测试、red、实现、green、审查代码。最终 M12 必须执行：
-
-- focused tests for config/pr/explain/claude/docs；
-- `npm test --prefix core`；
-- `python3 tests/run_regression.py`；
-- `bash scripts/validate-config.sh .pipeline/config.yaml`；
-- `node cli/bin/hypo-workflow sync --check-only --project .`；
-- `claude plugin validate .`；
-- `git diff --check`；
-- 文档 Agent 自检；
-- Subagent 审计生成产物、prompt 闭环、PR/Explain 风险边界和 Claude Resume 修复。
-
-## Open Risks
-
-- GitHub PR 和 GitLab MR 的 live API 行为会变化；C9 应以 fixture/mock 为测试基线。
-- PR/MR 写操作很容易越界；所有远端写都必须人工确认。
-- Explain 如果没有证据约束会变成普通聊天；默认行为必须收集证据并声明不确定性。
-- 中文化 references 可能造成 spec 漂移；命令、schema 和测试预期必须保持精确。
-- Claude Code 自动补全行为受宿主影响；修复要避免声称能控制平台内置命令，只能控制 Hypo plugin/alias/instruction surface。
+- self-hosted GitLab 在 M2 做最小可用实现，还是只保留配置和 provider seam。
+- 真实远端写 smoke 需要用户提供 token/remote 并再次确认。

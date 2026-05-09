@@ -16,8 +16,8 @@ tmp_home="$(mktemp -d)"
 HOME="$tmp_home" node cli/bin/hypo-workflow init-project --platform opencode --project "$tmp_project" >"$init_log"
 
 count="$(find "$tmp_project/.opencode/commands" -maxdepth 1 -type f -name 'hw-*.md' | wc -l | tr -d ' ')"
-test "$count" = "38" || {
-  echo "expected 38 command files, found $count" >&2
+test "$count" = "39" || {
+  echo "expected 39 command files, found $count" >&2
   exit 1
 }
 

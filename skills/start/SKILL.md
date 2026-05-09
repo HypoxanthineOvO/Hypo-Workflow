@@ -77,6 +77,9 @@ Use this skill to start execution from a local `.pipeline/` workspace. This is t
 20. When `execution.worker_separation.mode` is `recommended` or `strict`, resolve implement/test/audit role coverage before acceptance:
    - try to start distinct workers for `implement`, `test`, and `audit`
    - if roles are missing or collide onto one worker identity, mark the run degraded
+   - implementation Subagent workers must not read test source, fixtures, snapshots, or assertion details; provide only requirements, public interfaces, allowed edit scope, test command, pass/fail status, and sanitized failure summary
+   - if this role isolation cannot be preserved, stop before delegated execution and request explicit user confirmation for degraded mode
+   - record role isolation degradation, missing roles, worker collisions, unavailable boundaries, and the user decision in the report/log/state notes
    - `recommended` may continue with explicit degraded-mode confirmation and evidence
    - `strict` must not treat degraded execution as fully accepted
 21. On failure, the main agent must choose one of:

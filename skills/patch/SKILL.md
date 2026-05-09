@@ -158,7 +158,7 @@ When Step 6 succeeds, update or append these fields in the Patch file while pres
 - 状态: closed
 - 修复时间: 29日 14:30
 - 改动: src/scheduler.py:120 — 修正条件判断逻辑
-- 测试: ✅ 回归通过（38/38）
+- 测试: ✅ 回归通过（39/39）
 - commit: `a1b2c3d`
 ```
 

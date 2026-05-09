@@ -39,6 +39,12 @@
 | `acceptance.mode` | `auto`、`manual`、`timeout` 或 legacy `confirm` 控制交付接受方式 | 手动验收或团队流程用 `manual`/`confirm` |
 | `evaluation.max_diff_score` | diff score 超阈值可触发警告或修复 | 越低越保守 |
 
+## P0 Configure 与 Subagent 授权
+
+`P0 Configure` 是每个新 Cycle 在 `P1 Discover` 前的配置阶段。用户可以重新选择，也可以明确沿用上一轮或项目/全局默认。该阶段覆盖 automation、Subagent authorization、acceptance、PR/MR remote write、full regression、analysis boundaries 和 worker separation，并把来源记录为 `cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config` 或 `built_in_default`。
+
+strict worker separation 要求 implementation Subagent 与 test/review/audit 角色隔离。implementation worker 不读取 test source、fixtures、snapshots 或 assertion details；它只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若宿主平台不能提供这种隔离，必须在执行前说明 degraded mode，获得 explicit user confirmation，并记录 role isolation degradation。
+
 ## Analysis preset 边界
 
 | 字段 | manual | hybrid | auto |

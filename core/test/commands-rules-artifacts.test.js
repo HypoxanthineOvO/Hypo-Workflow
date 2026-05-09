@@ -6,9 +6,9 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { commandByCanonical, commandMap, loadRulesSummary, writeOpenCodeArtifacts } from "../src/index.js";
 
-test("commandMap contains 38 OpenCode mappings", () => {
+test("commandMap contains 39 OpenCode mappings", () => {
   const commands = commandMap("opencode");
-  assert.equal(commands.length, 38);
+  assert.equal(commands.length, 39);
   assert.equal(commandByCanonical("/hw:plan").opencode, "/hw-plan");
   assert.equal(commandByCanonical("/hw:report").agent, "hw-report");
   assert.equal(commandByCanonical("/hw:compact").agent, "hw-compact");
@@ -22,6 +22,8 @@ test("commandMap contains 38 OpenCode mappings", () => {
   assert.equal(commandByCanonical("/hw:docs").opencode, "/hw-docs");
   assert.equal(commandByCanonical("/hw:pr").opencode, "/hw-pr");
   assert.equal(commandByCanonical("/hw:pr").agent, "hw-review");
+  assert.equal(commandByCanonical("/hw:pr create").opencode, "/hw-pr-create");
+  assert.equal(commandByCanonical("/hw:pr create").agent, "hw-build");
   assert.equal(commandByCanonical("/hw:explain").opencode, "/hw-explain");
 });
 
@@ -38,6 +40,7 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
 
   const releaseCommand = await readFile(join(dir, ".opencode", "commands", "hw-release.md"), "utf8");
   const explainCommand = await readFile(join(dir, ".opencode", "commands", "hw-explain.md"), "utf8");
+  const prCreateCommand = await readFile(join(dir, ".opencode", "commands", "hw-pr-create.md"), "utf8");
   const chatCommand = await readFile(join(dir, ".opencode", "commands", "hw-chat.md"), "utf8");
   const command = await readFile(join(dir, ".opencode", "commands", "hw-plan.md"), "utf8");
   const agent = await readFile(join(dir, ".opencode", "agents", "hw-plan.md"), "utf8");
@@ -54,6 +57,8 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
   assert.match(explainCommand, /evidence-first/);
   assert.match(explainCommand, /read-only/);
   assert.match(explainCommand, /--subagent/);
+  assert.match(prCreateCommand, /\/hw:pr create/);
+  assert.match(prCreateCommand, /change-request/);
   assert.match(chatCommand, /\/hw:chat/);
   assert.match(chatCommand, /state\.yaml \+ cycle\.yaml \+ PROGRESS\.md \+ recent report/);
   assert.match(chatCommand, /chat entries instead of Milestone reports/);

@@ -50,6 +50,20 @@ test("subagent policy separates implementation from validation and keeps aliases
   }
 });
 
+test("strict worker separation hides test source from implementation workers and records degraded mode", async () => {
+  const spec = await readFile(SUBAGENT_SPEC, "utf8");
+  const fullDelegation = await readFile("templates/subagent/full-delegation.md", "utf8");
+  const start = await readFile(START_SKILL, "utf8");
+  const combined = `${spec}\n${fullDelegation}\n${start}`;
+
+  assert.match(combined, /implementation Subagent.*must not read test source/i);
+  assert.match(combined, /fixtures.*snapshot.*assertion/i);
+  assert.match(combined, /test command.*pass\/fail.*sanitized failure summary/i);
+  assert.match(combined, /degraded mode/i);
+  assert.match(combined, /explicit user confirmation/i);
+  assert.match(combined, /role.*isolation.*degradation/i);
+});
+
 test("patch lane preserves lightweight scope while allowing independent review help", async () => {
   const patch = await readFile(PATCH_SKILL, "utf8");
 
@@ -65,7 +79,7 @@ test("setup and help do not route Codex Subagents to external providers", async 
   const setup = await readFile(SETUP_SKILL, "utf8");
   const combined = `${help}\n${setup}`;
 
-  assert.match(help, /38 user-facing Hypo-Workflow commands/i);
+  assert.match(help, /39 user-facing Hypo-Workflow commands/i);
   assert.match(combined, /Codex Subagents are Codex\/GPT runtime workers/i);
   assert.doesNotMatch(combined, /Codex can configure Claude as the subagent provider/i);
   assert.doesNotMatch(combined, /configure Claude as a subagent/i);

@@ -5,7 +5,7 @@ import { DEFAULT_ANALYSIS_INTERACTION } from "../analysis/index.js";
 import { DEFAULT_KNOWLEDGE_CONFIG } from "../knowledge/index.js";
 
 export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
-  version: "12.1.0",
+  version: "12.2.0",
   agent: {
     platform: "codex",
     model: "default",
@@ -86,6 +86,29 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
     default_state: "pending",
     timeout_hours: 72,
     reject_escalation_threshold: 3,
+  },
+  cycle: {
+    configure: {
+      stage: "P0 Configure",
+      trigger: "cycle_new_before_discover",
+      allow_reuse: true,
+      inheritance_order: [
+        "cycle_explicit",
+        "previous_cycle_snapshot",
+        "project_config",
+        "global_config",
+        "built_in_default",
+      ],
+      questions: [
+        "automation_level",
+        "subagent_authorization",
+        "acceptance_mode",
+        "pr_remote_write_policy",
+        "full_regression",
+        "analysis_boundaries",
+        "worker_separation",
+      ],
+    },
   },
   automation: {
     level: "balanced",
@@ -356,6 +379,38 @@ export function normalizeAutomationPolicy(policy = {}) {
   };
 }
 
+export function resolveP0ConfigurePolicy(sources = {}, options = {}) {
+  const base = DEFAULT_GLOBAL_CONFIG.cycle.configure;
+  const order = Array.isArray(options.inheritance_order)
+    ? options.inheritance_order
+    : base.inheritance_order;
+  const questions = Array.isArray(options.questions) ? options.questions : base.questions;
+  const decisions = {};
+
+  for (const question of questions) {
+    const found = findP0Decision(question, sources, order);
+    decisions[question] = {
+      value: found.value,
+      source: found.source,
+      reused: Boolean(options.reuse && found.source !== "built_in_default"),
+    };
+  }
+
+  return {
+    stage: base.stage,
+    trigger: base.trigger,
+    allow_reuse: base.allow_reuse,
+    inheritance_order: [...order],
+    questions: [...questions],
+    decisions,
+    audit: {
+      reused: Boolean(options.reuse),
+      created_at: options.now || new Date().toISOString(),
+      sources_checked: [...order],
+    },
+  };
+}
+
 export function resolveWorkerSeparationPolicy(projectConfig = {}, globalConfig = DEFAULT_GLOBAL_CONFIG) {
   const merged = mergeConfig(
     mergeConfig(DEFAULT_GLOBAL_CONFIG.execution.worker_separation, globalConfig?.execution?.worker_separation || {}),
@@ -551,6 +606,31 @@ function normalizeDegradationOptions(input) {
   ]);
   const values = Array.isArray(input) ? input : DEFAULT_GLOBAL_CONFIG.execution.worker_separation.degradation.options;
   return values.filter((value) => allowed.has(value));
+}
+
+function findP0Decision(question, sources, order) {
+  for (const source of order) {
+    const bucket = source === "cycle_explicit"
+      ? sources.cycle_explicit || sources.cycle || {}
+      : sources[source] || {};
+    if (Object.prototype.hasOwnProperty.call(bucket, question)) {
+      return { value: bucket[question], source };
+    }
+  }
+  return { value: builtInP0Default(question), source: "built_in_default" };
+}
+
+function builtInP0Default(question) {
+  const defaults = {
+    automation_level: DEFAULT_GLOBAL_CONFIG.automation.level,
+    subagent_authorization: DEFAULT_GLOBAL_CONFIG.automation.codex.prefer_subagents,
+    acceptance_mode: DEFAULT_GLOBAL_CONFIG.acceptance.mode,
+    pr_remote_write_policy: "single_confirmation",
+    full_regression: false,
+    analysis_boundaries: DEFAULT_GLOBAL_CONFIG.execution.analysis.interaction_mode,
+    worker_separation: DEFAULT_GLOBAL_CONFIG.execution.worker_separation.mode,
+  };
+  return defaults[question] ?? null;
 }
 
 function sameWorkerIdentity(left, right) {

@@ -12,6 +12,7 @@ Use this reference for `/hw:pr` when handling an existing GitHub Pull Request or
 - Keep remote reads and remote writes separate.
 - Record local evidence under `.pipeline/pr/` without treating it as the remote source of truth.
 - Require explicit confirmation for every remote write.
+- Provide a guided `/hw:pr create` flow for users who either already have local worktree changes or want to start a PR/MR-sized plan first.
 
 ## Supported Providers
 
@@ -100,6 +101,32 @@ Tests should fail if inspect or review calls push, merge, close, or any remote w
 - status is `waiting_confirmation`
 - no remote close operation is called
 
+## Create Flow
+
+`/hw:pr create` is an interactive guided creation surface. By default it first asks whether the user already has local changes.
+
+Supported modes:
+
+- `/hw:pr create`: guided mode; ask whether the user has local worktree changes.
+- `/hw:pr create --from-worktree`: create from existing local changes.
+- `/hw:pr create --plan`: create a plan-first PR/MR work item, then return to `/hw:pr create --from-worktree` after implementation and validation.
+
+The worktree flow teaches the user through:
+
+- dirty worktree inspection and file scope
+- branch choice or new feature branch
+- commit message and local commit
+- target branch
+- PR/MR title and body
+- optional reviewer and labels
+- a final confirmation summary
+
+The final confirmation may be one single confirmation for the full create sequence, but it must list every remote write action first: push branch, create pull request / merge request, reviewer writes, label writes, and target branch writes. Until that confirmation is recorded, provider write methods must not be called.
+
+`create-proposal.yaml` or an equivalent archive field records the planned create operation under `.pipeline/pr/PR-YYYYMMDD-NNN/`. The archive remains local evidence and never becomes the GitHub/GitLab source of truth.
+
+GitLab support should include `gitlab.com` first. Self-hosted GitLab must have a provider seam for `host` / `base_url`; live API completeness can be phased in later without changing the archive contract.
+
 ## Safety Rules
 
 - `.pipeline/pr/` is an evidence archive, not a platform state authority.
@@ -107,4 +134,4 @@ Tests should fail if inspect or review calls push, merge, close, or any remote w
 - `/hw:pr fix` may plan or perform local fixes inside ordinary project boundaries, but push remains a remote write.
 - `/hw:pr merge` and `/hw:pr close` must stop for explicit human confirmation before any remote action.
 - Archive writers must redact token, Authorization, Cookie, password, API key, private key, and similar secret markers.
-- `/hw:pr create` is reserved for future design and is not implemented in this contract.
+- `/hw:pr create` follows the same remote-write confirmation gate as fix/merge/close.

@@ -1,5 +1,5 @@
 pipeline:
-  name: "C9 Hypo-Workflow 配置治理、PR 管理、Explain 命令与 Claude Resume 修复"
+  name: "C10 一系列体验优化"
   source: local
   output: local
   prompts_dir: .pipeline/prompts

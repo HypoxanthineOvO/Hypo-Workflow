@@ -45,8 +45,8 @@ mapping_count="$(
   ' references/opencode-spec.md
 )"
 
-test "$mapping_count" = "38" || {
-  echo "expected 38 OpenCode command mappings, found $mapping_count" >&2
+test "$mapping_count" = "39" || {
+  echo "expected 39 OpenCode command mappings, found $mapping_count" >&2
   exit 1
 }
 
@@ -84,7 +84,7 @@ for term in "not a runner" "hypo-workflow" "plugins/opencode" "core/"; do
   }
 done
 
-grep -Fq "38 个用户指令" README.md || {
+grep -Fq "39 个用户指令" README.md || {
   echo "README.md missing current command count" >&2
   exit 1
 }

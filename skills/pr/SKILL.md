@@ -1,6 +1,6 @@
 ---
 name: pr
-description: Manage existing GitHub PRs or GitLab MRs through a local Change Request archive; use when the user invokes /hw:pr inspect, review, fix, merge, or close.
+description: Manage GitHub PRs or GitLab MRs through a local Change Request archive; use when the user invokes /hw:pr inspect, review, fix, merge, close, or create.
 ---
 
 # /hypo-workflow:pr
@@ -12,13 +12,13 @@ Read `.pipeline/config.yaml` and global config when available. User-facing expla
 ## Preconditions
 
 - A project-local `.pipeline/` workspace should exist.
-- Input should be an existing GitHub Pull Request URL, GitLab Merge Request URL, or a local archive id under `.pipeline/pr/`.
+- Input should be an existing GitHub Pull Request URL, GitLab Merge Request URL, a local archive id under `.pipeline/pr/`, or `/hw:pr create` with guided creation details.
 - Do not require live GitHub/GitLab access for tests or local archive creation.
 
 ## Execution Flow
 
 1. Load `references/pr-spec.md` for the Change Request contract.
-2. Parse the subcommand: `inspect`, `review`, `fix`, `merge`, or `close`.
+2. Parse the subcommand: `inspect`, `review`, `fix`, `merge`, `close`, or `create`.
 3. Normalize GitHub PR / GitLab MR terminology into a Change Request record.
 4. Create or reuse `.pipeline/pr/PR-YYYYMMDD-NNN/`.
 5. Write local evidence to `request.yaml`, `summary.md`, `review-notes.md`, `changes.md`, `decisions.yaml`, and `evidence/`.
@@ -27,12 +27,17 @@ Read `.pipeline/config.yaml` and global config when available. User-facing expla
 8. For `fix`, keep local changes traceable in `changes.md`, record tests, and mark push as confirmation-required.
 9. For `merge`, check CI/checks, approvals, conflicts, mergeability, target branch, and archive evidence; write a proposal and stop for confirmation.
 10. For `close`, require a close reason, write it to `decisions.yaml`, and stop for confirmation.
+11. For `create`, guide the user through one of three modes:
+   - `/hw:pr create`: ask whether local worktree changes already exist.
+   - `/hw:pr create --from-worktree`: inspect local changes, file scope, branch, commit, target branch, title/body, reviewer, and labels.
+   - `/hw:pr create --plan`: hand off to `/hw:plan`, then return to `/hw:pr create --from-worktree` after implementation and validation.
+12. Before any create remote write, show a single confirmation summary that lists push branch, create pull request / merge request, reviewer writes, label writes, and target branch writes.
 
 ## Interactive Behavior
 
 - Ask for the PR/MR URL or archive id if missing.
 - Ask before live network reads unless the current analysis/network boundary already permits them.
-- Always ask before push, merge, close, reviewer/label writes, or target branch writes.
+- Always ask before push, create, merge, close, reviewer/label writes, or target branch writes.
 
 ## Safety Rules
 
@@ -41,7 +46,7 @@ Read `.pipeline/config.yaml` and global config when available. User-facing expla
 - `inspect` and `review` may write local archive files but must not write remote platform state.
 - Remote writes are high-risk gates and require explicit user confirmation.
 - Redact secrets before writing evidence or lifecycle logs.
-- `/hw:pr create` is reserved; mention it only as a future command unless a later Cycle implements it.
+- `/hw:pr create` may create a local proposal archive before confirmation, but provider write methods must not run until the user confirms the full remote write summary.
 
 ## Failure Handling
 

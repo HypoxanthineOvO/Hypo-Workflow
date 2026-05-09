@@ -18,6 +18,7 @@ test -f plugins/opencode/README.md
 
 tmp_home="$(mktemp -d)"
 tmp_project="$(mktemp -d)"
+tmp_xdg_data="$(mktemp -d)"
 
 HOME="$tmp_home" node cli/bin/hypo-workflow init-project --platform opencode --project "$tmp_project"
 
@@ -42,7 +43,7 @@ grep -Fq '"compaction"' "$tmp_project/opencode.json"
 grep -Fq '"auto_continue"' "$tmp_project/.opencode/hypo-workflow.json"
 
 if command -v opencode >/dev/null 2>&1; then
-  (cd "$tmp_project" && opencode debug config >"$opencode_debug_log" 2>&1) || {
+  (cd "$tmp_project" && HOME="$tmp_home" XDG_DATA_HOME="$tmp_xdg_data" opencode debug config >"$opencode_debug_log" 2>&1) || {
     cat "$opencode_debug_log" >&2
     exit 1
   }

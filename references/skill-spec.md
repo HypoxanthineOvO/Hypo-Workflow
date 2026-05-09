@@ -58,7 +58,7 @@ The repository currently has 39 local Skill files under `skills/*/SKILL.md`:
 Additional inventory notes:
 
 - Root `SKILL.md` is the aggregate Hypo-Workflow router and system reference. It is not counted as a child Skill in the 39 local Skill files.
-- The OpenCode command map exposes 38 user-facing commands and 37 user-facing Skill paths because `/hw:patch` and `/hw:patch fix` intentionally share `skills/patch/SKILL.md`.
+- The OpenCode command map exposes 39 user-facing commands and 37 user-facing Skill paths because `/hw:patch` and `/hw:patch fix` share `skills/patch/SKILL.md`, and `/hw:pr` plus `/hw:pr create` share `skills/pr/SKILL.md`.
 - `skills/watchdog/SKILL.md` is internal and cron-only. It is intentionally not part of the user-facing command map.
 - The installed Codex copy under `$CODEX_HOME/skills/hypo-workflow` should mirror the same root plus child Skill layout after sync or installation.
 

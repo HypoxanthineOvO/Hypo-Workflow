@@ -15,6 +15,8 @@ description: Enter Hypo-Workflow planning mode when the user wants to design mil
 
 Use this skill for the full P1-P4 planning flow.
 
+Before P1 Discover, run or confirm `P0 Configure` for a new Cycle unless the current Cycle already has a configure decision. `P0 Configure` runs after `cycle new` and before `P1 Discover`; it asks about automation, Subagent authorization, acceptance mode, PR/MR remote write confirmation, full regression, analysis boundaries, and worker separation. Users may reuse prior settings, resolved in the order `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default`, and the reuse must leave an auditable note or `.plan-state/p0-configure.yaml`.
+
 Without `--batch`, preserve the existing single-feature P1-P4 flow. The ordinary `/hw:plan` command still runs one Discover interview, one Decompose checkpoint, one Generate phase, and one Confirm gate.
 
 Progressive Discover is enabled by default as a structure for P1. Start with the big questions first:
@@ -22,6 +24,8 @@ Progressive Discover is enabled by default as a structure for P1. Start with the
 1. task category
 2. desired effect
 3. verification method
+
+Before P1 starts, run or explicitly reuse the Cycle-level `P0 Configure` pre-discover stage. `P0 Configure` runs after `cycle new` and before `P1 Discover`; it asks about automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation. Reuse must record its source in this order: `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, `built_in_default`.
 
 When a project has not yet declared `execution.worker_separation.mode`, Discover should also ask whether the project wants `off`, `recommended`, or `strict` implement/test/audit separation and persist that decision during Generate.
 

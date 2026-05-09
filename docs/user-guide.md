@@ -17,13 +17,19 @@ Hypo-Workflow 围绕 `.pipeline/` 的状态、提示、报告、日志和恢复�
 
 ## 常用流程
 
+- 用 `/hw:cycle new` 开始新 Cycle 后，先完成或明确沿用 `P0 Configure`；它在 `P1 Discover` 前确认自动化程度、Subagent 授权、验收方式、PR/MR 远端写确认、完整回归、analysis 边界和 worker separation。
 - 用 `/hw:plan` 规划工作，再用 `/hw:start` 或 `/hw:resume` 执行。
 - 用 `/hw:status` 查看进度，用 `/hw:report` 查看报告。
 - 用 `/hw:explain [question]` 提问代码、配置、命令或近期改动原因；回答必须引用本地文件证据，证据不足时要明确 unknowns。
 - 用 `/hw:explain --subagent [question]` 让独立 Subagent 先做只读取证，主 Agent 校验 evidence packet 后再回答；平台不支持 Subagent 时记录 `fallback_reason` 并降级为 self evidence-first。
 - 用 `/hw:pr inspect|review|fix|merge|close <url|id>` 处理已有 GitHub PR 或 GitLab MR，并把本地证据归档到 `.pipeline/pr/`。
+- 用 `/hw:pr create` 进入问答式 PR/MR 创建；已有本地改动走 `--from-worktree`，还没开始的工作走 `--plan`，所有 push、create、reviewer/label/target branch 远端写都要一次性确认。
 - 用 `/hw:sync --repair` 修复派生上下文，用 `/hw:docs repair` 修复文档。
 - 生命周期 gate 处用 `/hw:accept` 或 `/hw:reject` 明确验收。
+
+## Subagent 与降级
+
+`execution.worker_separation.mode=recommended|strict` 时，非平凡工作要尽量拆出 implement、test、audit 不同角色。implementation Subagent 不应读取测试源码、fixtures、snapshots 或 assertion 细节，只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若平台无法维持隔离，必须记录 role isolation degradation；`recommended` 需要用户明确确认 degraded mode 后才可继续，`strict` 不能把降级执行视为 fully accepted。
 
 ## Explain 与 Status/Debug/Audit 的区别
 

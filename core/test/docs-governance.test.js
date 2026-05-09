@@ -14,7 +14,7 @@ import {
 } from "../src/index.js";
 
 test("docs command is exposed and mapped to OpenCode", async () => {
-  assert.equal(commandMap("opencode").length, 38);
+  assert.equal(commandMap("opencode").length, 39);
   assert.equal(commandByCanonical("/hw:docs").opencode, "/hw-docs");
   assert.equal(commandByCanonical("/hw:docs").agent, "hw-docs");
   assert.equal(commandByCanonical("/hw:docs").skill, "skills/docs/SKILL.md");
@@ -24,16 +24,23 @@ test("docs command is exposed and mapped to OpenCode", async () => {
 test("docs map defines ownership, generated references, and narrative policy", () => {
   const map = docsMap();
   const readme = map.documents.find((doc) => doc.path === "README.md");
+  const englishReadme = map.documents.find((doc) => doc.path === "README.en.md");
   const commands = map.documents.find((doc) => doc.path === "docs/reference/commands.md");
+  const englishCommands = map.documents.find((doc) => doc.path === "docs/en/reference/commands.md");
   const userGuide = map.documents.find((doc) => doc.path === "docs/user-guide.md");
+  const englishUserGuide = map.documents.find((doc) => doc.path === "docs/en/user-guide.md");
   const configuration = map.documents.find((doc) => doc.path === "docs/reference/configuration.md");
 
   assert.equal(readme.role, "concise_user_entrypoint");
   assert.equal(readme.narrative_update_policy, "explicit_repair");
   assert.ok(readme.must_not_include.includes("full_test_matrix"));
+  assert.equal(englishReadme.role, "english_user_entrypoint");
+  assert.equal(englishReadme.update_class, "generated_translation");
   assert.equal(commands.update_class, "generated_reference");
+  assert.equal(englishCommands.update_class, "generated_translation");
   assert.ok(commands.sources.includes("core/src/commands/index.js"));
   assert.equal(userGuide.role, "full_user_guide");
+  assert.equal(englishUserGuide.role, "english_full_user_guide");
   assert.equal(configuration.role, "configuration_governance_reference");
   assert.ok(configuration.sources.includes("references/config-spec.md"));
 });
@@ -67,18 +74,31 @@ test("docs repair writes docs IA and generated references without silently rewri
 
   const result = await repairDocs(root, { write: true });
 
+  assert.ok(result.generated.includes("README.en.md"));
   assert.ok(result.generated.includes("docs/reference/commands.md"));
+  assert.ok(result.generated.includes("docs/en/reference/commands.md"));
   assert.ok(result.generated.includes("docs/reference/configuration.md"));
+  assert.ok(result.generated.includes("docs/en/reference/configuration.md"));
   assert.ok(result.generated.includes("docs/user-guide.md"));
+  assert.ok(result.generated.includes("docs/en/user-guide.md"));
   assert.ok(result.generated.includes("docs/platforms/opencode.md"));
+  assert.ok(result.generated.includes("docs/en/platforms/opencode.md"));
   assert.ok(result.managed_blocks.includes("command-count"));
   assert.match(await readFile(join(root, "README.md"), "utf8"), /Manual README/);
-  assert.match(await readFile(join(root, "README.md"), "utf8"), /38 个用户指令/);
+  assert.match(await readFile(join(root, "README.md"), "utf8"), /39 个用户指令/);
+  assert.match(await readFile(join(root, "README.en.md"), "utf8"), /docs\/en\/user-guide\.md/);
+  assert.match(await readFile(join(root, "README.en.md"), "utf8"), /docs\/en\/platforms\/opencode\.md/);
+  assert.match(await readFile(join(root, "docs/en/user-guide.md"), "utf8"), /\/hw:pr create/);
+  assert.doesNotMatch(await readFile(join(root, "README.en.md"), "utf8"), /docs\/user-guide\.md/);
   assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:docs/);
   assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:pr/);
+  assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:pr create/);
   assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:explain/);
   assert.match(await readFile(join(root, "docs/user-guide.md"), "utf8"), /\/hw:explain --subagent/);
+  assert.match(await readFile(join(root, "docs/user-guide.md"), "utf8"), /P0 Configure/);
+  assert.match(await readFile(join(root, "docs/user-guide.md"), "utf8"), /\/hw:pr create/);
   assert.match(await readFile(join(root, "docs/reference/configuration.md"), "utf8"), /automation\.gates\.destructive_external/);
+  assert.match(await readFile(join(root, "docs/reference/configuration.md"), "utf8"), /strict worker separation/);
 });
 
 test("configuration governance reference covers automation, strictness, and hard gates", async () => {

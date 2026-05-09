@@ -4,6 +4,8 @@ Use this reference when planning needs stronger structure than “ask a few roun
 
 ## Big Questions First
 
+Before the first P1 question, a new Cycle should pass through `P0 Configure` when no current-Cycle configure decision exists. `P0 Configure` runs after `cycle new` and before `P1 Discover`; it asks about automation, Subagent authorization, acceptance mode, PR/MR remote write confirmation, full regression, analysis boundaries, and worker separation. Users may reuse previous settings. Reuse follows `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default` and must leave an auditable `.plan-state/p0-configure.yaml` or equivalent report note.
+
 Progressive Discover starts from three big questions before deeper drilling:
 
 1. task category
@@ -11,6 +13,10 @@ Progressive Discover starts from three big questions before deeper drilling:
 3. verification method
 
 The Agent should ask these early for both ordinary `/hw:plan` and `/hw:plan --batch`. This keeps later Milestone decomposition tied to the right task class and test surface.
+
+## P0 Configure
+
+Before those P1 questions, a new Cycle should run or explicitly reuse `P0 Configure`. The stage runs after `cycle new` and before `P1 Discover`; it confirms automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation. Reuse must preserve its source order: `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, `built_in_default`.
 
 ## Progressive Stages
 

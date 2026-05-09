@@ -27,6 +27,7 @@ OpenCode uses dash-style native slash commands. Each command remains traceable t
 | `/hw:patch` | `/hw-patch` | `hw-build` | `skills/patch/SKILL.md` |
 | `/hw:patch fix` | `/hw-patch-fix` | `hw-build` | `skills/patch/SKILL.md` |
 | `/hw:pr` | `/hw-pr` | `hw-review` | `skills/pr/SKILL.md` |
+| `/hw:pr create` | `/hw-pr-create` | `hw-build` | `skills/pr/SKILL.md` |
 | `/hw:explain` | `/hw-explain` | `hw-review` | `skills/explain/SKILL.md` |
 | `/hw:compact` | `/hw-compact` | `hw-compact` | `skills/compact/SKILL.md` |
 | `/hw:knowledge` | `/hw-knowledge` | `hw-compact` | `skills/knowledge/SKILL.md` |
@@ -50,5 +51,6 @@ Agent policy:
 - Compact, debug, and report commands use `hw-compact`, `hw-debug`, and `hw-report` so the OpenCode model matrix can tune those roles independently.
 - Audit/review commands use `hw-review`.
 - `/hw:pr` uses `hw-review` because PR/MR inspection and review are evidence-first and remote writes are manual-gated.
+- `/hw:pr create` uses `hw-build` because the guided flow prepares local commits/branches and only performs remote provider writes after explicit confirmation.
 - `/hw:explain` uses `hw-review` because answers must be grounded in local evidence and unknowns.
 - Status/help/log/rules/check commands use `hw-status`.

@@ -12,7 +12,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 - Claude Code exposes canonical commands through a plugin whose namespace is `hw`; the existing workflow skills remain authoritative and must not be duplicated into a second implementation
 - Claude Code `/hw:*` entries are plugin-skill entrypoints for the existing Hypo-Workflow skill files
 - Claude Code native `/resume` remains owned by Claude Code; Hypo-Workflow must never register or document bare `/resume` as an alias for `/hw:resume`
-- V12 canonical namespace contains 38 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups, plus an internal cron-only watchdog skill
+- V12 canonical namespace contains 39 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups, plus an internal cron-only watchdog skill
 - slash commands are exact and namespace-scoped
 - slash commands take precedence over fuzzy natural-language matching
 - natural-language commands remain valid for backward compatibility
@@ -237,7 +237,7 @@ Supported forms:
 Behavior:
 
 - read `SKILL.md` command tables as the source of truth
-- `/hw:help` lists all 38 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility
+- `/hw:help` lists all 39 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility
 - `/hw:help --quick` returns a compact cheat sheet
 - `/hw:help <cmd>` returns detailed usage, flags, and examples for the requested command
 
@@ -607,6 +607,9 @@ Behavior:
 
 Supported forms:
 
+- `/hw:pr create`
+- `/hw:pr create --from-worktree`
+- `/hw:pr create --plan`
 - `/hw:pr inspect <url|id>`
 - `/hw:pr review <url|id>`
 - `/hw:pr fix <url|id>`
@@ -617,13 +620,18 @@ Behavior:
 
 - load `skills/pr/SKILL.md`
 - normalize GitHub Pull Request and GitLab Merge Request inputs into one Change Request shape
+- create mode supports both GitHub PR and GitLab MR targets, including self-hosted GitLab hosts when repository host/URL is supplied
 - store local archives under `.pipeline/pr/PR-YYYYMMDD-NNN/`
 - write `request.yaml`, `summary.md`, `review-notes.md`, `changes.md`, `decisions.yaml`, and `evidence/`
 - keep `.pipeline/pr/` as local evidence, not the remote source of truth
+- `/hw:pr create` first asks whether the user already has local changes or wants a plan-first PR/MR-sized work item
+- `/hw:pr create --from-worktree` guides file scope, source branch, commit message, target branch, title/body, reviewers, labels, and final confirmation
+- `/hw:pr create --plan` hands off to `/hw:plan`, then returns to `/hw:pr create --from-worktree` after implementation and validation
+- create proposal archives may write `create-proposal.yaml` locally before confirmation
 - `inspect` and `review` are remote-readonly except for local archive writes
 - `fix` may record local changes and tests, but must not push
-- `merge` and `close` require explicit confirmation before remote writes
-- `/hw:pr create` is reserved for future design
+- `create`, `merge`, and `close` require explicit confirmation before remote writes
+- create confirmation summary must list `push`, `create_change_request`, `reviewer_write`, `label_write`, and `target_branch_write` before any provider write method runs
 
 ### `/hw:explain`
 

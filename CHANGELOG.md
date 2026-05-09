@@ -1,5 +1,27 @@
 # Changelog
 
+## v12.2.0 - 2026-05-09
+
+### Features
+
+- 新增 Cycle 级 `P0 Configure` 阶段，在 `P1 Discover` 前确认或沿用自动化程度、Subagent 授权、验收方式、PR/MR 远端写确认、完整回归、analysis 边界和 worker separation。
+- 新增 `/hw:pr create` 一等命令入口，支持 GitHub PR / GitLab MR 的问答式创建、已有本地改动的 `--from-worktree` 流程、plan-first 的 `--plan` 流程，以及远端写动作的一次性确认。
+- 新增 Subagent 授权、implementation/test/audit 隔离和 degraded mode 治理；implementation worker 不读取测试源码、fixtures、snapshots 或 assertion 细节。
+- 新增英文文档入口 [README.en.md](README.en.md) 和 `docs/en/` 英文子页面，中文 README 可一键切换到英文版，英文版子页面全部指向英文文档树。
+
+### Fixes
+
+- 刷新 OpenCode command map、generated docs、README 命令数量、Skill inventory、regression scenarios 和平台文档到 39-command surface。
+- 强化 PR/MR Create provider fake 与执行适配，确保确认前不会调用 push/create/reviewer/label 远端写方法。
+- 修复 Claude Code sync CLI 测试对用户 HOME 的依赖，避免 release 回归污染真实用户配置。
+
+### Tests
+
+- `npm test --prefix core`: 365/365 passing.
+- `python3 tests/run_regression.py`: 63/63 passing.
+- `bash scripts/validate-config.sh .pipeline/config.yaml`: passing.
+- `checkDocs('.')`, readme freshness, sync check-only derived health, and `git diff --check`: passing.
+
 ## v12.1.0 - 2026-05-07
 
 ### Features
@@ -13,7 +35,7 @@
 ### Fixes
 
 - Redacted secret-like text before Explain evidence excerpts, Subagent-rendered explanations, PR review findings, and PR review notes.
-- Refreshed OpenCode command maps and regression scenarios for the 38-command surface, including `/hw:pr` and `/hw:explain`.
+- Refreshed OpenCode command maps and regression scenarios for the 39-command surface, including `/hw:pr` and `/hw:explain`.
 - Distributed refreshed project adapters and local skill copies for Codex, Claude Code, OpenCode, Cursor, Copilot, and Trae.
 
 ### Tests

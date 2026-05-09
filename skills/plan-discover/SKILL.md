@@ -15,7 +15,11 @@ description: Run the discovery phase of Hypo-Workflow planning when the user nee
 
 Use this skill for P1 Discover only.
 
+`P1 Discover` begins only after `P0 Configure` has been run or explicitly reused for the current Cycle. `P0 Configure` runs after `cycle new` and before `P1 Discover`; it asks about automation, Subagent authorization, acceptance mode, PR/MR remote write confirmation, full regression, analysis boundaries, and worker separation. Reuse follows `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default` and must be auditable.
+
 For `/hw:plan --batch`, this phase becomes Batch Discover. Batch Discover covers multiple Feature candidates in one interview, but it keeps the same interactive hard gates as ordinary Discover.
+
+`P0 Configure` is the required pre-discover stage for new Cycle planning. It runs after `cycle new` and before `P1 Discover`; it can be completed by asking the user or by an explicit reuse decision. The stage covers automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation. Reuse sources are resolved in order: `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, `built_in_default`.
 
 ## Big Questions First
 

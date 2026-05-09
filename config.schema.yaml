@@ -1310,6 +1310,81 @@ properties:
       - showcase
     default: build
     description: Project default only. Each Cycle may own its own workflow_kind.
+  cycle:
+    type: object
+    additionalProperties: false
+    properties:
+      configure:
+        type: object
+        additionalProperties: false
+        properties:
+          stage:
+            type: string
+            enum:
+              - P0 Configure
+            default: P0 Configure
+          trigger:
+            type: string
+            enum:
+              - cycle_new_before_discover
+            default: cycle_new_before_discover
+          allow_reuse:
+            type: boolean
+            default: true
+          inheritance_order:
+            type: array
+            items:
+              type: string
+              enum:
+                - cycle_explicit
+                - previous_cycle_snapshot
+                - project_config
+                - global_config
+                - built_in_default
+            default:
+              - cycle_explicit
+              - previous_cycle_snapshot
+              - project_config
+              - global_config
+              - built_in_default
+          questions:
+            type: array
+            items:
+              type: string
+              enum:
+                - automation_level
+                - subagent_authorization
+                - acceptance_mode
+                - pr_remote_write_policy
+                - full_regression
+                - analysis_boundaries
+                - worker_separation
+            default:
+              - automation_level
+              - subagent_authorization
+              - acceptance_mode
+              - pr_remote_write_policy
+              - full_regression
+              - analysis_boundaries
+              - worker_separation
+        default:
+          stage: P0 Configure
+          trigger: cycle_new_before_discover
+          allow_reuse: true
+          inheritance_order:
+            - cycle_explicit
+            - previous_cycle_snapshot
+            - project_config
+            - global_config
+            - built_in_default
+          questions:
+            - automation_level
+            - subagent_authorization
+            - acceptance_mode
+            - pr_remote_write_policy
+            - full_regression
+            - analysis_boundaries
+            - worker_separation
   plan:
     type: object
     additionalProperties: false

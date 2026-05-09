@@ -35,6 +35,7 @@ hypo-workflow sync --platform opencode --project . --repair
 - 生成 native `/hw-*` slash command files。
 - 生成 OpenCode role agents、plugin runtime files、status sidecars 和 TUI/status config。
 - 用 native `question` 处理必要决策，用 `todowrite` 保持可见计划纪律。
+- `/hw-pr-create` 映射到 canonical `/hw:pr create`，用于问答式 GitHub PR / GitLab MR 创建流程。
 - 支持 OpenCode provider/model matrix metadata，但不把 Hypo-Workflow 变成 runner。
 
 ## 边界

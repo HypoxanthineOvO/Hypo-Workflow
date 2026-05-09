@@ -17,6 +17,8 @@ Use this skill when the user invokes `/hw:guide` or `/hypo-workflow:guide`.
 
 Guide is an interactive intent router for users who are unsure which Hypo-Workflow command path to run next. It senses project state plus user intent, recommends one next path, asks for confirmation, and then executes only the first recommended command when the user agrees.
 
+Before recommending `/hw:plan` for a new or active Cycle, Guide should surface the `P0 Configure` pre-discover stage when it has not been completed or explicitly reused. `P0 Configure` runs after `cycle new` and before `P1 Discover`; it confirms automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation. Users may choose to reuse prior configuration, resolved in order: `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, `built_in_default`.
+
 ## Step 1: Short Introduction
 
 Print at most 5 lines:
@@ -82,6 +84,8 @@ Use the deterministic guide router shape exposed as `routeGuideIntent` in `core/
 | Release a finished project | `/hw:release` |
 
 `/hw:docs` is the documentation workflow route target. Use it for documentation check, repair, generated references, and README/docs IA work.
+
+For flows that enter planning, recommend `P0 Configure` before the first `P1 Discover` question unless the user explicitly says to reuse the resolved configuration. `P0 Configure` runs after `cycle new` and before `P1 Discover`, asks about automation, Subagent authorization, acceptance mode, PR/MR remote write confirmation, full regression, analysis boundaries, and worker separation, and can reuse values from `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default`.
 
 ## Step 5: Confirm And Execute
 

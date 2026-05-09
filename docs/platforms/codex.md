@@ -37,6 +37,7 @@ ln -sfn /absolute/path/to/Hypo-Workflow ~/.codex/skills/hypo-workflow
 - 除非生命周期命令明确拥有写入权，否则保护 protected authority files。
 - 使用 Codex skills，并在可用时使用 Codex plan tool。
 - 对非平凡实现或审查工作优先使用 Codex Subagents，同时保持 implementation 与 testing/review 分离。
+- strict worker separation 下，implementation Subagent 不读取测试源码、fixtures、snapshots 或 assertion 细节；无法隔离时记录 degraded mode 并要求明确确认。
 - 不要求外部模型路由；Codex Subagents 留在 Codex/GPT runtime。
 
 ## 边界

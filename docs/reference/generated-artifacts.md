@@ -10,5 +10,7 @@
 | `.github/copilot-instructions.md` | third-party adapter helper | `/hw:sync --platform copilot` |
 | `.trae/rules/project_rules.md` | third-party adapter helper | `/hw:sync --platform trae` |
 | `.pipeline/*.compact.*` | `.pipeline/` authority files | `/hw:sync --repair` |
+| `.pipeline/plan-state/p0-configure.yaml` | Cycle-level P0 Configure decision | `/hw:plan` / `/hw:plan:discover` |
+| `.pipeline/pr/PR-YYYYMMDD-NNN/create-proposal.yaml` | `/hw:pr create` proposal | `/hw:pr create` |
 | `docs/reference/*.md` | docs map | `/hw:docs repair` |
 | README managed blocks | command/platform helpers | `/hw:docs repair` |

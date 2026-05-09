@@ -43,6 +43,9 @@ Resolve every configurable value in this order:
 | automation execution gate | `automation.gates.execution` | `automation.gates.execution` | `auto` |
 | automation destructive/external gate | `automation.gates.destructive_external` | `automation.gates.destructive_external` | `confirm` |
 | automation release publish gate | `automation.gates.release_publish` | `automation.gates.release_publish` | `confirm` |
+| P0 Configure stage | `cycle.configure.stage` | `cycle.configure.stage` | `P0 Configure` |
+| P0 Configure trigger | `cycle.configure.trigger` | `cycle.configure.trigger` | `cycle_new_before_discover` |
+| P0 Configure reuse | `cycle.configure.allow_reuse` | `cycle.configure.allow_reuse` | `true` |
 | plan mode | `plan.mode` | `plan.default_mode` | `interactive` |
 | plan interaction depth | `plan.interaction_depth` | `plan.interaction_depth` | `medium` |
 | plan interactive min rounds | `plan.interactive.min_rounds` | `plan.interactive.min_rounds` | `3` |
@@ -85,6 +88,14 @@ Codex delegation policy under `automation.codex` is instruction-level and runtim
 
 `automation.quality_pass.proposer_challenger=true` enables the lightweight C7 proposer/challenger pattern. It is not a full debate framework.
 
+## P0 Configure
+
+`P0 Configure` is the Cycle-scoped setup stage that runs after `cycle new` and before `P1 Discover`. `/hw:guide`, `/hw:init`, and `/hw:plan` should route users through this stage before planning when the current Cycle has not yet recorded an explicit configure decision.
+
+The stage asks about automation, Subagent authorization, acceptance mode, PR/MR remote write confirmation, full regression, analysis boundaries, and worker separation. Users may choose to reuse prior decisions, but the reuse must be auditable.
+
+The inheritance order is `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default`. Reused values should record source, value, timestamp, and any degraded-mode risk note so status and reports can explain why a Cycle used a setting.
+
 Worker separation policy is project-local execution policy:
 
 - `execution.worker_separation.mode=off`: preserve legacy behavior
@@ -124,6 +135,22 @@ Execution guidance:
 - `audit` may ask for re-test or re-implementation without blocking the whole execution by default.
 - acceptance may still be blocked when audit marks coverage as insufficient.
 - degraded mode should record missing roles, shared-worker collisions, and the explicit user decision.
+
+## P0 Configure
+
+`P0 Configure` is the Cycle-scoped setup gate that runs after `cycle new` and before `P1 Discover`. It exists so users can confirm the practical operating mode for the Cycle before requirement discovery starts.
+
+The stage asks about automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation.
+
+Users may reuse prior settings. Reuse resolution must be auditable and should follow this order:
+
+1. `cycle_explicit`
+2. `previous_cycle_snapshot`
+3. `project_config`
+4. `global_config`
+5. `built_in_default`
+
+When reusing settings, record the chosen source, reused fields, timestamp, and any degraded worker-separation risk.
 
 `/hw:init` asks for the project automation level in interactive contexts and writes the stable key to project config:
 

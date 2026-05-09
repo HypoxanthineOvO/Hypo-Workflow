@@ -17,7 +17,7 @@ test("writeClaudeCodePluginArtifacts renders hw namespace plugin metadata", asyn
   const monitors = JSON.parse(await readFile(join(dir, "monitors", "monitors.json"), "utf8"));
   const marketplace = JSON.parse(await readFile(join(dir, ".claude-plugin", "marketplace.json"), "utf8"));
 
-  assert.equal(commands.length, 38);
+  assert.equal(commands.length, 39);
   assert.equal(plugin.name, "hw");
   assert.equal(plugin.skills, "./skills/");
   assert.equal(plugin.monitors, "./monitors/monitors.json");
