@@ -1,0 +1,28 @@
+schema_version: 1
+archive_id: PR-20260509-001
+remote_write_gate: confirm
+readonly_operations_completed:
+  - inspect
+  - review
+  - local_archive_write
+remote_operations_requiring_confirmation:
+  - push
+  - merge
+  - close
+  - reviewer_write
+  - label_write
+  - target_branch_write
+proposed_operation: none
+merge_recommendation: ready_after_integration_fix
+reasons:
+  - integration_fix_applied
+  - local_validation_passed
+  - remote_checks_missing
+final_status: waiting_remote_merge_confirmation
+confirmation_required: true
+integration_branch: integrate/pr-4-end-of-run-compact
+validation:
+  core_tests: "pass 369/369"
+  regression: "pass 63/63"
+  config_validation: pass
+  diff_check: pass

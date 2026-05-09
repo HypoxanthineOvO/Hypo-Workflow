@@ -74,7 +74,7 @@ features:
         prompt_file: .pipeline/prompts/05-evidence-first-explain-contract.md
       - id: M07
         status: done
-        title: `--subagent` 取证流程
+        title: "`--subagent` 取证流程"
         prompt_file: .pipeline/prompts/06-explain-subagent-evidence-handoff.md
       - id: M08
         status: done
@@ -145,3 +145,17 @@ features:
         status: done
         title: C9 Agent Review 与全量回归
         prompt_file: .pipeline/prompts/11-c9-agent-review-and-full-regression.md
+  - id: F007
+    title: "`/hw:pr` 内容摘要优先的审查输出"
+    priority: 70
+    status: queued
+    gate: auto
+    decompose_mode: upfront
+    source: user-feedback-pr-review-20260509
+    workflow_kind: build
+    category: collaboration
+    desired_effect: "`/hw:pr inspect/review/merge` 在输出时先说明 PR/MR 实际改了什么、改动意图、主要文件和行为影响，再给 mergeability、checks、冲突和 merge 建议，避免只报告状态而缺少上下文。"
+    verification: PR/MR fixture 覆盖 feature patch、version bump、docs-only、conflicting PR 和 no-checks PR；review notes 与 summary archive 均包含 What Changed、Risk/Impact、Validation 和 Merge Advice 四段。
+    dependencies:
+      - F002
+    milestones: []

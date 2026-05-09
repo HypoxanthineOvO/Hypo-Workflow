@@ -1,0 +1,27 @@
+schema_version: 1
+archive_id: PR-20260509-002
+remote_write_gate: confirm
+readonly_operations_completed:
+  - inspect
+  - review
+  - local_archive_write
+remote_operations_requiring_confirmation:
+  - push
+  - merge
+  - close
+  - reviewer_write
+  - label_write
+  - target_branch_write
+proposed_operation: close
+merge_recommendation: block
+reasons:
+  - merge_conflict
+  - remote_checks_missing
+  - release_intent_unclear
+close_reason: "Reject/close PR #3 because it conflicts with current main and proposes an obsolete v13.0.0 release metadata bump that does not match the just-published v12.2.0 line. Please rebase and reopen as a focused PR if the worker-separation release work is still intended."
+final_status: needs_update_before_merge
+confirmation_required: false
+remote_close:
+  status: completed
+  closed_at: "2026-05-09T18:33:00+08:00"
+  command: gh pr close 3 --repo HypoxanthineOvO/Hypo-Workflow --comment
