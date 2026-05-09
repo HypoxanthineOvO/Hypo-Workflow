@@ -27,6 +27,7 @@ Hypo-Workflow 在所有平台上共享同一套 `.pipeline/` 协议：
 - **Rules / Habits**：把用户习惯和项目规则保存成结构化 authority，再生成各平台可读的指令视图。
 - **Agent Review**：在计划、测试、实现和收口阶段记录 review artifact，支持多轮 `needs_changes -> repair -> review`。
 - **PR/MR Create**：`/hw:pr create` 支持 GitHub PR 与 GitLab MR 的问答式创建，已有本地改动和 plan-first 工作分开处理，远端写一次性确认。
+- **Acceptance / Compact Evidence**：`/hw:accept` 会阻塞缺失或冲突的 worker evidence；`/hw:start` 和 `/hw:resume` 成功收口后按 `dirty_only` 策略刷新 compact 视图。
 - **Domain Packs**：把 RTL 等领域知识做成可选包；外部包只记录 metadata，安装或远程获取必须明确确认。
 - **Sync / Docs / Release**：同步平台适配器、修复文档、执行发布检查，但 Hypo-Workflow 本身不替代宿主 Agent 工作。
 
@@ -110,6 +111,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | [Platforms Reference](docs/reference/platforms.md) | 六个平台能力表 |
 | [Generated Artifacts](docs/reference/generated-artifacts.md) | OpenCode、第三方适配、压缩视图和文档引用的生成来源 |
 | [OpenCode Guide](docs/platforms/opencode.md) | OpenCode 指令、智能体角色、模型矩阵和边界 |
+| [v12.3.0 Release Notes](docs/release/v12.3.0.md) | worker separation、`dirty_only` compact、PR #5 和验证证据 |
 | [Cursor Guide](docs/platforms/cursor.md) | Cursor 仓库规则 |
 | [GitHub Copilot Guide](docs/platforms/copilot.md) | GitHub Copilot 仓库指令 |
 | [Trae Guide](docs/platforms/trae.md) | Trae 项目规则 |

@@ -45,6 +45,8 @@
 
 strict worker separation 要求 implementation Subagent 与 test/review/audit 角色隔离。implementation worker 不读取 test source、fixtures、snapshots 或 assertion details；它只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若宿主平台不能提供这种隔离，必须在执行前说明 degraded mode，获得 explicit user confirmation，并记录 role isolation degradation。
 
+acceptance hardening：`/hw:accept` 会阻塞缺失或身份碰撞的 implement/test/audit worker evidence、失败或 `close_failed` worker lifecycle、缺少 Codex `/hw:start` + `/hw:resume` 授权范围，以及把 runtime-only observation 当成 worker evidence 的验收。
+
 ## Analysis preset 边界
 
 | 字段 | manual | hybrid | auto |

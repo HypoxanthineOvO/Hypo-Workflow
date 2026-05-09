@@ -40,6 +40,8 @@ Configuration resolution is project config > global config > built-in default. P
 
 Strict worker separation requires implementation Subagents to stay isolated from test/review/audit roles. Implementation workers do not read test source, fixtures, snapshots, or assertion details; they may receive requirements, public interfaces, allowed edit scope, test command, pass/fail status, and sanitized failure summaries. If the host cannot preserve isolation, the run must explain degraded mode, obtain explicit user confirmation, and record role isolation degradation.
 
+Acceptance hardening: `/hw:accept` blocks missing or colliding implement/test/audit worker evidence, failed or `close_failed` worker lifecycle records, missing Codex `/hw:start` + `/hw:resume` authorization scope, and runtime-only observations being used as worker evidence.
+
 ## Default Profiles
 
 | Profile | Automation | Worker separation | Fixed confirmation boundaries |

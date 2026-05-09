@@ -39,6 +39,7 @@ Check status and continue:
 - **Rules / Habits**: store user habits and project rules as structured authority, then render platform-readable instruction views.
 - **Agent Review**: record review artifacts during planning, tests, implementation, and final checks.
 - **PR/MR Create**: `/hw:pr create` guides GitHub PR and GitLab MR creation from existing local changes or a plan-first work item, with remote writes gated by explicit confirmation.
+- **Acceptance / Compact Evidence**: `/hw:accept` blocks missing or colliding worker evidence; successful `/hw:start` and `/hw:resume` refresh compact views with `dirty_only` policy.
 - **Sync / Docs / Release**: synchronize platform adapters, repair docs, and run release checks without replacing host Agent work.
 
 ## Platform Entrypoints
@@ -87,6 +88,7 @@ Current version exposes **39 user-facing commands** and **1 internal watchdog** 
 | [Platforms Reference](docs/en/reference/platforms.md) | Platform capability matrix |
 | [Generated Artifacts](docs/en/reference/generated-artifacts.md) | Generated adapter and docs sources |
 | [Configuration Reference](docs/en/reference/configuration.md) | Automation, gates, profiles, and worker separation |
+| [v12.3.0 Release Notes](docs/en/release/v12.3.0.md) | Worker separation, `dirty_only` compact refresh, PR #5, and validation evidence |
 
 ## License
 

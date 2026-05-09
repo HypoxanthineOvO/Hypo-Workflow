@@ -31,6 +31,10 @@ Hypo-Workflow 围绕 `.pipeline/` 的状态、提示、报告、日志和恢复�
 
 `execution.worker_separation.mode=recommended|strict` 时，非平凡工作要尽量拆出 implement、test、audit 不同角色。implementation Subagent 不应读取测试源码、fixtures、snapshots 或 assertion 细节，只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若平台无法维持隔离，必须记录 role isolation degradation；`recommended` 需要用户明确确认 degraded mode 后才可继续，`strict` 不能把降级执行视为 fully accepted。
 
+`/hw:accept` 会把 worker separation 当成验收 gate：缺少 `test`、`implement` 或 `audit` worker evidence、角色身份碰撞、`close_failed` lifecycle、缺少 Codex `/hw:start` + `/hw:resume` 授权范围，或把 runtime-only subtask observation 当成 evidence，都会阻塞验收或要求先做明确降级。
+
+成功完成 `/hw:start` 或 `/hw:resume` 后，如果 `compact.auto=true` 且 `compact.end_of_run=true`，收口阶段按默认 `compact.refresh_policy=dirty_only` 只刷新已变脏的 compact targets。刷新必须从完整 authority 文件生成，不能从旧 `.compact` 文件复制。
+
 ## Explain 与 Status/Debug/Audit 的区别
 
 `/hw:explain` 是只读问答命令，适合解释新项目代码框架、某个配置为什么 strict、刚才为什么这样写，或者某个命令/文档的用途。它不修改文件，不替代 `/hw:status` 的进度摘要，也不替代 `/hw:debug` / `/hw:audit` 的问题定位和风险扫描。

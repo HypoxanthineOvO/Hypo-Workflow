@@ -37,6 +37,7 @@ hypo-workflow sync --platform opencode --project . --repair
 - 用 native `question` 处理必要决策，用 `todowrite` 保持可见计划纪律。
 - `/hw-pr-create` 映射到 canonical `/hw:pr create`，用于问答式 GitHub PR / GitLab MR 创建流程。
 - 支持 OpenCode provider/model matrix metadata，但不把 Hypo-Workflow 变成 runner。
+- Status 可显示 OpenCode active subagent/model，但这些 subtask 字段必须标记为 runtime-only，不能作为 `/hw:accept` worker evidence。
 
 ## 边界
 
@@ -44,6 +45,7 @@ hypo-workflow sync --platform opencode --project . --repair
 - `.pipeline/state.yaml`、`.pipeline/cycle.yaml` 和 `.pipeline/rules.yaml` 是 protected authority files。
 - External installs、user-level config writes、destructive commands 和 network side effects 必须显式确认。
 - OpenCode-specific events 和 plugins 是增量能力；Codex 和 Claude Code 行为不得依赖它们。
+- OpenCode `subtask` parts 只能作为 UI/status runtime-only observation；acceptance 和 worker separation gates 必须忽略它们。
 
 ## Model Matrix
 

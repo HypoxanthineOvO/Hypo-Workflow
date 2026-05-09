@@ -2,6 +2,8 @@
 
 这些文件由 core helper 或 sync/docs 命令生成。修改时应回到 source helper 或 authority 文件，再运行 repair/sync。不要直接把派生产物当成 source of truth；如果派生产物 stale，优先检查对应 source 和 writer command。
 
+`.pipeline/*.compact.*` 可以通过显式 `/hw:compact`、`/hw:sync --repair`，或成功 `/hw:start` / `/hw:resume` 结束后的收口刷新生成。默认 `compact.refresh_policy=dirty_only` 只刷新 source newer 或 target missing 的 compact targets，并且必须从完整 authority 文件生成，不能从旧 `.compact` 文件复制。
+
 | Artifact | Source | Repair |
 |---|---|---|
 | `.opencode/commands/hw-*.md` | command registry | `/hw:sync` |

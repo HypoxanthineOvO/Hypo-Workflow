@@ -1,11 +1,14 @@
 ok: true
-checked_at: "2026-05-09T06:01:44.831Z"
+checked_at: "2026-05-09T12:00:05.645Z"
 stale_count: 0
 error_count: 0
 refreshed:
   - .pipeline/PROGRESS.compact.md
+  - .pipeline/state.compact.yaml
+  - .pipeline/log.compact.yaml
   - .pipeline/metrics.compact.yaml
   - .pipeline/reports.compact.md
+  - .pipeline/patches.compact.md
   - PROJECT-SUMMARY.md
 skipped:
   -
@@ -25,6 +28,18 @@ artifacts:
     severity: ok
     repair_hint: null
   -
+    id: state_compact
+    path: .pipeline/state.compact.yaml
+    status: fresh
+    severity: ok
+    repair_hint: null
+  -
+    id: log_compact
+    path: .pipeline/log.compact.yaml
+    status: fresh
+    severity: ok
+    repair_hint: null
+  -
     id: metrics_compact
     path: .pipeline/metrics.compact.yaml
     status: fresh
@@ -33,6 +48,12 @@ artifacts:
   -
     id: reports_compact
     path: .pipeline/reports.compact.md
+    status: fresh
+    severity: ok
+    repair_hint: null
+  -
+    id: patches_compact
+    path: .pipeline/patches.compact.md
     status: fresh
     severity: ok
     repair_hint: null

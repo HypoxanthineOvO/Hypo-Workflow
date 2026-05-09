@@ -159,6 +159,24 @@ export function docsMap() {
         must_not_include: [],
       },
       {
+        path: "docs/release/v12.3.0.md",
+        role: "release_note",
+        update_class: "release_note",
+        sources: ["CHANGELOG.md", ".pipeline/log.yaml", ".pipeline/pr/PR-20260509-003/summary.md"],
+        managed_blocks: [],
+        narrative_update_policy: "release_flow",
+        must_not_include: [],
+      },
+      {
+        path: "docs/en/release/v12.3.0.md",
+        role: "english_release_note",
+        update_class: "release_note_translation",
+        sources: ["docs/release/v12.3.0.md", "CHANGELOG.md", ".pipeline/log.yaml"],
+        managed_blocks: [],
+        narrative_update_policy: "release_flow",
+        must_not_include: [],
+      },
+      {
         path: "CHANGELOG.md",
         role: "changelog",
         update_class: "release_generated",
@@ -388,6 +406,7 @@ function renderEnglishReadme() {
     "- **Rules / Habits**: store user habits and project rules as structured authority, then render platform-readable instruction views.",
     "- **Agent Review**: record review artifacts during planning, tests, implementation, and final checks.",
     "- **PR/MR Create**: `/hw:pr create` guides GitHub PR and GitLab MR creation from existing local changes or a plan-first work item, with remote writes gated by explicit confirmation.",
+    "- **Acceptance / Compact Evidence**: `/hw:accept` blocks missing or colliding worker evidence; successful `/hw:start` and `/hw:resume` refresh compact views with `dirty_only` policy.",
     "- **Sync / Docs / Release**: synchronize platform adapters, repair docs, and run release checks without replacing host Agent work.",
     "",
     "## Platform Entrypoints",
@@ -436,6 +455,7 @@ function renderEnglishReadme() {
     "| [Platforms Reference](docs/en/reference/platforms.md) | Platform capability matrix |",
     "| [Generated Artifacts](docs/en/reference/generated-artifacts.md) | Generated adapter and docs sources |",
     "| [Configuration Reference](docs/en/reference/configuration.md) | Automation, gates, profiles, and worker separation |",
+    "| [v12.3.0 Release Notes](docs/en/release/v12.3.0.md) | Worker separation, `dirty_only` compact refresh, PR #5, and validation evidence |",
     "",
     "## License",
     "",
@@ -477,6 +497,10 @@ function renderUserGuide() {
     "## Subagent 与降级",
     "",
     "`execution.worker_separation.mode=recommended|strict` 时，非平凡工作要尽量拆出 implement、test、audit 不同角色。implementation Subagent 不应读取测试源码、fixtures、snapshots 或 assertion 细节，只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若平台无法维持隔离，必须记录 role isolation degradation；`recommended` 需要用户明确确认 degraded mode 后才可继续，`strict` 不能把降级执行视为 fully accepted。",
+    "",
+    "`/hw:accept` 会把 worker separation 当成验收 gate：缺少 `test`、`implement` 或 `audit` worker evidence、角色身份碰撞、`close_failed` lifecycle、缺少 Codex `/hw:start` + `/hw:resume` 授权范围，或把 runtime-only subtask observation 当成 evidence，都会阻塞验收或要求先做明确降级。",
+    "",
+    "成功完成 `/hw:start` 或 `/hw:resume` 后，如果 `compact.auto=true` 且 `compact.end_of_run=true`，收口阶段按默认 `compact.refresh_policy=dirty_only` 只刷新已变脏的 compact targets。刷新必须从完整 authority 文件生成，不能从旧 `.compact` 文件复制。",
     "",
     "## Explain 与 Status/Debug/Audit 的区别",
     "",
@@ -553,6 +577,10 @@ function renderEnglishUserGuide() {
     "## Subagents And Degraded Mode",
     "",
     "When `execution.worker_separation.mode` is `recommended` or `strict`, non-trivial work should separate implement, test, and audit roles. Implementation Subagents must not read test source, fixtures, snapshots, or assertion details. They may receive requirements, public interfaces, allowed edit scope, test command, pass/fail status, and sanitized failure summaries. If the platform cannot preserve isolation, record role isolation degradation; `recommended` can continue only after explicit degraded-mode confirmation, while `strict` cannot treat degraded execution as fully accepted.",
+    "",
+    "`/hw:accept` treats worker separation as an acceptance gate. Missing `test`, `implement`, or `audit` worker evidence, role identity collisions, `close_failed` lifecycle records, missing Codex `/hw:start` + `/hw:resume` authorization scope, or runtime-only subtask observations being used as evidence block acceptance until repaired or explicitly downgraded where policy allows.",
+    "",
+    "After a successful `/hw:start` or `/hw:resume` run, when `compact.auto=true` and `compact.end_of_run=true`, the closeout refresh uses the default `compact.refresh_policy=dirty_only` and updates only dirty compact targets. The refresh is generated from full authority files, never copied from old `.compact` files.",
     "",
     "## Explain Versus Status/Debug/Audit",
     "",
@@ -840,6 +868,7 @@ function platformFeatureLines(platform) {
       "- 用 native `question` 处理必要决策，用 `todowrite` 保持可见计划纪律。",
       "- `/hw-pr-create` 映射到 canonical `/hw:pr create`，用于问答式 GitHub PR / GitLab MR 创建流程。",
       "- 支持 OpenCode provider/model matrix metadata，但不把 Hypo-Workflow 变成 runner。",
+      "- Status 可显示 OpenCode active subagent/model，但这些 subtask 字段必须标记为 runtime-only，不能作为 `/hw:accept` worker evidence。",
     ];
   }
   return [
@@ -872,6 +901,7 @@ function platformBoundaryLines(platform) {
     return [
       ...common,
       "- OpenCode-specific events 和 plugins 是增量能力；Codex 和 Claude Code 行为不得依赖它们。",
+      "- OpenCode `subtask` parts 只能作为 UI/status runtime-only observation；acceptance 和 worker separation gates 必须忽略它们。",
     ];
   }
   return common;
@@ -1062,6 +1092,7 @@ function englishPlatformFeatureLines(platform) {
       "- Generate OpenCode role agents, plugin runtime files, status sidecars, and TUI/status config.",
       "- Use native `question` for required decisions and `todowrite` for visible plan discipline.",
       "- Map `/hw-pr-create` to canonical `/hw:pr create` for guided GitHub PR / GitLab MR creation.",
+      "- Status may display OpenCode active subagent/model data, but those subtask fields are runtime-only and must not satisfy `/hw:accept` worker evidence.",
     ];
   }
   return [
@@ -1094,6 +1125,7 @@ function englishPlatformBoundaryLines(platform) {
     return [
       ...common,
       "- OpenCode-specific events and plugins are incremental capabilities; Codex and Claude Code behavior must not depend on them.",
+      "- OpenCode `subtask` parts are UI/status runtime-only observations; acceptance and worker separation gates must ignore them.",
     ];
   }
   return common;
@@ -1143,6 +1175,8 @@ function renderGeneratedArtifactsReference() {
     "# 派生产物参考",
     "",
     "这些文件由 core helper 或 sync/docs 命令生成。修改时应回到 source helper 或 authority 文件，再运行 repair/sync。不要直接把派生产物当成 source of truth；如果派生产物 stale，优先检查对应 source 和 writer command。",
+    "",
+    "`.pipeline/*.compact.*` 可以通过显式 `/hw:compact`、`/hw:sync --repair`，或成功 `/hw:start` / `/hw:resume` 结束后的收口刷新生成。默认 `compact.refresh_policy=dirty_only` 只刷新 source newer 或 target missing 的 compact targets，并且必须从完整 authority 文件生成，不能从旧 `.compact` 文件复制。",
     "",
     "| Artifact | Source | Repair |",
     "|---|---|---|",
@@ -1200,6 +1234,8 @@ function renderEnglishGeneratedArtifactsReference() {
     "[中文](../../../reference/generated-artifacts.md) | English",
     "",
     "These files are generated by core helpers or sync/docs commands. Change the source helper or authority file first, then run repair/sync. Do not treat generated artifacts as source of truth.",
+    "",
+    "`.pipeline/*.compact.*` can be generated by explicit `/hw:compact`, `/hw:sync --repair`, or the successful end-of-run refresh after `/hw:start` / `/hw:resume`. The default `compact.refresh_policy=dirty_only` updates only compact targets whose source is newer or whose target is missing, and it must generate from full authority files rather than old `.compact` files.",
     "",
     "| Artifact | Source | Repair |",
     "|---|---|---|",
@@ -1260,6 +1296,8 @@ function renderEnglishConfigurationReference() {
     "`P0 Configure` runs after `cycle new` and before `P1 Discover`. It lets the user select or reuse automation, Subagent authorization, acceptance, PR/MR remote-write policy, full regression, analysis boundaries, and worker separation. Reuse sources are recorded as `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, or `built_in_default`.",
     "",
     "Strict worker separation requires implementation Subagents to stay isolated from test/review/audit roles. Implementation workers do not read test source, fixtures, snapshots, or assertion details; they may receive requirements, public interfaces, allowed edit scope, test command, pass/fail status, and sanitized failure summaries. If the host cannot preserve isolation, the run must explain degraded mode, obtain explicit user confirmation, and record role isolation degradation.",
+    "",
+    "Acceptance hardening: `/hw:accept` blocks missing or colliding implement/test/audit worker evidence, failed or `close_failed` worker lifecycle records, missing Codex `/hw:start` + `/hw:resume` authorization scope, and runtime-only observations being used as worker evidence.",
     "",
     "## Default Profiles",
     "",
@@ -1338,6 +1376,8 @@ function renderConfigurationReference() {
     "`P0 Configure` 是每个新 Cycle 在 `P1 Discover` 前的配置阶段。用户可以重新选择，也可以明确沿用上一轮或项目/全局默认。该阶段覆盖 automation、Subagent authorization、acceptance、PR/MR remote write、full regression、analysis boundaries 和 worker separation，并把来源记录为 `cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config` 或 `built_in_default`。",
     "",
     "strict worker separation 要求 implementation Subagent 与 test/review/audit 角色隔离。implementation worker 不读取 test source、fixtures、snapshots 或 assertion details；它只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若宿主平台不能提供这种隔离，必须在执行前说明 degraded mode，获得 explicit user confirmation，并记录 role isolation degradation。",
+    "",
+    "acceptance hardening：`/hw:accept` 会阻塞缺失或身份碰撞的 implement/test/audit worker evidence、失败或 `close_failed` worker lifecycle、缺少 Codex `/hw:start` + `/hw:resume` 授权范围，以及把 runtime-only observation 当成 worker evidence 的验收。",
     "",
     "## Analysis preset 边界",
     "",

@@ -38,6 +38,7 @@ hypo-workflow sync --platform opencode --project . --repair
 - Generate OpenCode role agents, plugin runtime files, status sidecars, and TUI/status config.
 - Use native `question` for required decisions and `todowrite` for visible plan discipline.
 - Map `/hw-pr-create` to canonical `/hw:pr create` for guided GitHub PR / GitLab MR creation.
+- Status may display OpenCode active subagent/model data, but those subtask fields are runtime-only and must not satisfy `/hw:accept` worker evidence.
 
 ## Boundaries
 
@@ -45,6 +46,7 @@ hypo-workflow sync --platform opencode --project . --repair
 - `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/rules.yaml` are protected authority files.
 - External installs, user-level config writes, destructive commands, and network side effects require explicit confirmation.
 - OpenCode-specific events and plugins are incremental capabilities; Codex and Claude Code behavior must not depend on them.
+- OpenCode `subtask` parts are UI/status runtime-only observations; acceptance and worker separation gates must ignore them.
 
 ## Model Matrix
 
