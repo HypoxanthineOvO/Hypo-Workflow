@@ -76,7 +76,7 @@ export async function runEndOfRunCompact(projectRoot = ".", options = {}) {
     }
 
     try {
-      const content = await entry.refresh(root, entry, options);
+      const content = await entry.refresh(root, entry, { ...options, compact: compactConfig });
       if (content === null || content === undefined) {
         result.unchanged.push({ id: entry.id, path: entry.path, reason: "source_missing" });
         continue;

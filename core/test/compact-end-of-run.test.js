@@ -26,12 +26,16 @@ test("end-of-run compact refreshes dirty targets after a successful run only", a
     },
   });
   await writeConfig(join(root, ".pipeline", "log.yaml"), {
-    entries: [{ id: "M01-COMPLETE", type: "milestone_complete", timestamp: "2026-05-09T10:00:00+08:00" }],
+    entries: [
+      { id: "M00-OLDER", type: "milestone_complete", timestamp: "2026-05-09T09:00:00+08:00" },
+      { id: "M01-COMPLETE", type: "milestone_complete", timestamp: "2026-05-09T10:00:00+08:00" },
+    ],
   });
 
   const result = await runEndOfRunCompact(root, {
     success: true,
     now: "2026-05-09T10:05:00+08:00",
+    compact: { log_recent: 1 },
   });
 
   assert.equal(result.ok, true);
@@ -41,7 +45,9 @@ test("end-of-run compact refreshes dirty targets after a successful run only", a
   assert.ok(result.refreshed.includes(".pipeline/log.compact.yaml"));
   assert.match(await readFile(join(root, ".pipeline", "PROGRESS.compact.md"), "utf8"), /new end of run event/);
   assert.match(await readFile(join(root, ".pipeline", "state.compact.yaml"), "utf8"), /status: completed/);
-  assert.match(await readFile(join(root, ".pipeline", "log.compact.yaml"), "utf8"), /M01-COMPLETE/);
+  const logCompact = await readFile(join(root, ".pipeline", "log.compact.yaml"), "utf8");
+  assert.match(logCompact, /M01-COMPLETE/);
+  assert.doesNotMatch(logCompact, /M00-OLDER/);
 });
 
 test("end-of-run compact skips failed or disabled runs", async () => {

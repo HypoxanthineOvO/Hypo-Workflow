@@ -1132,12 +1132,23 @@ $defs:
             type: integer
             minimum: 1
             default: 3
+          end_of_run:
+            type: boolean
+            default: true
+          refresh_policy:
+            type: string
+            enum:
+              - dirty_only
+              - always
+            default: dirty_only
         default:
           auto: true
           progress_recent: 15
           state_history_full: 1
           log_recent: 20
           reports_summary_lines: 3
+          end_of_run: true
+          refresh_policy: dirty_only
       knowledge:
         $ref: "#/$defs/knowledge_config"
       sync:

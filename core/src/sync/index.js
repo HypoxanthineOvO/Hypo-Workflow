@@ -76,7 +76,7 @@ export async function runProjectSync(projectRoot = ".", options = {}) {
     derivedHealth = repair.health;
     operations.push("derived_repair");
   } else {
-    compact = await refreshCompactViews(root);
+    compact = await refreshCompactViews(root, { ...options, config });
     derivedHealth = await checkDerivedArtifacts(root, { ...options, now });
     operations.push("derived_check");
   }
@@ -478,13 +478,19 @@ async function detectExternalChanges(root, options = {}) {
   return changes;
 }
 
-async function refreshCompactViews(root) {
+async function refreshCompactViews(root, options = {}) {
   const files = [];
-  const progress = join(root, ".pipeline", "PROGRESS.md");
-  if (await exists(progress)) {
-    const compact = await renderProgressCompact(root);
-    await writeFile(join(root, ".pipeline", "PROGRESS.compact.md"), compact, "utf8");
-    files.push(".pipeline/PROGRESS.compact.md");
+  const compactConfig = resolveCompactConfig(options);
+  const entries = buildDerivedArtifactMap().filter((entry) => (
+    entry.path.includes(".compact.")
+    && typeof entry.refresh === "function"
+    && entry.repair_behavior === "safe_refresh"
+  ));
+  for (const entry of entries) {
+    const compact = await entry.refresh(root, entry, { ...options, compact: compactConfig });
+    if (compact === null || compact === undefined) continue;
+    await writeFile(join(root, entry.path), compact, "utf8");
+    files.push(entry.path);
   }
   return { files };
 }
@@ -841,16 +847,18 @@ function normalizeDerivedEntry(entry = {}) {
   };
 }
 
-async function renderProgressCompact(root) {
+async function renderProgressCompact(root, _entry = null, options = {}) {
   const source = await readOptionalText(join(root, ".pipeline", "PROGRESS.md"));
   if (!source) return null;
-  return `${source.split(/\r?\n/).slice(0, 80).join("\n").trimEnd()}\n`;
+  const limit = compactInteger(options, "progress_recent", 15);
+  return `${source.split(/\r?\n/).slice(0, limit).join("\n").trimEnd()}\n`;
 }
 
-async function renderStateCompact(root) {
+async function renderStateCompact(root, _entry = null, options = {}) {
   const source = await readOptionalText(join(root, ".pipeline", "state.yaml"));
   if (!source) return null;
   const state = parseYaml(source);
+  const fullCount = compactInteger(options, "state_history_full", 1, { allowZero: true });
   const compact = {};
   for (const key of ["pipeline", "current", "last_heartbeat", "acceptance", "continuation"]) {
     if (state[key] !== undefined) compact[key] = state[key];
@@ -865,8 +873,8 @@ async function renderStateCompact(root) {
   }
   if (state.history?.completed_prompts) {
     const completed = state.history.completed_prompts;
-    const recent = completed.slice(-1);
-    const older = completed.slice(0, -1).map((entry) => ({
+    const recent = fullCount > 0 ? completed.slice(-fullCount) : [];
+    const older = completed.slice(0, Math.max(0, completed.length - fullCount)).map((entry) => ({
       prompt: entry.prompt || entry.prompt_name || entry.name,
       status: entry.status || entry.result,
       score_summary: entry.score_summary || entry.scores || entry.score || null,
@@ -878,14 +886,19 @@ async function renderStateCompact(root) {
   return `${stringifyYaml(compact).trimEnd()}\n`;
 }
 
-async function renderLogCompact(root) {
+async function renderLogCompact(root, _entry = null, options = {}) {
   const source = await readOptionalText(join(root, ".pipeline", "log.yaml"));
   if (!source) return null;
   const log = parseYaml(source);
   const entries = Array.isArray(log.entries) ? log.entries : [];
   if (!entries.length) return null;
-  const recent = entries.slice(0, 20);
-  const older = entries.slice(20);
+  const limit = compactInteger(options, "log_recent", 20);
+  const sorted = entries
+    .map((entry, index) => ({ entry, index, timestamp: Date.parse(entry.timestamp || "") }))
+    .sort(compareLogEntries)
+    .map((item) => item.entry);
+  const recent = sorted.slice(0, limit);
+  const older = sorted.slice(limit);
   const compact = { entries: recent };
   if (older.length) {
     const timestamps = older.map((entry) => entry.timestamp).filter(Boolean).sort();
@@ -907,8 +920,9 @@ async function renderMetricsCompact(root) {
   return `${source.split(/\r?\n/).slice(0, 120).join("\n").trimEnd()}\n`;
 }
 
-async function renderReportsCompact(root) {
+async function renderReportsCompact(root, _entry = null, options = {}) {
   const reportsDir = join(root, ".pipeline", "reports");
+  const summaryLines = compactInteger(options, "reports_summary_lines", 3);
   let entries = [];
   try {
     entries = await readdir(reportsDir);
@@ -921,7 +935,13 @@ async function renderReportsCompact(root) {
     if (!source) continue;
     const title = source.split(/\r?\n/).find((line) => /^#\s+/.test(line)) || `# ${entry}`;
     const result = /-\s*Result:\s*(.+)/i.exec(source)?.[1] || /Decision:\s*(.+)/i.exec(source)?.[1] || "unknown";
-    reports.push(`- ${title.replace(/^#\s+/, "")} (${entry}) result=${result}`);
+    const summary = source
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line && !/^#\s+/.test(line))
+      .slice(0, summaryLines)
+      .join(" | ");
+    reports.push(`- ${title.replace(/^#\s+/, "")} (${entry}) result=${result}${summary ? ` summary=${summary}` : ""}`);
   }
   if (!reports.length) return null;
   return `# Reports Compact\n\n${reports.join("\n")}\n`;
@@ -948,6 +968,29 @@ async function renderPatchesCompact(root) {
   }
   if (!patches.length) return null;
   return `# Patches Compact\n\n${patches.join("\n")}\n`;
+}
+
+function resolveCompactConfig(options = {}) {
+  return {
+    ...(DEFAULT_GLOBAL_CONFIG.compact || {}),
+    ...(options.config?.compact || {}),
+    ...(options.compact || {}),
+  };
+}
+
+function compactInteger(options = {}, key, fallback, settings = {}) {
+  const compact = resolveCompactConfig(options);
+  const value = Number(compact[key]);
+  const minimum = settings.allowZero ? 0 : 1;
+  return Number.isInteger(value) && value >= minimum ? value : fallback;
+}
+
+function compareLogEntries(left, right) {
+  const leftValid = Number.isFinite(left.timestamp);
+  const rightValid = Number.isFinite(right.timestamp);
+  if (leftValid && rightValid && left.timestamp !== right.timestamp) return right.timestamp - left.timestamp;
+  if (leftValid !== rightValid) return leftValid ? -1 : 1;
+  return left.index - right.index;
 }
 
 async function renderProjectSummary(root) {

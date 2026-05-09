@@ -63,7 +63,7 @@ Use this skill to start execution from a local `.pipeline/` workspace. This is t
    - `.pipeline/PROGRESS.md`
    - top-level `last_heartbeat`
 16. Before declaring a milestone complete, run the Codex preflight/runtime checklist when platform is Codex or hooks are unavailable: protected authority writes, YAML/JSON/Markdown validity, stale derived artifacts, README freshness, output language, secret markers, and report/progress/log evidence.
-17. During execution, do not compact after every step. Track which compact source files changed (`PROGRESS.md`, `state.yaml`, `log.yaml`, `metrics.yaml`, `reports/`, `patches/`, and Knowledge records) while keeping full authoritative files available for development and validation.
+17. During execution, do not compact after every step. Track which compact source files changed (`PROGRESS.md`, `state.yaml`, `log.yaml`, `metrics.yaml`, `reports/`, `patches/`, and Knowledge records) while keeping full authoritative files available for development and validation. After the complete `/hw:start` run has finished successfully and validation/report/state updates have all passed, run end-of-run dirty-only compact refresh when `compact.auto=true` and `compact.end_of_run=true`; default `compact.refresh_policy=dirty_only`.
 18. If `.pipeline/feature-queue.yaml` exists, apply batch auto-chain after a Feature's final Milestone passes:
    - mark the completed Feature `done`
    - advance to the next queued Feature when `auto_chain=true`
