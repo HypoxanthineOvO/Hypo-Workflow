@@ -39,7 +39,7 @@ grep -Fq 'plan-tool-required: warn' rules/presets/recommended.yaml
 grep -Fq 'plan-tool-required: error' rules/presets/strict.yaml
 grep -Fq 'plan-tool-required: off' rules/presets/minimal.yaml
 
-grep -Fq 'Plan Tool Discipline' SKILL.md
+grep -Fq 'Plan 工具纪律' SKILL.md
 grep -Fq 'plan-tool-required' skills/plan/SKILL.md
 grep -Fq 'P1/P2/P3/P4 checkpoint' skills/plan/SKILL.md
 

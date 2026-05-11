@@ -4,7 +4,7 @@ description: Summarize the latest Hypo-Workflow report when the user asks for th
 ---
 
 # /hypo-workflow:report
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,11 +15,11 @@ description: Summarize the latest Hypo-Workflow report when the user asks for th
 
 Use this skill to summarize the latest generated report file.
 
-## Preconditions
+## 前置条件
 
 - a report exists in `.pipeline/reports/`, or the current state points to the latest report
 
-## Execution Flow
+## 执行流程
 
 1. Read `.pipeline/state.yaml` if present.
 2. Resolve `output.language` and `output.timezone` from project > global > defaults.
@@ -37,19 +37,19 @@ Use this skill to summarize the latest generated report file.
 7. If `.pipeline/PROGRESS.md` exists, keep its summary consistent conceptually, but do not mutate it from a read-only report command.
 8. Before displaying report snippets or summaries, apply the shared secret-safe evidence redaction helper. If generating or marking a report successful, block success when raw secret evidence is detected.
 
-## Flags
+## Flags 参数
 
 - `/hw:report --view M3`: load and display the complete report for Milestone `M3`.
 - `/hw:report`: list compact report summaries from `.pipeline/reports.compact.md` when available; otherwise summarize the latest report.
 
-## Output Rules
+## 输出规则
 
 - report summaries must use `output.language`; default is `zh-CN`
 - timestamps must be converted to `output.timezone`; default is `Asia/Shanghai`
 - for Chinese output, use compact progress times: same day `HH:MM`, cross-day `DD日 HH:MM`
 - template loading maps `zh-CN` / `zh` to `templates/zh/report.md`, maps `en` / `en-US` to `templates/en/report.md`, and falls back to `templates/report.md` when localized templates are missing
 
-## Reference Files
+## 参考文件
 
 - `references/evaluation-spec.md` — score interpretation
 - `references/commands-spec.md` — report selection behavior

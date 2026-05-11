@@ -4,7 +4,7 @@ description: Split discovered work into milestones when the user wants Hypo-Work
 ---
 
 # /hypo-workflow:plan-decompose
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -17,11 +17,11 @@ Use this skill for P2 Decompose only.
 
 For `/hw:plan --batch`, this phase decomposes Feature Queue entries according to `batch.decompose_mode`.
 
-## Preconditions
+## 前置条件
 
 - P1 Discover has already clarified the project enough to define milestones
 
-## Execution Flow
+## 执行流程
 
 1. Read the current design summary and repo context.
 2. Split work into serial milestones.
@@ -41,7 +41,7 @@ For `/hw:plan --batch`, this phase decomposes Feature Queue entries according to
    - do not silently renumber executed prompts
    - append new prompts after the highest safe sequence number
 
-## Interactive Behavior
+## 交互行为
 
 - in interactive mode, show the proposed milestone split and ask follow-up questions if dependencies or scope boundaries are still ambiguous
 - after P2 produces the split, stop at a checkpoint before P3
@@ -59,11 +59,11 @@ For `/hw:plan --batch`, this phase decomposes Feature Queue entries according to
 - if the user asks for changes, revise the split and present the checkpoint again
 - in auto mode, finalize the milestone split directly unless blocked
 
-## P2 Checkpoint Gate
+## P2 检查点门禁
 
 Interactive P2 completion is not permission to write files. The only valid next step is to display the proposed decomposition and ask the user to confirm it. P3 may start only after the user explicitly approves the milestone split.
 
-## Batch Decompose
+## 批量拆解
 
 When `--batch` is present:
 
@@ -77,12 +77,12 @@ When `--batch` is present:
    - a Feature-level architecture impact section
 6. Preserve single-feature `/hw:plan` behavior when `--batch` is absent.
 
-## Reference Files
+## 参考文件
 
 - `plan/PLAN-SKILL.md` — Decompose phase rules
 - `references/commands-spec.md` — command routing
 - `SKILL.md` — broader planning context
 
-## Analysis Decomposition Notes
+## Analysis 拆解说明
 
 For `workflow_kind: analysis`, decompose by question rather than by implementation slice. Each analysis Milestone should be able to define a question, gather context, hypothesize, experiment, interpret, and conclude with a ledger-backed report.

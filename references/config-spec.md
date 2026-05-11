@@ -43,6 +43,7 @@ Resolve every configurable value in this order:
 | automation execution gate | `automation.gates.execution` | `automation.gates.execution` | `auto` |
 | automation destructive/external gate | `automation.gates.destructive_external` | `automation.gates.destructive_external` | `confirm` |
 | automation release publish gate | `automation.gates.release_publish` | `automation.gates.release_publish` | `confirm` |
+| automation local whitelist | `automation.local_whitelist` | `automation.local_whitelist` | local test actions allowed when whitelisted; external remains `confirm` |
 | P0 Configure stage | `cycle.configure.stage` | `cycle.configure.stage` | `P0 Configure` |
 | P0 Configure trigger | `cycle.configure.trigger` | `cycle.configure.trigger` | `cycle_new_before_discover` |
 | P0 Configure reuse | `cycle.configure.allow_reuse` | `cycle.configure.allow_reuse` | `true` |
@@ -77,6 +78,32 @@ Hard gates are never downgraded by automation level:
 - `automation.gates.planning=confirm` is mandatory for P2 milestone split and P4 final plan confirmation.
 - `automation.gates.destructive_external=confirm` is mandatory for destructive or external side effects.
 - `automation.gates.release_publish=confirm` is the default for tag/push/publish operations unless a command receives explicit user confirmation.
+
+Durable local test-operation whitelist:
+
+- `automation.local_whitelist.safe_local.actions` covers local test helpers such as `start_dev_server`, `restart_dev_server`, `stop_dev_server`, `run_browser_e2e`, and `run_mock_service`.
+- `automation.local_whitelist.stateful_local.actions` covers local but stateful test operations such as `reset_test_database`, `clear_test_cache`, and `delete_generated_test_artifacts`.
+- `automation.local_whitelist.external.actions` records known external actions such as `remote_pr_write`, `publish_release`, and `write_real_api`, but the effective default remains `confirm`.
+- `automation.local_whitelist.scenario_overrides` may allow an action only under a named scenario such as `test_profiles.webapp` or `/hw:start`.
+- A user-approved local whitelist should prevent repeated prompts for the same local test action. It must not override destructive/external, release publish, PR/MR remote write, or real API write gates.
+
+```yaml
+automation:
+  local_whitelist:
+    safe_local:
+      actions:
+        - restart_dev_server
+        - run_browser_e2e
+    stateful_local:
+      actions:
+        - reset_test_database
+    external:
+      actions:
+        - remote_pr_write
+    scenario_overrides:
+      test_profiles.webapp:
+        - run_browser_e2e
+```
 
 Compatibility fields such as `evaluation.auto_continue`, `batch.auto_chain`, `batch.default_gate`, and `opencode.auto_continue` remain supported. Commands should resolve the explicit `automation.*` policy first, then use legacy fields as compatibility hints for ordinary execution gates only. They must not use legacy fields to skip planning, destructive/external, or release publish gates.
 

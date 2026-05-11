@@ -7,11 +7,11 @@ description: Synchronize Hypo-Workflow project adapters and lightweight derived 
 
 Use this skill when the user invokes `/hw:sync` or asks to run project sync from inside a Hypo-Workflow workspace.
 
-## Output Language Rules
+## 输出语言规则
 
 Follow the root Hypo-Workflow output language config. Use Chinese for user-facing output when `output.language` is `zh-CN` or `zh`, English when it is `en`, and follow the conversation language when it is `auto`.
 
-## Contract
+## 契约
 
 `/hw:sync` is an explicit project synchronization entrypoint. It shares semantics with `hypo-workflow sync` and never executes pipeline milestones.
 
@@ -23,7 +23,7 @@ Supported modes:
 - `/hw:sync --repair`: run standard sync plus safe refresh of declared derived artifacts such as `PROGRESS.compact.md`, metrics/report compact views, `PROJECT-SUMMARY.md`, and derived health.
 - `/hw:sync --deep`: run standard repair sync plus dependency scan and architecture rescan hints.
 
-## Derived Artifact Map
+## 派生产物映射
 
 The sync contract distinguishes protected authority files from derived views.
 
@@ -36,7 +36,7 @@ The sync contract distinguishes protected authority files from derived views.
 
 SessionStart performs only light external-change detection. It may prompt the user to run `/hw:sync --light` or standard `/hw:sync`, but it must not run adapter generation, compact refresh, dependency scans, or pipeline milestones by itself.
 
-## Boundaries
+## 边界
 
 - Do not execute pipeline prompts or milestone steps.
 - Do not mutate `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, or `.pipeline/rules.yaml`.
@@ -45,7 +45,7 @@ SessionStart performs only light external-change detection. It may prompt the us
 - Deep sync must be explicit.
 - Heavy scans, adapter writes, and compact writes are not allowed from SessionStart light detection.
 
-## Reference Files
+## 参考文件
 
 - `references/commands-spec.md`
 - `references/opencode-command-map.md`

@@ -130,12 +130,28 @@ Step override executor fields:
 
 Mixed-mode examples may use `subagent: codex` or `subagent: claude`; normalize that alias to `subagent_tool`.
 
-Subagent prompts should include:
+Subagent prompts must be assembled with a two-layer injection contract. The main agent owns both layers and must not let task-specific text weaken the host/orchestrator envelope.
+
+Layer 1 host/orchestrator envelope fields are mandatory for every spawned worker prompt:
+
+- `compact_rules_summary`: concise active rule summary, including write-scope boundaries, role separation requirements, lifecycle expectations, and any protected files
+- `authorization_state`: whether Subagent work is authorized, who/what granted it, scope, worker identity/session if known, and any degraded or pending authorization state
+- `role_boundary`: exact role name, allowed reads, allowed writes, forbidden reads/writes, non-overlap rules, and whether the worker is `test`, `implement`, `audit`, `review`, or read-only
+- `out_of_scope_stop_rule`: instruction to stop instead of editing, reading, spawning, validating, or deciding outside the declared role/scope; the worker must report the requested action/path, reason, and owning role
+
+Layer 2 task injection fields are mandatory for the concrete delegated task:
+
+- `user_requested_checks`: explicit checks requested by the user or current command, including any negative constraints and required confirmations
+- `milestone_audit_fields`: milestone, Patch, or prompt-specific audit fields the worker must evaluate or populate, such as role evidence, changed files, risks, degraded mode, and validation owner
+- `evidence_required`: concrete evidence the worker must return, such as commands, reviewed refs, focused diff notes, before/after output, screenshots, metrics, or sanitized failure summaries
+- `expected_output_artifact`: exact output artifact and schema, including JSON response shape, report path, review packet, or notes field where the main agent will persist the result
+
+Subagent prompts should also include:
 
 - the current prompt `需求`
 - the relevant `预期测试` or `预期产出`
 - changed code or a focused diff
-- relevant test files
+- relevant test files when the role is explicitly test/review/audit and allowed to read them
 - the exact JSON response shape expected for the step
 
 Template map:

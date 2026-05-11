@@ -1,0 +1,25 @@
+cycle:
+  number: 10
+  name: "一系列体验优化"
+  type: feature
+  status: completed
+  started: "2026-05-08T23:41:58+08:00"
+  finished: "2026-05-09T00:30:30+08:00"
+  preset: tdd
+  workflow_kind: build
+  context_sources: []
+  previous_cycle: 9
+  lifecycle_policy:
+    reject:
+      default_action: needs_revision
+    accept:
+      next: complete
+    resume:
+      default_action: continue_current
+    gates:
+      acceptance: auto
+    auto_continue: true
+  summary: "Delivered C10 experience improvements: P0 Configure before Discover, guided PR/MR Create with GitHub/GitLab support and manual remote-write confirmation, Subagent authorization/separation/degraded-mode governance, and refreshed docs/adapters with full regression."
+  lessons:
+    - "Expose subcommands such as /hw:pr create in the command registry when they are user-facing workflows, even if they share one Skill implementation."
+    - "Keep generated docs and regression command-count scenarios synchronized with command registry changes."

@@ -1,5 +1,9 @@
 # Platform Capabilities
 
+## 中文主体说明
+
+本规格对比 Codex、Claude Code、OpenCode、Cursor、GitHub Copilot 和 Trae 的能力边界。它不定义新的 runner，只说明各平台如何消费同一套 `.pipeline/` contract。平台名、hook、command、agent、config key 和路径保持英文 literal。
+
 Hypo-Workflow remains a single workflow system with platform adapters. OpenCode, Claude Code, Codex, and third-party IDE instruction surfaces consume the same `.pipeline/` file contract at different levels of native capability.
 
 ## Capability Matrix

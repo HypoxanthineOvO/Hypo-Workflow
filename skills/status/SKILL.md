@@ -4,7 +4,7 @@ description: Show current Hypo-Workflow progress when the user wants a concise s
 ---
 
 # /hypo-workflow:status
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -17,11 +17,11 @@ Use this skill to inspect pipeline progress only.
 
 Status is strictly read-only. If state, logs, progress, or step pointers are inconsistent, report the inconsistency and the recommended repair command; do not repair files, do not advance the current step, and do not make Stop hooks pass as a side effect of showing status.
 
-## Preconditions
+## 前置条件
 
 - none; if `.pipeline/state.yaml` is missing, report that no active pipeline exists
 
-## Execution Flow
+## 执行流程
 
 1. Read `~/.hypo-workflow/config.yaml` if present.
 2. Read `.pipeline/config.yaml` if present.
@@ -55,12 +55,12 @@ Status must expose one user-facing canonical phase and one next action. Derive t
 
 Do not make the user reconcile separate execution, acceptance, continuation, and lock axes on the first screen.
 
-## Flags
+## Flags 参数
 
 - `/hw:status --full`: ignore compact files and load the complete `.pipeline/state.yaml` and `.pipeline/PROGRESS.md`.
 - `/hw:status`: use compact files when available, with full-file fallback when compact files are absent.
 
-## Safety Rules
+## 安全规则
 
 - do not mutate `state.yaml`
 - do not mutate logs or reports
@@ -69,7 +69,7 @@ Do not make the user reconcile separate execution, acceptance, continuation, and
 - do not repair workflow inconsistencies during status display
 - do not display raw secrets from logs, reports, Knowledge records, or status sources
 
-## Reference Files
+## 参考文件
 
 - `references/state-contract.md` — state layout
 - `references/progress-spec.md` — progress summary layout

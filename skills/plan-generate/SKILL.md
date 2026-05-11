@@ -4,7 +4,7 @@ description: Generate Hypo-Workflow artifacts from the approved milestone plan w
 ---
 
 # /hypo-workflow:plan-generate
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,11 +15,11 @@ description: Generate Hypo-Workflow artifacts from the approved milestone plan w
 
 Use this skill for P3 Generate only.
 
-## Preconditions
+## 前置条件
 
 - milestones have been defined well enough to produce `.pipeline/` artifacts
 
-## Execution Flow
+## 执行流程
 
 1. Read `~/.hypo-workflow/config.yaml` if present.
 2. Generate `.pipeline/config.yaml` with project-specific values and only the overrides that should beat global defaults, including `output.*`, `plan.interactive.*`, and `watchdog.*` only when the project needs explicit overrides.
@@ -70,12 +70,12 @@ On Codex, missing execution subworker authorization does not remove the assignme
 
 If derived lifecycle artifacts fail to refresh after a successful authority commit, generated prompts should direct the operator to repair the derived artifact or run `/hw:sync --light` rather than treating the authority write as failed.
 
-## Interactive Behavior
+## 交互行为
 
 - in interactive mode, surface any major append-mode conflict or architecture uncertainty before finalizing
 - in auto mode, proceed unless blocked by a structural conflict that would rewrite history
 
-## Reference Files
+## 参考文件
 
 - `plan/PLAN-SKILL.md` — Generate phase behavior
 - `references/commands-spec.md` — command semantics

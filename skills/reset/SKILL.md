@@ -4,7 +4,7 @@ description: Reset Hypo-Workflow runtime artifacts when the user wants to clear 
 ---
 
 # /hypo-workflow:reset
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,11 +15,11 @@ description: Reset Hypo-Workflow runtime artifacts when the user wants to clear 
 
 Use this skill for safe, full, or hard reset behavior.
 
-## Preconditions
+## 前置条件
 
 - clearly identify what will be removed before deletion
 
-## Execution Flow
+## 执行流程
 
 1. `/hypo-workflow:reset`
    - reinitialize `state.yaml`
@@ -32,12 +32,12 @@ Use this skill for safe, full, or hard reset behavior.
    - require explicit `YES`
    - remove the whole `.pipeline/` workspace
 
-## Safety Rules
+## 安全规则
 
 - never skip the delete preview
 - never run hard reset without explicit confirmation
 
-## Reference Files
+## 参考文件
 
 - `references/commands-spec.md`
 - `references/log-spec.md`

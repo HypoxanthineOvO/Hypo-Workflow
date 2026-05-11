@@ -1,5 +1,9 @@
 # External Docs Index
 
+## 中文主体说明
+
+本索引用于记录需要外部核验的官方文档入口。修改平台 adapter、生成配置、model routing、MCP/docs lookup 或 OpenCode/Claude/Codex 兼容行为前，Agent 应优先查这些官方来源。表格中的 URL、provider、model、config、CLI flag 和路径保持英文原文。
+
 Last verified: 2026-05-02.
 
 This index records external official documentation surfaces that Hypo-Workflow agents should consult before changing platform adapters, generated config, model routing, or documentation lookup behavior. It is a lookup map, not a vendored copy of external docs.

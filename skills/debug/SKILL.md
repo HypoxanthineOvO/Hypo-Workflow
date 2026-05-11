@@ -4,7 +4,7 @@ description: Investigate a concrete failure when the user wants symptom-driven r
 ---
 
 # /hypo-workflow:debug
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -29,11 +29,11 @@ When project `execution.worker_separation.mode` is enabled:
 - do not reproduce, fix, and validate locally first and then report that the independent worker was unavailable
 - if debug work degrades role separation, record that limitation explicitly
 
-## Preconditions
+## 前置条件
 
 - a concrete symptom, failing test, trace, or abnormal behavior is available
 
-## Execution Flow
+## 执行流程
 
 1. Collect symptoms.
 2. Gather context:
@@ -52,7 +52,7 @@ When project `execution.worker_separation.mode` is enabled:
 11. Write the report to `.pipeline/debug/` with timestamps in `output.timezone` and append a debug lifecycle entry.
 12. Set `current.phase=lifecycle_debug` when state tracking is used.
 
-## Reference Files
+## 参考文件
 
 - `references/debug-spec.md`
 - `references/log-spec.md`

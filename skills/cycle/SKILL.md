@@ -4,7 +4,7 @@ description: Manage Hypo-Workflow Cycles with independent milestone sequences, s
 ---
 
 # /hypo-workflow:cycle
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -17,7 +17,7 @@ Use this skill when the user invokes `/hw:cycle` or `/hypo-workflow:cycle`.
 
 Cycles are project-level delivery containers. Each Cycle owns its own milestone sequence, `.pipeline/state.yaml`, `.pipeline/PROGRESS.md`, `.pipeline/prompts/`, and `.pipeline/reports/`. Milestone numbers restart from `M0` inside every Cycle. Cross-Cycle files stay in place.
 
-## Paths
+## 路径
 
 All paths are relative to `.pipeline/` unless a project-root path is explicitly named:
 
@@ -28,7 +28,7 @@ All paths are relative to `.pipeline/` unless a project-root path is explicitly 
 - persistent files: `.pipeline/architecture.md`, `.pipeline/config.yaml`, `.pipeline/log.yaml`, `.pipeline/patches/`
 - persistent knowledge: `.pipeline/knowledge/`
 
-## Commands
+## 指令列表
 
 Supported forms:
 
@@ -39,7 +39,7 @@ Supported forms:
 - `/hw:accept`
 - `/hw:reject "<feedback>"`
 
-## Cycle File
+## Cycle 文件
 
 Create `.pipeline/cycle.yaml` with this shape:
 
@@ -59,7 +59,7 @@ cycle:
 
 Use an ISO-8601 timestamp with timezone. Resolve timezone from `output.timezone`; default to `Asia/Shanghai`.
 
-## Type And Preset Mapping
+## 类型与 Preset 映射
 
 - `feature` -> `tdd`
 - `refactor` -> `tdd`
@@ -121,7 +121,7 @@ Execution:
 7. If `compact.auto=true`, regenerate compact views again after archiving so persistent files and closed patches have fresh summaries.
 8. Leave `.pipeline/` containing only persistent files plus any newly generated summary.
 
-## Archive Flow
+## 归档流程
 
 Create `.pipeline/archives/C{N}-{slug}/` and move or copy files as follows:
 
@@ -148,7 +148,7 @@ Do not archive or delete:
 
 Do not archive, move, or delete `.pipeline/knowledge/`. It is persistent cross-Cycle memory. The archive may contain only a generated `knowledge-summary.md` snapshot.
 
-## Cycle Acceptance
+## Cycle 验收
 
 When acceptance mode is manual, a completed Cycle enters `pending_acceptance` instead of archiving immediately. In `timeout` mode, status surfaces may deterministically show automatic acceptance after `acceptance.timeout_hours`; this is a read/check decision and must not be implemented as a background state mutation.
 
@@ -177,7 +177,7 @@ acceptance:
 
 `/hw:reject` reopens the Cycle as `active`, writes structured feedback under `.pipeline/acceptance/`, stores only `feedback_ref` in `state.yaml`, writes a `cycle_reject` log entry, and updates `PROGRESS.md`. Feedback files should include `problem`, `reproduce_steps`, `expected`, `actual`, `context`, `iteration`, and `created_at`.
 
-## Deferred Items
+## 延后事项
 
 When closing, scan `.pipeline/state.yaml` before moving it. For every milestone with `status: in_progress` or `status: pending`, add an entry to `.pipeline/archives/C{N}-{slug}/deferred.yaml`:
 
@@ -189,7 +189,7 @@ When closing, scan `.pipeline/state.yaml` before moving it. For every milestone 
 
 Also mark the archived `state.yaml` milestone status as `deferred` and set `deferred_reason: cycle closed` when feasible.
 
-## Archive Summary
+## 归档摘要
 
 Generate `.pipeline/archives/C{N}-{slug}/summary.md`.
 
@@ -241,7 +241,7 @@ For `/hw:cycle view 0` or `/hw:cycle view C0`, read `.pipeline/archives/cycle-0-
 - summary path
 - per-milestone report paths
 
-## Project Summary
+## 项目摘要
 
 After every close or archive, regenerate project-root `PROJECT-SUMMARY.md` using the rules in `/hypo-workflow:status` and this skill. This file is cross-Cycle project context and should not be moved into Cycle archives.
 
@@ -254,7 +254,7 @@ After every close or archive, regenerate project-root `PROJECT-SUMMARY.md` using
 
 When `output.language` is missing, default to English for backward compatibility.
 
-## Reference Files
+## 参考文件
 
 - `references/commands-spec.md` — command parsing and unknown-command behavior
 - `references/state-contract.md` — milestone status fields

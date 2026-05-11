@@ -140,7 +140,7 @@ test("guide and Discover contracts document router, adaptive Grill-Me, and artif
   assert.match(guideSkill, /Plan long-running or multi-Feature work/);
   assert.match(guideSkill, /do not force deep Grill-Me/i);
   assert.match(guideSkill, /\/hw:docs/);
-  assert.match(discoverSkill, /Adaptive Grill-Me/i);
+  assert.match(discoverSkill, /Adaptive Grill-Me|自适应追问/i);
   assert.match(discoverSkill, /\.pipeline\/design-concepts\.yaml/);
   assert.match(discoverSkill, /\.pipeline\/glossary\.md/);
   assert.match(knowledgeSpec, /Design Concept And Glossary Indexing/);

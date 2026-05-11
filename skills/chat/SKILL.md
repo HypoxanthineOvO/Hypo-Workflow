@@ -4,7 +4,7 @@ description: Enter lightweight append conversation mode when the user wants to c
 ---
 
 # /hypo-workflow:chat
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,12 +15,12 @@ description: Enter lightweight append conversation mode when the user wants to c
 
 Use this skill when the user invokes `/hw:chat` or `/hypo-workflow:chat`.
 
-## Preconditions
+## 前置条件
 
 - `.pipeline/state.yaml` exists
 - there is an existing Workflow context to reload
 
-## Execution Flow
+## 执行流程
 
 1. Read `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, `.pipeline/PROGRESS.md`, and the most recent report when present.
 2. Enter lightweight append conversation mode without opening a new Milestone.
@@ -28,7 +28,7 @@ Use this skill when the user invokes `/hw:chat` or `/hypo-workflow:chat`.
 4. On `/hw:chat end`, write a summary when needed or keep minimal chat entry persistence.
 5. When the chat scope stops being lightweight, recommend upgrading to `/hw:patch`.
 
-## Reference Files
+## 参考文件
 
 - `references/chat-spec.md` — chat mode contract
 - `references/commands-spec.md` — command semantics

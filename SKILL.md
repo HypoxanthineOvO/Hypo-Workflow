@@ -1,16 +1,16 @@
 ---
 name: hypo-workflow
-version: 12.3.0
+version: 12.4.0
 description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:plan`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
 ---
 
-# Hypo-Workflow v12.3.0
+# Hypo-Workflow v12.4.0
 
 > **Claude Code 用户**：请使用 `/hypo-workflow:<command>` 调用具体指令。输入 `/hypo-workflow:help` 查看全部 39 个用户指令。
 >
 > **Codex 用户**：本文件是完整的 Skill 入口，继续使用 `/hw:*` 指令。
 
-## Commands
+## 指令列表
 
 | Command | Description |
 |---------|-------------|
@@ -62,7 +62,7 @@ Load [`references/commands-spec.md`](./references/commands-spec.md) when you nee
 
 Compatibility alias: `/hw:review` now prints `⚠️ \`/hw:review\` 已迁移到 \`/hw:plan:review\`。请使用新命令。`
 
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -73,7 +73,7 @@ Compatibility alias: `/hw:review` now prints `⚠️ \`/hw:review\` 已迁移到
 
 Template loading maps `zh-CN` / `zh` to `templates/zh/`, maps `en` / `en-US` to `templates/en/`, and falls back to root `templates/` when the localized template is missing.
 
-## Plan Tool Discipline
+## Plan 工具纪律
 
 The `plan-tool-required` rule applies to complex tasks and planning work:
 
@@ -82,7 +82,7 @@ The `plan-tool-required` rule applies to complex tasks and planning work:
 - Claude Code: keep an explicit plan/checkpoint list in the conversation or configured planning surface.
 - P1/P2/P3/P4 checkpoints must update the visible plan before moving to the next phase.
 
-# Prompt Pipeline
+# Prompt Pipeline 执行骨架
 
 Use this skill to execute one prompt at a time from a project-local `.pipeline/` directory.
 
@@ -103,7 +103,7 @@ The runtime guarantees in this version focus on:
 
 If the configuration asks for a capability the current version does not support, stop and say so explicitly.
 
-## Progressive Disclosure
+## 渐进式加载
 
 Load the skill in three layers:
 
@@ -116,7 +116,7 @@ Load the skill in three layers:
 
 Prefer not to inline long policy text into the main conversation when a bundled file already defines it.
 
-## Plan Sub-Skill
+## Plan 子 Skill
 
 Plan Mode is implemented as a dedicated sub-skill:
 
@@ -132,7 +132,7 @@ When the command namespace is:
 
 load `plan/PLAN-SKILL.md` before executing the command-specific behavior.
 
-## First Actions
+## 首要动作
 
 1. Read `~/.hypo-workflow/config.yaml` if present.
 2. Read `.pipeline/config.yaml`.
@@ -152,7 +152,7 @@ load `plan/PLAN-SKILL.md` before executing the command-specific behavior.
 10. Read `.pipeline/log.yaml` when lifecycle history, milestone status, fixes, audits, release records, or debug context matters.
 11. Read `.pipeline/rules.yaml` and `.pipeline/rules/custom/` when rule severity, lifecycle gates, or always-on behavior constraints matter. Missing rules config is compatible and behaves as `extends: recommended`.
 
-## Runtime Resources
+## 运行时资源
 
 Use these bundled files when relevant:
 
@@ -196,7 +196,7 @@ Use these bundled files when relevant:
 - [`skills/pr/SKILL.md`](./skills/pr/SKILL.md)
 - [`skills/explain/SKILL.md`](./skills/explain/SKILL.md)
 
-## Supported Commands
+## 支持的指令
 
 Handle these commands directly:
 
@@ -269,7 +269,7 @@ Slash commands are exact and take precedence over fuzzy natural-language matchin
 
 If the user command is ambiguous, prefer a safe resume and say which prompt and step you are about to run.
 
-## Config Model
+## 配置模型
 
 Configuration has two layers:
 
@@ -369,7 +369,7 @@ The main skill only needs the normalized values. It should not care whether the 
 
 `pipeline.log_file` remains the legacy step-trace target for V0-V5 compatibility. V6 also uses `.pipeline/log.yaml` as the lifecycle ledger for milestones, fixes, audits, debug sessions, releases, and plan reviews.
 
-## Prompt Discovery
+## Prompt 发现
 
 For `source: local`:
 
@@ -394,11 +394,11 @@ Prompt files should usually contain:
 
 If headings differ slightly but meaning is clear, infer by meaning. If critical content is missing, block the prompt instead of guessing.
 
-## Architecture Files
+## 架构文件
 
 `/hw:init` establishes the architecture baseline. Read it before `/hw:plan`, `/hw:plan:review`, `/hw:audit`, and `/hw:debug`; update it through `/hw:init`, `/hw:init --rescan`, and `/hw:plan:review`. Layout rules stay in [`references/init-spec.md`](./references/init-spec.md).
 
-## Plan Modes
+## Plan 模式
 
 Planning now supports two modes through `plan.mode`:
 
@@ -425,7 +425,7 @@ The dashboard is an optional WebUI for `.pipeline/` state, config, progress, and
 - keep its configuration under the `dashboard` config block and plugin-level setup defaults
 - resolve the preferred port as project `dashboard.port` > global `dashboard.port` > `7700`
 
-## Cycles And Patches
+## Cycle 与 Patch
 
 V8 adds two persistent lifecycle surfaces:
 
@@ -445,7 +445,7 @@ Patch rules:
 - Patches are never archived with a Cycle
 - `/hw:plan --context patches` can inject open Patches into P1 Discover
 
-## Rules
+## 规则
 
 V8.4 adds Rules as an independent behavior dimension.
 
@@ -917,7 +917,7 @@ Execution is now modeled as main-agent orchestration plus serial Subagent work:
 
 When the pipeline was generated through Plan Mode and `.pipeline/architecture.md` exists, run Plan Review after prompt evaluation and before prompt advance, compare the completed milestone against the current baseline, record `ADDED`, `CHANGED`, `REASON`, and `IMPACT`, and inspect whether downstream prompts should be revised. Detailed behavior belongs in [`references/plan-review-spec.md`](./references/plan-review-spec.md).
 
-## Failure Handling
+## 失败处理
 
 When a milestone or step fails, Claude must explicitly choose one path:
 
@@ -954,7 +954,7 @@ If the user asks to abort:
 3. append one prompt-level log event
 4. stop without discarding context
 
-## Failure Handling
+## 失败处理
 
 Stop and explain the reason when:
 
@@ -1001,7 +1001,7 @@ The old `templates/` directory is retained for compatibility but is now consider
 
 Read [`templates/DEPRECATED.md`](./templates/DEPRECATED.md) before adding new material to the old template tree.
 
-## Boundaries
+## 边界
 
 V4 extends evaluation behavior but still does not add new remote execution capabilities beyond the existing runtime model.
 

@@ -7,11 +7,11 @@ description: Start and manage isolated Hypo-Workflow exploration worktrees witho
 
 Use this skill when the user invokes `/hw:explore`.
 
-## Output Language Rules
+## 输出语言规则
 
 Follow the root Hypo-Workflow output language config. Use Chinese for user-facing output when `output.language` is `zh-CN` or `zh`, English when it is `en`, and follow the conversation language when it is `auto`.
 
-## Contract
+## 契约
 
 `/hw:explore "topic"` starts an isolated exploration. `/hw:explore status`, `/hw:explore end E001`, `/hw:explore archive E001`, `/hw:explore upgrade plan E001`, and `/hw:explore upgrade analysis E001` manage the lifecycle after start.
 
@@ -27,7 +27,7 @@ Code worktree lives under:
 ~/.hypo-workflow/worktrees/<project-id>/E001-slug/
 ```
 
-## Start Semantics
+## 启动语义
 
 1. Inspect main git worktree cleanliness.
 2. If dirty, ask for a required user decision before writing exploration metadata.
@@ -38,7 +38,7 @@ Code worktree lives under:
 7. Append an `exploration_start` log entry.
 8. Add a Knowledge Ledger record of type `explore`.
 
-## Lifecycle Semantics
+## 生命周期语义
 
 - `/hw:explore status` lists exploration metadata from `.pipeline/explorations/*/exploration.yaml` and keeps parallel explorations distinct.
 - `/hw:explore end E001` writes a structured summary with findings, changed files, commits, outcome, and an `exploration_end` log entry.
@@ -47,7 +47,7 @@ Code worktree lives under:
 - `/hw:explore upgrade plan E001` exposes the exploration as `/hw:plan --context explore:E001` so Discover can load the summary, notes, and evidence refs.
 - `/hw:explore upgrade analysis E001` creates `.pipeline/analysis/explore-E001-context.yaml` with topic, summary, hypotheses, evidence, refs, branch, and worktree path.
 
-## Metadata
+## 元数据
 
 ```yaml
 id: E001
@@ -65,7 +65,7 @@ summary_path: .pipeline/explorations/E001-investigate-sync-drift/summary.md
 created_at: 2026-05-03T01:50:00+08:00
 ```
 
-## Boundaries
+## 边界
 
 - Do not authorize the whole `~/.hypo-workflow` tree.
 - Only HW-owned worktrees under `~/.hypo-workflow/worktrees/**` are allowed by OpenCode file guard.

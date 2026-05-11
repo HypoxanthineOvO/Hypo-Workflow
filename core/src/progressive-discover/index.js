@@ -38,6 +38,22 @@ export const P0_CONFIGURE_STAGE = Object.freeze({
   ],
 });
 
+export const PLAN_AUDIT_FIELDS = Object.freeze([
+  "audit_target",
+  "risk_hypotheses",
+  "test_scenarios",
+  "evidence_required",
+  "independent_validator",
+  "manual_checks",
+  "known_limits",
+]);
+
+export const EXAMPLE_ABSTRACTION_STEPS = Object.freeze([
+  "identify_example",
+  "generalize_requirement",
+  "confirm_scope",
+]);
+
 const FULL_STAGES = Object.freeze([
   {
     id: "assumption_statement",
@@ -93,6 +109,13 @@ export function buildProgressiveDiscoverPlan(input = {}, options = {}) {
     min_rounds: minRounds,
     pre_discover_stage: { ...P0_CONFIGURE_STAGE, questions: [...P0_CONFIGURE_STAGE.questions] },
     big_questions: DISCOVER_BIG_QUESTIONS.map((item) => ({ ...item })),
+    audit_questions: buildPlanAuditQuestions(input),
+    required_audit_fields: [...PLAN_AUDIT_FIELDS],
+    example_abstraction: {
+      required: true,
+      steps: [...EXAMPLE_ABSTRACTION_STEPS],
+      guidance: "用户给出“比如/例如/举个例子”时，先识别为 example，再提炼泛化需求，并反问确认覆盖范围。",
+    },
     stages: stages.map((item) => ({ ...item })),
     required_outputs: requiredOutputs,
     notes: coverage === "lightweight"
@@ -104,6 +127,32 @@ export function buildProgressiveDiscoverPlan(input = {}, options = {}) {
           "Keep the structure strong enough to prevent shallow planning, but still allow the agent to merge related questions.",
           "Batch mode should carry category and verification requirements for each Feature candidate.",
         ],
+  };
+}
+
+export function buildPlanAuditQuestions(input = {}) {
+  const target = input.audit_target || input.title || input.intent || "本次计划";
+  return [
+    `这次要审计的对象是什么？请确认 audit_target 是否是：${target}`,
+    "最担心哪些失败方式或回归？请列出 risk_hypotheses。",
+    "用哪些真实场景或命令验证成功？请说明 test_scenarios、evidence_required 和 independent_validator。",
+  ];
+}
+
+export function extractExampleAbstraction(text = "") {
+  const raw = String(text || "").trim();
+  const hasExample = /比如|例如|举个例子|for example|e\.g\./i.test(raw);
+  const generalized = raw
+    .replace(/比如|例如|举个例子|for example|e\.g\./gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return {
+    has_example: hasExample,
+    steps: [...EXAMPLE_ABSTRACTION_STEPS],
+    generalized_requirement: hasExample ? generalized : raw,
+    confirmation_question: hasExample
+      ? `我理解这个例子表达的是更泛化的需求：“${generalized}”。是否要按这个覆盖范围规划，而不是只处理例子本身？`
+      : "",
   };
 }
 
@@ -125,7 +174,19 @@ export function normalizeDiscoverFeature(feature = {}) {
       feature.goal ||
       "",
     verification,
+    audit_fields: normalizeAuditFields(feature.audit_fields || feature.auditFields || feature.verification?.audit_fields || {}),
   };
+}
+
+function normalizeAuditFields(value = {}) {
+  const result = {};
+  for (const field of PLAN_AUDIT_FIELDS) {
+    const raw = value[field];
+    result[field] = Array.isArray(raw)
+      ? raw.map((item) => String(item)).filter(Boolean)
+      : raw == null ? "" : String(raw);
+  }
+  return result;
 }
 
 function workflowKindFromAnalysisKind(feature = {}) {

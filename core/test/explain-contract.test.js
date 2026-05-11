@@ -31,6 +31,9 @@ test("explain evidence packet cites explicit files and configuration keys", asyn
   assert.match(packet.files_read[0].excerpt, /strict/);
 
   const answer = renderExplainAnswer(packet);
+  assert.match(answer, /## 结论/);
+  assert.match(answer, /## 解释/);
+  assert.match(answer, /## 下一步/);
   assert.match(answer, /证据/);
   assert.match(answer, /\.pipeline\/config\.yaml/);
   assert.match(answer, /strict/);
@@ -114,6 +117,7 @@ test("explain reports unknowns instead of inventing unsupported answers", async 
   assert.match(packet.unknowns.join("\n"), /src\/missing-module\.js/);
   assert.match(answer, /无法确认/);
   assert.match(answer, /needs_context/);
+  assert.match(answer, /## 下一步/);
 });
 
 async function explainFixture() {

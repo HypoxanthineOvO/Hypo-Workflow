@@ -4,7 +4,7 @@ description: Initialize or rescan a Hypo-Workflow project when the user wants ar
 ---
 
 # /hypo-workflow:init
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -17,12 +17,12 @@ Use this skill to bootstrap `.pipeline/` and the architecture baseline. normal `
 
 Interactive init should prepare the project for the Cycle-level `P0 Configure` pre-discover stage. `P0 Configure` runs after `cycle new` and before `P1 Discover`; it may reuse existing settings from `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, or `built_in_default`, and it covers automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation.
 
-## Preconditions
+## 前置条件
 
 - the repo is either empty, already contains source code, or already contains a partial pipeline
 - Git is optional for ordinary init. It is required only when `--import-history` is present.
 
-## Supported Flags
+## 支持的 Flags
 
 - `--rescan`: refresh architecture for an existing pipeline.
 - `--folder`: force folder-mode architecture output.
@@ -31,7 +31,7 @@ Interactive init should prepare the project for the Cycle-level `P0 Configure` p
 - `--interactive`: when used with `--import-history`, show the split plan and wait for explicit confirmation before writing archive files.
 - `--automation manual|balanced|full`: non-interactive automation level override for generated project config.
 
-## Execution Flow
+## 执行流程
 
 1. Read `~/.hypo-workflow/config.yaml` if present so generated project config can inherit defaults without duplicating them.
 2. Detect which of the three cases applies:
@@ -74,11 +74,11 @@ Interactive init should prepare the project for the Cycle-level `P0 Configure` p
 11. Use `--rescan` to refresh architecture for an existing pipeline.
 12. Set `current.phase=lifecycle_init` when tracking this command through state.
 
-## History Import
+## 历史导入
 
 `/hw:init --import-history` imports commits that happened before Hypo-Workflow started tracking the project. `/hw:init --import-history` requires git, but it must not change normal init behavior when the flag is absent.
 
-### Template Language
+### 模板语言
 
 When generating Legacy reports, resolve `output.language` from project > global > defaults.
 
@@ -88,7 +88,7 @@ When generating Legacy reports, resolve `output.language` from project > global 
 
 PROJECT-SUMMARY generation must use the same language for headings, table headers, status labels, and prose. Internal `state.yaml` and `log.yaml` remain English.
 
-### Preconditions
+### 前置条件
 
 1. Check the current directory is a Git repository:
    - run `git rev-parse --is-inside-work-tree`
@@ -100,7 +100,7 @@ PROJECT-SUMMARY generation must use the same language for headings, table header
 4. Resolve output language and timezone before presenting or writing results.
 5. Resolve `history_import.*` from project > global > defaults.
 
-### Config Defaults
+### 配置默认值
 
 ```yaml
 history_import:
@@ -113,7 +113,7 @@ history_import:
     - 'milestone-(\d+)'
 ```
 
-### Split Signals
+### 拆分信号
 
 In `split_method: auto`, try these signals in order and choose the first that creates at least 2 milestones:
 
@@ -124,7 +124,7 @@ In `split_method: auto`, try these signals in order and choose the first that cr
 
 If a specific `split_method` is configured, use only that method and fall back to `M0-legacy` when it cannot split.
 
-### Split Rules
+### 拆分规则
 
 - If fewer than 5 commits are eligible, do not split; import all as `M0-legacy`.
 - Tag milestones are named like `M0-v1.0`.
@@ -135,7 +135,7 @@ If a specific `split_method` is configured, use only that method and fall back t
 - When the cap is exceeded, merge the rest into `Mxx-remaining`.
 - For histories longer than 1000 commits, process normally but each report lists only the first 50 commits, followed by `... and N other commits`.
 
-### Interactive Mode
+### 交互模式
 
 When `--interactive` is present:
 
@@ -159,7 +159,7 @@ When `--interactive` is present:
 
 Without `--interactive`, generate files immediately after the split plan is computed.
 
-### Generated Files
+### 生成文件
 
 Create `.pipeline/archives/cycle-0-legacy/` with:
 
@@ -206,7 +206,7 @@ Each milestone report must use `templates/legacy-report.md` and include:
 
 Legacy reports must not include TDD fields such as `write_tests`, `run_red`, or `review_code`.
 
-### Current Cycle After Import
+### 导入后的当前 Cycle
 
 After writing Cycle 0 Legacy, create or preserve `.pipeline/cycle.yaml` as active Cycle 1:
 
@@ -221,7 +221,7 @@ cycle:
 
 Do not overwrite an existing active Cycle unless the user explicitly asks.
 
-### Edge Cases
+### 边界情况
 
 - Non-Git repo: stop with `❌ 当前目录不是 git 仓库，请先执行 git init`.
 - Existing `.pipeline/state.yaml`: import only commits before the earliest tracked pipeline start.
@@ -230,7 +230,7 @@ Do not overwrite an existing active Cycle unless the user explicitly asks.
 - Multiple branches: use only current branch first-parent history.
 - More than 1000 commits: report commit tables are capped at 50 entries per milestone.
 
-## Reference Files
+## 参考文件
 
 - `references/init-spec.md` — init behavior and architecture strategy
 - `references/commands-spec.md`

@@ -7,18 +7,18 @@ description: Generate, check, repair, and synchronize Hypo-Workflow documentatio
 
 Use this skill when the user invokes `/hw:docs` or asks to generate, check, repair, or sync documentation.
 
-## Output Language Rules
+## 输出语言规则
 
 Follow the root Hypo-Workflow output language config. Use Chinese for user-facing output when `output.language` is `zh-CN` or `zh`, English when it is `en`, and follow the conversation language when it is `auto`.
 
-## Forms
+## 指令形式
 
 - `/hw:docs check`
 - `/hw:docs repair`
 - `/hw:docs generate`
 - `/hw:docs sync`
 
-## Contract
+## 契约
 
 Documentation ownership is explicit:
 
@@ -30,19 +30,19 @@ Documentation ownership is explicit:
 - `CHANGELOG.md` belongs to release.
 - `LICENSE` is manual authority; if absent, report the gap.
 
-## Update Classes
+## 更新类别
 
 - Managed README blocks may be updated automatically.
 - Generated references may be regenerated.
 - Narrative docs require explicit `repair` or confirmation.
 
-## Safety
+## 安全边界
 
 - Do not make README a developer test checklist.
 - Do not silently rewrite narrative docs from `/hw:sync` or `/hw:release`.
 - Release must fact-check narrative docs for stale command counts and false platform claims.
 
-## Reference Files
+## 参考文件
 
 - `references/commands-spec.md`
 - `references/release-spec.md`

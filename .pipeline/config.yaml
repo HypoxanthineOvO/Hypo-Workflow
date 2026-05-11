@@ -1,5 +1,5 @@
 pipeline:
-  name: "C10 一系列体验优化"
+  name: "C11 Workflow 的一系列小体验问题"
   source: local
   output: local
   prompts_dir: .pipeline/prompts

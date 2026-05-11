@@ -74,6 +74,14 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 
 Lifecycle-mutating commands must use the workflow commit helper for protected workflow state. This applies to `/hw:accept`, `/hw:reject`, `/hw:start`, `/hw:resume`, `/hw:plan:generate`, prompt skip/stop transitions, and any command that writes `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, or `.pipeline/rules.yaml`.
 
+User-visible command responses must not collapse into "done" plus a file path. Use a human response structure:
+
+- conclusion: what is true now
+- explanation: why, with the most relevant evidence or changed content
+- next steps: what the user should do next
+
+Milestone, Cycle, report, status, explain, research, and link-analysis completions must additionally explain what changed, how it was validated, how the user can manually exercise it, and known risks or limits.
+
 The command should prepare authoritative writes first, prevalidate invariants, commit authority with temp-file atomic replacement, then refresh derived views such as `.pipeline/log.yaml`, `.pipeline/PROGRESS.md`, metrics mirrors, compact views, `PROJECT-SUMMARY.md`, and OpenCode status inputs. If a derived refresh fails after authority commits, do not roll back authority; report the warning, write `.pipeline/derived-refresh.yaml`, and recommend `/hw:sync --light` or rerunning the lifecycle command after repair.
 
 ### `/hw:start`

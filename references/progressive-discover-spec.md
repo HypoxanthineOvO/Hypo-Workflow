@@ -14,6 +14,18 @@ Progressive Discover starts from three big questions before deeper drilling:
 
 The Agent should ask these early for both ordinary `/hw:plan` and `/hw:plan --batch`. This keeps later Milestone decomposition tied to the right task class and test surface.
 
+Every Plan must also ask substantive audit and verification questions before P2. Do not treat audit as a vague final review. Capture these fields in planning notes and generated prompts:
+
+- `audit_target`
+- `risk_hypotheses`
+- `test_scenarios`
+- `evidence_required`
+- `independent_validator`
+- `manual_checks`
+- `known_limits`
+
+When the user gives an example, treat it as an example first. The Agent must identify the example, generalize the underlying requirement, and ask the user to confirm the intended coverage before using it as the only scope.
+
 ## P0 Configure
 
 Before those P1 questions, a new Cycle should run or explicitly reuse `P0 Configure`. The stage runs after `cycle new` and before `P1 Discover`; it confirms automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation. Reuse must preserve its source order: `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, `built_in_default`.

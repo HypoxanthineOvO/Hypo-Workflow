@@ -4,7 +4,7 @@ description: Manage the persistent lightweight Patch track for small fixes that 
 ---
 
 # /hypo-workflow:patch
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -17,7 +17,7 @@ Use this skill when the user invokes `/hw:patch` or `/hypo-workflow:patch`.
 
 Patch is a persistent side track for small issues, cleanups, and hot observations that do not deserve their own milestone. It is independent of the pipeline state machine and persists across Cycles.
 
-## Paths
+## 路径
 
 Canonical Patch directory:
 
@@ -25,7 +25,7 @@ Canonical Patch directory:
 
 When examples say `patches/P001-fix-login.md`, interpret it as `.pipeline/patches/P001-fix-login.md`.
 
-## Commands
+## 指令列表
 
 Supported forms:
 
@@ -41,7 +41,7 @@ OpenCode command contract:
 - `accept` and `reject` are argument subcommands of `/hw-patch`: use `/hw-patch accept P{NNN}` and `/hw-patch reject P{NNN} "feedback"`.
 - They are not first-class OpenCode commands; do not create or document `/hw-patch-accept` or `/hw-patch-reject`.
 
-## Patch File Format
+## Patch 文件格式
 
 ```markdown
 # P001: 修复登录页 CSS 错位
@@ -59,7 +59,7 @@ OpenCode command contract:
 
 Use `output.language` for labels when generating new content, but preserve the existing file's language when editing it.
 
-## Numbering
+## 编号规则
 
 Patch numbers are global and never reset across Cycles.
 
@@ -69,7 +69,7 @@ Patch numbers are global and never reset across Cycles.
 4. Format as `P001`, `P002`, and so on.
 5. Do not reuse closed or superseded numbers.
 
-## Creating A Patch
+## 创建 Patch
 
 For `/hw:patch "描述" [--severity ...]`:
 
@@ -86,7 +86,7 @@ For `/hw:patch "描述" [--severity ...]`:
 6. Create `.pipeline/patches/P{NNN}-{slug}.md`.
 7. Report the file path and status.
 
-## Listing Patches
+## 列出 Patch
 
 For `/hw:patch list`:
 
@@ -102,7 +102,7 @@ Filters:
 
 If no patches match, say so directly.
 
-## Closing A Patch
+## 关闭 Patch
 
 For `/hw:patch close P{NNN}`:
 
@@ -114,7 +114,7 @@ For `/hw:patch close P{NNN}`:
 
 When a milestone resolves one or more Patches, update `resolved_by` with `C{N}/M{N}` and close the Patch only when the milestone actually delivered the fix.
 
-## Fixing Patches
+## 修复 Patch
 
 Use `/hw:patch fix P001` to repair one Patch immediately, or `/hw:patch fix P001 P003 P007` to repair several Patches in sequence. Patch fix is a lightweight execution lane, not a Milestone and not a TDD pipeline run.
 
@@ -163,7 +163,7 @@ Patch fix is lightweight, but it is still production work. Patch fix must preser
 5. 超出范围时停下来建议升级为 Milestone
 6. 对 Codex 代码/测试 Patch，在编辑前必须 Ask 是否授权独立 `test`、`implement` 和 `audit` subworker；未授权时先停止，除非用户明确确认降级且 Patch 不自动关闭
 
-### Linear Fix Flow
+### 线性修复流程
 
 For each requested Patch, run these steps strictly in order:
 
@@ -176,7 +176,7 @@ For each requested Patch, run these steps strictly in order:
 7. **Commit** — create one independent commit per Patch with `git commit -m "fix(P001): <Patch title>"`. For batch fixes, do not combine Patch commits.
 8. **Close or Gate** — if independent `test` validation and `audit` review passed and all required worker tasks completed successfully with lifecycle states closed/released, update the Patch file as `closed`, refresh `.pipeline/PROGRESS.md` board tables, and append a lifecycle event to `.pipeline/log.yaml`. If any worker task is `failed` or `blocked`, or if independent validation or lifecycle closure is missing, set `pending_acceptance` or keep `open`, record the missing worker separation evidence, and stop before claiming completion.
 
-### Closed Patch Update
+### 已关闭 Patch 更新
 
 When Step 8 closes the Patch, update or append these fields in the Patch file while preserving existing notes:
 
@@ -192,7 +192,7 @@ When Step 8 closes the Patch, update or append these fields in the Patch file wh
 
 Use `output.language` and `output.timezone` for generated prose and time formatting. Preserve the existing Patch language if it is already clear.
 
-### Progress And Log Records
+### PROGRESS 与日志记录
 
 Update `.pipeline/PROGRESS.md` as a board-style summary:
 
@@ -222,7 +222,7 @@ Append a `.pipeline/log.yaml` lifecycle event with:
 
 Patch fix must never write `.pipeline/state.yaml` and must never generate `report.md`.
 
-### Batch Fixes
+### 批量修复
 
 For `/hw:patch fix P001 P003`:
 
@@ -231,7 +231,7 @@ For `/hw:patch fix P001 P003`:
 3. Each successful Patch gets its own commit.
 4. Finish with a summary such as `3/4 修复成功，P003 失败（测试未通过）`.
 
-## Metadata Semantics
+## 元数据语义
 
 - `discovered_in`: Cycle and milestone where the Patch was found
 - `resolved_by`: Cycle and milestone or Patch that resolved it
@@ -242,7 +242,7 @@ For `/hw:patch fix P001 P003`:
 - `accepted_at`: when the Patch was accepted and closed
 - `rejection_refs`: structured feedback files under `.pipeline/patches/feedback/`
 
-## Patch Acceptance
+## Patch 验收
 
 Patch acceptance is Patch-track state only. It must never write `.pipeline/state.yaml`.
 
@@ -290,11 +290,11 @@ The feedback file must include `problem`, `reproduce_steps`, `expected`, `actual
 
 The next `/hw:patch fix P001` must read `rejection_refs` and inject the structured rejection context before editing.
 
-## Relationship To Cycles
+## 与 Cycle 的关系
 
 Patches are not archived when a Cycle closes. They stay in `.pipeline/patches/` and can be injected into future planning with `/hw:plan --context patches` or `cycle.context_sources: [patches]`.
 
-## Reference Files
+## 参考文件
 
 - `skills/cycle/SKILL.md` — active Cycle detection
 - `skills/plan-discover/SKILL.md` — Patch context injection

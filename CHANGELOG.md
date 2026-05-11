@@ -1,5 +1,27 @@
 # Changelog
 
+## v12.4.0 - 2026-05-11
+
+### Features
+
+- 完成 C11 工作流体验改进：Skills 和关键 references 改为中文主体结构，并保留命令、配置键、文件名和平台术语的英文原文。
+- 强化 Plan Discover 的 P0/P1 访谈、例子抽象、自动化授权白名单和 Codex Subagent 授权记录。
+- 补齐 Subagent Layer 1 host envelope 与 Layer 2 task checks，明确 worker separation、hidden tests 和 degraded mode 边界。
+
+### Fixes
+
+- 修复 `s19-help-list` 与 `s56-agents-ask-todo-plan-discipline` 仍依赖旧英文标题的问题，改为验证中文化后的 canonical anchors。
+- 刷新 OpenCode / Claude Code adapters、compact 派生视图和 release/docs 入口。
+
+### Tests
+
+- `uv run -- npm --prefix core test`: 407/407 passing.
+- `uv run python tests/run_regression.py`: 63/63 passing.
+- `uv run -- node --test core/test/docs-governance.test.js core/test/readme-spec.test.js core/test/platform-adapters.test.js`: 14/14 passing.
+- `uv run -- bash scripts/validate-config.sh .pipeline/config.yaml`: passing.
+- OpenCode / Claude Code sync repair: `derived=fresh`.
+- `uv run -- git diff --check`: passing.
+
 ## v12.3.0 - 2026-05-09
 
 ### Features

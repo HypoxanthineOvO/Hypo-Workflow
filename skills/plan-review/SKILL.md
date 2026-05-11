@@ -4,7 +4,7 @@ description: Review architecture changes after a completed milestone when the us
 ---
 
 # /hypo-workflow:plan-review
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,12 +15,12 @@ description: Review architecture changes after a completed milestone when the us
 
 Use this skill for Plan Review after execution changes project reality.
 
-## Preconditions
+## 前置条件
 
 - a milestone has completed
 - architecture tracking is active or an architecture baseline exists
 
-## Execution Flow
+## 执行流程
 
 1. Read the architecture baseline.
 2. Resolve `output.language` and `output.timezone`.
@@ -34,7 +34,7 @@ Use this skill for Plan Review after execution changes project reality.
 6. Propose edits in `.plan-state/prompt-patch-queue.yaml` instead of silently rewriting prompts.
 7. Append a lifecycle log entry and update progress context if this review materially changes the plan.
 
-## Reference Files
+## 参考文件
 
 - `references/plan-review-spec.md` — full review format
 - `plan/PLAN-SKILL.md` — planning context

@@ -4,7 +4,7 @@ description: Show the full Hypo-Workflow command map when the user needs a quick
 ---
 
 # /hypo-workflow:help
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,7 +15,7 @@ description: Show the full Hypo-Workflow command map when the user needs a quick
 
 Use this skill to explain the 39 user-facing Hypo-Workflow commands and the internal watchdog skill.
 
-## Command Groups
+## 指令分组
 
 - Setup:
   - `setup`
@@ -32,7 +32,7 @@ Use this skill to explain the 39 user-facing Hypo-Workflow commands and the inte
 - Internal:
   - `watchdog` (cron-only; hidden from normal quick help unless explicitly requested)
 
-## Execution Flow
+## 执行流程
 
 1. By default, list all 39 user-facing commands grouped by category.
 2. For a specific command, explain:
@@ -48,7 +48,7 @@ Use this skill to explain the 39 user-facing Hypo-Workflow commands and the inte
 6. Include `/hw:cycle`, `/hw:patch`, `/hw:patch fix`, `/hw:compact`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, and `/hw:plan:extend` in normal help output.
 7. Mention `/hw:watchdog` only when the user asks about watchdog or auto resume internals.
 
-## Reference Files
+## 参考文件
 
 - `SKILL.md` — full command list and system context
 - `references/commands-spec.md` — parsing details

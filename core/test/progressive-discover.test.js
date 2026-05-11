@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import {
   buildProgressiveDiscoverPlan,
   DEFAULT_GLOBAL_CONFIG,
+  extractExampleAbstraction,
   loadConfig,
   loadRulesSummary,
   normalizeDiscoverFeature,
@@ -40,6 +41,14 @@ test("progressive discover spec defines big questions, stages, and command cover
     "ambiguity resolution",
     "tradeoff review",
     "validation criteria",
+    "audit_target",
+    "risk_hypotheses",
+    "test_scenarios",
+    "evidence_required",
+    "independent_validator",
+    "manual_checks",
+    "known_limits",
+    "generalize the underlying requirement",
     "@karpathy/guidelines",
     "not default enabled",
   ]) {
@@ -57,7 +66,7 @@ test("progressive discover spec defines big questions, stages, and command cover
   assert.match(planSkill, /OpenCode.*no extra authorization gate/is);
   assert.match(planSkill, /For Codex only.*missing authorization.*`recommended`/is);
   assert.match(planSkill, /explicitly confirm.*fastest single-agent/is);
-  assert.match(discoverSkill, /Big Questions First/i);
+  assert.match(discoverSkill, /Big Questions First|先问关键问题/i);
   assert.match(discoverSkill, /伪测试|pseudo/i);
   assert.match(discoverSkill, /worker separation|三权分立/i);
   assert.match(discoverSkill, /start-blocking gate/i);
@@ -88,6 +97,17 @@ test("buildProgressiveDiscoverPlan starts broad and keeps low-risk work lightwei
     full.big_questions.map((question) => question.id),
     ["task_category", "desired_effect", "verification_method"],
   );
+  assert.deepEqual(full.required_audit_fields, [
+    "audit_target",
+    "risk_hypotheses",
+    "test_scenarios",
+    "evidence_required",
+    "independent_validator",
+    "manual_checks",
+    "known_limits",
+  ]);
+  assert.equal(full.example_abstraction.required, true);
+  assert.match(full.audit_questions.join("\n"), /risk_hypotheses/);
   assert.deepEqual(
     full.stages.map((stage) => stage.id),
     ["assumption_statement", "ambiguity_resolution", "tradeoff_review", "validation_criteria", "worker_separation_policy"],
@@ -104,6 +124,15 @@ test("buildProgressiveDiscoverPlan starts broad and keeps low-risk work lightwei
   const ordinary = buildProgressiveDiscoverPlan({ mode: "single", intent: "small copy fix" });
   assert.equal(ordinary.coverage, "lightweight");
   assert.equal(ordinary.grill_me.requires_design_concept_alignment, false);
+});
+
+test("discover abstracts examples before treating them as scope", () => {
+  const result = extractExampleAbstraction("比如他调研链接只给文件路径，不解释内容");
+
+  assert.equal(result.has_example, true);
+  assert.deepEqual(result.steps, ["identify_example", "generalize_requirement", "confirm_scope"]);
+  assert.match(result.generalized_requirement, /调研链接只给文件路径/);
+  assert.match(result.confirmation_question, /是否要按这个覆盖范围规划/);
 });
 
 test("batch feature artifacts carry category, desired effect, and verification requirements", () => {
@@ -158,6 +187,15 @@ test("discover carries real test contract into batch artifacts for audit", () =>
   assert.match(feature.verification.pass_signal, /persisted state change/);
   assert.equal(feature.verification.independent_validator, "test worker");
   assert.equal(feature.verification.audit_policy.reject_pseudo_tests, true);
+  assert.deepEqual(Object.keys(feature.audit_fields), [
+    "audit_target",
+    "risk_hypotheses",
+    "test_scenarios",
+    "evidence_required",
+    "independent_validator",
+    "manual_checks",
+    "known_limits",
+  ]);
 
   const artifacts = renderBatchPlanArtifacts(
     {

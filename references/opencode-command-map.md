@@ -1,5 +1,9 @@
 # OpenCode Command Map
 
+## 中文主体说明
+
+本表定义 canonical `/hw:*` 命令到 OpenCode `/hw-*` native slash command 的映射。命令名、agent 名、Skill 路径和路由字段必须保持英文 literal，不得翻译；中文说明只解释用途和边界。
+
 OpenCode uses dash-style native slash commands. Each command remains traceable to a canonical Hypo-Workflow command.
 
 | HW command | OpenCode command | Agent | Skill |

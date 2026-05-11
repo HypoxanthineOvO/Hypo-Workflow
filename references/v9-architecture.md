@@ -1,5 +1,9 @@
 # V9 Architecture Baseline
 
+## 中文主体说明
+
+本基线说明 V9 OpenCode adapter 的架构原则：Hypo-Workflow 仍不是 runner，执行发生在 Codex、Claude Code 或 OpenCode Agent 内；`core/` 只做 deterministic helper 和 artifact generation。目录名、组件名、command、plugin 和配置路径保持英文 literal。
+
 V9 adapts Hypo-Workflow to OpenCode without turning Hypo-Workflow into a separate execution engine. The `hypo-workflow` CLI is a setup and synchronization utility, not a runner. Agent execution still happens inside Codex, Claude Code, or OpenCode.
 
 ## Architecture Principles

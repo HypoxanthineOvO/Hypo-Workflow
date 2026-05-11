@@ -28,8 +28,8 @@ export async function checkSkillQuality(options = {}) {
       issues.push(issue("missing-frontmatter", skillPath, "Skill must start with YAML frontmatter."));
     }
 
-    if (!/^## Output Language Rules$/m.test(content)) {
-      issues.push(issue("missing-output-language-rules", skillPath, "Skill must use the canonical Output Language Rules heading."));
+    if (!/^## (Output Language Rules|输出语言规则)$/m.test(content)) {
+      issues.push(issue("missing-output-language-rules", skillPath, "Skill must use the canonical output language rules heading."));
     }
 
     for (const referencePath of extractReferencePaths(content)) {

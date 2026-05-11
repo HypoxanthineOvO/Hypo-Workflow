@@ -30,8 +30,8 @@ test("docs map defines ownership, generated references, and narrative policy", (
   const userGuide = map.documents.find((doc) => doc.path === "docs/user-guide.md");
   const englishUserGuide = map.documents.find((doc) => doc.path === "docs/en/user-guide.md");
   const configuration = map.documents.find((doc) => doc.path === "docs/reference/configuration.md");
-  const releaseNote = map.documents.find((doc) => doc.path === "docs/release/v12.3.0.md");
-  const englishReleaseNote = map.documents.find((doc) => doc.path === "docs/en/release/v12.3.0.md");
+  const releaseNote = map.documents.find((doc) => doc.path === "docs/release/v12.4.0.md");
+  const englishReleaseNote = map.documents.find((doc) => doc.path === "docs/en/release/v12.4.0.md");
 
   assert.equal(readme.role, "concise_user_entrypoint");
   assert.equal(readme.narrative_update_policy, "explicit_repair");
@@ -162,20 +162,20 @@ test("human-facing docs and key references stay Chinese-body", async () => {
   assert.ok(result.checked.some((item) => item.path === "references/commands-spec.md"));
 });
 
-test("v12.3.0 release coverage is bilingual and linked from entrypoints", async () => {
-  const chineseRelease = await readFile("docs/release/v12.3.0.md", "utf8");
-  const englishRelease = await readFile("docs/en/release/v12.3.0.md", "utf8");
+test("v12.4.0 release coverage is bilingual and linked from entrypoints", async () => {
+  const chineseRelease = await readFile("docs/release/v12.4.0.md", "utf8");
+  const englishRelease = await readFile("docs/en/release/v12.4.0.md", "utf8");
   const readme = await readFile("README.md", "utf8");
   const englishReadme = await readFile("README.en.md", "utf8");
 
-  for (const item of ["PR #5", "dirty_only", "398/398", "399/399", "63/63"]) {
+  for (const item of ["C11", "中文", "Subagent", "407/407", "63/63"]) {
     assert.match(chineseRelease, new RegExp(escapeRegExp(item)), `Chinese release note missing ${item}`);
     assert.match(englishRelease, new RegExp(escapeRegExp(item)), `English release note missing ${item}`);
   }
-  assert.match(chineseRelease, /runtime-only[\s\S]*worker evidence/);
-  assert.match(englishRelease, /runtime-only[\s\S]*worker evidence/);
-  assert.match(readme, /docs\/release\/v12\.3\.0\.md/);
-  assert.match(englishReadme, /docs\/en\/release\/v12\.3\.0\.md/);
+  assert.match(chineseRelease, /s19-help-list[\s\S]*s56-agents-ask-todo-plan-discipline/);
+  assert.match(englishRelease, /s19-help-list[\s\S]*s56-agents-ask-todo-plan-discipline/);
+  assert.match(readme, /docs\/release\/v12\.4\.0\.md/);
+  assert.match(englishReadme, /docs\/en\/release\/v12\.4\.0\.md/);
 });
 
 test("release narrative fact check blocks stale docs claims", async () => {

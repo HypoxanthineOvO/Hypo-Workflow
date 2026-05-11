@@ -4,7 +4,7 @@ description: Generate compact context views for large Hypo-Workflow runtime file
 ---
 
 # /hypo-workflow:compact
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -19,7 +19,7 @@ Compact files are derived context views. They reduce SessionStart context size w
 
 Compact output is recovery and index context. Agents must restart from stable prompt/design artifacts such as `.pipeline/prompts/*.md`, `.pipeline/design-spec.md`, `.pipeline/design-concepts.yaml`, `.pipeline/glossary.md`, and durable Knowledge indexes. Compact summaries are not design authority and must not replace those stable artifacts when making implementation decisions.
 
-## Paths
+## 路径
 
 All compact files are written next to their source files:
 
@@ -32,7 +32,7 @@ All compact files are written next to their source files:
 
 Never delete or rewrite the original files while generating compact views.
 
-## Config
+## 配置
 
 Resolve `compact.*` from project config > global config > defaults:
 
@@ -49,13 +49,13 @@ compact:
 
 If config is missing, use these defaults.
 
-## Command
+## 指令
 
 Supported form:
 
 - `/hw:compact`
 
-## Execution Flow
+## 执行流程
 
 1. Read `~/.hypo-workflow/config.yaml` if present.
 2. Read `.pipeline/config.yaml` if present.
@@ -64,7 +64,7 @@ Supported form:
 5. Generate a `.compact` file only when the source file exists.
 6. Report the number of files generated and estimated token savings, for example `已生成 4 个 .compact 文件，预计节省 ~92% context token`.
 
-## Compact Strategies
+## Compact 策略
 
 ### `PROGRESS.compact.md`
 
@@ -149,7 +149,7 @@ Keep:
 
 Full raw knowledge records are not loaded by default. SessionStart loads `.pipeline/knowledge/knowledge.compact.md` and `.pipeline/knowledge/index/*.yaml` only.
 
-## Auto Generation
+## 自动生成
 
 When `compact.auto: true`:
 
@@ -164,11 +164,11 @@ End-of-run automatic compact is dirty-only: refresh only compact targets whose f
 
 `compact.refresh_policy=always` may be used by explicit maintenance commands when a full derived rebuild is desired. The default end-of-run policy is `dirty_only`.
 
-## Git Tracking
+## Git 跟踪
 
 Compact files are derived artifacts. `.gitignore` must include `*.compact.*` so they are not tracked.
 
-## Reference Files
+## 参考文件
 
 - `hooks/session-start.sh` — compact-first context loading
 - `skills/status/SKILL.md` — `--full` status behavior

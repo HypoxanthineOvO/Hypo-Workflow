@@ -5,7 +5,7 @@ import { DEFAULT_ANALYSIS_INTERACTION } from "../analysis/index.js";
 import { DEFAULT_KNOWLEDGE_CONFIG } from "../knowledge/index.js";
 
 export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
-  version: "12.3.0",
+  version: "12.4.0",
   agent: {
     platform: "codex",
     model: "default",
@@ -138,6 +138,35 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
       execution: "auto",
       destructive_external: "confirm",
       release_publish: "confirm",
+    },
+    local_whitelist: {
+      safe_local: {
+        default: "allow_when_whitelisted",
+        actions: [
+          "start_dev_server",
+          "restart_dev_server",
+          "stop_dev_server",
+          "run_browser_e2e",
+          "run_mock_service",
+        ],
+      },
+      stateful_local: {
+        default: "allow_when_whitelisted",
+        actions: [
+          "reset_test_database",
+          "clear_test_cache",
+          "delete_generated_test_artifacts",
+        ],
+      },
+      external: {
+        default: "confirm",
+        actions: [
+          "remote_pr_write",
+          "publish_release",
+          "write_real_api",
+        ],
+      },
+      scenario_overrides: {},
     },
     codex: {
       prefer_subagents: true,
@@ -383,6 +412,7 @@ export function normalizeAutomationPolicy(policy = {}) {
       destructive_external: "confirm",
       release_publish: "confirm",
     },
+    local_whitelist: normalizeAutomationWhitelist(merged.local_whitelist),
     codex: {
       ...DEFAULT_GLOBAL_CONFIG.automation.codex,
       ...(merged.codex || {}),
@@ -393,6 +423,57 @@ export function normalizeAutomationPolicy(policy = {}) {
       ...(merged.quality_pass || {}),
     },
   };
+}
+
+export function normalizeAutomationWhitelist(input = {}) {
+  const base = DEFAULT_GLOBAL_CONFIG.automation.local_whitelist;
+  const merged = mergeConfig(base, input || {});
+  return {
+    safe_local: normalizeWhitelistTier(merged.safe_local, "allow_when_whitelisted"),
+    stateful_local: normalizeWhitelistTier(merged.stateful_local, "allow_when_whitelisted"),
+    external: {
+      ...normalizeWhitelistTier(merged.external, "confirm"),
+      default: "confirm",
+    },
+    scenario_overrides: normalizeScenarioOverrides(merged.scenario_overrides),
+  };
+}
+
+export function isAutomationActionAllowed(policy = {}, action = "", options = {}) {
+  const whitelist = normalizeAutomationWhitelist(policy.local_whitelist || policy);
+  const scenario = options.scenario || options.command || "";
+  const tier = findAutomationTier(whitelist, action);
+  if (scenario && whitelist.scenario_overrides[scenario]?.includes(action)) {
+    return { allowed: true, tier: tier || "scenario_override", reason: "scenario_override" };
+  }
+  if (!tier) return { allowed: false, tier: "unknown", reason: "unknown_action" };
+  if (tier === "external") return { allowed: false, tier, reason: "external_requires_confirmation" };
+  return { allowed: true, tier, reason: "whitelisted_local_action" };
+}
+
+function normalizeWhitelistTier(input = {}, fallbackDefault) {
+  const value = isPlainObject(input) ? input : {};
+  return {
+    default: String(value.default || fallbackDefault),
+    actions: Array.isArray(value.actions) ? [...new Set(value.actions.map(String).filter(Boolean))] : [],
+  };
+}
+
+function normalizeScenarioOverrides(input = {}) {
+  if (!isPlainObject(input)) return {};
+  const result = {};
+  for (const [scenario, actions] of Object.entries(input)) {
+    result[String(scenario)] = Array.isArray(actions) ? [...new Set(actions.map(String).filter(Boolean))] : [];
+  }
+  return result;
+}
+
+function findAutomationTier(whitelist, action) {
+  const name = String(action || "");
+  for (const tier of ["safe_local", "stateful_local", "external"]) {
+    if (whitelist[tier]?.actions?.includes(name)) return tier;
+  }
+  return null;
 }
 
 export function resolveP0ConfigurePolicy(sources = {}, options = {}) {

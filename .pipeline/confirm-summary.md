@@ -1,39 +1,31 @@
-# C9 Plan Confirm Summary
+# C11 规划确认摘要
 
-## 项目
+## 结论
 
-- Cycle: C9
-- 名称: Hypo-Workflow 配置治理、PR 管理、Explain 命令与 Claude Resume 修复
-- Workflow kind: build
-- Preset: tdd
-- Feature 数: 6
-- Milestone 数: 12
+C11 将交付一组 Workflow 体验治理改动：中文主体 Skill/reference、Subagent 检查注入、长期自动化白名单、用户可见“说人话”输出契约、Plan 审计问题和例子抽象规则。
 
-## 生成文件
+## Milestone 拆分
 
-- `.pipeline/state.yaml`
-- `.pipeline/feature-queue.yaml`
-- `.pipeline/design-spec.md`
-- `.pipeline/architecture.md`
-- `.pipeline/PROGRESS.md`
-- `.pipeline/metrics.yaml`
-- `.pipeline/prompts/00-*.md` through `.pipeline/prompts/11-*.md`
-- `.plan-state/batch-discover.yaml`
-- `.plan-state/batch-decompose.yaml`
-- `.plan-state/batch-architecture.md`
-- `.plan-state/generate.yaml`
+1. M0 - P0 Configure 与规划授权记录
+2. M1 - 用户可见输出契约
+3. M2 - Plan Discover 访谈升级
+4. M3 - 自动化授权白名单
+5. M4 - Subagent 规则与检查点注入闭环
+6. M5 - Skills 中文化：核心执行链
+7. M6 - Skills 中文化：规划与辅助链
+8. M7 - References 中文化与回归
 
-## 关键确认点
+## 验证策略
 
-- 配置治理要覆盖自动程度、严格程度、确认边界和平台差异，并提供 `solo-auto`、`manual-review`、`team-strict`、`analysis-hybrid`。
-- `/hw:pr` 第一版处理已有 GitHub PR / GitLab MR；远端写操作始终高风险手动确认。
-- `.pipeline/pr/` 是本地 PR/MR 处理归档，不替代 GitHub/GitLab。
-- `/hw:explain` 是证据优先、只读问答命令；`--subagent` 用独立 Subagent 取证。
-- Claude Code 原生 `/resume` 与 Hypo `/hw:resume` 必须分离。
-- 给人看的 README 引用链、`docs/**` 和主要 `references/**` 要中文主体。
-- P3 生成后需要 Subagent 审计计划产物，然后进入 P4 确认。
-- Subagent 审计初始 verdict 为 `needs_changes`；P4 前已修复 high-risk gate、C9 config name、通用 plan-state 残留和 PR/MR remote-readonly 文案。
+- 每个 Milestone 使用 TDD preset，先写或更新可观察测试，再实现。
+- 每个 Milestone 必须记录审计字段：`audit_target`、`risk_hypotheses`、`test_scenarios`、`evidence_required`、`independent_validator`、`manual_checks`、`known_limits`。
+- Subagent 审计已获授权；实现/测试 Subagent 在 `/hw:start` 或 `/hw:resume` 执行前仍需按 prompt 边界确认。
+- Subagent 注入按两层建模：host/orchestrator 先生成 rules/authorization/role envelope，每个 Subagent 任务再注入用户检查点、审计字段和证据要求。
 
-## P4 Gate
+## 用户手动操作建议
 
-等待 Subagent 审计结果和用户确认后，C9 才进入执行。确认后从 M01 开始。
+确认后可运行 `/hw:start` 开始 M0。执行中重点观察：
+
+- Agent 是否在中间更新里说明正在做什么、发现了什么、下一步是什么。
+- Milestone 完成时是否给出“做了什么、怎么验证、你怎么手动试、已知风险”。
+- Subagent prompt 是否包含规则摘要和本轮检查点。

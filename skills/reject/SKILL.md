@@ -4,7 +4,7 @@ description: Reject pending Hypo-Workflow Cycle work with structured feedback an
 ---
 
 # /hw:reject
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,7 +15,7 @@ description: Reject pending Hypo-Workflow Cycle work with structured feedback an
 
 Use this skill when the user invokes `/hw:reject`.
 
-## Semantics
+## 语义
 
 - Read `.pipeline/cycle.yaml` and `.pipeline/state.yaml`.
 - Require Cycle acceptance state `pending_acceptance` or `acceptance.state: pending`.

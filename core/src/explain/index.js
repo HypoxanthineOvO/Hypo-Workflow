@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join, normalize } from "node:path";
 import { redactSecrets } from "../evidence/index.js";
+import { renderHumanResponse } from "../response/index.js";
 
 const DEFAULT_TARGETS = Object.freeze([
   ".pipeline/config.yaml",
@@ -57,27 +58,31 @@ export function renderExplainAnswer(packet = {}, options = {}) {
   const files = Array.isArray(packet.files_read) ? packet.files_read : [];
   const unknowns = Array.isArray(packet.unknowns) ? packet.unknowns : [];
   if (!files.length) {
-    return [
-      language.startsWith("zh") ? "无法确认。" : "Unable to confirm.",
-      `confidence: ${packet.confidence || "needs_context"}`,
-      "",
-      "Unknowns:",
-      ...(unknowns.length ? unknowns.map((item) => `- ${item}`) : ["- no evidence was available"]),
-      "",
-    ].join("\n");
+    return renderHumanResponse({
+      language,
+      conclusion: language.startsWith("zh") ? "无法确认。" : "Unable to confirm.",
+      explanation: [
+        `confidence: ${packet.confidence || "needs_context"}`,
+        "Unknowns:",
+        ...(unknowns.length ? unknowns.map((item) => `- ${item}`) : ["- no evidence was available"]),
+      ].join("\n"),
+      next_steps: [language.startsWith("zh") ? "补充可读取证据后重新提问。" : "Ask again with readable evidence."],
+    }, { language });
   }
-  return [
-    language.startsWith("zh") ? "基于以下证据回答：" : "Answer based on the following evidence:",
-    "",
-    ...files.map((file) => [
-      `- 证据: ${file.path}`,
-      indentExcerpt(file.excerpt),
-    ].join("\n")),
-    "",
-    `confidence: ${packet.confidence || "grounded"}`,
-    ...(unknowns.length ? ["", "Unknowns:", ...unknowns.map((item) => `- ${item}`)] : []),
-    "",
-  ].join("\n");
+  return renderHumanResponse({
+    language,
+    conclusion: language.startsWith("zh") ? "可以基于本地证据回答。" : "The answer can be grounded in local evidence.",
+    explanation: [
+      ...files.map((file) => [
+        `- 证据: ${file.path}`,
+        indentExcerpt(file.excerpt),
+      ].join("\n")),
+      "",
+      `confidence: ${packet.confidence || "grounded"}`,
+      ...(unknowns.length ? ["", "Unknowns:", ...unknowns.map((item) => `- ${item}`)] : []),
+    ].join("\n"),
+    next_steps: [language.startsWith("zh") ? "如果要继续验证，指定更具体的文件、报告或 diff。" : "For more verification, name a specific file, report, or diff."],
+  }, { language });
 }
 
 export function buildExplainSubagentHandoff(question = "", options = {}) {
@@ -122,20 +127,24 @@ export function renderExplainAnswerFromSubagentEvidence(question = "", packet = 
     ].join("\n");
   }
   return [
-    `问题：${String(question || "").trim()}`,
-    "",
-    "基于 Subagent evidence packet 的解释：",
-    "",
-    ...packet.findings.map((finding) => `- ${redactSecrets(finding.summary)} [${finding.ref || "unreferenced"}]`),
-    "",
-    "Unknowns:",
-    ...(packet.unknowns.length ? packet.unknowns.map((item) => `- ${item}`) : ["- none"]),
-    "",
-    "Risk notes:",
-    ...(packet.risk_notes.length ? packet.risk_notes.map((item) => `- ${redactSecrets(item)}`) : ["- none"]),
-    "",
-    `confidence: ${packet.confidence}`,
-    "",
+    renderHumanResponse({
+      language: options.language || "zh-CN",
+      conclusion: `问题：${String(question || "").trim()}`,
+      explanation: [
+        "基于 Subagent evidence packet 的解释：",
+        "",
+        ...packet.findings.map((finding) => `- ${redactSecrets(finding.summary)} [${finding.ref || "unreferenced"}]`),
+        "",
+        "Unknowns:",
+        ...(packet.unknowns.length ? packet.unknowns.map((item) => `- ${item}`) : ["- none"]),
+        "",
+        "Risk notes:",
+        ...(packet.risk_notes.length ? packet.risk_notes.map((item) => `- ${redactSecrets(item)}`) : ["- none"]),
+        "",
+        `confidence: ${packet.confidence}`,
+      ].join("\n"),
+      next_steps: ["如需更高置信度，补充更多 reviewed_refs 或让 Subagent 复查 unknowns。"],
+    }, { language: options.language || "zh-CN" }),
   ].join("\n");
 }
 

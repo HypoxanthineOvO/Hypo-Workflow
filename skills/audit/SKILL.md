@@ -4,7 +4,7 @@ description: Run a preventive code audit when the user wants graded findings acr
 ---
 
 # /hypo-workflow:audit
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -17,11 +17,11 @@ Use this skill for deep project auditing.
 
 When an audit is used as acceptance or worker-separation evidence, resolve Subagent/delegation authorization before scanning starts. The audit worker must be independent from the worker that implemented the audited change. If authorization is absent, declined, or unavailable, stop or record a degraded audit that cannot satisfy acceptance gates; do not audit locally first and then claim independent review was missing.
 
-## Preconditions
+## 前置条件
 
 - source code and architecture baseline should be available
 
-## Execution Flow
+## 执行流程
 
 1. Determine scope:
    - full project
@@ -38,7 +38,7 @@ When an audit is used as acceptance or worker-separation evidence, resolve Subag
 10. Append a lifecycle log entry.
 11. Set `current.phase=lifecycle_audit` when state tracking is used.
 
-## Reference Files
+## 参考文件
 
 - `references/audit-spec.md`
 - `references/log-spec.md`

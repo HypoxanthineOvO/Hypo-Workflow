@@ -4,7 +4,7 @@ description: Enter Hypo-Workflow planning mode when the user wants to design mil
 ---
 
 # /hypo-workflow:plan
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -86,12 +86,12 @@ Feature DAG concepts belong only to long-running, batch, multi-Feature, AFK, or 
 
 Use `/hw:plan --insert <natural language>` to edit an existing Feature Queue. Convert the natural-language request to a structured queue operation first, show the queue diff, then wait for explicit confirmation before writing `.pipeline/feature-queue.yaml`.
 
-## Preconditions
+## 前置条件
 
 - planning should happen before normal execution begins
 - if `.pipeline/` already exists, treat planning as revise-or-append, not necessarily greenfield
 
-## Plan Modes
+## Plan 模式
 
 - `plan.mode=interactive` (default)
   - user participates at each checkpoint
@@ -107,7 +107,7 @@ Use `/hw:plan --insert <natural language>` to edit an existing Feature Queue. Co
   - Claude completes P1-P4 without stopping for user answers unless blocked by missing critical information
   - P4 Confirm becomes a summary pass-through only when `automation.gates.planning=auto`; the default `confirm` gate remains a hard stop even in auto plan mode
 
-## Batch Plan Mode
+## 批量 Plan 模式
 
 `/hw:plan --batch` changes the planning target from one Feature to a Feature Queue.
 
@@ -131,7 +131,7 @@ Batch artifacts:
 - `.plan-state/batch-decompose.yaml`
 - `.plan-state/batch-architecture.md`
 
-## Queue Insert Mode
+## 队列插入模式
 
 `/hw:plan --insert` is a queue editing surface, not a new planning cycle.
 
@@ -180,7 +180,7 @@ Codex execution subworker authorization is also part of the P1 -> P2 gate. If th
 
 When `--context` is present, injected context can sharpen the first questions but must not skip the required interaction rounds.
 
-## Plan Tool Discipline
+## Plan 工具纪律
 
 The `plan-tool-required` built-in rule is active for Plan Mode unless disabled in `.pipeline/rules.yaml`.
 
@@ -189,7 +189,7 @@ The `plan-tool-required` built-in rule is active for Plan Mode unless disabled i
 - Claude Code: maintain an explicit plan/checkpoint list in the conversation or configured planning surface.
 - Each P1/P2/P3/P4 checkpoint must synchronize plan state before continuing.
 
-## Execution Flow
+## 执行流程
 
 1. Read `~/.hypo-workflow/config.yaml` if present.
 2. Read `plan.mode` and `plan.interaction_depth` from `.pipeline/config.yaml` when present.
@@ -237,7 +237,7 @@ The `plan-tool-required` built-in rule is active for Plan Mode unless disabled i
    - auto mode summarizes and moves on
 13. Set `current.phase` to the matching planning phase during each stage.
 
-## Interactive Checkpoints
+## 交互检查点
 
 - Discover, Decompose, Generate, and Confirm can all surface follow-up questions
 - in interactive mode, hook behavior should allow turn end during planning checkpoints
@@ -246,7 +246,7 @@ The `plan-tool-required` built-in rule is active for Plan Mode unless disabled i
 - in interactive mode, P4 is a hard gate and must wait for explicit confirmation
 - in auto mode, planning should continue unattended
 
-## Reference Files
+## 参考文件
 
 - `plan/PLAN-SKILL.md` — detailed P1-P4 planning system
 - `references/commands-spec.md` — command routing semantics

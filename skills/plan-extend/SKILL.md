@@ -4,7 +4,7 @@ description: Append new milestones to an active Cycle without closing or reopeni
 ---
 
 # /hypo-workflow:plan:extend
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -17,7 +17,7 @@ Use this skill when the user invokes `/hw:plan:extend` or `/hypo-workflow:plan:e
 
 This command extends the current active Cycle with additional milestones. It must never renumber existing milestones or rewrite prompts that have already been executed.
 
-## Preconditions
+## 前置条件
 
 - `.pipeline/cycle.yaml` exists with `cycle.status=active`
 - `.pipeline/state.yaml` exists
@@ -25,7 +25,7 @@ This command extends the current active Cycle with additional milestones. It mus
 
 If there is no active Cycle, stop and tell the user to run `/hw:cycle new "名称"` first. If `state.yaml` is missing, stop and ask the user to initialize or plan the Cycle before extending it.
 
-## Execution Flow
+## 执行流程
 
 1. Read `.pipeline/config.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/state.yaml`.
 2. Show the current Cycle metadata:
@@ -46,7 +46,7 @@ If there is no active Cycle, stop and tell the user to run `/hw:cycle new "名�
 9. Update `.pipeline/PROGRESS.md` if it exists: refresh the top metadata, milestone table, and timeline table instead of appending a loose one-line event.
 10. Append a lifecycle event to `.pipeline/log.yaml`.
 
-## Numbering Rules
+## 编号规则
 
 - Find the current highest milestone number from:
   - existing `state.yaml` milestones
@@ -56,7 +56,7 @@ If there is no active Cycle, stop and tell the user to run `/hw:cycle new "名�
 - Do not reorder existing milestones.
 - Prompt filenames should follow the existing local naming convention, for example `03-new-scope.md` after `02-existing.md`.
 
-## Interactive Rules
+## 交互规则
 
 `/hw:plan:extend` uses a lighter version of the M0 interactive gate because the Cycle already exists:
 
@@ -67,7 +67,7 @@ If there is no active Cycle, stop and tell the user to run `/hw:cycle new "名�
 - require explicit confirmation before writing files
 - if the user says only "确认一下", treat it as a request to summarize, not permission to write
 
-## Prompt Generation
+## Prompt 生成
 
 Each appended prompt must include:
 
@@ -83,7 +83,7 @@ Each appended prompt must include:
 
 Use the active Cycle preset unless the user explicitly asks for a custom per-milestone flow.
 
-## State Update
+## 状态更新
 
 Append milestone entries without rewriting existing records. If older states lack `status`, preserve their shape and add the minimal fields needed for the new entries.
 
@@ -98,14 +98,14 @@ Example appended entry:
 
 Update `pipeline.prompts_total` to include the appended prompts when that field exists.
 
-## Safety
+## 安全边界
 
 - never create a new Cycle from this command
 - never archive the current Cycle
 - never delete or truncate `.pipeline/prompts/`
 - never rewrite completed prompt files unless the user explicitly asks and confirms the exact files
 
-## Reference Files
+## 参考文件
 
 - `skills/plan/SKILL.md` — M0 interactive rules
 - `skills/plan-decompose/SKILL.md` — P2 checkpoint behavior

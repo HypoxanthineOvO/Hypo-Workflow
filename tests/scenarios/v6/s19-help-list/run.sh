@@ -7,9 +7,9 @@ repo_root="$(cd "$script_dir/../../../.." && pwd)"
 cd "$repo_root"
 
 count="$(awk '
-  /^## Commands$/ {in_table=1; next}
+  /^## 指令列表$/ {in_table=1; next}
   in_table && /^\| `\/hw:/ {c++}
-  in_table && /^When the user types/ {print c; exit}
+  in_table && /^Internal runtime skill:/ {print c; exit}
 ' SKILL.md)"
 
 test "$count" = "39"

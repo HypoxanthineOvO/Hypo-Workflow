@@ -1,34 +1,32 @@
-# C10 一系列体验优化 - PROGRESS
+# C11 Workflow 的一系列小体验问题 - PROGRESS
 
 ## 当前状态
 
 | 字段 | 值 |
 |---|---|
-| Cycle | C10 |
+| Cycle | C11 |
 | Phase | completed |
 | Preset | tdd |
-| Prompts | 5 / 5 |
+| Prompts | 8 / 8 |
 
 ## Milestones
 
 | Milestone | Status | Prompt | Highlights |
 |---|---|---|---|
-| M0 | done | `00-p0-configure-contract-state-inheritance.md` | P0 Configure contract/helper/docs completed; focused tests passed |
-| M1 | done | `01-pr-create-guide-contract-archive.md` | PR Create proposal/archive contract completed; focused tests passed |
-| M2 | done | `02-pr-create-execution-adapters-guided-flow.md` | PR Create execution helper and worktree guidance completed |
-| M3 | done | `03-subagent-authorization-separation-degraded-mode.md` | Subagent authorization/isolation/degraded contract completed |
-| M4 | done | `04-commands-docs-adapters-full-regression.md` | /hw:pr create command surface, docs/adapters, and full regression completed |
+| M0 | done | `00-p0-configure-and-cycle-authorization.md` | P0 配置、Subagent 授权、自动化白名单和审计字段已固化 |
+| M1 | done | `01-human-readable-response-contract.md` | “结论 / 解释 / 下一步”用户可见输出契约已建立 |
+| M2 | done | `02-plan-discover-audit-and-example-abstraction.md` | Plan 审计问题和例子抽象确认已升级 |
+| M3 | done | `03-automation-permission-whitelist.md` | 长期自动化授权白名单已实现 |
+| M4 | done | `04-subagent-rules-checks-injection.md` | Subagent 两层规则与检查点注入闭环已补强 |
+| M5 | done | `05-skills-zh-core-execution-chain.md` | 核心执行链 Skills 已中文骨架化 |
+| M6 | done | `06-skills-zh-planning-and-support-chain.md` | 规划与辅助链 Skills 已中文骨架化 |
+| M7 | done | `07-references-zh-and-regression.md` | references 中文主体和完整回归已完成 |
 
 ## Timeline
 
 | Time | Event |
 |---|---|
-| 2026-05-08T23:57:27+08:00 | P3 artifacts generated; ready for `/hw:start`. |
-| 2026-05-08T23:59:34+08:00 | `/hw:start` began M0 write_tests. |
-| 2026-05-09T00:01:02+08:00 | M0 red test failed as expected on missing `resolveP0ConfigurePolicy`. |
-| 2026-05-09T00:05:28+08:00 | M0 passed focused validation and paused before M1. |
-| 2026-05-09T00:08:16+08:00 | `/hw:start` resumed execution at M1 write_tests. |
-| 2026-05-09T00:17:06+08:00 | M1 passed PR focused tests and validation; M2 started. |
-| 2026-05-09T00:21:13+08:00 | M2 passed PR create execution tests and validation; M3 started. |
-| 2026-05-09T00:23:37+08:00 | M3 passed Subagent contract tests and validation; M4 started. |
-| 2026-05-09T00:30:30+08:00 | M4 passed command/docs/adapters validation, core tests, config validation, regression bundle, and diff check; C10 completed. |
+| 2026-05-11T14:36:05+08:00 | P3 artifacts generated; waiting for P4 confirmation. |
+| 2026-05-11T14:43:09+08:00 | `/hw:start` began C11 execution with Subagent authorization. |
+| 2026-05-11T14:55:25+08:00 | M0-M7 completed; core tests, config validation, sync, docs checks, and diff check passed. |
+| 2026-05-11T15:14:58+08:00 | 补齐 `s19-help-list` 与 `s56-agents-ask-todo-plan-discipline` 中文化回归锚点；`uv run python tests/run_regression.py` 已 63/63 通过。 |

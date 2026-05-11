@@ -4,7 +4,7 @@ description: Interactive onboarding guide that senses the current project state 
 ---
 
 # /hypo-workflow:guide
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -19,7 +19,7 @@ Guide is an interactive intent router for users who are unsure which Hypo-Workfl
 
 Before recommending `/hw:plan` for a new or active Cycle, Guide should surface the `P0 Configure` pre-discover stage when it has not been completed or explicitly reused. `P0 Configure` runs after `cycle new` and before `P1 Discover`; it confirms automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation. Users may choose to reuse prior configuration, resolved in order: `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, `built_in_default`.
 
-## Step 1: Short Introduction
+## Step 1: 简短介绍
 
 Print at most 5 lines:
 
@@ -29,7 +29,7 @@ Print at most 5 lines:
 
 Do not list all commands in the introduction.
 
-## Step 2: Sense Project State
+## Step 2: 感知项目状态
 
 Check the current working directory:
 
@@ -45,7 +45,7 @@ Check the current working directory:
 
 Do not mutate any file during sensing.
 
-## Step 3: Ask What The User Wants
+## Step 3: 询问用户目标
 
 Ask one open question:
 
@@ -55,14 +55,14 @@ Ask one open question:
 
 Wait for the user's answer.
 
-## Step 4: Intent Routing
+## Step 4: 意图路由
 
 Use the deterministic guide router shape exposed as `routeGuideIntent` in `core/src/guide/index.js` when available. Match the answer to one supported scenario and recommend exactly one 1-3 command path. If the answer is vague, ask 1-2 follow-up questions such as:
 
 - 项目现在是刚开始、开发中，还是准备发布？
 - 你是想修 Bug、规划新功能、查看进度，还是减少上下文占用？
 
-## Scenario Table
+## 场景表
 
 | User intent | Recommended command flow |
 | --- | --- |
@@ -87,7 +87,7 @@ Use the deterministic guide router shape exposed as `routeGuideIntent` in `core/
 
 For flows that enter planning, recommend `P0 Configure` before the first `P1 Discover` question unless the user explicitly says to reuse the resolved configuration. `P0 Configure` runs after `cycle new` and before `P1 Discover`, asks about automation, Subagent authorization, acceptance mode, PR/MR remote write confirmation, full regression, analysis boundaries, and worker separation, and can reuse values from `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default`.
 
-## Step 5: Confirm And Execute
+## Step 5: 确认并执行
 
 After recommending a flow, ask:
 
@@ -99,7 +99,7 @@ If the user explicitly confirms, execute the first command in the recommended fl
 
 If the user declines, leave the recommended command flow visible and stop.
 
-## Safety Rules
+## 安全规则
 
 - recommend command flows, not a single isolated command, unless the scenario naturally has one command
 - do not initialize, plan, resume, compact, audit, release, or patch-fix before user confirmation
@@ -111,7 +111,7 @@ If the user declines, leave the recommended command flow visible and stop.
 - do not expose Feature DAG concepts for ordinary single-feature planning
 - use `output.language` for all guide prose when config is available
 
-## Reference Files
+## 参考文件
 
 - `skills/init/SKILL.md`
 - `skills/plan/SKILL.md`

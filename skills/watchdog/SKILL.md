@@ -4,7 +4,7 @@ description: Internal cron-invoked Auto Resume watchdog for stalled executing pi
 ---
 
 # /hypo-workflow:watchdog
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,7 +15,7 @@ description: Internal cron-invoked Auto Resume watchdog for stalled executing pi
 
 This is an internal skill. It is not a normal user-facing command. It exists so `scripts/watchdog.sh` and cron-driven agents have a precise policy for deciding when to trigger `/hw:resume`.
 
-## Preconditions
+## 前置条件
 
 - `.pipeline/config.yaml` exists
 - `.pipeline/state.yaml` exists
@@ -23,7 +23,7 @@ This is an internal skill. It is not a normal user-facing command. It exists so 
 
 If `watchdog.enabled=false` or the field is missing, do nothing.
 
-## Config
+## 配置
 
 ```yaml
 watchdog:
@@ -37,7 +37,7 @@ watchdog:
 
 Defaults are intentionally disabled for backward compatibility.
 
-## Heartbeat Contract
+## Heartbeat 契约
 
 All Pipeline execution skills must update `.pipeline/state.yaml` after every meaningful execution transition:
 
@@ -55,7 +55,7 @@ Update `last_heartbeat` when:
 - a milestone completes, defers, blocks, stops, or fails
 - the pipeline completes
 
-## Detection Flow
+## 检测流程
 
 1. Resolve config as project > global > defaults.
 2. Read `.pipeline/state.yaml`.
@@ -89,7 +89,7 @@ Store retry state in `.pipeline/watchdog.state`.
 
 Successful resume resets the consecutive failure count to 0.
 
-## Cron Registration
+## Cron 注册
 
 When `/hw:start` reads `watchdog.enabled=true`, it should register a crontab entry for `scripts/watchdog.sh` using `watchdog.interval`.
 
@@ -103,7 +103,7 @@ Use an identifiable crontab marker:
 # hypo-workflow-watchdog:<project-root>
 ```
 
-## Reference Files
+## 参考文件
 
 - `scripts/watchdog.sh` — deterministic shell implementation of the detection flow
 - `skills/start/SKILL.md` — lock and heartbeat writes on start

@@ -5,7 +5,7 @@ argument-hint: "[optional context]"
 ---
 
 # /hypo-workflow:resume
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -16,12 +16,12 @@ argument-hint: "[optional context]"
 
 Use this skill to continue from `.pipeline/state.yaml` without restarting completed work.
 
-## Preconditions
+## 前置条件
 
 - `.pipeline/state.yaml` exists
 - the saved pipeline is unfinished, usually `pipeline.status=running` or `pipeline.status=stopped`
 
-## Execution Flow
+## 执行流程
 
 1. Read `~/.hypo-workflow/config.yaml` if present.
 2. Read `.pipeline/config.yaml` and `.pipeline/state.yaml`.
@@ -88,7 +88,7 @@ Use this skill to continue from `.pipeline/state.yaml` without restarting comple
 26. Remove `.pipeline/.lock` when the resume turn completes, stops, blocks, aborts, or finishes.
 27. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
 
-## Safety Rules
+## 安全规则
 
 - never silently discard saved work
 - never resume when a fresh `.pipeline/.lock` lease says another execution is active
@@ -96,7 +96,7 @@ Use this skill to continue from `.pipeline/state.yaml` without restarting comple
 - if the current step is already complete, advance to the next runnable step rather than rerunning it blindly
 - active `.pipeline/continuation.yaml` has priority over generic state pointers, but unsafe `safe_resume_command` values must be rejected instead of executed
 
-## Continuation And Preflight
+## 续跑与 Preflight
 
 - `.pipeline/continuation.yaml` is file-backed recovery state for Codex and other environments without Stop hooks.
 - Active continuation records `next_action`, `reason`, `updated_at`, `safe_resume_command`, and focused `context`.
@@ -104,11 +104,11 @@ Use this skill to continue from `.pipeline/state.yaml` without restarting comple
 - `safe_resume_command` is a display/resume hint only; never shell-execute it.
 - Blocking preflight findings must be fixed before declaring completion. Warning findings should be recorded with repair hints and may continue when correctness is otherwise preserved.
 
-## Watchdog Integration
+## Watchdog 集成
 
 Watchdog-triggered resumes follow the same safety rules as user-triggered resumes. They must update `last_heartbeat`, honor fresh execution leases, take over expired leases with evidence, and write a concise note to `.pipeline/watchdog.log` when the triggering script provides context.
 
-## Reference Files
+## 参考文件
 
 - `references/state-contract.md` — resume semantics and required fields
 - `references/commands-spec.md` — command behavior

@@ -4,7 +4,7 @@ description: Inspect and maintain Hypo-Workflow Knowledge Ledger records, indexe
 ---
 
 # /hypo-workflow:knowledge
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,13 +15,13 @@ description: Inspect and maintain Hypo-Workflow Knowledge Ledger records, indexe
 
 Use this skill for `/hw:knowledge` and OpenCode `/hw-knowledge`.
 
-## Preconditions
+## 前置条件
 
 - `.pipeline/config.yaml` should be read when config defaults affect loading, compaction, redaction, or strictness.
 - `.pipeline/knowledge/` may be absent on older projects; report an empty ledger instead of failing.
 - Raw record reads should happen only when the user asks for a specific `view` or narrow `search`.
 
-## Execution Flow
+## 执行流程
 
 1. Read `references/knowledge-spec.md`.
 2. Resolve `knowledge.*` config from project > global > defaults.
@@ -32,7 +32,7 @@ Use this skill for `/hw:knowledge` and OpenCode `/hw-knowledge`.
 7. For `search`, filter by category, tag, source, or text, and open raw records only for matching candidates.
 8. Redact secret-like fields before showing any record content.
 
-## Command Semantics
+## 指令语义
 
 - `list`: show available categories, compact summary status, and record ids.
 - `view`: show one redacted record.
@@ -40,7 +40,7 @@ Use this skill for `/hw:knowledge` and OpenCode `/hw-knowledge`.
 - `index`: show or regenerate generated category indexes.
 - `search`: filter by `category`, `tag`, `source`, or free text.
 
-## Safety Rules
+## 安全规则
 
 - Never write raw API keys, tokens, passwords, authorization headers, or secrets into `.pipeline/`.
 - Real values belong in `~/.hypo-workflow/secrets.yaml` or environment variables.
@@ -48,7 +48,7 @@ Use this skill for `/hw:knowledge` and OpenCode `/hw-knowledge`.
 - This skill is not a runner and does not execute Milestones.
 - M01 defines the contract. Full hook capture and automatic SessionStart integration belong to later milestones.
 
-## Reference Files
+## 参考文件
 
 - `references/knowledge-spec.md`
 - `references/config-spec.md`

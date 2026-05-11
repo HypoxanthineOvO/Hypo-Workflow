@@ -5,17 +5,17 @@ description: Answer project, code, config, command, or recent-change questions w
 
 # /hypo-workflow:explain
 
-## Output Language Rules
+## 输出语言规则
 
 Read `.pipeline/config.yaml` and global config when available. User-visible explanations should follow `output.language`; file paths, command names, config keys, and code identifiers stay literal.
 
-## Preconditions
+## 前置条件
 
 - A question, file path, diff target, report id, or other explanation target should be available.
 - If no target is provided, collect a small local evidence packet from likely project and `.pipeline/` sources.
 - Explain must remain read-only.
 
-## Execution Flow
+## 执行流程
 
 1. Load `references/explain-spec.md`.
 2. Parse the question and any explicit target such as `--file`, `--diff`, or `--report`.
@@ -27,13 +27,13 @@ Read `.pipeline/config.yaml` and global config when available. User-visible expl
 8. Answer with cited evidence and confidence.
 9. If evidence is missing, say `needs_context` or `unknown` and list what could not be verified.
 
-## Interactive Behavior
+## 交互行为
 
 - Ask for a narrower target when the question is too broad to answer with local evidence.
 - Do not ask when a reasonable local evidence packet can be collected safely.
 - `--subagent` requests independent read-only evidence collection; the Subagent does not produce the final answer.
 
-## Safety Rules
+## 安全规则
 
 - Do not mutate state, log, reports, source files, Patch files, Cycle files, or remote resources.
 - Do not advance the pipeline.
@@ -41,13 +41,13 @@ Read `.pipeline/config.yaml` and global config when available. User-visible expl
 - Do not invent unsupported causes; mark unknowns explicitly.
 - Redact secret-like evidence before displaying it.
 
-## Failure Handling
+## 失败处理
 
 - Missing files become `unknowns`, not hallucinated explanations.
 - Unsupported flags should stop with a clear message.
 - If requested evidence appears secret-bearing, ask for sanitized evidence or redact before answering.
 
-## Reference Files
+## 参考文件
 
 - `references/explain-spec.md`
 - `references/commands-spec.md`

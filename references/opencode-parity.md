@@ -1,5 +1,9 @@
 # OpenCode V8.4 Parity Matrix
 
+## 中文主体说明
+
+本矩阵说明 OpenCode adapter 如何在 native slash command、plugin context、file guard 和 event 行为上保持 Hypo-Workflow 既有能力。OpenCode 专有命令、agent 名称、Skill 路径和 parity 字段保持英文，中文只描述兼容目标和限制。
+
 V9 OpenCode support targets V8.4 user-facing parity through native slash commands plus plugin-assisted context, guard, and event behavior. The plugin does not perform business work; the OpenCode Agent still executes the command semantics.
 
 | Capability | OpenCode command | Agent | Parity note |

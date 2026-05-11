@@ -4,7 +4,7 @@ description: Run a health check over config, state, prompts, and architecture wh
 ---
 
 # /hypo-workflow:check
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,11 +15,11 @@ description: Run a health check over config, state, prompts, and architecture wh
 
 Use this skill for the seven-surface health check.
 
-## Preconditions
+## 前置条件
 
 - if `.pipeline/` is missing, instruct the user to run init first
 
-## Execution Flow
+## 执行流程
 
 1. Read `~/.hypo-workflow/config.yaml` if present and warn if it is malformed.
 2. Resolve `output.language` and `output.timezone`.
@@ -36,7 +36,7 @@ Use this skill for the seven-surface health check.
 5. Summarize overall health, effective config source, and recommended next action in `output.language`.
 6. Set `current.phase=lifecycle_check` when tracking this command through state.
 
-## Reference Files
+## 参考文件
 
 - `references/check-spec.md`
 - `references/commands-spec.md`

@@ -299,6 +299,24 @@ $defs:
           release_publish:
             $ref: "#/$defs/automation_gate"
             default: confirm
+      local_whitelist:
+        type: object
+        additionalProperties: false
+        description: "Durable whitelist for local test automation. External actions remain confirmation-gated."
+        properties:
+          safe_local:
+            $ref: "#/$defs/automation_whitelist_tier"
+          stateful_local:
+            $ref: "#/$defs/automation_whitelist_tier"
+          external:
+            $ref: "#/$defs/automation_whitelist_tier"
+          scenario_overrides:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                type: string
+                minLength: 1
       codex:
         type: object
         additionalProperties: false
@@ -330,6 +348,28 @@ $defs:
         execution: auto
         destructive_external: confirm
         release_publish: confirm
+      local_whitelist:
+        safe_local:
+          default: allow_when_whitelisted
+          actions:
+            - start_dev_server
+            - restart_dev_server
+            - stop_dev_server
+            - run_browser_e2e
+            - run_mock_service
+        stateful_local:
+          default: allow_when_whitelisted
+          actions:
+            - reset_test_database
+            - clear_test_cache
+            - delete_generated_test_artifacts
+        external:
+          default: confirm
+          actions:
+            - remote_pr_write
+            - publish_release
+            - write_real_api
+        scenario_overrides: {}
       codex:
         prefer_subagents: true
         separate_test_and_implementation: true
@@ -350,6 +390,21 @@ $defs:
       description:
         type: string
         minLength: 1
+  automation_whitelist_tier:
+    type: object
+    additionalProperties: false
+    properties:
+      default:
+        type: string
+        enum:
+          - allow_when_whitelisted
+          - confirm
+      actions:
+        type: array
+        default: []
+        items:
+          type: string
+          minLength: 1
   worker_separation_mode:
     type: string
     enum:

@@ -9,7 +9,7 @@ Use this skill when the user invokes `/hw:showcase` or `/hypo-workflow:showcase`
 
 Showcase is a non-development preset that proves Hypo-Workflow can run structured AI work beyond code implementation. It generates project introduction material under `.pipeline/showcase/` and keeps the normal Pipeline state machine untouched.
 
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -20,7 +20,7 @@ Showcase is a non-development preset that proves Hypo-Workflow can run structure
 
 Showcase artifacts must follow `showcase.language` when set. `showcase.language: auto` follows `output.language`.
 
-## Commands
+## 指令列表
 
 Supported forms:
 
@@ -57,7 +57,7 @@ Step meanings:
 
 `analyze` always runs because every artifact depends on it. `review` always runs because Showcase is user-facing material.
 
-## Selection Logic
+## 选择逻辑
 
 | Flags | Steps |
 |---|---|
@@ -83,7 +83,7 @@ When no selection flag is provided, ask and wait:
 
 Do not auto-generate all artifacts in interactive mode. Wait for the user response before continuing.
 
-## Directory Initialization
+## 目录初始化
 
 Canonical directory:
 
@@ -147,7 +147,7 @@ showcase:
 
 Use ISO-8601 timestamps converted to `output.timezone`.
 
-## Analyze Step
+## Analyze 步骤
 
 Read project files in this priority:
 
@@ -171,7 +171,7 @@ Summary fields:
 - statistics: command count, file count, code lines, tests, scenarios
 - version history from README, PROGRESS, or archives
 
-## `intro_doc` Step
+## `intro_doc` 步骤
 
 Write `.pipeline/showcase/PROJECT-INTRO.md` for non-developer users.
 
@@ -186,7 +186,7 @@ Required structure:
 
 Style: concise, attractive, non-technical. Follow `output.language`.
 
-## `tech_doc` Step
+## `tech_doc` 步骤
 
 Write `.pipeline/showcase/TECHNICAL-DOC.md` for developers and contributors.
 
@@ -201,7 +201,7 @@ Required structure:
 
 Style: accurate, deep enough to be useful, and clearly structured. Follow `output.language`.
 
-## `slides` Step
+## `slides` 步骤
 
 Write `.pipeline/showcase/slides.md` as Markdown slides separated by `---`.
 
@@ -219,7 +219,7 @@ Suggested pages:
 
 Each page should have one clear topic, a title, and 3-5 bullets or one short paragraph.
 
-## `poster` Step
+## `poster` 步骤
 
 Generate `.pipeline/showcase/poster.png` with GPT Image when available.
 
@@ -256,7 +256,7 @@ Failure handling:
 - if API call fails, skip poster and continue other artifacts
 - poster failure must not fail the whole Showcase run
 
-## `review` Step
+## `review` 步骤
 
 Run after all selected artifacts have been attempted.
 
@@ -279,7 +279,7 @@ Update the top metadata timestamp and keep `PROGRESS.md` as a board-style summar
 
 Use the compact time format required by `output.timezone`.
 
-## Reference Files
+## 参考文件
 
 - `config.schema.yaml` — `showcase.*` config
 - `references/config-spec.md` — config fallback rules

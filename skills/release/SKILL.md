@@ -4,7 +4,7 @@ description: Run Hypo-Workflow release automation when the user wants regression
 ---
 
 # /hypo-workflow:release
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,12 +15,12 @@ description: Run Hypo-Workflow release automation when the user wants regression
 
 Use this skill for the release workflow.
 
-## Preconditions
+## 前置条件
 
 - worktree should be ready for release
 - no unfinished milestone should remain in state
 
-## Execution Flow
+## 执行流程
 
 1. Preflight:
    - verify clean worktree
@@ -42,7 +42,7 @@ Use this skill for the release workflow.
 11. Append a lifecycle log entry.
 12. Set `current.phase=lifecycle_release` when state tracking is used.
 
-## Reference Files
+## 参考文件
 
 - `references/release-spec.md`
 - `references/log-spec.md`

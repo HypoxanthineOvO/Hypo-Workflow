@@ -1,5 +1,53 @@
 entries:
   -
+    id: RELEASE-v12.4.0-20260511T152823+0800
+    type: release
+    ref: v12.4.0
+    status: completed
+    timestamp: "2026-05-11T15:28:23+08:00"
+    summary: Released Hypo-Workflow v12.4.0 with C11 Chinese-first workflow surfaces, planning discipline, Subagent injection hardening, local distribution, refreshed adapters, and full regression validation.
+    trigger: user
+    details:
+      distribution:
+        global_cli: /home/heyx/.hypo-workflow/hypo-workflow
+        codex_skill: /home/heyx/.codex/skills/hypo-workflow
+        registered_projects:
+          - path: /home/heyx/Hypo-Switcher
+            status: adapters_refreshed_to_12.4.0
+            note: ".pipeline/log.yaml missing leaves log_compact warning; version references are current."
+      tests:
+        -
+          "uv run -- npm --prefix core test: 407/407 passing"
+        -
+          "uv run python tests/run_regression.py: 63/63 passing"
+        -
+          "uv run -- node --test core/test/docs-governance.test.js core/test/readme-spec.test.js core/test/platform-adapters.test.js: 14/14 passing"
+        -
+          "uv run -- bash scripts/validate-config.sh .pipeline/config.yaml: passing"
+        -
+          "uv run -- node cli/bin/hypo-workflow sync --platform opencode --project /home/heyx/Hypo-Workflow --check-only: derived=fresh"
+        -
+          "uv run -- node cli/bin/hypo-workflow sync --platform claude-code --project /home/heyx/Hypo-Workflow --check-only: derived=fresh"
+        -
+          "uv run -- git diff --check: passing"
+  -
+    id: CYCLE-COMPLETE-C11-20260511T151458+0800
+    type: cycle_complete
+    ref: C11
+    status: completed
+    timestamp: "2026-05-11T15:14:58+08:00"
+    summary: Completed C11 workflow experience improvements and repaired Chinese-localized regression anchors; final validation passed through uv-managed commands.
+    report: .pipeline/reports/07-references-zh-and-regression.report.md
+    trigger: auto
+    tests:
+      - "uv run -- npm --prefix core test: 407/407 passing"
+      - "uv run python tests/run_regression.py: 63/63 passing"
+      - "uv run -- bash scripts/validate-config.sh .pipeline/config.yaml: passing"
+      - "uv run -- node --test core/test/docs-governance.test.js core/test/readme-spec.test.js core/test/platform-adapters.test.js: 14/14 passing"
+      - "uv run -- node cli/bin/hypo-workflow sync --platform opencode --project /home/heyx/Hypo-Workflow --repair: derived=fresh"
+      - "uv run -- node cli/bin/hypo-workflow sync --platform claude-code --project /home/heyx/Hypo-Workflow --repair: derived=fresh"
+      - "uv run -- git diff --check: passing"
+  -
     id: RELEASE-v12.3.0-20260509T194733+0800
     type: release
     ref: v12.3.0

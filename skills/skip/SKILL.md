@@ -4,7 +4,7 @@ description: Skip the current prompt or step when the user explicitly wants to b
 ---
 
 # /hypo-workflow:skip
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,12 +15,12 @@ description: Skip the current prompt or step when the user explicitly wants to b
 
 Use this skill for prompt-level skip behavior. For step-level skip cascade, apply the root system rules for `skip step`.
 
-## Preconditions
+## 前置条件
 
 - a pipeline is active
 - there is a current prompt to skip
 
-## Execution Flow
+## 执行流程
 
 1. Read `.pipeline/state.yaml` and confirm there is an active current prompt.
 2. Mark the prompt as skipped with a machine-readable reason.
@@ -29,13 +29,13 @@ Use this skill for prompt-level skip behavior. For step-level skip cascade, appl
 5. Advance to the next prompt without incrementing `pipeline.prompts_completed`.
 6. If no next prompt exists, mark the pipeline completed.
 
-## Safety Rules
+## 安全规则
 
 - keep skipped work explicit and recoverable
 - do not pretend skipped milestones passed
 - preserve the reason in state and human-readable progress output
 
-## Reference Files
+## 参考文件
 
 - `references/commands-spec.md` — skip semantics
 - `references/state-contract.md` — state mutations

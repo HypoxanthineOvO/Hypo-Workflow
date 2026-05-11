@@ -4,7 +4,7 @@ description: Gracefully stop Hypo-Workflow when the user wants to pause executio
 ---
 
 # /hypo-workflow:stop
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,11 +15,11 @@ description: Gracefully stop Hypo-Workflow when the user wants to pause executio
 
 Use this skill to pause the current run while preserving resumable state.
 
-## Preconditions
+## 前置条件
 
 - active unfinished pipeline work exists
 
-## Execution Flow
+## 执行流程
 
 1. Read `.pipeline/state.yaml` and confirm the current run is unfinished.
 2. Persist current prompt and step state.
@@ -32,14 +32,14 @@ Use this skill to pause the current run while preserving resumable state.
 9. Remove `.pipeline/.lock` if it belongs to the current execution.
 10. Unregister the watchdog cron entry because this stop is intentional.
 
-## Safety Rules
+## 安全规则
 
 - do not mark the prompt aborted
 - do not discard partial work
 - stop should be resumable, not destructive
 - do not leave `.pipeline/.lock` behind after a successful stop
 
-## Reference Files
+## 参考文件
 
 - `references/commands-spec.md` — stop behavior and flags
 - `references/state-contract.md` — stopped state semantics

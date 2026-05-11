@@ -4,7 +4,7 @@ description: Run the discovery phase of Hypo-Workflow planning when the user nee
 ---
 
 # /hypo-workflow:plan-discover
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -21,7 +21,7 @@ For `/hw:plan --batch`, this phase becomes Batch Discover. Batch Discover covers
 
 `P0 Configure` is the required pre-discover stage for new Cycle planning. It runs after `cycle new` and before `P1 Discover`; it can be completed by asking the user or by an explicit reuse decision. The stage covers automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation. Reuse sources are resolved in order: `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, `built_in_default`.
 
-## Big Questions First
+## 先问关键问题
 
 Before diving into details, start with three broad questions:
 
@@ -66,7 +66,7 @@ For any testable delivery task, Discover must also pin down the closed-loop test
 
 For agent-service work, the real scenario may be outside the repository. If the user says the only valid test is "use NapCat to simulate the main account sending a message to the agent", persist that exact method. A test worker that only runs unit mocks, synthetic fake messages, or a non-user-equivalent path has produced pseudo evidence; the audit worker should reject it.
 
-## Adaptive Grill-Me
+## 自适应追问
 
 After the broad questions are answered, decide whether the task needs deep Grill-Me design-concept alignment. Use light Discover for low-risk patches, small incremental features, and narrow docs/config requests.
 
@@ -88,7 +88,7 @@ Deep Grill-Me should align concepts before P2 decomposition. It should ask focus
 
 Do not force deep Grill-Me for every small task.
 
-## Design Concept Artifacts
+## 设计概念产物
 
 When Discover confirms durable design concepts, write or update these layers during or after Generate:
 
@@ -105,17 +105,17 @@ Keep layers separate:
 
 Knowledge Ledger indexes design decisions and references; it must not copy full design-concepts or glossary bodies into every context.
 
-## Preconditions
+## 前置条件
 
 - planning mode is active or about to start
 - user goals are not yet structured into milestones
 
-## Plan Modes
+## Plan 模式
 
 - `interactive`: ask questions in rounds and wait for user answers
 - `auto`: infer from repo context and user prompt without pausing unless blocked
 
-## interaction_depth Rules
+## interaction_depth 规则
 
 - `low`
   - at least 2 rounds
@@ -154,7 +154,7 @@ If `plan.interactive.min_rounds` is set, use it as an additional floor after res
 用户明确表示「够了」「开始吧」「可以了」等结束信号。
 如果用户只是回答了你的问题，你应该继续提问，不应该理解为「可以开始了」。
 
-## Interactive Behavior
+## 交互行为
 
 1. Ask only 2-3 targeted questions per round.
 2. Start broad, then drill into detail.
@@ -170,7 +170,7 @@ If `plan.interactive.min_rounds` is set, use it as an additional floor after res
 10. If user input is vague, ask follow-up questions instead of silently filling gaps.
 11. If the user says "确认一下" or merely answers the previous questions, summarize and continue asking.
 
-## Context Injection
+## 上下文注入
 
 `/hw:plan --context <sources>` and `cycle.yaml` `context_sources` can preload P1 with existing evidence. Supported sources:
 
@@ -192,7 +192,7 @@ Example opening:
 
 > 基于审计报告 + 3 个 open patch，我看到这些问题：…… 你想全部处理还是只修 Critical？还有其他想加的吗？
 
-## Batch Discover
+## 批量 Discover
 
 When `--batch` is present:
 
@@ -220,7 +220,7 @@ Required Batch Discover output:
 - a Markdown Feature candidate table
 - unresolved cross-Feature dependency questions
 
-## Reference Files
+## 参考文件
 
 - `plan/PLAN-SKILL.md` — Discover phase baseline
 - `references/commands-spec.md` — command routing

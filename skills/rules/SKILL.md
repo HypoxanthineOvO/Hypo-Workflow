@@ -4,7 +4,7 @@ description: Manage Hypo-Workflow rule severities, custom natural-language rules
 ---
 
 # /hypo-workflow:rules
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -17,7 +17,7 @@ Use this skill when the user invokes `/hw:rules` or `/hypo-workflow:rules`.
 
 Rules are a standalone Hypo-Workflow dimension alongside skills, commands, hooks, and config. They collect behavior constraints that were previously scattered across `SKILL.md`, hooks, and `config.yaml`.
 
-## Paths
+## 路径
 
 Plugin-distributed rules:
 
@@ -41,7 +41,7 @@ User-level structured habits:
 
 Global habits are user-level authority and should be loaded only when explicitly configured or selected by the active rules command. Do not make project behavior depend silently on whatever exists in the operator's home directory.
 
-## Severity Model
+## Severity 模型
 
 Use the ESLint-style severity model:
 
@@ -53,7 +53,7 @@ Use the ESLint-style severity model:
 
 The severity decides behavior. Labels are metadata only.
 
-## Structured Rules/Habits Authority
+## Structured Rules/Habits 权威
 
 C8 introduces structured Rules/Habits as the preferred authority for durable user preferences and project behavior. Markdown files and adapter instruction text are generated or compatibility views.
 
@@ -124,7 +124,7 @@ Supported lifecycle hook points:
 
 Rules may bind to multiple hooks. `always` rules are injected into execution context and should be followed for the whole session.
 
-## Commands
+## 指令列表
 
 Supported forms:
 
@@ -143,7 +143,7 @@ Supported forms:
 /hw:rules pack import <url>
 ```
 
-## Loading Algorithm
+## 加载算法
 
 Build the effective rule table in this priority order, low to high:
 
@@ -179,7 +179,7 @@ rules:
 
 `extends` may be a string or list. Built-in values are `recommended`, `strict`, and `minimal`. Git rule packs may be referenced as `github:owner/repo` or `gitee:owner/repo`.
 
-## Listing Rules
+## 列出规则
 
 For `/hw:rules` or `/hw:rules list`:
 
@@ -193,7 +193,7 @@ For `/hw:rules` or `/hw:rules list`:
 
 When shell execution is available, use `scripts/rules-summary.sh` as the deterministic summary helper, then present the result in the configured output language.
 
-## Enabling, Disabling, And Setting Rules
+## 启用、禁用与设置规则
 
 For `/hw:rules enable <name>`:
 
@@ -214,7 +214,7 @@ For `/hw:rules set <name> <severity>`:
 
 Use structured YAML edits where possible. Do not rewrite unrelated project config.
 
-## Creating Custom Rules
+## 创建自定义规则
 
 For `/hw:rules create <name>`:
 
@@ -244,7 +244,7 @@ Generated Markdown format:
 
 Do not auto-create a custom rule without the user's natural-language content.
 
-## Creating Structured Rules
+## 创建结构化规则
 
 For new remembered preferences, prefer structured YAML over Markdown custom rules. Use this path selection:
 
@@ -254,7 +254,7 @@ For new remembered preferences, prefer structured YAML over Markdown custom rule
 
 Ordinary inferred candidates should be presented for confirmation at the end of the current discussion or checkpoint. Do not interrupt the user's main task just because a possible rule was detected. Explicit force-write wording may write immediately, but must still use the selected scope and log the action.
 
-## Editing And Deleting Custom Rules
+## 编辑与删除自定义规则
 
 For `/hw:rules edit <name>`:
 
@@ -307,7 +307,7 @@ For `/hw:rules pack import <url>`:
 
 Network access may be unavailable; if import cannot run, provide the exact Git command and target path.
 
-## Runtime Enforcement
+## 运行时执行约束
 
 At each lifecycle hook point:
 
@@ -321,7 +321,7 @@ At each lifecycle hook point:
 
 `always` rules are injected during SessionStart and should be obeyed continuously. `hooks/session-start.sh` uses `scripts/rules-summary.sh` to include active always rules in `additionalContext`.
 
-## Built-In Rules
+## 内置规则
 
 The distributed built-ins are:
 
@@ -357,7 +357,7 @@ During project initialization, offer a rules preset:
 
 When selected, write `.pipeline/rules.yaml`. Skipping leaves old behavior compatible, which is equivalent to recommended defaults at runtime.
 
-## Reference Files
+## 参考文件
 
 - `rules/builtin/`
 - `rules/presets/`

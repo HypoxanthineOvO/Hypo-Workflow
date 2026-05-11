@@ -7,7 +7,9 @@ import {
   assessWorkerSeparationStatus,
   DEFAULT_GLOBAL_CONFIG,
   loadConfig,
+  isAutomationActionAllowed,
   normalizeAutomationPolicy,
+  normalizeAutomationWhitelist,
   parseYaml,
   resolveWorkerSeparationPolicy,
   writeConfig,
@@ -111,6 +113,9 @@ test("default config exposes automation policy levels and safe gates", () => {
   assert.equal(DEFAULT_GLOBAL_CONFIG.automation.gates.destructive_external, "confirm");
   assert.equal(DEFAULT_GLOBAL_CONFIG.automation.gates.execution, "auto");
   assert.equal(DEFAULT_GLOBAL_CONFIG.execution.worker_separation.mode, "recommended");
+  assert.ok(DEFAULT_GLOBAL_CONFIG.automation.local_whitelist.safe_local.actions.includes("restart_dev_server"));
+  assert.ok(DEFAULT_GLOBAL_CONFIG.automation.local_whitelist.stateful_local.actions.includes("reset_test_database"));
+  assert.ok(DEFAULT_GLOBAL_CONFIG.automation.local_whitelist.external.actions.includes("remote_pr_write"));
 });
 
 test("normalizeAutomationPolicy preserves planning gates under full automation", () => {
@@ -129,6 +134,26 @@ test("normalizeAutomationPolicy preserves planning gates under full automation",
   assert.equal(policy.gates.destructive_external, "confirm");
   assert.equal(policy.gates.release_publish, "confirm");
   assert.equal(policy.gates.execution, "auto");
+  assert.equal(policy.local_whitelist.external.default, "confirm");
+});
+
+test("automation whitelist allows local test actions but keeps external actions gated", () => {
+  const whitelist = normalizeAutomationWhitelist({
+    safe_local: { actions: ["restart_dev_server"] },
+    stateful_local: { actions: ["reset_test_database"] },
+    external: { actions: ["remote_pr_write"] },
+    scenario_overrides: {
+      "test_profiles.webapp": ["run_browser_e2e"],
+    },
+  });
+
+  assert.deepEqual(whitelist.safe_local.actions, ["restart_dev_server"]);
+  assert.equal(isAutomationActionAllowed(whitelist, "restart_dev_server").allowed, true);
+  assert.equal(isAutomationActionAllowed(whitelist, "reset_test_database").tier, "stateful_local");
+  assert.equal(isAutomationActionAllowed(whitelist, "remote_pr_write").allowed, false);
+  assert.equal(isAutomationActionAllowed(whitelist, "remote_pr_write").reason, "external_requires_confirmation");
+  assert.equal(isAutomationActionAllowed(whitelist, "run_browser_e2e", { scenario: "test_profiles.webapp" }).allowed, true);
+  assert.equal(isAutomationActionAllowed(whitelist, "unknown_action").reason, "unknown_action");
 });
 
 test("normalizeAutomationPolicy rejects invalid automation levels", () => {
@@ -186,6 +211,10 @@ test("config schema documents worker separation authorization and backend fields
   const schema = await readFile("config.schema.yaml", "utf8");
 
   assert.match(schema, /worker_separation_policy:/);
+  assert.match(schema, /local_whitelist:/);
+  assert.match(schema, /restart_dev_server/);
+  assert.match(schema, /reset_test_database/);
+  assert.match(schema, /remote_pr_write/);
   assert.match(schema, /authorization:/);
   assert.match(schema, /blocked_until_authorized/);
   assert.match(schema, /downgraded_off/);

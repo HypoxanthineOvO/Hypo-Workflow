@@ -4,7 +4,7 @@ description: Confirm the generated Hypo-Workflow plan when the user wants a fina
 ---
 
 # /hypo-workflow:plan-confirm
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,11 +15,11 @@ description: Confirm the generated Hypo-Workflow plan when the user wants a fina
 
 Use this skill for P4 Confirm only.
 
-## Preconditions
+## 前置条件
 
 - planning artifacts already exist or have just been generated
 
-## Execution Flow
+## 执行流程
 
 1. Resolve plan mode as project `plan.mode` > global `plan.default_mode` > `interactive`, and resolve `automation.gates.planning` as project > global > default `confirm`.
 2. Summarize:
@@ -33,13 +33,13 @@ Use this skill for P4 Confirm only.
 4. If `automation.gates.planning=auto`, `plan.mode=auto` may treat confirm as a summary checkpoint and continue without requiring approval.
 5. Set `current.phase=plan_confirm` while this checkpoint is active.
 
-## Interactive Hard Gate
+## 交互硬门禁
 
 Interactive Confirm must not be collapsed into a passive summary. The agent must stop and wait until the user explicitly says「确认」or an unambiguous equivalent approval such as「确认，开始执行」. A vague acknowledgement, a request to "check once more", or silence is not approval.
 
 When `automation.gates.planning=confirm`, or when `plan.interactive.require_explicit_confirm=true` or the field is missing in interactive mode, this gate is mandatory. Automation level must not silently downgrade the planning confirm gate.
 
-## Reference Files
+## 参考文件
 
 - `plan/PLAN-SKILL.md` — Confirm phase rules
 - `references/commands-spec.md`

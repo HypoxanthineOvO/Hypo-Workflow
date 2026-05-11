@@ -4,7 +4,7 @@ description: Start Hypo-Workflow execution when the user wants to begin running 
 ---
 
 # /hypo-workflow:start
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,13 +15,13 @@ description: Start Hypo-Workflow execution when the user wants to begin running 
 
 Use this skill to start execution from a local `.pipeline/` workspace. This is the platform-specific entrypoint for the same behavior described by the root `SKILL.md` `/hw:start` command.
 
-## Preconditions
+## 前置条件
 
 - `.pipeline/config.yaml` exists and should be validated before mutating state
 - prompt files exist under the configured prompts directory
 - if `.pipeline/state.yaml` already contains unfinished work, resume it unless the user explicitly asks for a clean restart
 
-## Execution Flow
+## 执行流程
 
 1. Read `~/.hypo-workflow/config.yaml` if present.
 2. Read `.pipeline/config.yaml`, normalize defaults, and validate it against `config.schema.yaml`.
@@ -111,7 +111,7 @@ Use this skill to start execution from a local `.pipeline/` workspace. This is t
 28. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
 29. Only allow the turn to end naturally when all milestones are complete or the main agent has explicitly chosen the `stop` outcome.
 
-## Continuation And Preflight
+## 续跑与 Preflight
 
 - `.pipeline/continuation.yaml` is a recovery pointer for Codex turns and other environments without Stop hooks.
 - `safe_resume_command` must be `/hw:resume` or another documented natural-language resume alias, never a shell command.
@@ -119,7 +119,7 @@ Use this skill to start execution from a local `.pipeline/` workspace. This is t
 - Preflight blocking checks: uncommitted protected authority writes, invalid authority YAML/JSON, secret markers, missing required report/progress/log evidence, malformed leases, and invalid resume pointers.
 - Preflight warning checks: stale derived artifacts, README freshness gaps, optional Codex notify absence, adapter staleness, and non-final output language mismatches.
 
-## Watchdog Integration
+## Watchdog 集成
 
 - resolve `watchdog.*` from project > global > defaults
 - when `watchdog.enabled=false`, do not register cron
@@ -130,13 +130,13 @@ Use this skill to start execution from a local `.pipeline/` workspace. This is t
 - remove `.pipeline/.lock` on all clean exits and blocking exits
 - stale lease takeover must log `lease_takeover`; platform failure hooks should record `reported_failure`, while heartbeat-only timeout records `inferred_stall`
 
-## Failure Handling
+## 失败处理
 
 - `retry` is allowed without a fixed numeric cap when the main agent believes another strategy can work
 - `deferred` requires writing `milestones[].status=deferred` and `deferred_reason`
 - `stop` should leave a clear reason in state, log, and progress summary
 
-## Progress Tracking
+## 进度跟踪
 
 - create `.pipeline/PROGRESS.md` if it does not exist
 - update current milestone status after every step
@@ -152,7 +152,7 @@ When loading report or TDD step templates, resolve `output.language` from projec
 
 All user-visible report and PROGRESS prose must follow `output.language`. Internal `state.yaml` and `log.yaml` keys remain English.
 
-## Reference Files
+## 参考文件
 
 - `references/tdd-spec.md` — step sequencing and TDD rules
 - `references/evaluation-spec.md` — scoring and continuation gates

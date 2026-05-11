@@ -4,7 +4,7 @@ description: Internal legacy dashboard launcher removed from the active command 
 ---
 
 # /hypo-workflow:dashboard
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,16 +15,16 @@ description: Internal legacy dashboard launcher removed from the active command 
 
 This Skill is deprecated and kept only for compatibility notes.
 
-## Preconditions
+## 前置条件
 
 - none
 
-## Execution Flow
+## 执行流程
 
 1. Inform the user that `/hw:dashboard` has been removed from the active command surface.
 2. Direct the user to `/hw:start`, `/hw:resume`, or `/hw:status` for current workflow control.
 3. If the user needs browser-based status later, defer to the planned Claude Code plugin/Web surface.
 
-## Reference Files
+## 参考文件
 
 - `SKILL.md` — broader pipeline context if needed

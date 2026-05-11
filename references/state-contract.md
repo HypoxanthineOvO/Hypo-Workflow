@@ -1,5 +1,9 @@
 # State Contract
 
+## 中文主体说明
+
+本契约定义 `.pipeline/state.yaml` 的结构、生命周期字段、Milestone 状态、step 记录、acceptance mirror、continuation 和 worker evidence。字段名、状态枚举、YAML 路径和 command literal 必须保持英文，不翻译成中文键名。
+
 This file defines the full `state.yaml` contract used by the pipeline.
 
 ## Top-Level Structure

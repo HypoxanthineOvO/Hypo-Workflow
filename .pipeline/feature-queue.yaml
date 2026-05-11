@@ -1,5 +1,5 @@
 version: 1
-cycle_id: C9
+cycle_id: C11
 current_feature: null
 defaults:
   decompose_mode: upfront
@@ -8,154 +8,47 @@ defaults:
   default_gate: auto
 features:
   - id: F001
-    title: 配置治理与默认配置组合
+    title: Workflow 体验契约治理
     priority: 10
     status: done
     gate: auto
     decompose_mode: upfront
     source: plan-discover
     workflow_kind: build
-    category: docs-and-config
-    desired_effect: 把现有 project/global 配置、自动程度、严格程度、确认边界和平台差异整理成中文主体文档，并提供几组可直接理解的默认配置组合。
-    verification: 配置字段矩阵自检、默认组合 fixture、中文文档审查、配置校验脚本和核心测试。
+    category: workflow-experience
+    desired_effect: 中文主体 Skill/reference、Subagent 检查注入、自动化白名单、说人话输出和 Plan 审计能力全部形成可测试契约。
+    verification: 8 个 Milestone 的 contract tests、scenario checks、Subagent audit、manual QA guidance 和 full regression。
     dependencies: []
     milestones:
-      - id: M01
+      - id: M0
         status: done
-        title: 配置字段盘点与严格度矩阵
-        prompt_file: .pipeline/prompts/00-configuration-field-audit-and-strictness-matrix.md
-      - id: M02
+        title: P0 Configure 与规划授权记录
+        prompt_file: .pipeline/prompts/00-p0-configure-and-cycle-authorization.md
+      - id: M1
         status: done
-        title: 默认配置组合
-        prompt_file: .pipeline/prompts/01-default-configuration-profiles.md
-  - id: F002
-    title: PR/MR 管理与本地归档
-    priority: 20
-    status: done
-    gate: auto
-    decompose_mode: upfront
-    source: plan-discover
-    workflow_kind: build
-    category: collaboration
-    desired_effect: 新增统一的 Change Request 流程来处理已有 GitHub PR 或 GitLab MR，支持只读检查、审查、修复建议、手动合并边界和本地证据归档。
-    verification: PR/MR fixture、无远端写操作测试、本地归档 contract、人工确认门和文档审查。
-    dependencies:
-      - F001
-    milestones:
-      - id: M03
+        title: 用户可见输出契约
+        prompt_file: .pipeline/prompts/01-human-readable-response-contract.md
+      - id: M2
         status: done
-        title: Change Request 合同与本地归档
-        prompt_file: .pipeline/prompts/02-change-request-contract-and-local-archive.md
-      - id: M04
+        title: Plan Discover 访谈升级
+        prompt_file: .pipeline/prompts/02-plan-discover-audit-and-example-abstraction.md
+      - id: M3
         status: done
-        title: 只读 inspect/review 流程
-        prompt_file: .pipeline/prompts/03-pr-mr-inspect-review-readonly-flow.md
-      - id: M05
+        title: 自动化授权白名单
+        prompt_file: .pipeline/prompts/03-automation-permission-whitelist.md
+      - id: M4
         status: done
-        title: fix/merge/close 手动门
-        prompt_file: .pipeline/prompts/04-pr-mr-fix-merge-close-manual-gates.md
-  - id: F003
-    title: Evidence-first Explain 命令
-    priority: 30
-    status: done
-    gate: auto
-    decompose_mode: upfront
-    source: plan-discover
-    workflow_kind: build
-    category: explainability
-    desired_effect: 新增 `/hw:explain` 作为证据优先、只读、可引用文件/diff/log/report 的问答命令，并支持 `--subagent` 独立取证。
-    verification: 命令解析测试、只读行为测试、证据引用 fixture、Subagent evidence handoff 和中文文档。
-    dependencies:
-      - F001
-    milestones:
-      - id: M06
+        title: Subagent 规则与检查点注入闭环
+        prompt_file: .pipeline/prompts/04-subagent-rules-checks-injection.md
+      - id: M5
         status: done
-        title: Evidence-first Explain 合同
-        prompt_file: .pipeline/prompts/05-evidence-first-explain-contract.md
-      - id: M07
+        title: Skills 中文化：核心执行链
+        prompt_file: .pipeline/prompts/05-skills-zh-core-execution-chain.md
+      - id: M6
         status: done
-        title: "`--subagent` 取证流程"
-        prompt_file: .pipeline/prompts/06-explain-subagent-evidence-handoff.md
-      - id: M08
+        title: Skills 中文化：规划与辅助链
+        prompt_file: .pipeline/prompts/06-skills-zh-planning-and-support-chain.md
+      - id: M7
         status: done
-        title: Explain 测试与文档
-        prompt_file: .pipeline/prompts/07-explain-tests-and-docs.md
-  - id: F004
-    title: Claude Resume 命名冲突修复
-    priority: 40
-    status: done
-    gate: auto
-    decompose_mode: upfront
-    source: plan-discover
-    workflow_kind: build
-    category: platform-adapter
-    desired_effect: 修复 Claude Code 内置 `/resume` 被自动补全或误路由到 Hypo `/hw:resume` 的冲突，明确 Claude 原生命令和 Hypo namespace 边界。
-    verification: Claude plugin/command alias fixture、生成 artifact 检查、Claude smoke 文档和插件验证。
-    dependencies:
-      - F001
-    milestones:
-      - id: M09
-        status: done
-        title: Claude `/resume` 冲突审计
-        prompt_file: .pipeline/prompts/08-claude-resume-conflict-audit.md
-      - id: M10
-        status: done
-        title: Claude 适配修复与烟测
-        prompt_file: .pipeline/prompts/09-claude-resume-adapter-fix-and-smoke.md
-  - id: F005
-    title: 中文主体文档治理
-    priority: 50
-    status: done
-    gate: auto
-    decompose_mode: upfront
-    source: plan-discover
-    workflow_kind: build
-    category: docs
-    desired_effect: 让给人看的 README 引用链、docs 和主要 references 保持中文主体，同时保留命令名、配置键、文件名和专有英文术语。
-    verification: README 链接遍历、中文主体检查、命令数量新鲜度、平台边界审查和 docs governance 测试。
-    dependencies:
-      - F001
-      - F002
-      - F003
-      - F004
-    milestones:
-      - id: M11
-        status: done
-        title: 人读文档中文主体化
-        prompt_file: .pipeline/prompts/10-chinese-human-docs-conversion.md
-  - id: F006
-    title: C9 总体验收
-    priority: 60
-    status: done
-    gate: auto
-    decompose_mode: upfront
-    source: plan-discover
-    workflow_kind: build
-    category: validation
-    desired_effect: 用 Agent Review、Subagent 审计、文档自检、全量回归和平台 smoke 验证 C9 可以交付。
-    verification: Focused tests、full Node tests、Python regression、config validation、sync check、Claude plugin validate、git diff check 和 review artifact。
-    dependencies:
-      - F001
-      - F002
-      - F003
-      - F004
-      - F005
-    milestones:
-      - id: M12
-        status: done
-        title: C9 Agent Review 与全量回归
-        prompt_file: .pipeline/prompts/11-c9-agent-review-and-full-regression.md
-  - id: F007
-    title: "`/hw:pr` 内容摘要优先的审查输出"
-    priority: 70
-    status: queued
-    gate: auto
-    decompose_mode: upfront
-    source: user-feedback-pr-review-20260509
-    workflow_kind: build
-    category: collaboration
-    desired_effect: "`/hw:pr inspect/review/merge` 在输出时先说明 PR/MR 实际改了什么、改动意图、主要文件和行为影响，再给 mergeability、checks、冲突和 merge 建议，避免只报告状态而缺少上下文。"
-    verification: PR/MR fixture 覆盖 feature patch、version bump、docs-only、conflicting PR 和 no-checks PR；review notes 与 summary archive 均包含 What Changed、Risk/Impact、Validation 和 Merge Advice 四段。
-    dependencies:
-      - F002
-    milestones: []
+        title: References 中文化与回归
+        prompt_file: .pipeline/prompts/07-references-zh-and-regression.md

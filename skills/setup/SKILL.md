@@ -4,7 +4,7 @@ description: Configure Hypo-Workflow global defaults for agent platform, executi
 ---
 
 # /hypo-workflow:setup
-## Output Language Rules
+## 输出语言规则
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,7 +15,7 @@ description: Configure Hypo-Workflow global defaults for agent platform, executi
 
 Use this skill as the plugin-level setup wizard. It configures Hypo-Workflow itself, not a project-local `.pipeline/` workspace.
 
-## Configuration Target
+## 配置目标
 
 Always use the global file:
 
@@ -24,7 +24,7 @@ Always use the global file:
 
 Do not write `.pipeline/config.yaml` from setup. Project-local configuration belongs to `/hypo-workflow:init` or `/hypo-workflow:plan-generate`.
 
-## Config Priority
+## 配置优先级
 
 When another skill needs runtime defaults, resolve values in this order:
 
@@ -45,7 +45,7 @@ Important mappings:
 - project `watchdog.enabled` > global `watchdog.enabled` > `false`
 - project rules from `.pipeline/rules.yaml` > project `rules.*` > global `rules.*` > `extends: recommended`
 
-## Execution Flow
+## 执行流程
 
 1. Create the config directory if needed:
    - `mkdir -p ~/.hypo-workflow`
@@ -82,7 +82,7 @@ Important mappings:
 11. Write `~/.hypo-workflow/config.yaml`.
 12. Print a concise configuration summary and remind the user that project config can override these values.
 
-## First-Run Questions
+## 首次运行问题
 
 Use short, concrete prompts:
 
@@ -101,7 +101,7 @@ Use short, concrete prompts:
 - "History import split method?"
 - "Rules preset: `recommended`, `strict`, or `minimal`?"
 
-## Default Values
+## 默认值
 
 - `agent.platform=claude-code` when running in Claude Code, otherwise `codex`
 - `agent.model` should use the current session model when visible
@@ -140,7 +140,7 @@ Use short, concrete prompts:
 - `rules.rules={}`
 - `version=8.4.0`
 
-## Config Shape
+## 配置结构
 
 ```yaml
 # Hypo-Workflow global config
@@ -219,7 +219,7 @@ updated: "2026-04-26T14:00:00+08:00"
 
 Omit `subagent.codex.base_url` when the default OpenAI endpoint is used.
 
-## Connection Checks
+## 连接检查
 
 Only run checks that match installed tools:
 
@@ -231,7 +231,7 @@ Only run checks that match installed tools:
 
 If a check fails, keep the config but mark the provider as unverified in the summary. Do not block setup unless the user asks for a strict check.
 
-## Platform Notes
+## 平台说明
 
 Claude Code users:
 
@@ -251,7 +251,7 @@ Mixed mode:
 - delegate individual steps with `step_overrides.<step>.executor=subagent`
 - choose a subagent backend only when it is native to the active platform or explicitly documented as a non-Codex handoff path
 
-## Existing Config Behavior
+## 既有配置行为
 
 When a config exists:
 
@@ -259,7 +259,7 @@ When a config exists:
 2. ask whether to edit
 3. preserve unspecified existing values
 
-## Config TUI Editing
+## Config TUI 编辑
 
 Interactive config editing must keep global defaults and project config as separate targets. Stage edits first, show a diff, validate supported schema fields, and require confirmation before writing.
 
@@ -267,7 +267,7 @@ Do not write `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, or `.pipeline/rules
 4. update `updated`
 5. keep the original `created` timestamp
 
-## Reference Files
+## 参考文件
 
 - `references/config-spec.md` - global/project config priority and field mapping
 - `config.schema.yaml` - project schema plus global config schema definition

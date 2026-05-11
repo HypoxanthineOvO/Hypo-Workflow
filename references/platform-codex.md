@@ -1,5 +1,9 @@
 # Platform Guide: Codex CLI
 
+## 中文主体说明
+
+本指南说明 Hypo-Workflow 在 Codex CLI 中如何依赖 Skill、AGENTS.md、Subagent、continuation 和 preflight 纪律运行。Codex 没有完整 hook/plugin 系统；本文保留 notify、Subagent、config、command 和路径英文 literal，方便和 Codex 实际能力对齐。
+
 Use this reference when the pipeline runs inside Codex CLI.
 
 ## Environment Shape
