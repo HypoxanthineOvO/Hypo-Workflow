@@ -15,6 +15,8 @@ Follow the root Hypo-Workflow output language config. Use Chinese for user-facin
 
 `/hw:sync` is an explicit project synchronization entrypoint. It shares semantics with `hypo-workflow sync` and never executes pipeline milestones.
 
+For Codex skills, `/hw:sync` guidance prefers controlled sync of a generated snapshot/copy into the Codex skills directory. Do not use sync as a reason to hot-edit a live symlink skill source while running Codex may read it; that self-modifying skill-source path can expose half-updated or partially updated files. Edit the source project, test in an isolated worktree or isolated copy, then sync the snapshot. This is supporting guidance and does not replace audit/rework/worker-separation gates.
+
 Supported modes:
 
 - `/hw:sync --light`: refresh registry status, refresh Knowledge Ledger compact/index when source records changed, detect external changes, and report what needs attention.

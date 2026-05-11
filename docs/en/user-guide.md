@@ -27,13 +27,13 @@ Start from the platform guide for your host Agent. The README stays as a compact
 - Use `/hw:pr inspect|review|fix|merge|close <url|id>` for existing GitHub PRs or GitLab MRs, with local archives under `.pipeline/pr/`.
 - Use `/hw:pr create` for guided PR/MR creation; existing local changes use `--from-worktree`, while plan-first work uses `--plan`.
 - Use `/hw:sync --repair` to repair derived context and `/hw:docs repair` to refresh documentation.
-- Use `/hw:accept` or `/hw:reject` at lifecycle gates.
+- Use `/hw:accept`, `/hw:achieve`, or `/hw:reject` at lifecycle gates; `/hw:achieve` is an alias for `/hw:accept`.
 
 ## Subagents And Degraded Mode
 
 When `execution.worker_separation.mode` is `recommended` or `strict`, non-trivial work should separate implement, test, and audit roles. Implementation Subagents must not read test source, fixtures, snapshots, or assertion details. They may receive requirements, public interfaces, allowed edit scope, test command, pass/fail status, and sanitized failure summaries. If the platform cannot preserve isolation, record role isolation degradation; `recommended` can continue only after explicit degraded-mode confirmation, while `strict` cannot treat degraded execution as fully accepted.
 
-`/hw:accept` treats worker separation as an acceptance gate. Missing `test`, `implement`, or `audit` worker evidence, role identity collisions, `close_failed` lifecycle records, missing Codex `/hw:start` + `/hw:resume` authorization scope, or runtime-only subtask observations being used as evidence block acceptance until repaired or explicitly downgraded where policy allows.
+`/hw:accept` and `/hw:achieve` treat worker separation as an acceptance gate. Missing `test`, `implement`, or `audit` worker evidence, role identity collisions, `close_failed` lifecycle records, missing Codex `/hw:start` + `/hw:resume` authorization scope, or runtime-only subtask observations being used as evidence block acceptance until repaired or explicitly downgraded where policy allows.
 
 After a successful `/hw:start` or `/hw:resume` run, when `compact.auto=true` and `compact.end_of_run=true`, the closeout refresh uses the default `compact.refresh_policy=dirty_only` and updates only dirty compact targets. The refresh is generated from full authority files, never copied from old `.compact` files.
 

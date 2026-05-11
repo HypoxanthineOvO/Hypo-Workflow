@@ -1,5 +1,16 @@
 # Changelog
 
+## v12.4.0 - 2026-05-11
+
+### Features
+
+- 新增 `/hw:achieve` 作为 `/hw:accept` 的同义命令，共用 `skills/accept/SKILL.md`、worker-separation acceptance gate、lifecycle commit 和派生刷新语义。
+- OpenCode command map 新增 `/hw-achieve`，命令总数更新为 40，Claude Code 和 Codex 适配器随版本刷新。
+
+### Docs
+
+- 更新 README、用户指南、命令参考、Skill inventory、OpenCode spec 和 release notes，明确 `achieve` 不创建第二条验收路径。
+
 ## v12.3.0 - 2026-05-09
 
 ### Features

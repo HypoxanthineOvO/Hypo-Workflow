@@ -274,8 +274,20 @@ test("recommended mode may degrade audit while still requiring implement-test se
     current: { phase: "completed", prompt_name: "M01 / Demo", step: null },
     runtime_workers: {
       workers: [
-        { role: "implement", worker_id: "impl-1", lifecycle: DONE },
-        { role: "test", worker_id: "test-1", lifecycle: DONE },
+        {
+          role: "implement",
+          worker_id: "impl-1",
+          lifecycle: DONE,
+          prompt_scope: ["core/src/**"],
+          changed_files: ["core/src/acceptance/index.js"],
+        },
+        {
+          role: "test",
+          worker_id: "test-1",
+          lifecycle: DONE,
+          prompt_scope: ["core/test/**"],
+          changed_files: ["core/test/cycle-acceptance.test.js"],
+        },
       ],
       role_availability: {
         audit: { status: "unavailable", reason: "tool_unavailable" },
@@ -542,8 +554,11 @@ test("acceptance blocks worker authorization waiting for start resume scope", as
 
 test("cycle acceptance command map and docs are exposed", async () => {
   assert.equal(commandByCanonical("/hw:accept").opencode, "/hw-accept");
+  assert.equal(commandByCanonical("/hw:achieve").opencode, "/hw-achieve");
   assert.equal(commandByCanonical("/hw:reject").opencode, "/hw-reject");
   assert.equal(commandByCanonical("/hw:accept").agent, "hw-build");
+  assert.equal(commandByCanonical("/hw:achieve").agent, "hw-build");
+  assert.equal(commandByCanonical("/hw:achieve").skill, "skills/accept/SKILL.md");
   assert.equal(commandByCanonical("/hw:reject").agent, "hw-build");
 
   const cycleSkill = await readFile("skills/cycle/SKILL.md", "utf8");

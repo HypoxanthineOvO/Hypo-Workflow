@@ -20,6 +20,7 @@ Use this skill to continue from `.pipeline/state.yaml` without restarting comple
 
 - `.pipeline/state.yaml` exists
 - the saved pipeline is unfinished, usually `pipeline.status=running` or `pipeline.status=stopped`
+- if the saved milestone uses delegated worker-separated execution, optional derived subworker prompts live under `.pipeline/prompts/derived/Mxx/`; if no delegation exists, keep using the canonical milestone prompt only
 
 ## Execution Flow
 

@@ -6,9 +6,9 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { commandByCanonical, commandMap, loadRulesSummary, writeOpenCodeArtifacts } from "../src/index.js";
 
-test("commandMap contains 39 OpenCode mappings", () => {
+test("commandMap contains 40 OpenCode mappings", () => {
   const commands = commandMap("opencode");
-  assert.equal(commands.length, 39);
+  assert.equal(commands.length, 40);
   assert.equal(commandByCanonical("/hw:plan").opencode, "/hw-plan");
   assert.equal(commandByCanonical("/hw:report").agent, "hw-report");
   assert.equal(commandByCanonical("/hw:compact").agent, "hw-compact");
@@ -16,6 +16,8 @@ test("commandMap contains 39 OpenCode mappings", () => {
   assert.equal(commandByCanonical("/hw:chat").opencode, "/hw-chat");
   assert.equal(commandByCanonical("/hw:knowledge").opencode, "/hw-knowledge");
   assert.equal(commandByCanonical("/hw:accept").opencode, "/hw-accept");
+  assert.equal(commandByCanonical("/hw:achieve").opencode, "/hw-achieve");
+  assert.equal(commandByCanonical("/hw:achieve").skill, "skills/accept/SKILL.md");
   assert.equal(commandByCanonical("/hw:reject").opencode, "/hw-reject");
   assert.equal(commandByCanonical("/hw:explore").opencode, "/hw-explore");
   assert.equal(commandByCanonical("/hw:sync").opencode, "/hw-sync");
@@ -39,6 +41,7 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
   await writeOpenCodeArtifacts(dir, { profile: "standard" });
 
   const releaseCommand = await readFile(join(dir, ".opencode", "commands", "hw-release.md"), "utf8");
+  const achieveCommand = await readFile(join(dir, ".opencode", "commands", "hw-achieve.md"), "utf8");
   const explainCommand = await readFile(join(dir, ".opencode", "commands", "hw-explain.md"), "utf8");
   const prCreateCommand = await readFile(join(dir, ".opencode", "commands", "hw-pr-create.md"), "utf8");
   const chatCommand = await readFile(join(dir, ".opencode", "commands", "hw-chat.md"), "utf8");
@@ -56,6 +59,9 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
 
   assert.match(command, /\/hw:plan/);
   assert.match(command, /not a separate runner/);
+  assert.match(achieveCommand, /\/hw:achieve/);
+  assert.match(achieveCommand, /skills\/accept\/SKILL\.md/);
+  assert.match(achieveCommand, /not a separate runner/);
   assert.match(releaseCommand, /update_readme/);
   assert.match(releaseCommand, /readme-freshness/);
   assert.match(explainCommand, /evidence-first/);

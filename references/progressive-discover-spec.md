@@ -20,6 +20,8 @@ Before those P1 questions, a new Cycle should run or explicitly reuse `P0 Config
 
 The verification answer must become a real test contract, not a vague testing note. Ask for the 真实测试方法 / real test method, the exact scenario or command, the observable pass/fail signal, and the independent validator. For example, an agent-service project may require "use NapCat to simulate the main account sending a message to the agent"; unit mocks or pseudo tests do not satisfy that contract unless the user explicitly defined them as the real acceptance method.
 
+P1 has a mandatory audit question group. It must ask who holds audit authority, what the rejection scope covers, when pseudo-test rejection is required, whether blocked approval needs audit sign-off, and what audit evidence must be retained. The audit question group cannot be skipped; missing fields block Discover completion and must not allow entry to P2.
+
 ## Progressive Stages
 
 After the big questions, the default full structure is:

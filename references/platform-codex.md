@@ -18,6 +18,15 @@ Use this reference when the pipeline runs inside Codex CLI.
 - Treat `.pipeline/continuation.yaml` as the durable recovery pointer when a turn ends before the pipeline is complete.
 - Use `/hw:setup` to create `~/.hypo-workflow/config.yaml`.
 - Cross-tool delegation may exist in a user's broader environment, but it is not Codex Subagent behavior and must not be presented as the Codex default path.
+- Codex skills should prefer snapshot/copy installation or controlled sync into the Codex skills directory over direct hot-editing of a live symlink skill source.
+
+## Codex Skill Snapshot Isolation
+
+For Codex skill development, edit the source project first, test it in an isolated worktree or isolated copy, then generate/sync a snapshot into the Codex skills directory with controlled sync.
+
+Avoid hot-editing a live symlink source while a running Codex session may read it. That pattern creates a self-modifying skill-source risk: Codex can observe half-updated or partially updated files while the working checkout is being changed.
+
+This is supporting guidance for Codex skill consumption. It is not the main audit governance mechanism and does not replace audit/rework/worker-separation gates.
 
 ## Hook 降级说明
 

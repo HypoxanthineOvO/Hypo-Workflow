@@ -1,102 +1,39 @@
-# Architecture Baseline - C9 配置治理、PR/MR、Explain 与 Claude Resume
+# C11 Audit 审计治理强化 - Architecture Snapshot
 
-## Current Baseline
+## 当前目标
 
-- Active Cycle: C9, "Hypo-Workflow 配置治理、PR 管理、Explain 命令与 Claude Resume 修复"。
-- Workflow kind: build。
-- Preset: tdd。
-- `.pipeline/` 继续作为 Cycle、state、Feature Queue、rules、progress、logs、prompts、reports、reviews、metrics、Knowledge、patches 和 archives 的 source of truth。
-- Hypo-Workflow 不是 runner；它生成计划、命令协议、文档、adapter、审查证据和恢复指针，实际工作由宿主 Agent 执行。
-- C9 使用 Feature Queue，6 个 Feature，12 个 serial Milestone。
+本轮 C11 不是普通功能开发，而是对 Hypo-Workflow 的 audit 治理能力做结构性增强。目标是让 audit 成为执行主线中的硬 gate，而不是结束时附带的一次浅层 review。
 
-## Architecture Direction
+## 关键升级方向
 
-C9 增加四条用户可见能力线：
+1. `audit` 拥有中途介入和打回权，不需要等 milestone 即将完成。
+2. `audit` 可拒绝 `milestone`、`feature`、`cycle` 三个层级。
+3. `blocked` 不是 implement 单方面宣布；只能由 implement 提出，audit 审批。
+4. 引入持久化 `audit memory`，记住项目级 rules、用户特殊要求和 cycle 决策。
+5. Plan 阶段必须有固定审计问题组，并在 P2/P3 回显审计契约。
+6. 每个 milestone 默认只有一个 canonical prompt file；需要委派时才在固定 derived 路径下生成 `orchestrator/test/implement/audit` 的 subworker prompts。
+7. 返工采用增量 `rework prompt`，保留与原 prompt 的可追溯关系。
+8. spawn 串权是重点风险，尤其是同一 worker 同时承担 `test` 与 `implement`。
 
-1. **Configuration Governance**：把散落在 config、Cycle、rules、analysis、automation、review 和 platform profile 中的边界整理为中文可读矩阵。
-2. **Change Request Workflow**：用 `/hw:pr` 处理已有 GitHub PR / GitLab MR，并在 `.pipeline/pr/` 留下本地归档。
-3. **Evidence-first Explain**：用 `/hw:explain` 回答代码、配置、变更和命令问题，默认查证据，支持 `--subagent` 独立取证。
-4. **Claude Resume Namespace Boundary**：修复 Claude Code 原生 `/resume` 和 Hypo `/hw:resume` 的自动补全/路由歧义。
+## 当前授权与边界
 
-## Expected Code Areas
+- execution subworkers: authorized
+- mode: strict
+- scope: `/hw:plan`, `/hw:start`, `/hw:resume`
+- roles: `test`, `implement`, `audit`
 
-- `references/config-spec.md`
-- `docs/user-guide.md`
-- `docs/developer.md`
-- `docs/reference/*.md`
-- `docs/platforms/*.md`
-- `references/commands-spec.md`
-- `references/platform-claude.md`
-- `references/platform-capabilities.md`
-- new PR/MR reference contract, likely `references/pr-spec.md`
-- new Explain reference contract, likely `references/explain-spec.md`
-- new or updated skills under `skills/pr/`, `skills/explain/`, `skills/resume/`
-- `.claude-plugin/plugin.json`
-- `core/src/commands/`
-- `core/src/docs/`
-- `core/src/artifacts/claude.js`
-- `core/src/claude-*`
-- `core/test/*config*.test.js`
-- `core/test/*pr*.test.js`
-- `core/test/*explain*.test.js`
-- `core/test/*claude*resume*.test.js`
-- `core/test/docs-governance.test.js`
-- `.opencode/commands/` and generated command map when new commands are added
+当前执行按 `strict` worker separation 规划：`test`、`implement`、`audit` 必须保持独立，audit 有权因串权、伪测试、用户要求遗漏、worker lifecycle 不完整而拒绝。
 
-## Source-Of-Truth Boundaries
+## 规划中的新产物
 
-- `.pipeline/config.yaml` and `~/.hypo-workflow/config.yaml` define effective configuration, but docs must explain project > global > default precedence.
-- `.pipeline/cycle.yaml` defines Cycle-local lifecycle policy and must not be silently overwritten.
-- `.pipeline/pr/` stores PR/MR local evidence. It does not replace GitHub/GitLab as remote source of truth.
-- `/hw:explain` is read-only. It must not update state, create patches, or advance workflow unless a future explicit flag is designed.
-- Claude Code native `/resume` belongs to Claude. Hypo-Workflow owns only `/hw:resume` and exact `hw` namespace entries.
+- `audit memory` 持久化文件
+- `rejection artifact`
+- `blocked evidence`
+- 每个 milestone 的 canonical prompt file，以及按需生成的 `orchestrator/test/implement/audit` derived prompts
+- `rework prompt`
+- 相关 focused tests 与 canonical examples
 
-## Review And Evidence
+## 配套治理
 
-C9 requires durable review artifacts for generated plan and final delivery:
-
-```text
-.pipeline/reviews/
-  C9-plan-generation/
-    subagent-audit/
-  F002-pr/
-    M03/
-  F003-explain/
-    M07/
-  F006-validation/
-    M12/
-```
-
-Every new command contract should record:
-
-- command name and supported flags;
-- read/write side effects;
-- protected file writes;
-- network/remote behavior;
-- user confirmation gates;
-- fixture-based validation;
-- documentation and adapter generation requirements.
-
-## Milestone Strategy
-
-1. M01 配置字段盘点与严格度矩阵。
-2. M02 默认配置组合。
-3. M03 Change Request 合同与本地归档。
-4. M04 只读 inspect/review 流程。
-5. M05 fix/merge/close 手动门。
-6. M06 Evidence-first Explain 合同。
-7. M07 `--subagent` 取证流程。
-8. M08 Explain 测试与文档。
-9. M09 Claude `/resume` 冲突审计。
-10. M10 Claude 适配修复与烟测。
-11. M11 人读文档中文主体化。
-12. M12 C9 Agent Review 与全量回归。
-
-## Cross-Cutting Constraints
-
-- 不自动安装插件、改 user-level config、push、merge、close、publish 或执行远端写操作。
-- PR/MR live remote 读取受网络/remote boundary 约束，测试默认用 fixture/mock。
-- Explain 输出必须引用证据或声明无法确认。
-- 文档中文化不得改变命令、配置键和 schema field 的精确拼写。
-- 新命令必须更新 command map、help、platform docs、generated artifacts 和 adapter surfaces。
-- 所有用户可见说明按 `output.language=zh-CN`。
+- C10 的 live prompts 已归档，避免新 cycle 读取旧 prompt truth。
+- Codex skill source 使用 snapshot 副本，不直接读取热修改中的工作仓库。

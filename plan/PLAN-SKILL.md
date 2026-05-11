@@ -123,6 +123,7 @@ Interactive questioning rules:
 - start with task category, desired effect, and verification method before implementation detail
 - summarize what was learned after each round
 - convert "verification method" into a closed-loop real test contract before leaving Discover: exact command or scenario, observable pass/fail signal, who independently validates it, and whether audit rejects pseudo tests
+- P1 must ask a mandatory audit question group before leaving Discover; the audit question group captures audit authority, rejection scope, pseudo-test rejection, blocked approval, and audit evidence, and missing answers block completion and deny entry to P2
 - before leaving Discover on Codex, capture execution subworker authorization for `/hw:start` and `/hw:resume` even when `execution.worker_separation.mode` already exists; without one explicit outcome, P1 must not enter P2
 - valid Codex P1 authorization outcomes are `authorized recommended`, `authorized strict`, `start/resume blocked until authorization`, or explicit user-confirmed fastest single-agent `execution.worker_separation.mode=off`
 - before leaving Discover on Claude Code, choose execution subworker backend `subcodex` or `subclaude`; no separate subworker authorization gate is required
@@ -172,7 +173,8 @@ Batch Discover adds:
 
 Decompose output rules:
 
-- each milestone should map to one generated prompt file
+- each milestone should map to one canonical generated prompt file
+- P2 must echo the P1 audit contract in the milestone plan and preserve real test method, pseudo-test rejection, rejection scope, blocked approval, and audit evidence
 - every milestone must include:
   - objective
   - implementation scope
@@ -246,10 +248,15 @@ Preset selection rules:
 - convert that implementation plan into the final prompt file format instead of freehand summary text
 - preserve the validation intent from the milestone plan in the generated prompt's `预期测试` and constraints sections
 - preserve closed-loop validation commands, real test method, scenario, pass/fail signal, evidence expectations, audit pseudo-test rejection rule, and implementation-versus-validation ownership in the generated prompt
-- include a `Subworker Assignment Plan` in each generated implementation prompt whenever worker separation is enabled or independent validation is required; assign exactly `test`, `implement`, and `audit` before any implementation steps. `review_tests` remains only the TDD step for checking tests, owned by the `test` worker.
+- P3 must carry forward the P1 audit contract into generated prompts and architecture notes, preserving real test method, pseudo-test rejection, rejection scope, blocked approval, and audit evidence
+- keep the default prompt set compact: one canonical milestone prompt per milestone, and release derived subworker prompt files only when the milestone is actually delegated for worker-separated execution
+- if no delegation decision exists, or the milestone stays single-agent, do not release derived prompt files at all; keep the canonical prompt as the sole milestone artifact
+- when derived subworker prompts are released, place them only under `.pipeline/prompts/derived/Mxx/` for that milestone; treat that directory as the fixed derived release path
+- if delegated subworker prompts are generated, they may fan out into `orchestrator`, `test`, `implement`, and `audit` role files, but that fan-out is a derived execution detail rather than the canonical milestone count or canonical release trigger
+- include a `Subworker Assignment Plan` in each canonical prompt whenever worker separation is enabled or independent validation is required; assign exactly `test`, `implement`, and `audit` before any implementation steps. `review_tests` remains only the TDD step for checking tests, owned by the `test` worker.
 - include each role's write boundary in the generated prompt: spawned workers edit only `.pipeline/` files and explicitly scoped root-level non-project documentation such as `README.md`, `CHANGELOG.md`, and `PROJECT-SUMMARY.md`; `audit` is read-only. Generated prompts must say that scope violations stop the worker and that workers may not revert or overwrite another worker's edits unless explicitly authorized by the orchestrator.
-- on Codex without execution subworker authorization, keep the assignment but mark it `blocked_until_authorized` and write the start/resume authorization gate; do not remove the subworker plan unless the user explicitly confirmed fastest single-agent `off`
-- generated implementation prompts must carry Objective, Boundaries, Non-Goals, Validation Commands, Evidence, and Human QA sections when applicable
+- on Codex without execution subworker authorization, keep the assignment but mark it `blocked_until_authorized` and write the start/resume authorization gate; do not release derived subworker prompt files until that authorization is granted, unless the user explicitly confirmed fastest single-agent `off`
+- generated canonical prompts must carry Objective, Boundaries, Non-Goals, Validation Commands, Evidence, Human QA, and Subworker Assignment Plan sections when applicable
 
 Required Generate outputs:
 

@@ -273,6 +273,94 @@ export function resolveCycleStatusPhase(input = {}) {
   };
 }
 
+export function resolveRejectionNextStep({ artifact = {}, lifecycle_policy: lifecyclePolicy = {} } = {}) {
+  const rejectAction = normalizeRejectAction(
+    lifecyclePolicy.reject?.default_action ||
+    lifecyclePolicy.reject_default_action ||
+    lifecyclePolicy.default_action,
+  );
+  const verdict = normalizeToken(artifact.verdict);
+
+  if (verdict === "rejected" && rejectAction === "needs_revision") {
+    return {
+      action: "rework",
+      silent_continue: false,
+      requires_acceptance: false,
+      required_roles: collectRequiredReworkRoles(artifact.required_rework),
+      prompt_kind: "rework",
+      reason: "cycle_rejected",
+    };
+  }
+
+  return {
+    action: rejectAction,
+    silent_continue: false,
+    requires_acceptance: false,
+    required_roles: [],
+    prompt_kind: rejectAction === "needs_revision" ? "rework" : rejectAction,
+    reason: verdict === "rejected" ? "cycle_rejected" : "not_rejected",
+  };
+}
+
+export function evaluateBlockedRuntimeDecision(input = {}) {
+  const actorRole = normalizeToken(input.actor_role || input.actorRole);
+  const action = normalizeToken(input.action);
+
+  if (action === "propose_blocked") {
+    if (actorRole !== "implement") {
+      return deniedBlockedDecision("only implement may propose blocked", input);
+    }
+    const now = input.created_at || input.createdAt || new Date().toISOString();
+    const blockedRequest = {
+      schema_version: 1,
+      status: "blocked_proposed",
+      proposed_by_role: "implement",
+      proposed_by_worker_id: input.actor_worker_id || input.actorWorkerId || null,
+      approved_by_role: null,
+      approved_by_worker_id: null,
+      evidence: input.evidence || {},
+      reason: input.evidence?.reason || input.reason || null,
+      created_at: now,
+      approved_at: null,
+    };
+    return {
+      allowed: true,
+      status: "blocked_proposed",
+      approved: false,
+      reason: "implement_blocked_proposal",
+      blocked_request: blockedRequest,
+    };
+  }
+
+  if (action === "approve_blocked") {
+    if (actorRole !== "audit") {
+      return deniedBlockedDecision("only audit may approve blocked; blocked cannot be self-approved", input);
+    }
+    const proposal = input.proposal || input.blocked_request || {};
+    if (normalizeToken(proposal.proposed_by_role) === "audit") {
+      return deniedBlockedDecision("audit cannot approve its own blocked proposal", input, proposal);
+    }
+    const now = input.approved_at || input.approvedAt || new Date().toISOString();
+    const blockedRequest = {
+      ...proposal,
+      schema_version: proposal.schema_version || 1,
+      status: "blocked_approved",
+      approved_by_role: "audit",
+      approved_by_worker_id: input.actor_worker_id || input.actorWorkerId || null,
+      approved_at: now,
+    };
+    return {
+      allowed: true,
+      status: "blocked_approved",
+      approved: true,
+      reason: "audit_blocked_approval",
+      blocked_request: blockedRequest,
+    };
+  }
+
+  return deniedBlockedDecision("unsupported blocked runtime action", input);
+}
+
 export function selectLifecycleContinuation(value = {}, kind = "follow_up_plan") {
   const node = unwrapCycle(value);
   const continuations = normalizeContinuations(
@@ -398,6 +486,27 @@ function nextActionForPhase(phase) {
   if (phase === "follow_up_planning") return "start_follow_up_plan";
   if (phase === "blocked") return "inspect_blocker";
   return "none";
+}
+
+function collectRequiredReworkRoles(requiredRework = []) {
+  const roles = new Set(["test", "implement"]);
+  for (const item of Array.isArray(requiredRework) ? requiredRework : []) {
+    for (const role of Array.isArray(item?.owner_roles) ? item.owner_roles : []) {
+      const normalized = String(role || "").trim();
+      if (normalized) roles.add(normalized);
+    }
+  }
+  return [...roles];
+}
+
+function deniedBlockedDecision(reason, input = {}, blockedRequest = input.proposal || input.blocked_request || null) {
+  return {
+    allowed: false,
+    status: "denied",
+    approved: false,
+    reason,
+    blocked_request: blockedRequest,
+  };
 }
 
 function unwrapCycle(value = {}) {

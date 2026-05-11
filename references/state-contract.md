@@ -129,8 +129,18 @@ runtime_workers:
   workers:
     - role: implement
       worker_id: self
+      prompt_scope:
+        - core/src/**
+        - references/**
+      changed_files:
+        - core/src/acceptance/index.js
     - role: test
       worker_id: codex
+      prompt_scope:
+        - core/test/**
+        - tests/scenarios/**
+      changed_files:
+        - core/test/example.test.js
     - role: audit
       worker_id: self
   role_availability:
@@ -145,6 +155,11 @@ Rules:
 - `runtime_workers` is a compact mirror, not the authority; step records remain the underlying evidence.
 - `runtime_workers.workers` must not include Codex/OpenCode runtime-only subtask observations as acceptance evidence.
 - `workers[*].role` should use `implement`, `test`, or `audit`.
+- `workers[*].prompt_scope` should list the persisted write scope declared before the worker started. Exact paths and simple glob patterns such as `core/src/**` and `references/**` are valid.
+- `workers[*].changed_files` should list the persisted files changed by that worker. Acceptance gates use this with `prompt_scope` to reject out-of-scope or cross-role ownership evidence.
+- For required file-changing roles (`implement` and `test`), `prompt_scope` and `changed_files` must be present as persisted fields. Missing fields mean missing ownership evidence; an explicit empty `changed_files: []` means the worker made no file changes and is valid no-op evidence when `prompt_scope` is also persisted.
+- Runtime-only observation is not enough for `prompt_scope` or `changed_files`; these fields must be persisted in step records, parsed worker results, reports, logs, or the runtime mirror derived from those records.
+- Ownership rejection rules are role-specific: `audit` is read-only and must have no changed files; `implement` must not change test-owned assets such as `core/test/**`, `tests/**`, fixtures, snapshots, or assertions; `test` must not change implementation-owned assets such as `core/src/**`.
 - `role_availability.<role>.status` currently supports `unavailable` or omission.
 - `reason` should be a machine-readable token such as `tool_unavailable`, `command_unavailable`, `platform_unsupported`, `capability_missing`, `permission_denied`, `spawn_failed`, or `exec_nonzero`.
 - The mirror should be refreshed when a relevant execution step finishes or when fallback evidence changes.
@@ -243,7 +258,9 @@ Read `state.yaml` at these moments:
 - `status=skipped` should carry a `reason`.
 - `milestones[].status=deferred` should carry `deferred_reason`.
 - `pipeline.status=stopped` means the run is intentionally paused and resumable.
+- `pipeline.status=blocked` is authoritative only after audit approves the blocked transition.
 - `prompt_state.result=stopped` means the current prompt was paused mid-flight and should resume from `current.step`.
+- `prompt_state.result=blocked` should be used only for an audit-approved blocked outcome, not for an implement-only proposal.
 - prompt-level `result=skipped` should not increment `pipeline.prompts_completed`.
 - `history.completed_prompts` is a legacy field name and may contain non-pass entries such as `blocked`, `aborted`, or `skipped`.
 - optional `chat.*` state must never replace Cycle / Milestone / Patch state; it only annotates an append conversation lane.
@@ -254,6 +271,94 @@ Read `state.yaml` at these moments:
 - `state.yaml` must not store full acceptance or rejection feedback text.
 - `current.phase=needs_revision` means `/hw:resume` should continue the revision path using `acceptance.feedback_ref` as input instead of resuming a completed step.
 - `current.phase=follow_up_planning` means accepted work is waiting to start the active `continuation` record.
+- only `implement` may propose `blocked` with evidence and rationale.
+- only `audit` may approve `blocked`, and it may do so before milestone completion when the run must stop mid-flight.
+
+## Rejection Rework Runtime Contract
+
+A rejection must produce a structured rejection artifact before the runtime chooses the next step. The artifact is an authority payload stored outside compact `state.yaml`; `state.yaml` may keep only a pointer such as `acceptance.feedback_ref`.
+
+Suggested shape:
+
+```yaml
+schema_version: 1
+cycle_id: C11
+feature_id: F001
+milestone_id: M05
+scope: milestone
+verdict: rejected
+reasons:
+  - code: TEST-01
+    severity: warning
+    summary: Rejection loop has no deterministic rework routing.
+required_rework:
+  - id: RW-01
+    owner_roles: [test, implement]
+    summary: Add deterministic rework routing and validation evidence.
+    files: [core/src/acceptance/index.js, core/src/lifecycle/index.js]
+blocked_request:
+  status: none
+  proposed_by_role: null
+  approved_by_role: null
+audit:
+  reviewer_role: audit
+  verdict: needs_changes
+  findings: []
+original_prompt_ref: .pipeline/prompts/04-orchestrator-rejection-rework-blocked-runtime-loop.md
+created_at: 2026-05-11T10:00:00+08:00
+```
+
+Rules:
+
+- `schema_version` is currently `1`.
+- `verdict=rejected` with `lifecycle_policy.reject.default_action=needs_revision` deterministically routes to a rework prompt.
+- Rework requires at least `test` and `implement` roles; additional `required_rework[*].owner_roles` may expand, not replace, those roles.
+- Rejection rework must not silently continue. The runtime should surface `silent_continue=false`, `prompt_kind=rework`, and `reason=cycle_rejected`.
+- Rework prompt linkage must preserve both `original_prompt_ref` and the active `prompt_ref`.
+- Rework scope is incremental. `incremental_scope` is derived from `required_rework`, rejection reasons, rejection scope, and `audit.findings`.
+- `allow_unrelated_scope=false` unless a future schema explicitly expands the rejected scope.
+
+## Audit Memory State Boundary
+
+Durable `audit memory` is an authority file family outside `state.yaml`.
+
+Suggested files:
+
+```yaml
+.pipeline/audit-memory/<cycle-id>-audit-memory.yaml:
+  audit_memory:
+    schema_version: 1
+    cycle_id: C11
+    source_authority:
+      - user_special_requirements
+      - project_rules_summary
+      - cycle_decisions
+    user_special_requirements: []
+    project_rules_summary: []
+    cycle_decisions: []
+    raw_conversation:
+      authority: false
+
+.pipeline/audit-memory/<milestone-id>-audit-delta.yaml:
+  audit_delta:
+    schema_version: 1
+    cycle_id: C11
+    milestone_id: M02
+    cycle_memory_ref: .pipeline/audit-memory/C11-audit-memory.yaml
+    local_special_requirements: []
+    authority:
+      inherits_cycle_memory: true
+      raw_freeform_is_authority: false
+```
+
+Rules:
+
+- cycle-level audit memory persists user requirements, project rules summaries, and Cycle decisions as the source of truth for audit carry-over.
+- milestone-level audit delta records local Milestone requirements and scoped visibility without replacing cycle-level audit memory.
+- `/hw:plan`, `/hw:start`, and `/hw:resume` should consume scoped audit summaries derived from the cycle-level audit memory and current milestone-level audit delta.
+- `state.yaml` may store only compact pointers or summaries for status surfaces; it must not become the full audit memory store.
+- raw free-form conversation is not authority and is not the source of truth for user requirements, rules, Cycle decisions, or audit deltas.
+- `audit` may reject a `milestone`, `feature`, or `cycle`; rejection scope should match the smallest invalidated delivery unit unless policy escalates it.
 
 ## Acceptance State
 

@@ -2,6 +2,29 @@
 
 Use this reference for `/hw:audit`, the preventive code auditing workflow.
 
+## Governance Authority
+
+- `audit` is a hard governance gate, not only a final passive review.
+- `audit` may intervene before milestone completion and reject work mid-flight when execution evidence, worker separation, or validation quality is insufficient.
+- `audit` may reject a `milestone`, `feature`, or `cycle` depending on the scope of the defect or governance breach.
+- only `implement` may propose `blocked`; only `audit` may approve `blocked`.
+- blocked approval is deterministic: an implement proposal alone is `blocked_proposed`, not an approved blocked runtime state; the approved state exists only after an `audit` actor approves the proposal.
+- `implement` must never approve its own blocked proposal, even if it created the evidence.
+- when `audit` rejects work, it must produce or reference a structured rejection artifact with `schema_version`, rejection scope, reasons, required rework, audit findings, blocked request state, original prompt reference, and creation timestamp.
+- rejected work with `needs_revision` must route through rework requiring at least `test` and `implement`, with no silent continuation.
+
+Canonical regression examples for these governance cases live in `core/test/fixtures/audit-regression-canonical-examples/` and are exercised by `core/test/audit-regression-canonical-examples.test.js`.
+
+## Audit Memory Authority
+
+- durable `audit memory` is the authority for audit-relevant carry-over across a Cycle.
+- cycle-level audit memory stores user requirements, project rules summaries, and Cycle decisions under `.pipeline/audit-memory/<cycle-id>-audit-memory.yaml`.
+- milestone-level audit delta stores local Milestone requirements under `.pipeline/audit-memory/<milestone-id>-audit-delta.yaml` and inherits, rather than replaces, the cycle-level audit memory.
+- `/hw:plan` consumes scoped audit summaries built from audit memory plus the current audit delta before planning context is handed to planning workers or reviewers.
+- `/hw:start` consumes scoped audit summaries built from audit memory plus the current audit delta.
+- `/hw:resume` consumes the same scoped audit summaries so user requirements survive handoff after interruption.
+- raw free-form conversation may help capture memory, but it is not authority and is not the source of truth.
+
 ## Audit Dimensions
 
 | Dimension | Code | Checks | Severity |

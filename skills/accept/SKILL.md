@@ -13,7 +13,11 @@ description: Accept pending Hypo-Workflow Cycle work and complete the manual acc
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill when the user invokes `/hw:accept`.
+Use this skill when the user invokes `/hw:accept` or `/hw:achieve`.
+
+`/hw:achieve` is an alias for `/hw:accept`. It uses the same Cycle acceptance gate,
+worker-separation checks, lifecycle writes, log entry semantics, and derived refresh
+behavior. Do not create a second acceptance path for `achieve`.
 
 ## Semantics
 
@@ -26,6 +30,8 @@ Use this skill when the user invokes `/hw:accept`.
   - each required worker must have lifecycle evidence for requested, started, terminal `completed`, and closed/released state
   - any missing worker, failed/blocked worker, `close_failed`, runtime-only subtask observation, or missing Codex `/hw:start` + `/hw:resume` authorization scope blocks acceptance
 - If project worker separation policy requires audit-backed acceptance, ensure audit did not mark test coverage as insufficient before final acceptance.
+- `audit` remains a hard governance gate before final acceptance: it may intervene before milestone completion, reject work mid-flight, or escalate rejection scope from `milestone` to `feature` or `cycle` when the defect invalidates the larger unit.
+- only `implement` may propose `blocked`; only `audit` may approve `blocked`.
 - Mark `cycle.status: completed`.
 - Mark `cycle.acceptance.state: accepted` and store `accepted_at`.
 - If `cycle.lifecycle_policy.accept.next=follow_up_plan` or a planned `cycle.continuations[]` follow-up plan exists:
@@ -49,4 +55,4 @@ Use this skill when the user invokes `/hw:accept`.
 
 Do not store full review notes in `state.yaml`.
 
-`audit` may ask for re-test or re-implementation without blocking the whole execution by default, but it may still block acceptance when project policy requires it.
+`audit` may ask for re-test or re-implementation without blocking the whole execution by default, but it may still block acceptance when project policy requires it, and it may also reject a milestone, feature, or cycle before completion when governance requires intervention.

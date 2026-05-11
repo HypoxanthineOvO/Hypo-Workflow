@@ -72,6 +72,7 @@ See also [`external-docs-index.md`](./external-docs-index.md) for the cross-plat
 | `/hw:plan:review` | `/hw-plan-review` | `hw-review` | Native slash command, architecture drift review. |
 | `/hw:cycle` | `/hw-cycle` | `hw-status` | Native slash command group; subcommands remain prompt arguments. |
 | `/hw:accept` | `/hw-accept` | `hw-build` | Native slash command, Cycle acceptance gate. |
+| `/hw:achieve` | `/hw-achieve` | `hw-build` | Native slash command, alias for Cycle acceptance gate. |
 | `/hw:reject` | `/hw-reject` | `hw-build` | Native slash command, Cycle rejection feedback. |
 | `/hw:explore` | `/hw-explore` | `hw-explore` | Native slash command, isolated global worktree exploration. |
 | `/hw:sync` | `/hw-sync` | `hw-build` | Native slash command, adapter and derived-context synchronization. |

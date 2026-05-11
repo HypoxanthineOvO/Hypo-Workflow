@@ -6,7 +6,7 @@
 
 规划 -> 执行 -> 审查 -> 报告 -> 恢复
 
-[![Version](https://img.shields.io/badge/version-12.3.0-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-12.4.0-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/reference/platforms.md)
 
@@ -27,7 +27,7 @@ Hypo-Workflow 在所有平台上共享同一套 `.pipeline/` 协议：
 - **Rules / Habits**：把用户习惯和项目规则保存成结构化 authority，再生成各平台可读的指令视图。
 - **Agent Review**：在计划、测试、实现和收口阶段记录 review artifact，支持多轮 `needs_changes -> repair -> review`。
 - **PR/MR Create**：`/hw:pr create` 支持 GitHub PR 与 GitLab MR 的问答式创建，已有本地改动和 plan-first 工作分开处理，远端写一次性确认。
-- **Acceptance / Compact Evidence**：`/hw:accept` 会阻塞缺失或冲突的 worker evidence；`/hw:start` 和 `/hw:resume` 成功收口后按 `dirty_only` 策略刷新 compact 视图。
+- **Acceptance / Compact Evidence**：`/hw:accept` 与 `/hw:achieve` 会阻塞缺失或冲突的 worker evidence；`/hw:start` 和 `/hw:resume` 成功收口后按 `dirty_only` 策略刷新 compact 视图。
 - **Domain Packs**：把 RTL 等领域知识做成可选包；外部包只记录 metadata，安装或远程获取必须明确确认。
 - **Sync / Docs / Release**：同步平台适配器、修复文档、执行发布检查，但 Hypo-Workflow 本身不替代宿主 Agent 工作。
 
@@ -65,7 +65,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 - 完成前做交付前检查：格式、派生产物、README/文档新鲜度、secret marker、测试证据和报告证据。
 - 自动化等级由 `.pipeline/config.yaml` 的 `automation.level` 决定；发布、破坏性操作和外部副作用仍按配置确认点执行。
 
-当前版本提供 **39 个用户指令**，另有 **1 个内部 watchdog** skill。
+当前版本提供 **40 个用户指令**，另有 **1 个内部 watchdog** skill。
 
 ## 常用命令
 
@@ -87,7 +87,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | 引导下一步 | `/hw:guide` |
 | 查看或调整规则 | `/hw:rules` |
 | 隔离探索 | `/hw:explore` |
-| 接受或拒绝交付 | `/hw:accept` / `/hw:reject` |
+| 接受或拒绝交付 | `/hw:accept` / `/hw:achieve` / `/hw:reject` |
 
 ## 命令概览
 
@@ -95,7 +95,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 |---|---|
 | Pipeline | `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat` |
 | Plan | `/hw:plan`, `/hw:plan:discover`, `/hw:plan:decompose`, `/hw:plan:generate`, `/hw:plan:confirm`, `/hw:plan:extend`, `/hw:plan:review` |
-| Lifecycle | `/hw:init`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:patch`, `/hw:patch fix`, `/hw:release` |
+| Lifecycle | `/hw:init`, `/hw:cycle`, `/hw:accept`, `/hw:achieve`, `/hw:reject`, `/hw:patch`, `/hw:patch fix`, `/hw:release` |
 | Analysis/Review | `/hw:check`, `/hw:audit`, `/hw:debug`, `/hw:pr`, `/hw:pr create`, `/hw:explain` |
 | Utility | `/hw:sync`, `/hw:docs`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:help`, `/hw:reset`, `/hw:log`, `/hw:setup`, `/hw:explore` |
 
@@ -111,7 +111,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | [Platforms Reference](docs/reference/platforms.md) | 六个平台能力表 |
 | [Generated Artifacts](docs/reference/generated-artifacts.md) | OpenCode、第三方适配、压缩视图和文档引用的生成来源 |
 | [OpenCode Guide](docs/platforms/opencode.md) | OpenCode 指令、智能体角色、模型矩阵和边界 |
-| [v12.3.0 Release Notes](docs/release/v12.3.0.md) | worker separation、`dirty_only` compact、PR #5 和验证证据 |
+| [v12.4.0 Release Notes](docs/release/v12.4.0.md) | `/hw:achieve` alias、adapter refresh 和验证证据 |
 | [Cursor Guide](docs/platforms/cursor.md) | Cursor 仓库规则 |
 | [GitHub Copilot Guide](docs/platforms/copilot.md) | GitHub Copilot 仓库指令 |
 | [Trae Guide](docs/platforms/trae.md) | Trae 项目规则 |

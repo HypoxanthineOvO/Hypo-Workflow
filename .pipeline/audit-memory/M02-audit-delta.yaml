@@ -1,0 +1,62 @@
+audit_delta:
+  schema_version: 1
+  cycle_id: C11
+  milestone_id: M02
+  created_at: "2026-05-11T00:00:00+08:00"
+  updated_at: "2026-05-11T00:00:00+08:00"
+  cycle_memory_ref: .pipeline/audit-memory/C11-audit-memory.yaml
+  local_special_requirements:
+    -
+      id: M02-LOCAL-001
+      summary: M02 test worker may edit only test assets and fixtures.
+      source: M02_worker_prompt
+      scope: milestone
+    -
+      id: M02-LOCAL-002
+      summary: M02 implement worker must create real durable authority files instead of relying on test assets and fixtures.
+      source: C11_M02_rejection_001
+      scope: milestone
+    -
+      id: M02-LOCAL-003
+      summary: M02 must cover scoped audit summaries for plan, start, and resume handoff.
+      source: C11_M02_rejection_001
+      scope: milestone
+    -
+      id: M02-LOCAL-004
+      summary: M02 must not write audit verdict artifacts during implement rework.
+      source: implement_rework_prompt
+      scope: milestone
+  scoped_visibility:
+    test:
+      include:
+        - local_special_requirements
+        - user_special_requirements
+        - project_rules_summary
+        - cycle_decisions
+        - source_refs
+      exclude:
+        - raw_conversation
+        - unrestricted_memory
+    implement:
+      include:
+        - local_special_requirements
+        - user_special_requirements
+        - project_rules_summary
+        - cycle_decisions
+        - source_refs
+      exclude:
+        - raw_conversation
+        - unrestricted_memory
+    audit:
+      include:
+        - local_special_requirements
+        - user_special_requirements
+        - project_rules_summary
+        - cycle_decisions
+        - source_refs
+      exclude:
+        - raw_conversation
+        - unrestricted_memory
+  authority:
+    inherits_cycle_memory: true
+    raw_freeform_is_authority: false

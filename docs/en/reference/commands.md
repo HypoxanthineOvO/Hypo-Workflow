@@ -2,7 +2,7 @@
 
 [中文](../../../reference/commands.md) | English
 
-This page is generated from `core/src/commands/index.js`. Current user-facing command count: 39. Use the Canonical column as the user entrypoint and the OpenCode column as the platform mapping.
+This page is generated from `core/src/commands/index.js`. Current user-facing command count: 40. Use the Canonical column as the user entrypoint and the OpenCode column as the platform mapping.
 
 | Canonical | OpenCode | Agent | Skill |
 |---|---|---|---|
@@ -22,6 +22,7 @@ This page is generated from `core/src/commands/index.js`. Current user-facing co
 | `/hw:plan:review` | `/hw-plan-review` | `hw-review` | `skills/plan-review/SKILL.md` |
 | `/hw:cycle` | `/hw-cycle` | `hw-status` | `skills/cycle/SKILL.md` |
 | `/hw:accept` | `/hw-accept` | `hw-build` | `skills/accept/SKILL.md` |
+| `/hw:achieve` | `/hw-achieve` | `hw-build` | `skills/accept/SKILL.md` |
 | `/hw:reject` | `/hw-reject` | `hw-build` | `skills/reject/SKILL.md` |
 | `/hw:explore` | `/hw-explore` | `hw-explore` | `skills/explore/SKILL.md` |
 | `/hw:sync` | `/hw-sync` | `hw-build` | `skills/sync/SKILL.md` |
