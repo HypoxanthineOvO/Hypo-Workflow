@@ -1,0 +1,59 @@
+audit_memory:
+  schema_version: 1
+  cycle_id: C11
+  created_at: "2026-05-10T00:00:00+08:00"
+  updated_at: "2026-05-11T00:00:00+08:00"
+  source_authority:
+    - user_special_requirements
+    - project_rules_summary
+    - cycle_decisions
+  user_special_requirements:
+    -
+      id: USR-C11-001
+      summary: User special requirements must survive plan/start/resume handoff.
+      source: C11_confirm_summary
+      scope: cycle
+    -
+      id: USR-C11-002
+      summary: Audit must be able to check missing user requirement carry-over.
+      source: C11_M02_rejection_rework
+      scope: cycle
+    -
+      id: USR-C11-003
+      summary: Audit governance must preserve strict worker separation and prevent one worker from acting as test, implement, and audit at the same time.
+      source: C11_confirm_summary
+      scope: cycle
+  project_rules_summary:
+    -
+      id: prefer-chinese-output
+      severity: warn
+      summary: User-facing explanations, README updates, PROGRESS summaries, and interaction prompts prefer Chinese; command names, config keys, file names, and proper English terms stay in English.
+    -
+      id: worker-separation
+      severity: guard
+      summary: Test, implement, and audit roles must stay separated; each role must respect prompt scope and file ownership.
+    -
+      id: protected-files
+      severity: guard
+      summary: .pipeline/state.yaml, .pipeline/cycle.yaml, and .pipeline/rules.yaml are protected and require explicit confirmation for unexpected writes.
+  cycle_decisions:
+    -
+      id: D-C11-001
+      summary: Audit memory is durable cycle authority for special requirements.
+      source: C11_confirm_summary
+    -
+      id: D-C11-002
+      summary: Raw conversation may inform capture but is not the source of truth.
+      source: C11_confirm_summary
+    -
+      id: D-C11-003
+      summary: /hw:plan, /hw:start, and /hw:resume must receive role-scoped audit summaries from durable audit memory and milestone audit deltas.
+      source: C11_M02_rejection_rework
+    -
+      id: D-C11-004
+      summary: Only implement may propose blocked, and audit must approve blocked before the workflow enters a blocked state.
+      source: audit_spec
+  raw_conversation:
+    retained: false
+    authority: false
+    note: Raw free-form planning chat is not the source of truth and must not be the only authority.

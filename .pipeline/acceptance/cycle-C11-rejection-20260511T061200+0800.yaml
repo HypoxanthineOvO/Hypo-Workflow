@@ -1,0 +1,9 @@
+scope: cycle
+ref: C11
+iteration: 1
+problem: "现有 prompt 结构已收口为 7 个 canonical 文件，但 subworker prompt 的标准落点和释放规则仍未定义，导致验收口径不清。"
+reproduce_steps: "检查 .pipeline/prompts 目录与 plan/skills 里的 prompt contract，无法找到 subworker prompt 的固定落点。"
+expected: "cycle 应保留 7 个 canonical prompt，同时明确 subworker prompt 的标准路径或明确声明不放出。"
+actual: "只有 canonical prompt 口径，没有可执行的 subworker prompt 放出路径合同。"
+context: "用户要求先 reject 当前 cycle，再追加一个 milestone 专门补 subworker 提示词落点。"
+created_at: "2026-05-11T06:12:00+08:00"

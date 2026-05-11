@@ -18,7 +18,7 @@ Use this skill to start execution from a local `.pipeline/` workspace. This is t
 ## Preconditions
 
 - `.pipeline/config.yaml` exists and should be validated before mutating state
-- prompt files exist under the configured prompts directory
+- prompt files exist under the configured prompts directory; if a milestone is delegated for worker-separated execution, optional derived subworker prompts live under `.pipeline/prompts/derived/Mxx/` and the canonical milestone prompt remains the source of truth
 - if `.pipeline/state.yaml` already contains unfinished work, resume it unless the user explicitly asks for a clean restart
 
 ## Execution Flow

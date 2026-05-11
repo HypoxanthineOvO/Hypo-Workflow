@@ -12,7 +12,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 - Claude Code exposes canonical commands through a plugin whose namespace is `hw`; the existing workflow skills remain authoritative and must not be duplicated into a second implementation
 - Claude Code `/hw:*` entries are plugin-skill entrypoints for the existing Hypo-Workflow skill files
 - Claude Code native `/resume` remains owned by Claude Code; Hypo-Workflow must never register or document bare `/resume` as an alias for `/hw:resume`
-- V12 canonical namespace contains 39 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups, plus an internal cron-only watchdog skill
+- V12 canonical namespace contains 40 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups, plus an internal cron-only watchdog skill
 - slash commands are exact and namespace-scoped
 - slash commands take precedence over fuzzy natural-language matching
 - natural-language commands remain valid for backward compatibility
@@ -51,6 +51,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
    - `/hw:plan:review`
    - `/hw:cycle`
    - `/hw:accept`
+   - `/hw:achieve`
    - `/hw:reject`
    - `/hw:explore`
    - `/hw:sync`
@@ -61,7 +62,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 3. parse remaining tokens as command arguments
 4. flags are order-independent
 5. if a command is unknown, return exactly:
-   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:achieve, /hw:reject, /hw:explore, /hw:sync, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 6. if a known command receives an unsupported flag, stop and report the unsupported flag explicitly instead of guessing
 7. if a prompt selector is ambiguous, list the candidates and stop
 8. plan and review commands load `plan/PLAN-SKILL.md` before execution
@@ -72,7 +73,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 
 ## Command Semantics
 
-Lifecycle-mutating commands must use the workflow commit helper for protected workflow state. This applies to `/hw:accept`, `/hw:reject`, `/hw:start`, `/hw:resume`, `/hw:plan:generate`, prompt skip/stop transitions, and any command that writes `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, or `.pipeline/rules.yaml`.
+Lifecycle-mutating commands must use the workflow commit helper for protected workflow state. This applies to `/hw:accept`, `/hw:achieve`, `/hw:reject`, `/hw:start`, `/hw:resume`, `/hw:plan:generate`, prompt skip/stop transitions, and any command that writes `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, or `.pipeline/rules.yaml`.
 
 The command should prepare authoritative writes first, prevalidate invariants, commit authority with temp-file atomic replacement, then refresh derived views such as `.pipeline/log.yaml`, `.pipeline/PROGRESS.md`, metrics mirrors, compact views, `PROJECT-SUMMARY.md`, and OpenCode status inputs. If a derived refresh fails after authority commits, do not roll back authority; report the warning, write `.pipeline/derived-refresh.yaml`, and recommend `/hw:sync --light` or rerunning the lifecycle command after repair.
 
@@ -107,6 +108,12 @@ Behavior:
 - before declaring completion in Codex or hook-limited environments, run preflight checks for protected writes, format validity, derived artifacts, README freshness, output language, secret markers, and required evidence
 - when worker separation is enabled, required evidence should include implement/test/audit role coverage; in `recommended`, implement/test degradation is valid only with objective subworker-unavailable evidence, while audit may degrade with explicit evidence
 
+Audit memory:
+
+- load cycle-level audit memory and the current milestone-level audit delta before execution context is handed to a worker.
+- build scoped audit summaries for `/hw:start` from `user_special_requirements`, `project_rules_summary`, `cycle_decisions`, `local_special_requirements`, and `source_refs`.
+- do not include raw free-form conversation in `/hw:start` scoped audit summaries because it is not authority or source of truth.
+
 ### `/hw:resume`
 
 Supported flags:
@@ -135,6 +142,12 @@ Behavior:
 - continue from the next runnable step
 - update top-level `last_heartbeat` whenever state is persisted
 - run the same Codex preflight checks before declaring a resumed milestone complete
+
+Audit memory:
+
+- reload cycle-level audit memory and the current milestone-level audit delta before resuming a worker.
+- build scoped audit summaries for `/hw:resume` with the same authority fields used by `/hw:start`, preserving user requirements across interruption and handoff.
+- do not treat raw free-form conversation as authority during resume recovery.
 
 ### Continuation And Preflight Contract
 
@@ -240,7 +253,7 @@ Supported forms:
 Behavior:
 
 - read `SKILL.md` command tables as the source of truth
-- `/hw:help` lists all 39 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility
+- `/hw:help` lists all 40 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility
 - `/hw:help --quick` returns a compact cheat sheet
 - `/hw:help <cmd>` returns detailed usage, flags, and examples for the requested command
 
@@ -361,6 +374,14 @@ Supported flags:
 Behavior:
 
 - follow the four-step audit workflow in `references/audit-spec.md`
+- treat `audit` as a hard governance gate, not only an end-of-run report
+- `audit` may intervene before milestone completion and reject work mid-flight
+- `audit` may reject a `milestone`, `feature`, or `cycle`
+- only `implement` may propose `blocked`; only `audit` may approve `blocked`
+- an implement blocked proposal returns `blocked_proposed` and must not set `pipeline.status=blocked` or `prompt_state.result=blocked`
+- an audit blocked approval returns `blocked_approved`; only then may lifecycle state become blocked
+- audit rejection must preserve the original or source prompt reference and create an incremental rework linkage
+- rejected `needs_revision` work must route to a `rework` prompt with `silent_continue=false` and required roles including `test` and `implement`
 - scan all six dimensions by default
 - write the detailed report to `.pipeline/audits/` and append an audit log entry
 
@@ -426,6 +447,12 @@ Behavior:
 - honor `plan.mode=auto|interactive` from project config, falling back to global `plan.default_mode` when available
 - default to `/hw:plan:discover` when no explicit sub-phase is given
 - do not start normal pipeline execution yet
+
+Audit memory:
+
+- load cycle-level audit memory and the current milestone-level audit delta before planning context is handed to a planning worker, reviewer, or challenger.
+- build scoped audit summaries for `/hw:plan` from `user_special_requirements`, `project_rules_summary`, `cycle_decisions`, `local_special_requirements`, and `source_refs`.
+- do not include raw free-form conversation in `/hw:plan` scoped audit summaries because it is not authority or source of truth.
 
 ### `/hw:plan:discover`
 

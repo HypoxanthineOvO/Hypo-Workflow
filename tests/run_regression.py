@@ -81,6 +81,12 @@ TARGET_SCENARIOS = {
     "s61-opencode-model-matrix-sync",
     "s62-analysis-preset-runtime",
     "s63-init-automation-non-git",
+    "s65-audit-memory-handoff",
+    "s66-plan-audit-interview-prompt-architecture",
+    "s67-worker-separation-spawn-enforcement",
+    "s68-rejection-rework-blocked-runtime-loop",
+    "s69-audit-regression-canonical-examples",
+    "s70-codex-skill-snapshot-isolation-guidance",
 }
 
 
@@ -279,6 +285,12 @@ def scenario_specific(scene: Path, result: ScenarioResult) -> None:
         "s61-opencode-model-matrix-sync",
         "s62-analysis-preset-runtime",
         "s63-init-automation-non-git",
+        "s65-audit-memory-handoff",
+        "s66-plan-audit-interview-prompt-architecture",
+        "s67-worker-separation-spawn-enforcement",
+        "s68-rejection-rework-blocked-runtime-loop",
+        "s69-audit-regression-canonical-examples",
+        "s70-codex-skill-snapshot-isolation-guidance",
     }:
         proc = run(f'bash "{scene / "run.sh"}"', cwd=scene)
         add(result, "run_sh", proc.returncode == 0, (proc.stdout + proc.stderr).strip())

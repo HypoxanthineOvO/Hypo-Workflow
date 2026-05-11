@@ -1,39 +1,36 @@
-# C9 Plan Confirm Summary
+# C11 Plan Confirm Summary
 
 ## 项目
 
-- Cycle: C9
-- 名称: Hypo-Workflow 配置治理、PR 管理、Explain 命令与 Claude Resume 修复
+- Cycle: C11
+- 名称: Audit 审计治理强化
 - Workflow kind: build
 - Preset: tdd
-- Feature 数: 6
-- Milestone 数: 12
+- Feature 数: 1
+- Milestone 数: 8
 
 ## 生成文件
 
+- `.pipeline/cycle.yaml`
 - `.pipeline/state.yaml`
 - `.pipeline/feature-queue.yaml`
-- `.pipeline/design-spec.md`
+- `.pipeline/confirm-summary.md`
 - `.pipeline/architecture.md`
 - `.pipeline/PROGRESS.md`
-- `.pipeline/metrics.yaml`
-- `.pipeline/prompts/00-*.md` through `.pipeline/prompts/11-*.md`
-- `.plan-state/batch-discover.yaml`
-- `.plan-state/batch-decompose.yaml`
-- `.plan-state/batch-architecture.md`
-- `.plan-state/generate.yaml`
 
 ## 关键确认点
 
-- 配置治理要覆盖自动程度、严格程度、确认边界和平台差异，并提供 `solo-auto`、`manual-review`、`team-strict`、`analysis-hybrid`。
-- `/hw:pr` 第一版处理已有 GitHub PR / GitLab MR；远端写操作始终高风险手动确认。
-- `.pipeline/pr/` 是本地 PR/MR 处理归档，不替代 GitHub/GitLab。
-- `/hw:explain` 是证据优先、只读问答命令；`--subagent` 用独立 Subagent 取证。
-- Claude Code 原生 `/resume` 与 Hypo `/hw:resume` 必须分离。
-- 给人看的 README 引用链、`docs/**` 和主要 `references/**` 要中文主体。
-- P3 生成后需要 Subagent 审计计划产物，然后进入 P4 确认。
-- Subagent 审计初始 verdict 为 `needs_changes`；P4 前已修复 high-risk gate、C9 config name、通用 plan-state 残留和 PR/MR remote-readonly 文案。
+- `audit` 从附属检查升级为执行主线中的硬治理角色，具备中途打回能力。
+- `audit` 可拒绝 `milestone`、`feature` 或 `cycle`，并要求 `test` 与 `implement` 重做。
+- 只有 `implement` 提出客观阻塞、且 `audit` 认可后，才能进入 `blocked`。
+- 审计记忆区需要记录项目级 `rules.md` 关键解释、用户特殊要求和当前 cycle 关键决策。
+- 每个 milestone 以一个 canonical prompt 作为主合同；`test`、`implement`、`audit` prompt 作为派生执行物，只在真实分派时展开。
+- 返工使用增量 `rework prompt` 并引用原 prompt。
+- 审计必须检查 worker 身份唯一性、prompt scope、改动文件归属、生命周期闭环以及 test/implement 证据分离。
+- 重点治理 spawn 串权，尤其是同一 worker 偷偷同时承担 `test` 与 `implement`。
+- Codex subworker 已授权为 `authorized strict`，作用域覆盖 `/hw:plan`、`/hw:start`、`/hw:resume`，角色为 `test`、`implement`、`audit`。
+- C10 的 live prompts 已归档到 `.pipeline/archives/C10-experience-improvements/`；Codex skill source 已切换为独立 snapshot，避免开发中自改当前使用中的 skill。
 
 ## P4 Gate
 
-等待 Subagent 审计结果和用户确认后，C9 才进入执行。确认后从 M01 开始。
+等待用户确认后，C11 进入执行前的 prompt/spec 生成与后续 `/hw:start` 流程。确认后从 M01 开始。

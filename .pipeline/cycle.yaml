@@ -1,13 +1,17 @@
 cycle:
-  number: 10
-  name: "一系列体验优化"
+  number: 11
+  name: Audit 审计治理强化
   type: feature
   status: completed
-  started: "2026-05-08T23:41:58+08:00"
+  started: "2026-05-10T00:00:00+08:00"
+  finished: "2026-05-11T21:59:36+08:00"
   preset: tdd
   workflow_kind: build
-  context_sources: []
-  previous_cycle: 9
+  context_sources:
+    - previous_cycle
+    - audit
+    - rules
+  previous_cycle: 10
   lifecycle_policy:
     reject:
       default_action: needs_revision
@@ -16,9 +20,15 @@ cycle:
     resume:
       default_action: continue_current
     gates:
+      planning: confirm
+      execution: auto
       acceptance: auto
     auto_continue: true
-  summary: "Delivered C10 experience improvements: P0 Configure before Discover, guided PR/MR Create with GitHub/GitLab support and manual remote-write confirmation, Subagent authorization/separation/degraded-mode governance, and refreshed docs/adapters with full regression."
+  summary: "Planning in progress for audit governance hardening: milestone-level audit prompts, audit memory, rejection/rework loop, and worker separation enforcement."
   lessons:
-    - "Expose subcommands such as /hw:pr create in the command registry when they are user-facing workflows, even if they share one Skill implementation."
-    - "Keep generated docs and regression command-count scenarios synchronized with command registry changes."
+
+  acceptance:
+    state: accepted
+    mode: manual
+    requested_at: "2026-05-11T21:05:19+08:00"
+    accepted_at: "2026-05-11T21:59:36+08:00"

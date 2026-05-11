@@ -16,6 +16,27 @@ plan:
 
 execution:
   mode: self
+  worker_separation:
+    mode: strict
+    authorization:
+      status: authorized
+      scope:
+        - /hw:start
+        - /hw:resume
+      granted_by: user
+      fallback_when_declined: block_start
+      downgrade_requires_confirmation: true
+      confirmed_by_user: true
+    roles:
+      implement:
+        required: true
+      test:
+        required: true
+      audit:
+        required: true
+    evidence:
+      log_roles: true
+      report_roles: true
   steps:
     preset: tdd
   step_overrides:

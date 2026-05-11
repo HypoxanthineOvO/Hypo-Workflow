@@ -1,12 +1,12 @@
 ---
 name: hypo-workflow
-version: 12.3.0
-description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:plan`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
+version: 12.4.0
+description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:plan`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:achieve`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
 ---
 
-# Hypo-Workflow v12.3.0
+# Hypo-Workflow v12.4.0
 
-> **Claude Code 用户**：请使用 `/hypo-workflow:<command>` 调用具体指令。输入 `/hypo-workflow:help` 查看全部 39 个用户指令。
+> **Claude Code 用户**：请使用 `/hypo-workflow:<command>` 调用具体指令。输入 `/hypo-workflow:help` 查看全部 40 个用户指令。
 >
 > **Codex 用户**：本文件是完整的 Skill 入口，继续使用 `/hw:*` 指令。
 
@@ -29,7 +29,7 @@ description: Run a serialized prompt execution pipeline from a local `.pipeline/
 | `/hw:plan:extend` | Append milestones to an active Cycle |
 | `/hw:plan:review` | Run Plan Review for the current or all milestones |
 | `/hw:cycle` | Create, list, view, close, and archive delivery Cycles |
-| `/hw:accept` | Accept pending Cycle work and complete the manual acceptance gate |
+| `/hw:accept` / `/hw:achieve` | Accept pending Cycle work and complete the manual acceptance gate |
 | `/hw:reject` | Reject pending Cycle work with structured feedback and reopen the Cycle |
 | `/hw:explore` | Start an isolated exploration worktree and record exploration metadata |
 | `/hw:sync` | Synchronize project adapters and lightweight derived context without executing pipeline milestones |
@@ -81,6 +81,12 @@ The `plan-tool-required` rule applies to complex tasks and planning work:
 - Codex: use the available plan/update tool when present; otherwise keep an explicit checklist in the conversation.
 - Claude Code: keep an explicit plan/checkpoint list in the conversation or configured planning surface.
 - P1/P2/P3/P4 checkpoints must update the visible plan before moving to the next phase.
+
+## Codex Skill Snapshot Isolation
+
+When developing this Hypo-Workflow Codex skill, prefer snapshot/copy installation or controlled sync into the Codex skills directory. Avoid direct hot-editing of a live symlink skill source that a running Codex session may read; it can turn the work into a self-modifying skill-source and expose half-updated or partially updated files.
+
+Safe path: edit the source project, test in an isolated worktree or isolated copy, then generate or sync a snapshot to the Codex skills directory with controlled sync. This is supporting guidance for skill consumption, not the main audit governance feature, and it does not replace audit/rework/worker-separation gates.
 
 # Prompt Pipeline
 
@@ -196,6 +202,17 @@ Use these bundled files when relevant:
 - [`skills/pr/SKILL.md`](./skills/pr/SKILL.md)
 - [`skills/explain/SKILL.md`](./skills/explain/SKILL.md)
 
+## Audit Memory
+
+Durable `audit memory` is the authority for audit carry-over in a Cycle.
+
+- cycle-level audit memory records user requirements, project rules summaries, and Cycle decisions in `.pipeline/audit-memory/<cycle-id>-audit-memory.yaml`.
+- milestone-level audit delta records local Milestone requirements in `.pipeline/audit-memory/<milestone-id>-audit-delta.yaml` and inherits cycle-level audit memory.
+- `/hw:plan` must receive scoped audit summaries derived from audit memory and the current audit delta before planning context is handed to workers or reviewers.
+- `/hw:start` must receive scoped audit summaries derived from audit memory and the current audit delta.
+- `/hw:resume` must receive scoped audit summaries derived from the same authority so user requirements survive handoff.
+- raw free-form conversation may be capture input, but it is not authority and is not the source of truth.
+
 ## Supported Commands
 
 Handle these commands directly:
@@ -231,7 +248,7 @@ Handle these commands directly:
 - `/hw:release`
   Run the seven-step release flow. Support `--dry-run`, `--skip-tests`, and explicit `--patch` / `--minor` / `--major` version overrides.
 - `/hw:audit`
-  Audit the whole project or a narrower scope, grade findings as Critical / Warning / Info, write `.pipeline/audits/audit-NNN.md`, and log the result.
+  Audit the whole project or a narrower scope, grade findings as Critical / Warning / Info, write `.pipeline/audits/audit-NNN.md`, and log the result. `audit` is a hard governance gate: it may intervene before milestone completion, reject work mid-flight, reject a milestone, feature, or cycle, and approve `blocked` only after an `implement` proposal.
 - `/hw:debug`
   Investigate a concrete symptom, generate ranked root-cause hypotheses, validate them, and optionally apply `--auto-fix` only after verification passes.
 - `/hw:plan`, `/hw:plan:discover`, `/hw:plan:decompose`, `/hw:plan:generate`, `/hw:plan:confirm`, `/hw:plan:extend`, `/hw:plan:review`
@@ -263,7 +280,7 @@ Handle these commands directly:
 
 If a command starts with `/hw:` and is not listed above, return:
 
-`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:achieve, /hw:reject, /hw:explore, /hw:sync, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 
 Slash commands are exact and take precedence over fuzzy natural-language matching. Detailed parsing and option semantics live in [`references/commands-spec.md`](./references/commands-spec.md).
 

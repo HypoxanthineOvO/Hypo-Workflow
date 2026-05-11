@@ -15,6 +15,7 @@ export const CANONICAL_COMMANDS = Object.freeze([
   { canonical: "/hw:plan:review", opencode: "/hw-plan-review", agent: "hw-review", route: "review", skill: "skills/plan-review/SKILL.md" },
   { canonical: "/hw:cycle", opencode: "/hw-cycle", agent: "hw-status", route: "lifecycle", skill: "skills/cycle/SKILL.md" },
   { canonical: "/hw:accept", opencode: "/hw-accept", agent: "hw-build", route: "lifecycle", skill: "skills/accept/SKILL.md" },
+  { canonical: "/hw:achieve", opencode: "/hw-achieve", agent: "hw-build", route: "lifecycle", skill: "skills/accept/SKILL.md" },
   { canonical: "/hw:reject", opencode: "/hw-reject", agent: "hw-build", route: "lifecycle", skill: "skills/reject/SKILL.md" },
   { canonical: "/hw:explore", opencode: "/hw-explore", agent: "hw-explore", route: "explore", skill: "skills/explore/SKILL.md" },
   { canonical: "/hw:sync", opencode: "/hw-sync", agent: "hw-build", route: "tool", skill: "skills/sync/SKILL.md" },

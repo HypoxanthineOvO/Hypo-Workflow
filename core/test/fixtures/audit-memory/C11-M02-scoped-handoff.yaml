@@ -1,0 +1,58 @@
+scoped_handoff:
+  schema_version: 1
+  cycle_id: C11
+  milestone_id: M02
+  plan:
+    command: /hw:plan
+    summary:
+      user_special_requirements:
+        - User special requirements must survive plan/start/resume handoff.
+        - Audit must be able to check missing user requirement carry-over.
+      project_rules_summary:
+        - User-facing explanations and generated summaries prefer Chinese.
+        - Test, implement, and audit roles must stay separated.
+      cycle_decisions:
+        - Audit memory is durable cycle authority for special requirements.
+        - Raw conversation may inform capture but is not the source of truth.
+      local_special_requirements:
+        - M02 test worker may edit only test assets and fixtures.
+        - M02 must cover scoped audit summaries for plan, start, and resume handoff.
+      source_refs:
+        - .pipeline/audit-memory/C11-audit-memory.yaml
+        - .pipeline/audit-memory/M02-audit-delta.yaml
+  start:
+    command: /hw:start
+    summary:
+      user_special_requirements:
+        - User special requirements must survive plan/start/resume handoff.
+        - Audit must be able to check missing user requirement carry-over.
+      project_rules_summary:
+        - User-facing explanations and generated summaries prefer Chinese.
+        - Test, implement, and audit roles must stay separated.
+      cycle_decisions:
+        - Audit memory is durable cycle authority for special requirements.
+        - Raw conversation may inform capture but is not the source of truth.
+      local_special_requirements:
+        - M02 test worker may edit only test assets and fixtures.
+        - M02 must cover scoped audit summaries for plan, start, and resume handoff.
+      source_refs:
+        - .pipeline/audit-memory/C11-audit-memory.yaml
+        - .pipeline/audit-memory/M02-audit-delta.yaml
+  resume:
+    command: /hw:resume
+    summary:
+      user_special_requirements:
+        - User special requirements must survive plan/start/resume handoff.
+        - Audit must be able to check missing user requirement carry-over.
+      project_rules_summary:
+        - User-facing explanations and generated summaries prefer Chinese.
+        - Test, implement, and audit roles must stay separated.
+      cycle_decisions:
+        - Audit memory is durable cycle authority for special requirements.
+        - Raw conversation may inform capture but is not the source of truth.
+      local_special_requirements:
+        - M02 test worker may edit only test assets and fixtures.
+        - M02 must cover scoped audit summaries for plan, start, and resume handoff.
+      source_refs:
+        - .pipeline/audit-memory/C11-audit-memory.yaml
+        - .pipeline/audit-memory/M02-audit-delta.yaml

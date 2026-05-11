@@ -61,6 +61,8 @@ If the user has completed the normal requirement interview but this authorizatio
 
 The verification answer must be captured as a 真实测试方法 / real test method contract: exact command or scenario, observable pass/fail signal, independent validator, and whether audit must reject pseudo tests. Example: for a Heaticy-style agent-service project, the real method may be "use NapCat to simulate the main account sending a message to the agent"; if the test worker only runs unit mocks or a fake message path, the audit worker must reject it.
 
+P1 requires a mandatory audit question group before Discover can complete. The audit question group must capture audit authority, rejection scope, pseudo-test rejection, blocked approval, and audit evidence. If this audit question group is missing or incomplete, P1 cannot complete, must not enter P2, and must not leave Discover.
+
 Then continue through assumption statement, ambiguity resolution, tradeoff review, and validation criteria as needed. Keep this structure strong, but do not turn it into a rigid questionnaire.
 
 Test Profiles sit on top of presets. Keep `preset` for step order, but collect category-specific validation policy through `execution.test_profiles` or inferred Discover context.
@@ -213,12 +215,16 @@ The `plan-tool-required` built-in rule is active for Plan Mode unless disabled i
    - when `--batch` is present, collect multiple Feature candidates, priorities, gates, dependencies, acceptance boundaries, category, and verification requirements before leaving Discover
 10. Run P2 Decompose:
    - split work into reviewable milestones with validation points
+   - P2 must carry forward the P1 audit contract in each milestone, preserving real test method, pseudo-test rejection, rejection scope, blocked approval, and audit evidence
    - reject milestone splits that have only open-loop implementation actions and no credible closed-loop validation path
    - in interactive mode, stop after showing the proposed split and wait for user confirmation before P3
    - when `--batch` and `batch.decompose_mode=upfront`, decompose all Features; when `just_in_time`, create Feature scaffolds only
 11. Run P3 Generate:
    - generate `.pipeline/` artifacts and architecture baseline
+   - P3 must echo the P1 audit contract into generated artifacts and prompts, preserving real test method, pseudo-test rejection, rejection scope, blocked approval, and audit evidence
    - preserve closed-loop validation commands, real test method, evidence expectations, validator separation, and audit pseudo-test rejection rules in generated prompts
+   - generate one canonical prompt file per milestone, plus optional derived subworker prompts only when the work is actually delegated; canonical and derived artifacts must not be counted the same way
+   - when derived subworker prompts are released, place them only under `.pipeline/prompts/derived/Mxx/` for the relevant milestone
    - generate a `Subworker Assignment Plan` inside each prompt before implementation steps, assigning at minimum:
      - `test`: owns `write_tests` and `review_tests`; independently validates the planned real test method, failure evidence, final test run, and pseudo-test rejection rule
      - `implement`: owns implementation edits within the milestone scope

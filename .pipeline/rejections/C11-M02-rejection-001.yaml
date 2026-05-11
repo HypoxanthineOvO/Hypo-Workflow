@@ -1,0 +1,26 @@
+version: 1
+cycle_id: C11
+feature_id: F001
+milestone_id: M02
+scope: milestone
+verdict: rejected
+rejected_by: audit
+created_at: "2026-05-10T23:52:00+08:00"
+reasons:
+  - violated_rule: durable_audit_memory_authority
+    detail: Current C11 user requirements were represented in fixtures and contract text, but no real `.pipeline/audit-memory/C11-audit-memory.yaml` or `.pipeline/audit-memory/M02-audit-delta.yaml` authority file exists.
+  - violated_rule: scoped_handoff_integration
+    detail: `/hw:start` and `/hw:resume` contracts mention scoped audit summaries, but runtime/contract evidence does not prove the execution path consumes durable audit memory.
+  - violated_rule: plan_scope_view
+    detail: M02 prompt requires role-scoped views for `/hw:plan`, `/hw:start`, and `/hw:resume`; current tests cover only start/resume.
+required_rework:
+  - role: test
+    action: Add tests proving real `.pipeline/audit-memory/` authority files and `/hw:plan` scoped summary behavior, not only fixtures.
+  - role: implement
+    action: Add durable current-cycle audit memory artifacts and connect or specify load/merge/scoped summary behavior for plan/start/resume.
+blocked_request:
+  proposed_by: null
+  audit_verdict: denied
+notes:
+  - Test, implement, and audit worker identities were separated.
+  - This is a rework rejection, not an objective blocked state.

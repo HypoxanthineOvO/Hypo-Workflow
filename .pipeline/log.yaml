@@ -1,11 +1,560 @@
 entries:
   -
+    id: CYCLE-ACCEPTED-C11-20260511T215936+0800
+    type: cycle_accept
+    ref: C11
+    status: completed
+    timestamp: "2026-05-11T21:59:36+08:00"
+    summary: Cycle C11 accepted.
+    trigger: manual
+  -
+    id: CYCLE-PENDING-C11-20260511T210519+0800
+    type: cycle_pending_acceptance
+    ref: C11
+    status: pending_acceptance
+    timestamp: "2026-05-11T21:05:19+08:00"
+    summary: Cycle C11 is pending user acceptance.
+    trigger: auto
+  -
+    id: CYCLE-ACCEPTED-C11-20260511T061200+0800
+    type: cycle_accept
+    ref: C11
+    status: completed
+    timestamp: "2026-05-11T06:12:00+08:00"
+    summary: Cycle C11 accepted.
+    trigger: manual
+  -
+    id: M07-WRITE-TESTS-C11-20260511T025911+0800
+    type: step_complete
+    ref: C11/M07/write_tests
+    status: completed
+    timestamp: "2026-05-11T02:59:11+08:00"
+    summary: Dedicated test worker added Codex skill snapshot isolation guidance tests plus s70 scenario.
+    report: core/test/codex-skill-snapshot-isolation-guidance.test.js
+    trigger: auto
+    related_milestone: M07
+  -
+    id: M07-IMPLEMENT-C11-20260511T025911+0800
+    type: step_complete
+    ref: C11/M07/implement
+    status: completed
+    timestamp: "2026-05-11T02:59:11+08:00"
+    summary: Dedicated implement worker updated Codex docs and sync guidance to prefer snapshot/copy or controlled sync over live symlink hot-editing.
+    report: docs/platforms/codex.md
+    tests: "node --test core/test/codex-skill-snapshot-isolation-guidance.test.js: 4/4 passing; bash tests/scenarios/v11/s70-codex-skill-snapshot-isolation-guidance/run.sh: passing"
+    trigger: auto
+    related_milestone: M07
+  -
+    id: M07-AUDIT-C11-20260511T025911+0800
+    type: audit
+    ref: C11/M07/audit
+    status: completed
+    timestamp: "2026-05-11T02:59:11+08:00"
+    summary: Read-only audit passed M07, confirming snapshot isolation guidance is correct, proportionate, and does not replace audit/rework/worker-separation gates.
+    report: .pipeline/reports/06-codex-skill-snapshot-isolation-guidance.report.md
+    tests: "node --test core/test/codex-skill-snapshot-isolation-guidance.test.js: 4/4 passing; bash tests/scenarios/v11/s70-codex-skill-snapshot-isolation-guidance/run.sh: passing"
+    trigger: audit
+    related_milestone: M07
+  -
+    id: M08-WRITE-TESTS-C11-20260511202520+0800
+    type: step_complete
+    ref: C11/M08/write_tests
+    status: completed
+    timestamp: "2026-05-11T20:25:20+08:00"
+    summary: Dedicated test worker tightened M08 prompt architecture regression coverage to canonical versus derived prompt release rules.
+    report: core/test/plan-audit-interview-prompt-architecture.test.js
+    trigger: auto
+    related_milestone: M08
+  -
+    id: M08-IMPLEMENT-C11-20260511202520+0800
+    type: step_complete
+    ref: C11/M08/implement
+    status: completed
+    timestamp: "2026-05-11T20:25:20+08:00"
+    summary: Dedicated implement worker clarified canonical prompt contracts, derived prompt release rules, and fixed derived path policy.
+    report: plan/assets/prompt-template.md
+    tests: "node --test core/test/plan-audit-interview-prompt-architecture.test.js: 4/4 passing"
+    trigger: auto
+    related_milestone: M08
+  -
+    id: M08-AUDIT-C11-20260511202520+0800
+    type: audit
+    ref: C11/M08/audit
+    status: completed
+    timestamp: "2026-05-11T20:25:20+08:00"
+    summary: Read-only audit confirmed canonical prompt retention, fixed derived path policy, and delegated-only release semantics without reintroducing four-file forcing.
+    report: .pipeline/reports/12-c11-follow-up-subworker-prompt-path-and-release-contract.report.md
+    tests: "node --test core/test/plan-audit-interview-prompt-architecture.test.js: 4/4 passing"
+    trigger: audit
+    related_milestone: M08
+  -
+    id: M08-COMPLETE-C11-20260511202520+0800
+    type: milestone_complete
+    ref: C11/M08
+    status: completed
+    timestamp: "2026-05-11T20:25:20+08:00"
+    summary: Completed Subworker Prompt Path And Release Contract with focused contract updates, fixed derived path rules, green validation, and read-only audit pass.
+    report: .pipeline/reports/12-c11-follow-up-subworker-prompt-path-and-release-contract.report.md
+    tests: "node --test core/test/plan-audit-interview-prompt-architecture.test.js: 4/4 passing"
+    trigger: auto
+    related_milestone: M08
+  -
+    id: M07-COMPLETE-C11-20260511T025911+0800
+    type: milestone_complete
+    ref: C11/M07
+    status: completed
+    timestamp: "2026-05-11T02:59:11+08:00"
+    summary: Completed Codex Skill Snapshot Isolation Guidance with focused tests, docs updates, green validation, and read-only audit pass.
+    report: .pipeline/reports/06-codex-skill-snapshot-isolation-guidance.report.md
+    tests: "node --test core/test/codex-skill-snapshot-isolation-guidance.test.js: 4/4 passing; bash tests/scenarios/v11/s70-codex-skill-snapshot-isolation-guidance/run.sh: passing"
+    trigger: auto
+    related_milestone: M07
+  -
+    id: C11-COMPLETE-20260511T025911+0800
+    type: cycle_complete
+    ref: C11
+    status: completed
+    timestamp: "2026-05-11T02:59:11+08:00"
+    summary: Completed C11 Audit Governance Hardening with seven audit-gated milestones, two real audit rejection/rework loops, and focused s64-s70 validation coverage.
+    report: .pipeline/reports/C11-audit-governance-hardening.summary.md
+    trigger: auto
+  -
+    id: M06-WRITE-TESTS-C11-20260511T024945+0800
+    type: step_complete
+    ref: C11/M06/write_tests
+    status: completed
+    timestamp: "2026-05-11T02:49:45+08:00"
+    summary: Dedicated test worker added canonical audit regression example tests plus s69 scenario.
+    report: core/test/audit-regression-canonical-examples.test.js
+    trigger: auto
+    related_milestone: M06
+  -
+    id: M06-IMPLEMENT-C11-20260511T024945+0800
+    type: step_complete
+    ref: C11/M06/implement
+    status: completed
+    timestamp: "2026-05-11T02:49:45+08:00"
+    summary: Dedicated implement worker added four durable canonical audit regression fixtures and audit-spec index guidance.
+    report: core/test/fixtures/audit-regression-canonical-examples
+    tests: "node --test core/test/audit-regression-canonical-examples.test.js: 6/6 passing; bash tests/scenarios/v11/s69-audit-regression-canonical-examples/run.sh: passing"
+    trigger: auto
+    related_milestone: M06
+  -
+    id: M06-AUDIT-C11-20260511T024945+0800
+    type: audit
+    ref: C11/M06/audit
+    status: completed
+    timestamp: "2026-05-11T02:49:45+08:00"
+    summary: Read-only audit passed M06, confirming canonical examples are durable executable regression fixtures rather than decorative prose.
+    report: .pipeline/reports/05-audit-regression-and-canonical-examples.report.md
+    tests: "node --test core/test/audit-regression-canonical-examples.test.js: 6/6 passing; bash tests/scenarios/v11/s69-audit-regression-canonical-examples/run.sh: passing"
+    trigger: audit
+    related_milestone: M06
+  -
+    id: M06-COMPLETE-C11-20260511T024945+0800
+    type: milestone_complete
+    ref: C11/M06
+    status: completed
+    timestamp: "2026-05-11T02:49:45+08:00"
+    summary: Completed Audit Regression And Canonical Examples with focused tests, durable fixtures, green validation, and read-only audit pass.
+    report: .pipeline/reports/05-audit-regression-and-canonical-examples.report.md
+    tests: "node --test core/test/audit-regression-canonical-examples.test.js: 6/6 passing; bash tests/scenarios/v11/s69-audit-regression-canonical-examples/run.sh: passing"
+    trigger: auto
+    related_milestone: M06
+  -
+    id: M07-START-C11-20260511T024945+0800
+    type: milestone_start
+    ref: C11/M07
+    status: active
+    timestamp: "2026-05-11T02:49:45+08:00"
+    summary: Started Codex Skill Snapshot Isolation Guidance; next step is write_tests with a dedicated test worker.
+    report: .pipeline/prompts/06-orchestrator-codex-skill-snapshot-isolation-guidance.md
+    trigger: auto
+    related_milestone: M07
+  -
+    id: M05-WRITE-TESTS-C11-20260511T023953+0800
+    type: step_complete
+    ref: C11/M05/write_tests
+    status: completed
+    timestamp: "2026-05-11T02:39:53+08:00"
+    summary: Dedicated test worker added rejection/rework/blocked runtime loop focused tests plus s68 regression scenario.
+    report: core/test/rejection-rework-blocked-runtime-loop.test.js
+    trigger: auto
+    related_milestone: M05
+  -
+    id: M05-IMPLEMENT-C11-20260511T023953+0800
+    type: step_complete
+    ref: C11/M05/implement
+    status: completed
+    timestamp: "2026-05-11T02:39:53+08:00"
+    summary: Dedicated implement worker added structured rejection artifact, deterministic rework route, audit-owned blocked decision, and rework prompt linkage helpers.
+    report: core/src/acceptance/index.js
+    tests: "node --test core/test/rejection-rework-blocked-runtime-loop.test.js: 4/4 passing; bash tests/scenarios/v11/s68-rejection-rework-blocked-runtime-loop/run.sh: passing"
+    trigger: auto
+    related_milestone: M05
+  -
+    id: M05-AUDIT-C11-20260511T023953+0800
+    type: audit
+    ref: C11/M05/audit
+    status: completed
+    timestamp: "2026-05-11T02:39:53+08:00"
+    summary: Read-only audit passed M05, confirming deterministic rejection rework routing, implement proposal/audit approval blocked semantics, and incremental rework prompt linkage.
+    report: .pipeline/reports/04-rejection-rework-blocked-runtime-loop.report.md
+    tests: "node --test core/test/rejection-rework-blocked-runtime-loop.test.js: 4/4 passing; bash tests/scenarios/v11/s68-rejection-rework-blocked-runtime-loop/run.sh: passing"
+    trigger: audit
+    related_milestone: M05
+  -
+    id: M05-COMPLETE-C11-20260511T023953+0800
+    type: milestone_complete
+    ref: C11/M05
+    status: completed
+    timestamp: "2026-05-11T02:39:53+08:00"
+    summary: Completed Rejection Rework Blocked Runtime Loop with focused tests, runtime helpers, contract docs, green validation, and read-only audit pass.
+    report: .pipeline/reports/04-rejection-rework-blocked-runtime-loop.report.md
+    tests: "node --test core/test/rejection-rework-blocked-runtime-loop.test.js: 4/4 passing; bash tests/scenarios/v11/s68-rejection-rework-blocked-runtime-loop/run.sh: passing"
+    trigger: auto
+    related_milestone: M05
+  -
+    id: M06-START-C11-20260511T023953+0800
+    type: milestone_start
+    ref: C11/M06
+    status: active
+    timestamp: "2026-05-11T02:39:53+08:00"
+    summary: Started Audit Regression And Canonical Examples; next step is write_tests with a dedicated test worker.
+    report: .pipeline/prompts/05-orchestrator-audit-regression-and-canonical-examples.md
+    trigger: auto
+    related_milestone: M06
+  -
+    id: M04-REWORK-TESTS-C11-20260511T022441+0800
+    type: step_complete
+    ref: C11/M04/rework_write_tests
+    status: completed
+    timestamp: "2026-05-11T02:24:41+08:00"
+    summary: Rework test worker added red coverage for missing persisted prompt_scope and changed_files evidence while preserving explicit no-op changed_files semantics.
+    report: core/test/worker-separation-spawn-enforcement.test.js
+    trigger: auto
+    related_milestone: M04
+  -
+    id: M04-REWORK-IMPLEMENT-C11-20260511T022441+0800
+    type: step_complete
+    ref: C11/M04/rework_implement
+    status: completed
+    timestamp: "2026-05-11T02:24:41+08:00"
+    summary: Rework implement worker made worker separation gates reject missing persisted prompt_scope and changed_files evidence for implement/test roles.
+    report: core/src/config/index.js
+    tests: "node --test core/test/worker-separation-spawn-enforcement.test.js: 8/8 passing; bash tests/scenarios/v11/s67-worker-separation-spawn-enforcement/run.sh: passing"
+    trigger: auto
+    related_milestone: M04
+  -
+    id: M04-REWORK-AUDIT-C11-20260511T022441+0800
+    type: audit
+    ref: C11/M04/rework_audit
+    status: completed
+    timestamp: "2026-05-11T02:24:41+08:00"
+    summary: Rework audit passed M04 after missing persisted worker scope and changed-file evidence became a hard gate.
+    report: .pipeline/reports/03-worker-separation-and-spawn-anti-cross-role-enforcement.report.md
+    tests: "node --test core/test/worker-separation-spawn-enforcement.test.js: 8/8 passing; bash tests/scenarios/v11/s67-worker-separation-spawn-enforcement/run.sh: passing"
+    trigger: audit
+    related_milestone: M04
+  -
+    id: M04-COMPLETE-C11-20260511T022441+0800
+    type: milestone_complete
+    ref: C11/M04
+    status: completed
+    timestamp: "2026-05-11T02:24:41+08:00"
+    summary: Completed Worker Separation And Spawn Anti-Cross-Role Enforcement with focused tests, scope/ownership enforcement, and an audit-driven rejection/rework/pass loop.
+    report: .pipeline/reports/03-worker-separation-and-spawn-anti-cross-role-enforcement.report.md
+    tests: "node --test core/test/worker-separation-spawn-enforcement.test.js: 8/8 passing; bash tests/scenarios/v11/s67-worker-separation-spawn-enforcement/run.sh: passing"
+    trigger: auto
+    related_milestone: M04
+  -
+    id: M05-START-C11-20260511T022441+0800
+    type: milestone_start
+    ref: C11/M05
+    status: active
+    timestamp: "2026-05-11T02:24:41+08:00"
+    summary: Started Rejection Rework Blocked Runtime Loop; next step is write_tests with a dedicated test worker.
+    report: .pipeline/prompts/04-orchestrator-rejection-rework-blocked-runtime-loop.md
+    trigger: auto
+    related_milestone: M05
+  -
+    id: M04-AUDIT-REJECT-C11-20260511T021502+0800
+    type: audit
+    ref: C11/M04/audit
+    status: rejected
+    timestamp: "2026-05-11T02:15:02+08:00"
+    summary: Audit rejected M04 because strict worker separation could still pass without persisted prompt_scope and changed_files evidence.
+    report: .pipeline/rejections/C11-M04-rejection-001.yaml
+    trigger: audit
+    related_milestone: M04
+  -
+    id: M03-IMPLEMENT-C11-20260511T002947+0800
+    type: step_complete
+    ref: C11/M03/implement
+    status: completed
+    timestamp: "2026-05-11T00:29:47+08:00"
+    summary: Dedicated implement worker added M03 planning and prompt architecture audit contracts across plan, plan-generate, progressive-discover, and prompt-template files.
+    report: plan/PLAN-SKILL.md
+    tests: "node --test core/test/plan-audit-interview-prompt-architecture.test.js: 4/4 passing; bash tests/scenarios/v11/s66-plan-audit-interview-prompt-architecture/run.sh: passing"
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M03-RUN-GREEN-C11-20260511T002947+0800
+    type: step_complete
+    ref: C11/M03/run_tests_green
+    status: completed
+    timestamp: "2026-05-11T00:29:47+08:00"
+    summary: M03 focused plan audit interview tests and s66 regression scenario passed after contract implementation.
+    report: core/test/plan-audit-interview-prompt-architecture.test.js
+    tests: "node --test core/test/plan-audit-interview-prompt-architecture.test.js: 4/4 passing; bash tests/scenarios/v11/s66-plan-audit-interview-prompt-architecture/run.sh: passing"
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M03-AUDIT-C11-20260511T002947+0800
+    type: step_complete
+    ref: C11/M03/audit
+    status: completed
+    timestamp: "2026-05-11T00:29:47+08:00"
+    summary: Read-only audit passed M03, confirming mandatory P1 audit question blocking, P2/P3 audit echo, four per-milestone role files, and rejection-driven rework prompt scope.
+    report: .pipeline/reports/02-plan-audit-interview-and-prompt-architecture.report.md
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M03-COMPLETE-C11-20260511T002947+0800
+    type: milestone_complete
+    ref: C11/M03
+    status: completed
+    timestamp: "2026-05-11T00:29:47+08:00"
+    summary: Completed Plan Audit Interview And Prompt Architecture with focused tests, contract implementation, green validation, and read-only audit pass under strict worker separation.
+    report: .pipeline/reports/02-plan-audit-interview-and-prompt-architecture.report.md
+    tests: "node --test core/test/plan-audit-interview-prompt-architecture.test.js: 4/4 passing; bash tests/scenarios/v11/s66-plan-audit-interview-prompt-architecture/run.sh: passing"
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M04-START-C11-20260511T002947+0800
+    type: milestone_start
+    ref: C11/M04
+    status: active
+    timestamp: "2026-05-11T00:29:47+08:00"
+    summary: Started Worker Separation And Spawn Anti-Cross-Role Enforcement; next step is write_tests with a dedicated test worker.
+    report: .pipeline/prompts/03-orchestrator-worker-separation-and-spawn-anti-cross-role-enforcement.md
+    trigger: auto
+    related_milestone: M04
+  -
+    id: M02-REWORK-AUDIT-C11-20260511T000400+0800
+    type: audit
+    ref: C11/M02/rework_audit
+    status: completed
+    timestamp: "2026-05-11T00:04:00+08:00"
+    summary: Rework audit passed M02 after real audit-memory authority files and plan/start/resume scoped summary contract were added.
+    report: .pipeline/audit-memory/C11-audit-memory.yaml
+    tests: "node --test core/test/audit-memory-contract.test.js: 7/7 passing; bash tests/scenarios/v11/s65-audit-memory-handoff/run.sh: passing"
+    trigger: audit
+    related_milestone: M02
+  -
+    id: M02-COMPLETE-C11-20260511T000400+0800
+    type: milestone_complete
+    ref: C11/M02
+    status: completed
+    timestamp: "2026-05-11T00:04:00+08:00"
+    summary: Completed Audit Memory And User-Requirement Capture with durable authority files, scoped plan/start/resume summaries, focused tests, and an audit-driven rejection/rework/pass loop.
+    report: .pipeline/reports/01-audit-memory-and-user-requirement-capture.report.md
+    tests: "node --test core/test/audit-memory-contract.test.js: 7/7 passing; bash tests/scenarios/v11/s65-audit-memory-handoff/run.sh: passing"
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M03-START-C11-20260511T000400+0800
+    type: milestone_start
+    ref: C11/M03
+    status: active
+    timestamp: "2026-05-11T00:04:00+08:00"
+    summary: Started Plan Audit Interview And Prompt Architecture under strict worker separation; write_tests assigned to a dedicated Codex test worker.
+    report: .pipeline/prompts/02-orchestrator-plan-audit-interview-and-prompt-architecture.md
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M03-WRITE-TESTS-C11-20260511T000800+0800
+    type: step_complete
+    ref: C11/M03/write_tests
+    status: completed
+    timestamp: "2026-05-11T00:08:00+08:00"
+    summary: Dedicated test worker added plan audit interview and prompt architecture focused tests plus s66 regression scenario.
+    report: core/test/plan-audit-interview-prompt-architecture.test.js
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M03-RUN-RED-C11-20260511T000800+0800
+    type: step_complete
+    ref: C11/M03/run_tests_red
+    status: completed
+    timestamp: "2026-05-11T00:08:00+08:00"
+    summary: New M03 tests failed as expected because plan audit interview and prompt architecture contract text is not implemented yet.
+    report: core/test/plan-audit-interview-prompt-architecture.test.js
+    trigger: auto
+    related_milestone: M03
+  -
+    id: M01-START-C11-20260510T233334+0800
+    type: milestone_start
+    ref: C11/M01
+    status: active
+    timestamp: "2026-05-10T23:33:34+08:00"
+    summary: Started C11 M01 Audit Governance Contract under strict worker separation; write_tests assigned to a dedicated Codex test worker.
+    report: .pipeline/prompts/00-orchestrator-audit-governance-contract.md
+    trigger: user
+    related_milestone: M01
+  -
+    id: M01-WRITE-TESTS-C11-20260510T233630+0800
+    type: step_complete
+    ref: C11/M01/write_tests
+    status: completed
+    timestamp: "2026-05-10T23:36:30+08:00"
+    summary: Dedicated test worker added focused failing tests and a v11 regression scenario covering mid-flight audit rejection, milestone/feature/cycle rejection scope, and blocked approval ownership.
+    report: core/test/audit-governance-contract.test.js
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-RUN-RED-C11-20260510T233630+0800
+    type: step_complete
+    ref: C11/M01/run_tests_red
+    status: completed
+    timestamp: "2026-05-10T23:36:30+08:00"
+    summary: New M01 audit governance contract tests failed as expected because the contract text does not yet declare the required audit authority semantics.
+    report: core/test/audit-governance-contract.test.js
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-IMPLEMENT-C11-20260510T233900+0800
+    type: step_complete
+    ref: C11/M01/implement
+    status: completed
+    timestamp: "2026-05-10T23:39:00+08:00"
+    summary: Dedicated implement worker added audit governance authority semantics to audit, commands, state, accept, and root skill contracts without editing tests.
+    report: references/audit-spec.md
+    tests: "node --test core/test/audit-governance-contract.test.js: 3/3 passing; bash tests/scenarios/v11/s64-audit-governance-contract/run.sh: passing"
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-RUN-GREEN-C11-20260510T233900+0800
+    type: step_complete
+    ref: C11/M01/run_tests_green
+    status: completed
+    timestamp: "2026-05-10T23:39:00+08:00"
+    summary: M01 focused audit governance contract tests and s64 regression scenario passed after contract implementation.
+    report: core/test/audit-governance-contract.test.js
+    tests: "node --test core/test/audit-governance-contract.test.js: 3/3 passing; bash tests/scenarios/v11/s64-audit-governance-contract/run.sh: passing"
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-AUDIT-C11-20260510T234200+0800
+    type: step_complete
+    ref: C11/M01/audit
+    status: completed
+    timestamp: "2026-05-10T23:42:00+08:00"
+    summary: Dedicated read-only audit worker passed M01, confirming audit authority semantics and strict test/implement/audit role separation evidence.
+    report: .pipeline/prompts/00-audit-audit-governance-contract.md
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M01-COMPLETE-C11-20260510T234200+0800
+    type: milestone_complete
+    ref: C11/M01
+    status: completed
+    timestamp: "2026-05-10T23:42:00+08:00"
+    summary: Completed Audit Governance Contract with focused tests, contract implementation, green validation, and read-only audit pass under strict worker separation.
+    report: .pipeline/reports/00-audit-governance-contract.report.md
+    tests: "node --test core/test/audit-governance-contract.test.js: 3/3 passing; bash tests/scenarios/v11/s64-audit-governance-contract/run.sh: passing"
+    trigger: auto
+    related_milestone: M01
+  -
+    id: M02-START-C11-20260510T234200+0800
+    type: milestone_start
+    ref: C11/M02
+    status: active
+    timestamp: "2026-05-10T23:42:00+08:00"
+    summary: Started Audit Memory And User-Requirement Capture under strict worker separation; write_tests assigned to a dedicated Codex test worker.
+    report: .pipeline/prompts/01-orchestrator-audit-memory-and-user-requirement-capture.md
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M02-WRITE-TESTS-C11-20260510T234500+0800
+    type: step_complete
+    ref: C11/M02/write_tests
+    status: completed
+    timestamp: "2026-05-10T23:45:00+08:00"
+    summary: Dedicated test worker added audit-memory focused tests, fixtures, and s65 regression scenario for durable cycle memory, milestone deltas, and scoped start/resume handoff.
+    report: core/test/audit-memory-contract.test.js
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M02-RUN-RED-C11-20260510T234500+0800
+    type: step_complete
+    ref: C11/M02/run_tests_red
+    status: completed
+    timestamp: "2026-05-10T23:45:00+08:00"
+    summary: New M02 audit-memory tests failed as expected because durable audit-memory contract text and runtime helper exports are not implemented yet.
+    report: core/test/audit-memory-contract.test.js
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M02-IMPLEMENT-C11-20260510T234900+0800
+    type: step_complete
+    ref: C11/M02/implement
+    status: completed
+    timestamp: "2026-05-10T23:49:00+08:00"
+    summary: Dedicated implement worker added audit-memory runtime helpers and contract text for durable cycle memory, milestone deltas, and scoped start/resume handoff.
+    report: core/src/audit-memory/index.js
+    tests: "node --test core/test/audit-memory-contract.test.js: 5/5 passing; bash tests/scenarios/v11/s65-audit-memory-handoff/run.sh: passing"
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M02-RUN-GREEN-C11-20260510T234900+0800
+    type: step_complete
+    ref: C11/M02/run_tests_green
+    status: completed
+    timestamp: "2026-05-10T23:49:00+08:00"
+    summary: M02 focused audit-memory tests and s65 regression scenario passed after runtime and contract implementation.
+    report: core/test/audit-memory-contract.test.js
+    tests: "node --test core/test/audit-memory-contract.test.js: 5/5 passing; bash tests/scenarios/v11/s65-audit-memory-handoff/run.sh: passing"
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M02-AUDIT-REJECT-C11-20260510T235200+0800
+    type: audit
+    ref: C11/M02/audit
+    status: rejected
+    timestamp: "2026-05-10T23:52:00+08:00"
+    summary: "Audit rejected M02 because durable audit memory was only represented by fixtures/helper contracts, start/resume integration was not proven, and /hw:plan scoped summary coverage was missing."
+    report: .pipeline/rejections/C11-M02-rejection-001.yaml
+    trigger: audit
+    related_milestone: M02
+  -
+    id: M02-REWORK-TESTS-C11-20260510T235600+0800
+    type: step_complete
+    ref: C11/M02/rework_write_tests
+    status: completed
+    timestamp: "2026-05-10T23:56:00+08:00"
+    summary: "Rework test worker added coverage for real .pipeline/audit-memory authority files and /hw:plan scoped summary behavior after audit rejection."
+    report: core/test/audit-memory-contract.test.js
+    trigger: auto
+    related_milestone: M02
+  -
+    id: M02-REWORK-IMPLEMENT-C11-20260511T000000+0800
+    type: step_complete
+    ref: C11/M02/rework_implement
+    status: completed
+    timestamp: "2026-05-11T00:00:00+08:00"
+    summary: Rework implement worker created real audit-memory authority files and added plan scoped summary contract behavior after audit rejection.
+    report: .pipeline/audit-memory/C11-audit-memory.yaml
+    tests: "node --test core/test/audit-memory-contract.test.js: 7/7 passing; bash tests/scenarios/v11/s65-audit-memory-handoff/run.sh: passing"
+    trigger: auto
+    related_milestone: M02
+  -
     id: RELEASE-v12.3.0-20260509T194733+0800
     type: release
     ref: v12.3.0
     status: completed
     timestamp: "2026-05-09T19:47:33+08:00"
-    summary: Released Hypo-Workflow v12.3.0 with worker-separation acceptance hardening, end-of-run dirty-only compact refresh, PR #5 clean integration, refreshed version metadata, and full regression validation.
+    summary: "Released Hypo-Workflow v12.3.0 with worker-separation acceptance hardening, end-of-run dirty-only compact refresh, PR #5 clean integration, refreshed version metadata, and full regression validation."
     trigger: user
     details:
       tests:
@@ -87,7 +636,7 @@ entries:
     timestamp: "2026-05-07T16:55:00+08:00"
     summary: Completed final C9 Agent Review and full regression; fixed Subagent audit blockers for Explain/PR secret redaction, PR local archive id support, and 38-command OpenCode scenario freshness.
     report: .pipeline/reports/11-c9-agent-review-and-full-regression.report.md
-    tests: node --test focused Explain/PR tests: 25/25 passing; npm test --prefix core: 349/349 passing; python3 tests/run_regression.py: 63/63 passing; bash scripts/validate-config.sh .pipeline/config.yaml: passing; node cli/bin/hypo-workflow sync --check-only --project .: derived=fresh; claude plugin validate .: passed; git diff --check: passed
+    tests: "node --test focused Explain/PR tests: 25/25 passing; npm test --prefix core: 349/349 passing; python3 tests/run_regression.py: 63/63 passing; bash scripts/validate-config.sh .pipeline/config.yaml: passing; node cli/bin/hypo-workflow sync --check-only --project .: derived=fresh; claude plugin validate .: passed; git diff --check: passed"
     trigger: auto
     related_milestone: M12
   -
@@ -139,7 +688,7 @@ entries:
     timestamp: "2026-05-07T16:39:50+08:00"
     summary: Full core regression passed after docs language self-check and Chinese-body documentation updates.
     report: .pipeline/reports/10-chinese-human-docs-conversion.report.md
-    tests: npm test --prefix core: 345/345 passing
+    tests: "npm test --prefix core: 345/345 passing"
     trigger: auto
     related_milestone: M11
   -
@@ -160,7 +709,7 @@ entries:
     timestamp: "2026-05-07T16:36:00+08:00"
     summary: Confirmed docs language self-check failed before generated docs and key references received Chinese-body summaries.
     report: core/test/docs-governance.test.js
-    tests: node --test core/test/docs-governance.test.js: expected failure before docs conversion
+    tests: "node --test core/test/docs-governance.test.js: expected failure before docs conversion"
     trigger: auto
     related_milestone: M11
   -
@@ -189,7 +738,7 @@ entries:
     ref: C9/M10
     status: completed
     timestamp: "2026-05-07T16:34:00+08:00"
-    summary: Completed Claude resume namespace fix by removing bare resume skill metadata, preserving /hw:resume, and documenting native /resume boundaries.
+    summary: "Completed Claude resume namespace fix by removing bare resume skill metadata, preserving /hw:resume, and documenting native /resume boundaries."
     report: .pipeline/reports/09-claude-resume-adapter-fix-and-smoke.report.md
     tests: node --test core/test/*claude*resume*.test.js core/test/claude-plugin-alias.test.js core/test/platform-adapters.test.js core/test/skill-quality.test.js; claude plugin validate .; node cli/bin/hypo-workflow sync --check-only --project .; npm test --prefix core; git diff --check
     trigger: auto
@@ -202,7 +751,7 @@ entries:
     timestamp: "2026-05-07T16:33:50+08:00"
     summary: Full core regression passed after Claude resume metadata and docs fix.
     report: .pipeline/reports/09-claude-resume-adapter-fix-and-smoke.report.md
-    tests: npm test --prefix core: 344/344 passing
+    tests: "npm test --prefix core: 344/344 passing"
     trigger: auto
     related_milestone: M10
   -
@@ -223,7 +772,7 @@ entries:
     timestamp: "2026-05-07T16:31:00+08:00"
     summary: Confirmed updated namespace expectations failed before docs regeneration and resume metadata repair.
     report: core/test/claude-resume-namespace.test.js
-    tests: node --test core/test/*claude*resume*.test.js core/test/claude-plugin-alias.test.js: expected failure before repair/docs regeneration
+    tests: "node --test core/test/*claude*resume*.test.js core/test/claude-plugin-alias.test.js: expected failure before repair/docs regeneration"
     trigger: auto
     related_milestone: M10
   -
@@ -232,7 +781,7 @@ entries:
     ref: C9/M10/write_tests
     status: completed
     timestamp: "2026-05-07T16:30:30+08:00"
-    summary: Updated tests to require current Claude resume metadata to be autocomplete-safe while preserving a legacy fixture that catches bare name: resume.
+    summary: "Updated tests to require current Claude resume metadata to be autocomplete-safe while preserving a legacy fixture that catches bare name: resume."
     report: core/test/claude-resume-namespace.test.js
     trigger: auto
     related_milestone: M10
@@ -265,7 +814,7 @@ entries:
     timestamp: "2026-05-07T16:29:50+08:00"
     summary: Full core regression passed after adding Claude resume namespace audit helper and tests.
     report: .pipeline/reports/08-claude-resume-conflict-audit.report.md
-    tests: npm test --prefix core: 343/343 passing
+    tests: "npm test --prefix core: 343/343 passing"
     trigger: auto
     related_milestone: M09
   -
@@ -286,7 +835,7 @@ entries:
     timestamp: "2026-05-07T16:27:50+08:00"
     summary: Added Claude resume namespace audit fixture expectations before implementation to capture bare /resume registry and skill-name collision evidence.
     report: core/test/claude-resume-namespace.test.js
-    tests: node --test core/test/claude-resume-namespace.test.js: expected failure before audit helper existed
+    tests: "node --test core/test/claude-resume-namespace.test.js: expected failure before audit helper existed"
     trigger: auto
     related_milestone: M09
   -
@@ -295,7 +844,7 @@ entries:
     ref: C9/M09/write_tests
     status: completed
     timestamp: "2026-05-07T16:27:00+08:00"
-    summary: Added tests for exact /hw:resume registry ownership, Claude native /resume boundary, plugin manifest safety, and resume skill-name collision detection.
+    summary: "Added tests for exact /hw:resume registry ownership, Claude native /resume boundary, plugin manifest safety, and resume skill-name collision detection."
     report: core/test/claude-resume-namespace.test.js
     trigger: auto
     related_milestone: M09
@@ -328,7 +877,7 @@ entries:
     timestamp: "2026-05-07T16:25:00+08:00"
     summary: Full core regression passed after adding Explain fixture inference and docs/adapter guidance.
     report: .pipeline/reports/07-explain-tests-and-docs.report.md
-    tests: npm test --prefix core: 340/340 passing
+    tests: "npm test --prefix core: 340/340 passing"
     trigger: auto
     related_milestone: M08
   -
@@ -349,7 +898,7 @@ entries:
     timestamp: "2026-05-07T16:22:00+08:00"
     summary: Added fixture expectations for framework and recent-change Explain evidence plus OpenCode /hw-explain guidance before implementation.
     report: core/test/explain-contract.test.js
-    tests: node --test core/test/explain-contract.test.js core/test/commands-rules-artifacts.test.js: expected failure before helper/docs updates
+    tests: "node --test core/test/explain-contract.test.js core/test/commands-rules-artifacts.test.js: expected failure before helper/docs updates"
     trigger: auto
     related_milestone: M08
   -
@@ -358,7 +907,7 @@ entries:
     ref: C9/M08/write_tests
     status: completed
     timestamp: "2026-05-07T16:21:00+08:00"
-    summary: Added tests for Explain framework questions, recent-change diff_refs, docs repair /hw:explain --subagent coverage, and OpenCode hw-explain guidance.
+    summary: "Added tests for Explain framework questions, recent-change diff_refs, docs repair /hw:explain --subagent coverage, and OpenCode hw-explain guidance."
     report: core/test/explain-contract.test.js
     trigger: auto
     related_milestone: M08
@@ -378,7 +927,7 @@ entries:
     ref: C9/M07
     status: completed
     timestamp: "2026-05-07T16:20:00+08:00"
-    summary: Completed /hw:explain --subagent read-only evidence handoff, required packet schema, self fallback prompt, and platform guidance.
+    summary: "Completed /hw:explain --subagent read-only evidence handoff, required packet schema, self fallback prompt, and platform guidance."
     report: .pipeline/reports/06-explain-subagent-evidence-handoff.report.md
     tests: node --test core/test/explain-subagent.test.js core/test/explain-contract.test.js; node --test core/test/explain-subagent.test.js core/test/explain-contract.test.js core/test/codex-subagent-discipline.test.js core/test/platform-adapters.test.js; node --test core/test/skill-quality.test.js core/test/commands-rules-artifacts.test.js; npm test --prefix core; bash scripts/validate-config.sh .pipeline/config.yaml; node cli/bin/hypo-workflow sync --check-only --project .; git diff --check
     trigger: auto
@@ -391,7 +940,7 @@ entries:
     timestamp: "2026-05-07T16:19:00+08:00"
     summary: Full core regression passed after adding Explain Subagent evidence handoff helpers.
     report: .pipeline/reports/06-explain-subagent-evidence-handoff.report.md
-    tests: npm test --prefix core: 338/338 passing
+    tests: "npm test --prefix core: 338/338 passing"
     trigger: auto
     related_milestone: M07
   -
@@ -412,7 +961,7 @@ entries:
     timestamp: "2026-05-07T16:15:00+08:00"
     summary: Confirmed failing Explain Subagent tests before implementation because handoff, schema validation, and fallback helpers were absent.
     report: core/test/explain-subagent.test.js
-    tests: node --test core/test/explain-subagent.test.js: expected failure
+    tests: "node --test core/test/explain-subagent.test.js: expected failure"
     trigger: auto
     related_milestone: M07
   -
@@ -441,7 +990,7 @@ entries:
     ref: C9/M06
     status: completed
     timestamp: "2026-05-07T16:12:29+08:00"
-    summary: Completed /hw:explain command contract with read-only evidence packets, cited local files, needs_context unknowns, and command/docs/skill count updates.
+    summary: "Completed /hw:explain command contract with read-only evidence packets, cited local files, needs_context unknowns, and command/docs/skill count updates."
     report: .pipeline/reports/05-evidence-first-explain-contract.report.md
     tests: node --test core/test/explain-contract.test.js; focused command/docs/skill/readme/sync tests; npm test --prefix core; bash scripts/validate-config.sh .pipeline/config.yaml; node cli/bin/hypo-workflow sync --check-only --project .; git diff --check
     trigger: auto
@@ -452,9 +1001,9 @@ entries:
     ref: C9/M06/run_tests_green
     status: completed
     timestamp: "2026-05-07T16:12:29+08:00"
-    summary: Full core regression passed after adding /hw:explain evidence-first contract.
+    summary: "Full core regression passed after adding /hw:explain evidence-first contract."
     report: .pipeline/reports/05-evidence-first-explain-contract.report.md
-    tests: npm test --prefix core: 334/334 passing
+    tests: "npm test --prefix core: 334/334 passing"
     trigger: auto
     related_milestone: M06
   -
@@ -463,7 +1012,7 @@ entries:
     ref: C9/M06/implement
     status: completed
     timestamp: "2026-05-07T16:10:00+08:00"
-    summary: Implemented Explain evidence packet helpers, /hw:explain command registration, skill/spec/docs updates, and command count migration to 38.
+    summary: "Implemented Explain evidence packet helpers, /hw:explain command registration, skill/spec/docs updates, and command count migration to 38."
     report: core/src/explain/index.js
     trigger: auto
     related_milestone: M06
@@ -475,7 +1024,7 @@ entries:
     timestamp: "2026-05-07T16:08:00+08:00"
     summary: Confirmed failing Explain contract tests before implementation because Explain helpers and command metadata were absent.
     report: core/test/explain-contract.test.js
-    tests: node --test core/test/explain-contract.test.js: expected failure
+    tests: "node --test core/test/explain-contract.test.js: expected failure"
     trigger: auto
     related_milestone: M06
   -
@@ -484,7 +1033,7 @@ entries:
     ref: C9/M06/write_tests
     status: completed
     timestamp: "2026-05-07T16:07:00+08:00"
-    summary: Added tests for /hw:explain command metadata, explicit file evidence, read-only state/log behavior, and needs_context unknowns.
+    summary: "Added tests for /hw:explain command metadata, explicit file evidence, read-only state/log behavior, and needs_context unknowns."
     report: core/test/explain-contract.test.js
     trigger: auto
     related_milestone: M06
@@ -517,7 +1066,7 @@ entries:
     timestamp: "2026-05-07T16:04:20+08:00"
     summary: Full core regression passed after adding PR/MR manual gate helpers.
     report: .pipeline/reports/04-pr-mr-fix-merge-close-manual-gates.report.md
-    tests: npm test --prefix core: 330/330 passing
+    tests: "npm test --prefix core: 330/330 passing"
     trigger: auto
     related_milestone: M05
   -
@@ -538,7 +1087,7 @@ entries:
     timestamp: "2026-05-07T16:01:00+08:00"
     summary: Confirmed failing manual gate tests before implementation because fix/merge/close proposal helpers were absent.
     report: core/test/pr-manual-gates.test.js
-    tests: node --test core/test/pr-manual-gates.test.js: expected failure
+    tests: "node --test core/test/pr-manual-gates.test.js: expected failure"
     trigger: auto
     related_milestone: M05
   -
@@ -580,7 +1129,7 @@ entries:
     timestamp: "2026-05-07T15:59:51+08:00"
     summary: Full core regression passed after adding remote-readonly inspect/review flow.
     report: .pipeline/reports/03-pr-mr-inspect-review-readonly-flow.report.md
-    tests: npm test --prefix core: 326/326 passing
+    tests: "npm test --prefix core: 326/326 passing"
     trigger: auto
     related_milestone: M04
   -
@@ -601,7 +1150,7 @@ entries:
     timestamp: "2026-05-07T15:57:00+08:00"
     summary: Confirmed failing readonly PR flow test before implementation because inspect/review helpers were absent.
     report: core/test/pr-readonly-flow.test.js
-    tests: node --test core/test/pr-readonly-flow.test.js: expected failure
+    tests: "node --test core/test/pr-readonly-flow.test.js: expected failure"
     trigger: auto
     related_milestone: M04
   -
@@ -630,7 +1179,7 @@ entries:
     ref: C9/M03
     status: completed
     timestamp: "2026-05-07T15:55:35+08:00"
-    summary: Completed /hw:pr Change Request command contract, GitHub PR and GitLab MR normalization, local archive schema, and secret-safe evidence writing.
+    summary: "Completed /hw:pr Change Request command contract, GitHub PR and GitLab MR normalization, local archive schema, and secret-safe evidence writing."
     report: .pipeline/reports/02-change-request-contract-and-local-archive.report.md
     tests: node --test core/test/pr-contract.test.js; focused command/docs/skill/readme/sync tests; npm test --prefix core; bash scripts/validate-config.sh .pipeline/config.yaml; node cli/bin/hypo-workflow sync --check-only --project .; git diff --check
     trigger: auto
@@ -641,9 +1190,9 @@ entries:
     ref: C9/M03/run_tests_green
     status: completed
     timestamp: "2026-05-07T15:55:35+08:00"
-    summary: Full core regression passed after adding /hw:pr and refreshing derived artifacts.
+    summary: "Full core regression passed after adding /hw:pr and refreshing derived artifacts."
     report: .pipeline/reports/02-change-request-contract-and-local-archive.report.md
-    tests: npm test --prefix core: 323/323 passing
+    tests: "npm test --prefix core: 323/323 passing"
     trigger: auto
     related_milestone: M03
   -
@@ -652,7 +1201,7 @@ entries:
     ref: C9/M03/implement
     status: completed
     timestamp: "2026-05-07T15:50:00+08:00"
-    summary: Implemented Change Request helpers, /hw:pr command registration, PR skill, PR spec, command counts, and generated/reference docs updates.
+    summary: "Implemented Change Request helpers, /hw:pr command registration, PR skill, PR spec, command counts, and generated/reference docs updates."
     report: core/src/pr/index.js
     trigger: auto
     related_milestone: M03
@@ -662,9 +1211,9 @@ entries:
     ref: C9/M03/run_tests_red
     status: completed
     timestamp: "2026-05-07T15:47:00+08:00"
-    summary: Confirmed failing PR contract test before implementation because Change Request helpers and /hw:pr command metadata were absent.
+    summary: "Confirmed failing PR contract test before implementation because Change Request helpers and /hw:pr command metadata were absent."
     report: core/test/pr-contract.test.js
-    tests: node --test core/test/pr-contract.test.js: expected failure
+    tests: "node --test core/test/pr-contract.test.js: expected failure"
     trigger: auto
     related_milestone: M03
   -
@@ -673,7 +1222,7 @@ entries:
     ref: C9/M03/write_tests
     status: completed
     timestamp: "2026-05-07T15:46:00+08:00"
-    summary: Added focused tests for /hw:pr command metadata, GitHub PR and GitLab MR normalization, local archive schema, stable ids, and secret redaction.
+    summary: "Added focused tests for /hw:pr command metadata, GitHub PR and GitLab MR normalization, local archive schema, stable ids, and secret redaction."
     report: core/test/pr-contract.test.js
     trigger: auto
     related_milestone: M03
@@ -716,7 +1265,7 @@ entries:
     timestamp: "2026-05-07T15:44:00+08:00"
     summary: Focused and full validation passed after adding configuration profiles and generated configuration documentation.
     report: .pipeline/reports/01-default-configuration-profiles.report.md
-    tests: npm test --prefix core: 319/319 passing
+    tests: "npm test --prefix core: 319/319 passing"
     trigger: auto
     related_milestone: M02
   -
@@ -737,7 +1286,7 @@ entries:
     timestamp: "2026-05-07T15:39:00+08:00"
     summary: Confirmed failing default profile tests before implementation because configuration profile exports and generated docs were missing.
     report: core/test/profile-platform.test.js
-    tests: node --test core/test/profile-platform.test.js: expected failure
+    tests: "node --test core/test/profile-platform.test.js: expected failure"
     trigger: auto
     related_milestone: M02
   -
@@ -4412,15 +4961,19 @@ entries:
     ref: C10/M4
     status: completed
     timestamp: "2026-05-09T00:30:30+08:00"
-    summary: Completed command/docs/adapter coverage for P0 Configure, /hw:pr create, and Subagent strict/degraded governance; full validation passed.
+    summary: "Completed command/docs/adapter coverage for P0 Configure, /hw:pr create, and Subagent strict/degraded governance; full validation passed."
     report: .pipeline/reports/04-commands-docs-adapters-full-regression.report.md
     trigger: auto
     related_milestone: M4
     tests:
-      - "npm test --prefix core: 365/365 passing"
-      - "bash scripts/validate-config.sh .pipeline/config.yaml: passing"
-      - "python3 tests/run_regression.py: 63/63 passing"
-      - "git diff --check: passing"
+      -
+        "npm test --prefix core: 365/365 passing"
+      -
+        "bash scripts/validate-config.sh .pipeline/config.yaml: passing"
+      -
+        "python3 tests/run_regression.py: 63/63 passing"
+      -
+        "git diff --check: passing"
   -
     id: CYCLE-COMPLETE-C10-20260509T003030+0800
     type: cycle_complete

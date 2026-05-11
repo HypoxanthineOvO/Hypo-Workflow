@@ -58,6 +58,9 @@ Every spawned worker prompt must declare its role and write scope before work st
 - `audit` worker: read-only. It must not modify any file, including `.pipeline/`, documentation, reports, tests, production code, or generated artifacts; it returns findings and evidence pointers only.
 - if a worker needs a file outside its declared scope, it must stop and report the requested path, reason, and owning role instead of editing locally.
 - a spawned worker must not revert, overwrite, or "clean up" another worker's changes unless that exact action is explicitly included in its declared write scope and confirmed by the orchestrating main agent.
+- acceptance worker evidence must persist both `prompt_scope` and `changed_files` for required file-changing roles (`implement` and `test`) even when the worker made no edits. Runtime-only observations, active subtask lists, terminal output, or an in-memory note that a worker stayed in scope do not satisfy this evidence. A missing `changed_files` field means missing evidence; an explicit `changed_files: []` means a persisted no-op worker result and may satisfy the gate when paired with a persisted `prompt_scope`.
+- worker separation gates must reject persisted evidence when changed files cross role ownership: `audit` is read-only and any `changed_files` entry is invalid; `implement` must not change test-owned assets such as `core/test/**`, `tests/**`, fixtures, snapshots, or assertions; `test` must not change implementation-owned assets such as `core/src/**`.
+- if `prompt_scope` is declared, every `changed_files` path must match that scope. Scope matching supports exact paths and simple glob patterns such as `core/src/**` and `references/**`.
 
 The main agent must not implement, write tests, review tests, debug, audit, or plan locally first and then report that the independent worker was missing. That reverses the gate and invalidates the evidence.
 

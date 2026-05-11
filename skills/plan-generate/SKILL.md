@@ -57,16 +57,35 @@ Generated analysis prompts should point to `templates/analysis/*`, `references/a
 
 Generated implementation prompts must not degrade testing into open-loop prose. Carry forward the exact validation command or executable scenario, the observable pass/fail evidence, and the implementation-versus-validation ownership split when the plan called for it.
 
-Generated implementation prompts must include a `Subworker Assignment Plan` whenever worker separation is `recommended` or `strict`, or the planned work is non-trivial enough to require independent validation. Place this section before any implementation steps. The section must be concrete enough that `/hw:start` can execute without inventing role boundaries:
+P3 must preserve and echo audit contracts gathered in P1. Generated artifacts carry forward the real test method, pseudo-test rejection, rejection scope, blocked approval, and audit evidence so the audit worker can reject missing evidence instead of inferring policy.
+
+Prompt architecture requires one canonical prompt file per milestone. The canonical prompt is always the milestone's primary release artifact. If delegated subworker prompts are actually needed, generate them only as derived artifacts under a fixed derived path; canonical and derived artifacts must not collapse into a single generic worker prompt or be counted as the same milestone surface.
+
+Derived prompt release rules:
+
+- release derived prompts only when the milestone is explicitly delegated for worker-separated execution
+- if no delegation exists, or the milestone remains single-agent, do not create derived prompt files
+- when derived prompts are released, place them only under `.pipeline/prompts/derived/Mxx/` and keep the path deterministic for that milestone
+- name the derived files by role or role-equivalent execution function, not by ad hoc labels
+- do not count derived subworker prompts toward milestone count, canonical prompt count, or prompt generation completion
+
+Generated canonical prompts must include a `Subworker Assignment Plan` whenever worker separation is `recommended` or `strict`, or the planned work is non-trivial enough to require independent validation. Place this section before any implementation steps. The section must be concrete enough that `/hw:start` can execute without inventing role boundaries:
 
 - `test`: owns `write_tests` and `review_tests`; independently validates the real test contract, records command/scenario evidence, checks failure/green evidence where applicable, and rejects pseudo tests
 - `implement`: owns scoped implementation edits and produces a concise change summary
-- `audit`: inspects the final diff, test evidence, assumptions, risk, and worker identity separation
+- `audit`: inspects the final diff, test evidence, assumptions, risk, worker identity separation, and whether the derived prompt release path is explicit and deterministic
 - main agent: orchestrates, integrates returned artifacts, updates lifecycle/progress/log files, and makes the final decision; it must not write red tests or implementation locally before the `test` and `implement` workers are authorized or assigned
 - non-overlap: the same worker identity must not satisfy both `test` and `implement`; `strict` must also keep audit separate
 - artifacts: name the expected review/test/audit artifact paths under `.pipeline/reviews/` or the prompt-specific report path
 
-On Codex, missing execution subworker authorization does not remove the assignment. Instead, generate the same `Subworker Assignment Plan` with `status: blocked_until_authorized` and include a start/resume gate requiring `/hw:start` or `/hw:resume` to Ask before role-sensitive work. Only an explicit user-confirmed fastest single-agent downgrade may generate prompts without subworker assignments, and those prompts must state that worker-separation gates are intentionally disabled.
+On Codex, missing execution subworker authorization does not remove the assignment. Instead, generate the same `Subworker Assignment Plan` with `status: blocked_until_authorized` and include a start/resume gate requiring `/hw:start` or `/hw:resume` to Ask before role-sensitive work. Canonical prompts still release, but derived subworker prompt files do not release until authorization exists. Only an explicit user-confirmed fastest single-agent downgrade may generate prompts without subworker assignments, and those prompts must state that worker-separation gates are intentionally disabled.
+
+Default prompt file contract:
+
+- keep one canonical prompt file per milestone under `.pipeline/prompts/`
+- if delegated subworker prompts are required, generate them only under a fixed derived path such as `.pipeline/prompts/derived/Mxx/`
+- do not count derived subworker prompts toward milestone count or canonical prompt count
+- do not require four always-present role files for every milestone
 
 If derived lifecycle artifacts fail to refresh after a successful authority commit, generated prompts should direct the operator to repair the derived artifact or run `/hw:sync --light` rather than treating the authority write as failed.
 

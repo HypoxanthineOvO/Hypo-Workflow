@@ -1,0 +1,47 @@
+audit_delta:
+  schema_version: 1
+  cycle_id: C11
+  milestone_id: M02
+  cycle_memory_ref: .pipeline/audit-memory/C11-audit-memory.yaml
+  local_special_requirements:
+    -
+      id: M02-LOCAL-001
+      summary: M02 test worker may edit only test assets and fixtures.
+      source: test_prompt
+      scope: milestone
+    -
+      id: M02-LOCAL-002
+      summary: M02 must cover scoped audit summaries for plan, start, and resume handoff.
+      source: orchestrator_prompt
+      scope: milestone
+  scoped_visibility:
+    test:
+      include:
+        - local_special_requirements
+        - user_special_requirements
+        - project_rules_summary
+        - cycle_decisions
+      exclude:
+        - raw_conversation
+        - unrestricted_memory
+    implement:
+      include:
+        - local_special_requirements
+        - user_special_requirements
+        - project_rules_summary
+        - cycle_decisions
+      exclude:
+        - raw_conversation
+        - unrestricted_memory
+    audit:
+      include:
+        - local_special_requirements
+        - user_special_requirements
+        - project_rules_summary
+        - cycle_decisions
+        - source_refs
+      exclude:
+        - raw_conversation
+  authority:
+    inherits_cycle_memory: true
+    raw_freeform_is_authority: false
