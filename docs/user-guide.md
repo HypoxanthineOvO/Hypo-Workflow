@@ -25,13 +25,13 @@ Hypo-Workflow 围绕 `.pipeline/` 的状态、提示、报告、日志和恢复�
 - 用 `/hw:pr inspect|review|fix|merge|close <url|id>` 处理已有 GitHub PR 或 GitLab MR，并把本地证据归档到 `.pipeline/pr/`。
 - 用 `/hw:pr create` 进入问答式 PR/MR 创建；已有本地改动走 `--from-worktree`，还没开始的工作走 `--plan`，所有 push、create、reviewer/label/target branch 远端写都要一次性确认。
 - 用 `/hw:sync --repair` 修复派生上下文，用 `/hw:docs repair` 修复文档。
-- 生命周期 gate 处用 `/hw:accept` 或 `/hw:reject` 明确验收。
+- 生命周期 gate 处用 `/hw:accept`、`/hw:achieve` 或 `/hw:reject` 明确验收；`/hw:achieve` 是 `/hw:accept` 的同义命令。
 
 ## Subagent 与降级
 
 `execution.worker_separation.mode=recommended|strict` 时，非平凡工作要尽量拆出 implement、test、audit 不同角色。implementation Subagent 不应读取测试源码、fixtures、snapshots 或 assertion 细节，只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若平台无法维持隔离，必须记录 role isolation degradation；`recommended` 需要用户明确确认 degraded mode 后才可继续，`strict` 不能把降级执行视为 fully accepted。
 
-`/hw:accept` 会把 worker separation 当成验收 gate：缺少 `test`、`implement` 或 `audit` worker evidence、角色身份碰撞、`close_failed` lifecycle、缺少 Codex `/hw:start` + `/hw:resume` 授权范围，或把 runtime-only subtask observation 当成 evidence，都会阻塞验收或要求先做明确降级。
+`/hw:accept` 与 `/hw:achieve` 会把 worker separation 当成验收 gate：缺少 `test`、`implement` 或 `audit` worker evidence、角色身份碰撞、`close_failed` lifecycle、缺少 Codex `/hw:start` + `/hw:resume` 授权范围，或把 runtime-only subtask observation 当成 evidence，都会阻塞验收或要求先做明确降级。
 
 成功完成 `/hw:start` 或 `/hw:resume` 后，如果 `compact.auto=true` 且 `compact.end_of_run=true`，收口阶段按默认 `compact.refresh_policy=dirty_only` 只刷新已变脏的 compact targets。刷新必须从完整 authority 文件生成，不能从旧 `.compact` 文件复制。
 

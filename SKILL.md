@@ -1,12 +1,12 @@
 ---
 name: hypo-workflow
-version: 12.3.0
-description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:plan`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
+version: 12.4.0
+description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:plan`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:achieve`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
 ---
 
-# Hypo-Workflow v12.3.0
+# Hypo-Workflow v12.4.0
 
-> **Claude Code 用户**：请使用 `/hypo-workflow:<command>` 调用具体指令。输入 `/hypo-workflow:help` 查看全部 39 个用户指令。
+> **Claude Code 用户**：请使用 `/hypo-workflow:<command>` 调用具体指令。输入 `/hypo-workflow:help` 查看全部 40 个用户指令。
 >
 > **Codex 用户**：本文件是完整的 Skill 入口，继续使用 `/hw:*` 指令。
 
@@ -29,7 +29,7 @@ description: Run a serialized prompt execution pipeline from a local `.pipeline/
 | `/hw:plan:extend` | Append milestones to an active Cycle |
 | `/hw:plan:review` | Run Plan Review for the current or all milestones |
 | `/hw:cycle` | Create, list, view, close, and archive delivery Cycles |
-| `/hw:accept` | Accept pending Cycle work and complete the manual acceptance gate |
+| `/hw:accept` / `/hw:achieve` | Accept pending Cycle work and complete the manual acceptance gate |
 | `/hw:reject` | Reject pending Cycle work with structured feedback and reopen the Cycle |
 | `/hw:explore` | Start an isolated exploration worktree and record exploration metadata |
 | `/hw:sync` | Synchronize project adapters and lightweight derived context without executing pipeline milestones |
@@ -263,7 +263,7 @@ Handle these commands directly:
 
 If a command starts with `/hw:` and is not listed above, return:
 
-`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:achieve, /hw:reject, /hw:explore, /hw:sync, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 
 Slash commands are exact and take precedence over fuzzy natural-language matching. Detailed parsing and option semantics live in [`references/commands-spec.md`](./references/commands-spec.md).
 

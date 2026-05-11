@@ -542,8 +542,11 @@ test("acceptance blocks worker authorization waiting for start resume scope", as
 
 test("cycle acceptance command map and docs are exposed", async () => {
   assert.equal(commandByCanonical("/hw:accept").opencode, "/hw-accept");
+  assert.equal(commandByCanonical("/hw:achieve").opencode, "/hw-achieve");
   assert.equal(commandByCanonical("/hw:reject").opencode, "/hw-reject");
   assert.equal(commandByCanonical("/hw:accept").agent, "hw-build");
+  assert.equal(commandByCanonical("/hw:achieve").agent, "hw-build");
+  assert.equal(commandByCanonical("/hw:achieve").skill, "skills/accept/SKILL.md");
   assert.equal(commandByCanonical("/hw:reject").agent, "hw-build");
 
   const cycleSkill = await readFile("skills/cycle/SKILL.md", "utf8");

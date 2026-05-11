@@ -6,7 +6,7 @@
 
 Plan -> Execute -> Review -> Report -> Resume
 
-[![Version](https://img.shields.io/badge/version-12.3.0-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-12.4.0-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/en/reference/platforms.md)
 
@@ -39,7 +39,7 @@ Check status and continue:
 - **Rules / Habits**: store user habits and project rules as structured authority, then render platform-readable instruction views.
 - **Agent Review**: record review artifacts during planning, tests, implementation, and final checks.
 - **PR/MR Create**: `/hw:pr create` guides GitHub PR and GitLab MR creation from existing local changes or a plan-first work item, with remote writes gated by explicit confirmation.
-- **Acceptance / Compact Evidence**: `/hw:accept` blocks missing or colliding worker evidence; successful `/hw:start` and `/hw:resume` refresh compact views with `dirty_only` policy.
+- **Acceptance / Compact Evidence**: `/hw:accept` and `/hw:achieve` block missing or colliding worker evidence; successful `/hw:start` and `/hw:resume` refresh compact views with `dirty_only` policy.
 - **Sync / Docs / Release**: synchronize platform adapters, repair docs, and run release checks without replacing host Agent work.
 
 ## Platform Entrypoints
@@ -62,7 +62,7 @@ Third-party IDE adapters are repository instruction files. They teach the host I
 - Run pre-delivery checks for formatting, stale derived artifacts, README/docs freshness, secret markers, tests, and report evidence.
 - Automation is governed by `.pipeline/config.yaml`; release, destructive operations, external side effects, and PR/MR remote writes still follow explicit confirmation gates.
 
-Current version exposes **39 user-facing commands** and **1 internal watchdog** skill.
+Current version exposes **40 user-facing commands** and **1 internal watchdog** skill.
 
 ## Common Commands
 
@@ -88,7 +88,7 @@ Current version exposes **39 user-facing commands** and **1 internal watchdog** 
 | [Platforms Reference](docs/en/reference/platforms.md) | Platform capability matrix |
 | [Generated Artifacts](docs/en/reference/generated-artifacts.md) | Generated adapter and docs sources |
 | [Configuration Reference](docs/en/reference/configuration.md) | Automation, gates, profiles, and worker separation |
-| [v12.3.0 Release Notes](docs/en/release/v12.3.0.md) | Worker separation, `dirty_only` compact refresh, PR #5, and validation evidence |
+| [v12.4.0 Release Notes](docs/en/release/v12.4.0.md) | `/hw:achieve` alias, adapter refresh, and validation evidence |
 
 ## License
 

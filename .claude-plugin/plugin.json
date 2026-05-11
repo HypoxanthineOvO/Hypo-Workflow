@@ -1,6 +1,6 @@
 {
   "name": "hw",
-  "version": "12.3.0",
+  "version": "12.4.0",
   "description": "Hypo-Workflow for Claude Code. The plugin namespace is intentionally `hw` so existing workflow skills surface as /hw:* commands.",
   "author": {
     "name": "Hypoxanthine",
@@ -15,7 +15,7 @@
     "tdd",
     "prompt-engineering",
     "ai-agent",
-    "dashboard",
+    "status",
     "claude-code",
     "codex",
     "opencode"

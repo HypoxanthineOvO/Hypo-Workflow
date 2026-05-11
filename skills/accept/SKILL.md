@@ -13,7 +13,11 @@ description: Accept pending Hypo-Workflow Cycle work and complete the manual acc
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill when the user invokes `/hw:accept`.
+Use this skill when the user invokes `/hw:accept` or `/hw:achieve`.
+
+`/hw:achieve` is an alias for `/hw:accept`. It uses the same Cycle acceptance gate,
+worker-separation checks, lifecycle writes, log entry semantics, and derived refresh
+behavior. Do not create a second acceptance path for `achieve`.
 
 ## Semantics
 

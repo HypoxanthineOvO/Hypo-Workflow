@@ -12,7 +12,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 - Claude Code exposes canonical commands through a plugin whose namespace is `hw`; the existing workflow skills remain authoritative and must not be duplicated into a second implementation
 - Claude Code `/hw:*` entries are plugin-skill entrypoints for the existing Hypo-Workflow skill files
 - Claude Code native `/resume` remains owned by Claude Code; Hypo-Workflow must never register or document bare `/resume` as an alias for `/hw:resume`
-- V12 canonical namespace contains 39 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups, plus an internal cron-only watchdog skill
+- V12 canonical namespace contains 40 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups, plus an internal cron-only watchdog skill
 - slash commands are exact and namespace-scoped
 - slash commands take precedence over fuzzy natural-language matching
 - natural-language commands remain valid for backward compatibility
@@ -51,6 +51,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
    - `/hw:plan:review`
    - `/hw:cycle`
    - `/hw:accept`
+   - `/hw:achieve`
    - `/hw:reject`
    - `/hw:explore`
    - `/hw:sync`
@@ -61,7 +62,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 3. parse remaining tokens as command arguments
 4. flags are order-independent
 5. if a command is unknown, return exactly:
-   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:achieve, /hw:reject, /hw:explore, /hw:sync, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 6. if a known command receives an unsupported flag, stop and report the unsupported flag explicitly instead of guessing
 7. if a prompt selector is ambiguous, list the candidates and stop
 8. plan and review commands load `plan/PLAN-SKILL.md` before execution
@@ -72,7 +73,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 
 ## Command Semantics
 
-Lifecycle-mutating commands must use the workflow commit helper for protected workflow state. This applies to `/hw:accept`, `/hw:reject`, `/hw:start`, `/hw:resume`, `/hw:plan:generate`, prompt skip/stop transitions, and any command that writes `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, or `.pipeline/rules.yaml`.
+Lifecycle-mutating commands must use the workflow commit helper for protected workflow state. This applies to `/hw:accept`, `/hw:achieve`, `/hw:reject`, `/hw:start`, `/hw:resume`, `/hw:plan:generate`, prompt skip/stop transitions, and any command that writes `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, or `.pipeline/rules.yaml`.
 
 The command should prepare authoritative writes first, prevalidate invariants, commit authority with temp-file atomic replacement, then refresh derived views such as `.pipeline/log.yaml`, `.pipeline/PROGRESS.md`, metrics mirrors, compact views, `PROJECT-SUMMARY.md`, and OpenCode status inputs. If a derived refresh fails after authority commits, do not roll back authority; report the warning, write `.pipeline/derived-refresh.yaml`, and recommend `/hw:sync --light` or rerunning the lifecycle command after repair.
 
@@ -240,7 +241,7 @@ Supported forms:
 Behavior:
 
 - read `SKILL.md` command tables as the source of truth
-- `/hw:help` lists all 39 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility
+- `/hw:help` lists all 40 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility
 - `/hw:help --quick` returns a compact cheat sheet
 - `/hw:help <cmd>` returns detailed usage, flags, and examples for the requested command
 
