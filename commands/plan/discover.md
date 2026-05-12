@@ -1,15 +1,15 @@
 ---
-description: Hypo-Workflow mapping for /hw:setup
+description: Hypo-Workflow mapping for /hw:plan:discover
 hypo_workflow_managed: true
 ---
 
-# /hw:setup
+# /hw:plan:discover
 
-Canonical command: `/hw:setup`
-Route: `setup`
-Skill: `skills/setup/SKILL.md`
+Canonical command: `/hw:plan:discover`
+Route: `plan`
+Skill: `skills/plan-discover/SKILL.md`
 
-Load the corresponding Hypo-Workflow skill instructions from `skills/setup/SKILL.md`, then execute `/hw:setup` semantics with any user-provided arguments.
+Load the corresponding Hypo-Workflow skill instructions from `skills/plan-discover/SKILL.md`, then execute `/hw:plan:discover` semantics with any user-provided arguments.
 
 Before acting, inspect the relevant context when present:
 

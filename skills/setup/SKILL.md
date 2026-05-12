@@ -235,9 +235,9 @@ If a check fails, keep the config but mark the provider as unverified in the sum
 
 Claude Code users:
 
-- invoke commands as `/hypo-workflow:<command>`
+- install/enable the `hw` plugin and invoke commands as `/hw:*`; Claude native `/resume` remains separate from Hypo `/hw:resume`
 - configure Codex as a subagent by installing `@openai/codex`, setting `OPENAI_API_KEY`, and choosing `subagent.provider=codex`
-- use `/hypo-workflow:dashboard` for the WebUI
+- dashboard is not part of the active Claude Code command surface unless a future release explicitly re-enables it
 
 Codex users:
 

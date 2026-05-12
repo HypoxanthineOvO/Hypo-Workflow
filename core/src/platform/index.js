@@ -13,7 +13,7 @@ export const PLATFORM_CAPABILITIES = Object.freeze({
     delegation_policy: "Prefer Codex subagents for substantial work; keep testing/review separate from implementation when practical.",
   },
   "claude-code": {
-    commands: "plugin-skill",
+    commands: "plugin-slash+skills",
     ask: "chat",
     plan: "prompt-managed",
     subagents: "available",

@@ -4,7 +4,9 @@ import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
+  auditClaudeResumeNamespace,
   commandMap,
+  loadStructuredRulesAuthority,
   writeClaudeCodePluginArtifacts,
 } from "../src/index.js";
 
@@ -16,18 +18,30 @@ test("writeClaudeCodePluginArtifacts renders hw namespace plugin metadata", asyn
   const plugin = JSON.parse(await readFile(join(dir, ".claude-plugin", "plugin.json"), "utf8"));
   const monitors = JSON.parse(await readFile(join(dir, "monitors", "monitors.json"), "utf8"));
   const marketplace = JSON.parse(await readFile(join(dir, ".claude-plugin", "marketplace.json"), "utf8"));
+  const patchCommand = await readFile(join(dir, "commands", "patch.md"), "utf8");
+  const planDiscoverCommand = await readFile(join(dir, "commands", "plan", "discover.md"), "utf8");
+  const setupCommand = await readFile(join(dir, "commands", "setup.md"), "utf8");
 
   assert.equal(commands.length, 39);
   assert.equal(plugin.name, "hw");
   assert.equal(plugin.skills, "./skills/");
   assert.equal(plugin.monitors, "./monitors/monitors.json");
   assert.equal(monitors[0].command, "node hooks/claude-hook.mjs ProgressMonitor");
-  assert.equal((await writeClaudeCodePluginArtifacts(dir)).namespace, "hw");
+  const result = await writeClaudeCodePluginArtifacts(dir);
+  assert.equal(result.namespace, "hw");
+  assert.equal(result.command_count, 37);
+  assert.ok(result.written_commands.includes("commands/patch.md"));
+  assert.ok(result.written_commands.includes("commands/plan/discover.md"));
   assert.ok(plugin.keywords.includes("claude-code"));
   assert.ok(plugin.keywords.includes("hypo-workflow"));
   assert.equal(marketplace.plugins[0].name, "hw");
   assert.ok(marketplace.plugins[0].tags.includes("claude-code"));
   assert.ok(marketplace.plugins[0].tags.includes("workflow"));
+  assert.match(patchCommand, /Canonical command: `\/hw:patch`/);
+  assert.match(patchCommand, /Skill: `skills\/patch\/SKILL\.md`/);
+  assert.match(planDiscoverCommand, /Canonical command: `\/hw:plan:discover`/);
+  assert.match(setupCommand, /Canonical command: `\/hw:setup`/);
+  assert.doesNotMatch(setupCommand, /\/hypo-workflow:setup/);
 });
 
 test("writeClaudeCodePluginArtifacts removes legacy hw-* alias skills", async () => {
@@ -53,12 +67,26 @@ test("Claude Code platform docs explain hw namespace without replacing existing 
   const commandSpec = await readFile("references/commands-spec.md", "utf8");
 
   assert.match(guide, /plugin name .*`hw`|plugin name 有意设为 `hw`/s);
-  assert.match(guide, /existing workflow skills|现有 workflow skills/s);
-  assert.match(guide, /root `skills\/` directory|root `skills\/`/);
+  assert.match(guide, /plugin-root `commands\/`/);
+  assert.match(guide, /root `skills\/` authority/);
   assert.match(guide, /does not generate `skills\/hw-\*` alias skills|不生成 `skills\/hw-\*`/);
   assert.match(guide, /Claude native `\/resume`/);
   assert.match(guide, /Hypo workflow resume is `\/hw:resume`/);
   assert.match(commandSpec, /namespace is `hw`/s);
-  assert.match(commandSpec, /existing Hypo-Workflow skill files/s);
+  assert.match(commandSpec, /plugin-root `commands\/` files/s);
+  assert.match(commandSpec, /existing `skills\/\*\/SKILL\.md` authority/s);
   assert.match(commandSpec, /native `\/resume` remains owned by Claude Code/);
+});
+
+test("project rules enforce Claude hw command namespace and resume boundary", async () => {
+  const authority = await loadStructuredRulesAuthority(".", ".");
+  const rule = authority.effective.rules.find((item) => item.id === "claude-hw-command-namespace");
+  const audit = await auditClaudeResumeNamespace(".");
+
+  assert.equal(rule.scope, "project");
+  assert.equal(rule.severity, "error");
+  assert.deepEqual(rule.hooks, ["always", "pre-commit", "pre-release"]);
+  assert.match(rule.content.instruction, /\/hw:\*/);
+  assert.match(rule.content.rationale, /\/hw:resume/);
+  assert.equal(audit.ok, true);
 });

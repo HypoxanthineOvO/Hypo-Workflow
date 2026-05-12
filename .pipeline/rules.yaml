@@ -4,3 +4,4 @@ rules:
   git-clean-check: warn
   report-language: warn
   progress-timezone: warn
+  claude-hw-command-namespace: error

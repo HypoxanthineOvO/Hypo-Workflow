@@ -670,12 +670,13 @@ function renderPlatformGuide(platform) {
       "",
       "## Plugin Namespace",
       "",
-      "Claude Code plugin name 有意设为 `hw`，因此现有 workflow skills 以 `/hw:*` 命令暴露。",
+      "Claude Code plugin name 有意设为 `hw`，plugin-root `commands/` 会把 `/hw:*` 映射到现有 workflow Skills。",
       "",
-      "- The adapter uses the root `skills/` directory and existing workflow skills.",
+      "- The adapter generates plugin-root `commands/*.md` slash-command files that load the root `skills/` authority.",
       "- It does not generate `skills/hw-*` alias skills.",
       "- Claude native `/resume` belongs to Claude Code; Hypo workflow resume is `/hw:resume`.",
       "- `skills/resume/SKILL.md` intentionally omits a bare `name: resume` frontmatter field so metadata does not suggest a `/resume` alias.",
+      "- Do not promote `/hypo-workflow:<command>` as the primary Claude Code command path.",
       "- Hook `matcher: resume` means Claude SessionStart resume event, not a user slash command.",
       "- Settings are merged through project-local `settings.local_file` policy.",
       "- DeepSeek and Mimo may be used through Claude Code agent routing when configured; this is separate from Codex Subagents.",
@@ -854,7 +855,8 @@ function platformFeatureLines(platform) {
   if (platform === "claude-code") {
     return [
       ...common,
-      "- 通过 `hw` Claude Code plugin namespace 暴露 `/hw:*`。",
+      "- 通过 `hw` Claude Code plugin namespace 和 plugin-root `commands/` 暴露 `/hw:*`。",
+      "- 生成 Claude plugin slash command files，并让它们加载现有 `skills/*/SKILL.md` authority。",
       "- 生成 project-local hooks，用于 SessionStart、Stop、PermissionRequest、compact resume 和 progress/status refresh。",
       "- 为 plan、code、test、review、debug、docs、report、compact 角色生成 Claude agents 和 routing metadata。",
       "- 检测到官方 OpenAI Codex plugin 已安装后，可选择性用于 implementation delegation。",
@@ -963,11 +965,12 @@ function renderEnglishPlatformGuide(platform) {
       "",
       "## Plugin Namespace",
       "",
-      "The Claude Code plugin name is intentionally `hw`, so existing workflow skills surface as `/hw:*` commands.",
+      "The Claude Code plugin name is intentionally `hw`; plugin-root `commands/` files map `/hw:*` to the existing workflow Skills.",
       "",
-      "- The adapter uses the root `skills/` directory and existing workflow skills.",
+      "- The adapter generates plugin-root `commands/*.md` slash-command files that load the root `skills/` authority.",
       "- It does not generate `skills/hw-*` alias skills.",
       "- Claude native `/resume` remains owned by Claude Code; Hypo workflow resume is `/hw:resume`.",
+      "- Do not promote `/hypo-workflow:<command>` as the primary Claude Code command path.",
       "- Optional OpenAI Codex plugin installation is a separate explicit-confirmation flow.",
     );
   }
@@ -1080,7 +1083,8 @@ function englishPlatformFeatureLines(platform) {
   if (platform === "claude-code") {
     return [
       ...common,
-      "- Expose `/hw:*` through the `hw` Claude Code plugin namespace.",
+      "- Expose `/hw:*` through the `hw` Claude Code plugin namespace and plugin-root `commands/`.",
+      "- Generate Claude plugin slash command files that load existing `skills/*/SKILL.md` authority.",
       "- Generate project-local hooks for SessionStart, Stop, PermissionRequest, compact resume, and progress/status refresh.",
       "- Generate Claude agents and routing metadata for plan, code, test, review, debug, docs, report, and compact roles.",
     ];

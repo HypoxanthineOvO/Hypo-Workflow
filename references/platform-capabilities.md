@@ -10,8 +10,8 @@ Hypo-Workflow remains a single workflow system with platform adapters. OpenCode,
 
 | Capability | Codex | Claude Code | OpenCode | Cursor | GitHub Copilot | Trae |
 |---|---|---|---|---|---|---|
-| User command surface | `/hw:*` skill invocation | `/hw:*` plugin-skill namespace | `/hw-*` native slash commands | repository instructions | repository instructions | repository instructions |
-| Instruction surface | `SKILL.md` + rules files | Claude plugin skills | OpenCode command/agent files plus plugin context | `.cursor/rules/hypo-workflow.mdc` | `.github/copilot-instructions.md` | `.trae/rules/project_rules.md` |
+| User command surface | `/hw:*` skill invocation | `/hw:*` plugin slash commands backed by Skills | `/hw-*` native slash commands | repository instructions | repository instructions | repository instructions |
+| Instruction surface | `SKILL.md` + rules files | Claude plugin `commands/`, skills, hooks, and agents | OpenCode command/agent files plus plugin context | `.cursor/rules/hypo-workflow.mdc` | `.github/copilot-instructions.md` | `.trae/rules/project_rules.md` |
 | Interactive questions | Direct chat or Codex UI prompts where available | Direct chat / tool prompts where available | Native `question` tool | chat | chat | chat |
 | Plan tool / todos | Codex plan tool, best-effort discipline | Prompt-managed plan/checklists | Native `todowrite` | host dependent | host dependent | host dependent |
 | Subagents | Codex/GPT runtime workers | Claude subagents where configured | Native agents and subagents | host dependent | host dependent | host dependent |
@@ -39,7 +39,7 @@ V9 must not degrade Codex or Claude Code.
 
 | Layer | Codex adapter | Claude Code adapter | OpenCode adapter |
 |---|---|---|---|
-| Command rendering | Keep root `SKILL.md` and child skills. | Keep `.claude-plugin` metadata and command docs. | Generate `.opencode/commands/*.md`. |
+| Command rendering | Keep root `SKILL.md` and child skills. | Generate plugin-root `commands/*.md` and keep child Skills authoritative. | Generate `.opencode/commands/*.md`. |
 | Context bootstrap | Read compact/runtime files through skill policy. | SessionStart hook loads runtime files. | Plugin injects compact runtime files and current command context. |
 | Interactive gates | Ask user in chat and wait. | Ask user in chat/tool flow and wait. | Use `question` tool whenever interaction is required. |
 | Plan discipline | Strengthen prompt instructions to use the available plan tool. | Strengthen prompt instructions and checkpoints. | Bind `/hw-plan*` to `hw-plan` and require `todowrite`. |

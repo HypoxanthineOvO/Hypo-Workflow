@@ -1,15 +1,15 @@
 ---
-description: Hypo-Workflow mapping for /hw:setup
+description: Hypo-Workflow mapping for /hw:reject
 hypo_workflow_managed: true
 ---
 
-# /hw:setup
+# /hw:reject
 
-Canonical command: `/hw:setup`
-Route: `setup`
-Skill: `skills/setup/SKILL.md`
+Canonical command: `/hw:reject`
+Route: `lifecycle`
+Skill: `skills/reject/SKILL.md`
 
-Load the corresponding Hypo-Workflow skill instructions from `skills/setup/SKILL.md`, then execute `/hw:setup` semantics with any user-provided arguments.
+Load the corresponding Hypo-Workflow skill instructions from `skills/reject/SKILL.md`, then execute `/hw:reject` semantics with any user-provided arguments.
 
 Before acting, inspect the relevant context when present:
 

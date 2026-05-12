@@ -1,7 +1,7 @@
 {
   "name": "hw",
   "version": "12.5.0",
-  "description": "Hypo-Workflow for Claude Code. The plugin namespace is intentionally `hw` so existing workflow skills surface as /hw:* commands.",
+  "description": "Hypo-Workflow for Claude Code. The plugin namespace is intentionally `hw`; plugin-root commands map /hw:* to existing workflow Skills.",
   "author": {
     "name": "Hypoxanthine",
     "url": "https://github.com/HypoxanthineOvO"

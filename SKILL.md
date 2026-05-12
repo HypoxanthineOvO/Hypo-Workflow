@@ -6,7 +6,7 @@ description: Run a serialized prompt execution pipeline from a local `.pipeline/
 
 # Hypo-Workflow v12.5.0
 
-> **Claude Code 用户**：请使用 `/hypo-workflow:<command>` 调用具体指令。输入 `/hypo-workflow:help` 查看全部 39 个用户指令。
+> **Claude Code 用户**：安装/启用 `hw` plugin 后使用 `/hw:*` 指令；Claude 原生 `/resume` 不属于 Hypo-Workflow，Hypo 恢复命令始终是 `/hw:resume`。
 >
 > **Codex 用户**：本文件是完整的 Skill 入口，继续使用 `/hw:*` 指令。
 

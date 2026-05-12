@@ -9,8 +9,8 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 ## Namespace
 
 - all explicit Hypo-Workflow commands use the `/hw:` prefix
-- Claude Code exposes canonical commands through a plugin whose namespace is `hw`; the existing workflow skills remain authoritative and must not be duplicated into a second implementation
-- Claude Code `/hw:*` entries are plugin-skill entrypoints for the existing Hypo-Workflow skill files
+- Claude Code exposes canonical commands through plugin-root `commands/` files under a plugin whose namespace is `hw`; those slash-command files must load the existing Hypo-Workflow skill files instead of duplicating a second implementation
+- Claude Code `/hw:*` entries are plugin slash-command mappings backed by the existing `skills/*/SKILL.md` authority
 - Claude Code native `/resume` remains owned by Claude Code; Hypo-Workflow must never register or document bare `/resume` as an alias for `/hw:resume`
 - V12 canonical namespace contains 39 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups, plus an internal cron-only watchdog skill
 - slash commands are exact and namespace-scoped

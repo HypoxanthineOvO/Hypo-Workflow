@@ -126,6 +126,7 @@ for file in "$repo_root"/rules/builtin/*.yaml; do
 done
 
 custom_dir="$pipeline_dir/rules/custom"
+structured_project_dir="$pipeline_dir/rules/structured/project"
 if [[ -d "$custom_dir" ]]; then
   printf '\n[Custom Rules]\n'
   for file in "$custom_dir"/*.md "$custom_dir"/*.yaml; do
@@ -139,6 +140,29 @@ if [[ -d "$custom_dir" ]]; then
     fi
     hooks="$(custom_field "钩子点" "$file")"
     [[ -n "$label" ]] || label="custom"
+    [[ -n "$severity" ]] || severity="warn"
+    [[ -n "$hooks" ]] || hooks="always"
+    total=$((total + 1))
+    case "$severity" in
+      error) errors=$((errors + 1)); enabled=$((enabled + 1)) ;;
+      warn) warns=$((warns + 1)); enabled=$((enabled + 1)) ;;
+      off) off=$((off + 1)) ;;
+    esac
+    printf '%s\t%s\t%s\t%s\n' "$name" "$label" "$severity" "$hooks"
+  done
+fi
+
+if [[ -d "$structured_project_dir" ]]; then
+  printf '\n[Structured Project Rules]\n'
+  for file in "$structured_project_dir"/*.yaml; do
+    [[ -f "$file" ]] || continue
+    name="$(field_for id "$file")"
+    [[ -n "$name" ]] || name="$(basename "$file" .yaml)"
+    label="$(field_for label "$file")"
+    severity="$(severity_for "$name" "$preset")"
+    [[ -n "$severity" ]] || severity="$(field_for severity "$file")"
+    hooks="$(hooks_for "$file")"
+    [[ -n "$label" ]] || label="workflow"
     [[ -n "$severity" ]] || severity="warn"
     [[ -n "$hooks" ]] || hooks="always"
     total=$((total + 1))
@@ -176,6 +200,33 @@ if [[ -d "$custom_dir" ]]; then
     if [[ "$severity" != "off" && ",$hooks," == *",always,"* ]]; then
       printf '\n%s\n' "- ${name} (${severity})"
       custom_content "$file"
+    fi
+  done
+fi
+if [[ -d "$structured_project_dir" ]]; then
+  for file in "$structured_project_dir"/*.yaml; do
+    [[ -f "$file" ]] || continue
+    name="$(field_for id "$file")"
+    [[ -n "$name" ]] || name="$(basename "$file" .yaml)"
+    severity="$(severity_for "$name" "$preset")"
+    [[ -n "$severity" ]] || severity="$(field_for severity "$file")"
+    hooks="$(hooks_for "$file")"
+    [[ -n "$severity" ]] || severity="warn"
+    [[ -n "$hooks" ]] || hooks="always"
+    if [[ "$severity" != "off" && ",$hooks," == *",always,"* ]]; then
+      instruction="$(sed -nE 's/^[[:space:]]*instruction:[[:space:]]*"?([^"]*)"?[[:space:]]*$/\1/p' "$file" | head -n1)"
+      if [[ -z "$instruction" ]]; then
+        instruction="$(awk '
+        /^[[:space:]]*instruction:[[:space:]]*>-/ { in_instruction=1; next }
+        in_instruction && /^[[:space:]]*[a-zA-Z_]+:/ { in_instruction=0 }
+        in_instruction {
+          sub(/^[[:space:]]+/, "")
+          print
+        }
+      ' "$file" | tr '\n' ' ' | sed -E 's/[[:space:]]+/ /g; s/[[:space:]]+$//')"
+      fi
+      printf '\n%s\n' "- ${name} (${severity})"
+      [[ -n "$instruction" ]] && printf '%s\n' "$instruction"
     fi
   done
 fi

@@ -81,7 +81,7 @@ test("model pool maps roles to Claude Code agents without OpenCode coupling", as
 
 test("Claude Code platform capability exposes plugin skills hooks settings and model routing", () => {
   const capabilities = capabilityFor("claude-code");
-  assert.equal(capabilities.commands, "plugin-skill");
+  assert.equal(capabilities.commands, "plugin-slash+skills");
   assert.equal(capabilities.events, "hooks");
   assert.equal(capabilities.permissions, "claude-settings");
   assert.equal(capabilities.model_routing, "claude-agents-from-model-pool");

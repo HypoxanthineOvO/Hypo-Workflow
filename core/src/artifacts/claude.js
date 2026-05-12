@@ -1,5 +1,5 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { renderClaudeStatusMonitorManifest } from "../claude-status/index.js";
 import { planClaudeCodexDelegation } from "../claude-codex/index.js";
 import { commandMap } from "../commands/index.js";
@@ -10,6 +10,7 @@ const HW_VERSION = "12.5.0";
 export async function writeClaudeCodePluginArtifacts(outDir = ".", options = {}) {
   const pluginDir = join(outDir, ".claude-plugin");
   const monitorsDir = join(outDir, "monitors");
+  const commands = commandMap("claude-code");
   await mkdir(pluginDir, { recursive: true });
   await mkdir(monitorsDir, { recursive: true });
 
@@ -28,17 +29,73 @@ export async function writeClaudeCodePluginArtifacts(outDir = ".", options = {})
     `${JSON.stringify(renderClaudeStatusMonitorManifest(), null, 2)}\n`,
     "utf8",
   );
+  const writtenCommands = await writeClaudeCodeSlashCommandArtifacts(outDir, commands);
   const removedAliases = await removeLegacyClaudeAliasSkills(outDir);
 
   return {
     plugin_dir: ".claude-plugin",
     namespace: "hw",
     command_namespace: "/hw",
-    skill_count: commandMap("claude-code").length,
+    command_count: writtenCommands.length,
+    skill_count: commands.length,
     skills_dir: "skills",
+    commands_dir: "commands",
+    written_commands: writtenCommands,
     monitors_file: "monitors/monitors.json",
     removed_legacy_aliases: removedAliases,
   };
+}
+
+async function writeClaudeCodeSlashCommandArtifacts(outDir, commands) {
+  const written = [];
+  for (const command of commands) {
+    const relative = claudeSlashCommandRelativePath(command);
+    if (!relative) continue;
+    const absolute = join(outDir, relative);
+    await mkdir(dirname(absolute), { recursive: true });
+    await writeFile(absolute, renderClaudeCodeSlashCommand(command), "utf8");
+    written.push(relative);
+  }
+  return written;
+}
+
+function claudeSlashCommandRelativePath(command) {
+  const canonical = String(command.canonical || "");
+  if (!canonical.startsWith("/hw:")) return null;
+  const commandName = canonical.slice("/hw:".length).trim();
+  if (!commandName || /\s/.test(commandName)) return null;
+  const parts = commandName.split(":").filter(Boolean);
+  if (parts.length === 0) return null;
+  return join("commands", ...parts.slice(0, -1), `${parts.at(-1)}.md`);
+}
+
+export function renderClaudeCodeSlashCommand(command = {}) {
+  return [
+    "---",
+    `description: Hypo-Workflow mapping for ${command.canonical}`,
+    "hypo_workflow_managed: true",
+    "---",
+    "",
+    `# ${command.canonical}`,
+    "",
+    `Canonical command: \`${command.canonical}\``,
+    `Route: \`${command.route}\``,
+    `Skill: \`${command.skill}\``,
+    "",
+    `Load the corresponding Hypo-Workflow skill instructions from \`${command.skill}\`, then execute \`${command.canonical}\` semantics with any user-provided arguments.`,
+    "",
+    "Before acting, inspect the relevant context when present:",
+    "",
+    "- `.pipeline/config.yaml`",
+    "- `.pipeline/cycle.yaml`",
+    "- `.pipeline/state.yaml`",
+    "- `.pipeline/rules.yaml`",
+    "- current prompt/report files for pipeline commands",
+    "- open patches for Patch commands",
+    "",
+    "Keep this command as a Claude Code plugin slash-command mapping, not a separate runner. Claude Code performs the work; Hypo-Workflow files remain the source of truth.",
+    "",
+  ].join("\n");
 }
 
 async function removeLegacyClaudeAliasSkills(outDir) {
@@ -221,7 +278,7 @@ export function renderClaudeCodePluginManifest(options = {}) {
   return {
     name: "hw",
     version: options.version || HW_VERSION,
-    description: "Hypo-Workflow for Claude Code. The plugin namespace is intentionally `hw` so existing workflow skills surface as /hw:* commands.",
+    description: "Hypo-Workflow for Claude Code. The plugin namespace is intentionally `hw`; plugin-root commands map /hw:* to existing workflow Skills.",
     author: {
       name: "Hypoxanthine",
       url: "https://github.com/HypoxanthineOvO",
@@ -259,7 +316,7 @@ export function renderClaudeCodeMarketplaceManifest(options = {}) {
         name: "hw",
         source: "./",
         version: options.version || HW_VERSION,
-        description: "Hypo-Workflow Claude Code plugin. Uses the `hw` namespace so skills are invoked as /hw:*.",
+      description: "Hypo-Workflow Claude Code plugin. Uses the `hw` namespace so plugin-root commands expose /hw:* backed by existing Skills.",
         author: {
           name: "Hypoxanthine",
           url: "https://github.com/HypoxanthineOvO",

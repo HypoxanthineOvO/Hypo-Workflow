@@ -1,15 +1,15 @@
 ---
-description: Hypo-Workflow mapping for /hw:setup
+description: Hypo-Workflow mapping for /hw:reset
 hypo_workflow_managed: true
 ---
 
-# /hw:setup
+# /hw:reset
 
-Canonical command: `/hw:setup`
-Route: `setup`
-Skill: `skills/setup/SKILL.md`
+Canonical command: `/hw:reset`
+Route: `lifecycle`
+Skill: `skills/reset/SKILL.md`
 
-Load the corresponding Hypo-Workflow skill instructions from `skills/setup/SKILL.md`, then execute `/hw:setup` semantics with any user-provided arguments.
+Load the corresponding Hypo-Workflow skill instructions from `skills/reset/SKILL.md`, then execute `/hw:reset` semantics with any user-provided arguments.
 
 Before acting, inspect the relevant context when present:
 

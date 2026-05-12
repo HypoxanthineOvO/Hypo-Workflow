@@ -6,7 +6,7 @@ Hypo-Workflow does not execute project work directly. The host Agent reads `.pip
 
 ## Capability Summary
 
-- Commands: plugin-skill.
+- Commands: plugin-slash+skills.
 - Ask gates: chat.
 - Plan support: prompt-managed.
 - Subagents: available.
@@ -40,7 +40,8 @@ hypo-workflow sync --platform claude-code --project .
 - Use canonical `/hw:*` workflow vocabulary: init, plan, start/resume, status/report, sync/docs, rules, patch, release.
 - Support `/hw:explain` as a read-only evidence-first command.
 - Protect authority files unless the active lifecycle command owns the write.
-- Expose `/hw:*` through the `hw` Claude Code plugin namespace.
+- Expose `/hw:*` through the `hw` Claude Code plugin namespace and plugin-root `commands/`.
+- Generate Claude plugin slash command files that load existing `skills/*/SKILL.md` authority.
 - Generate project-local hooks for SessionStart, Stop, PermissionRequest, compact resume, and progress/status refresh.
 - Generate Claude agents and routing metadata for plan, code, test, review, debug, docs, report, and compact roles.
 
@@ -54,9 +55,10 @@ hypo-workflow sync --platform claude-code --project .
 
 ## Plugin Namespace
 
-The Claude Code plugin name is intentionally `hw`, so existing workflow skills surface as `/hw:*` commands.
+The Claude Code plugin name is intentionally `hw`; plugin-root `commands/` files map `/hw:*` to the existing workflow Skills.
 
-- The adapter uses the root `skills/` directory and existing workflow skills.
+- The adapter generates plugin-root `commands/*.md` slash-command files that load the root `skills/` authority.
 - It does not generate `skills/hw-*` alias skills.
 - Claude native `/resume` remains owned by Claude Code; Hypo workflow resume is `/hw:resume`.
+- Do not promote `/hypo-workflow:<command>` as the primary Claude Code command path.
 - Optional OpenAI Codex plugin installation is a separate explicit-confirmation flow.

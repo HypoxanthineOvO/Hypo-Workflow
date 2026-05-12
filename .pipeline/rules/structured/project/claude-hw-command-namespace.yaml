@@ -1,0 +1,33 @@
+id: claude-hw-command-namespace
+scope: project
+label: workflow
+severity: error
+hooks:
+  - always
+  - pre-commit
+  - pre-release
+source:
+  captured_from: chat
+  author: user
+  date: 2026-05-12
+content:
+  instruction: "Claude Code integration must expose Hypo-Workflow commands through the `hw` plugin namespace as `/hw:*` slash commands while keeping Claude native `/resume` separate from Hypo `/hw:resume`."
+  rationale: "A previous fix avoided collisions between Claude native `/resume` and Hypo `/hw:resume`; future Claude adapter changes must preserve that namespace boundary and must not regress to a single `/hypo-workflow` aggregate command."
+  examples:
+    good:
+      - "plugin name is `hw`, so `commands/resume.md` maps to `/hw:resume`"
+      - "`skills/resume/SKILL.md` does not declare `name: resume`"
+      - "plugin metadata and docs do not document bare `/resume` as a Hypo alias"
+      - "Claude slash command files under `commands/` load the existing `skills/*/SKILL.md` authority"
+    bad:
+      - "registering `/resume` or `name: resume` for Hypo-Workflow"
+      - "telling Claude Code users to call `/hypo-workflow:<command>` as the primary path"
+      - "removing `commands/*.md` so autocomplete only shows the aggregate Skill"
+enforcement:
+  check_kind: checklist
+  evidence_required: true
+  checklist:
+    - "Run or inspect `auditClaudeResumeNamespace('.')`; it must report no error-level bare `/resume` registration."
+    - "Verify `.claude-plugin/plugin.json` has `name: hw`."
+    - "Verify generated Claude command files include `commands/resume.md`, `commands/patch.md`, and nested command files such as `commands/plan/discover.md`."
+    - "Verify root `SKILL.md` and Claude docs prefer `/hw:*` for Claude Code and do not promote `/hypo-workflow:<command>` as the primary Claude path."

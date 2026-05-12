@@ -11,7 +11,7 @@
       "name": "hw",
       "source": "./",
       "version": "12.5.0",
-      "description": "Hypo-Workflow Claude Code plugin. Uses the `hw` namespace so skills are invoked as /hw:*.",
+      "description": "Hypo-Workflow Claude Code plugin. Uses the `hw` namespace so plugin-root commands expose /hw:* backed by existing Skills.",
       "author": {
         "name": "Hypoxanthine",
         "url": "https://github.com/HypoxanthineOvO"
