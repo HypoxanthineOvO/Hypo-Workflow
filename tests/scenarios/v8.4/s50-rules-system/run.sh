@@ -29,7 +29,8 @@ printf '%s\n' "$summary" | rg -q 'git-clean-check[[:space:]]+guard[[:space:]]+wa
 printf '%s\n' "$summary" | rg -q 'knowledge-ledger-self-check[[:space:]]+hook[[:space:]]+warn[[:space:]]+post-step,post-milestone'
 printf '%s\n' "$summary" | rg -q 'plan-tool-required[[:space:]]+workflow[[:space:]]+warn'
 printf '%s\n' "$summary" | rg -q 'session-start-context-load[[:space:]]+hook[[:space:]]+error[[:space:]]+on-session-start'
-printf '%s\n' "$summary" | rg -q 'Summary: 15/17 enabled'
+printf '%s\n' "$summary" | rg -q 'claude-hw-command-namespace[[:space:]]+workflow[[:space:]]+error[[:space:]]+always,pre-commit,pre-release'
+printf '%s\n' "$summary" | rg -q 'Summary: 16/18 enabled'
 printf '%s\n' "$summary" | rg -q 'prefer-chinese-output'
 printf '%s\n' "$summary" | rg -q 'report-language'
 

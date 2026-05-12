@@ -6,7 +6,7 @@
 
 Plan -> Execute -> Review -> Report -> Resume
 
-[![Version](https://img.shields.io/badge/version-12.5.0-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-12.5.1-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/en/reference/platforms.md)
 
@@ -88,7 +88,7 @@ Current version exposes **39 user-facing commands** and **1 internal watchdog** 
 | [Platforms Reference](docs/en/reference/platforms.md) | Platform capability matrix |
 | [Generated Artifacts](docs/en/reference/generated-artifacts.md) | Generated adapter and docs sources |
 | [Configuration Reference](docs/en/reference/configuration.md) | Automation, gates, profiles, and worker separation |
-| [v12.5.0 Release Notes](docs/en/release/v12.5.0.md) | Clean PR #7 governance port, `.pipeline` PR path policy, audit memory, rework, and worker scope evidence |
+| [v12.5.1 Release Notes](docs/en/release/v12.5.1.md) | Claude Code `/hw:*` slash commands, resume namespace guard, structured rule enforcement, and release note cleanup |
 
 ## License
 

@@ -7,7 +7,7 @@ repo_root="$(cd "$script_dir/../../../.." && pwd)"
 cd "$repo_root"
 
 rg -q 'version: [0-9]+\.[0-9]+\.[0-9]+' SKILL.md
-rg -q '查看全部 39 个用户指令' SKILL.md
+rg -q '## 指令列表' SKILL.md
 rg -q '\| `/hw:compact` \|' SKILL.md
 rg -q '\| `/hw:knowledge` \|' SKILL.md
 rg -q '\| `/hw:guide` \|' SKILL.md

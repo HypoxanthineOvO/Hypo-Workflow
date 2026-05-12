@@ -1,5 +1,28 @@
 # Changelog
 
+## v12.5.1 - 2026-05-12
+
+### Features
+
+- 为 Claude Code plugin 生成 plugin-root `commands/*.md` slash command files，恢复 `/hw:*` 在 Claude Code 中的补全和入口发现。
+- 新增 37 个 Claude Code command mappings，覆盖 `/hw:patch`、`/hw:resume`、`/hw:plan:discover` 等入口，并保持现有 `skills/*/SKILL.md` 为唯一语义 authority。
+- 新增 project structured rule `claude-hw-command-namespace`，以 `error` 级别强制检查 `hw` namespace、`/hw:*` 暴露和 `/hw:resume` / Claude 原生 `/resume` 分离。
+
+### Fixes
+
+- 修复本机 Claude Code 只显示 `/hypo-workflow` 聚合入口、`/hw:` 无补全的问题。
+- 修复 setup skill 和 Claude Code 文档中的旧 `/hypo-workflow:<command>` 主入口描述。
+- 将 v12.3.0、v12.4.0、v12.5.0 中文 release notes 调整为规范分类结构。
+- 同步 package、plugin、adapter 和 Skill 版本到 `12.5.1`。
+
+### Tests
+
+- `uv run -- node --test core/test/*.test.js`: 437/437 passing.
+- `uv run -- node --test core/test/claude-plugin-alias.test.js core/test/claude-adapter-config.test.js core/test/claude-resume-namespace.test.js core/test/rules-authority.test.js core/test/docs-governance.test.js core/test/readme-spec.test.js`: 30/30 passing.
+- `claude plugin validate .`: passing.
+- `bash scripts/rules-summary.sh .`: `claude-hw-command-namespace` appears as `error`.
+- `uv run -- git diff --check`: passing.
+
 ## v12.5.0 - 2026-05-12
 
 ### Features
