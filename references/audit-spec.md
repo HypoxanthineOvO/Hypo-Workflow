@@ -2,6 +2,15 @@
 
 Use this reference for `/hw:audit`, the preventive code auditing workflow.
 
+## Governance Authority
+
+- `audit` is a hard governance gate, not only a final passive review.
+- `audit` may intervene before milestone completion and reject work mid-flight when execution evidence, worker separation, or validation quality is insufficient.
+- `audit` may reject a `milestone`, `feature`, or `cycle` depending on the scope of the defect or governance breach.
+- only `implement` may propose `blocked`; only `audit` may approve `blocked`.
+- blocked approval is deterministic: an implement proposal alone is `blocked_proposed`, not an approved blocked runtime state; the approved state exists only after an `audit` actor approves the proposal.
+- rejected work with `needs_revision` must route through rework requiring at least `test` and `implement`, with no silent continuation.
+
 ## Audit Dimensions
 
 | Dimension | Code | Checks | Severity |

@@ -557,6 +557,7 @@ export function assessWorkerSeparationStatus(policyInput = {}, runtime = {}) {
     .filter((role) => roleMap.get(role))
     .flatMap((role) => workerLifecycleIssues(role, roleMap.get(role)));
   const authorizationBlocked = workerAuthorizationIssues(policy.authorization, policy.mode, policy.platform);
+  const scopeBlocked = workers.flatMap((worker) => workerScopeIssues(worker));
 
   if (sameWorkerIdentity(implementWorker, testWorker)) {
     collisions.push("implement_test_shared_worker");
@@ -569,13 +570,17 @@ export function assessWorkerSeparationStatus(policyInput = {}, runtime = {}) {
   }
 
   const workerEvidenceObserved = workers.length > 0;
-  const degraded = missingRoles.length > 0 || collisions.length > 0 || lifecycleBlocked.length > 0 || authorizationBlocked.length > 0;
+  const degraded = missingRoles.length > 0
+    || collisions.length > 0
+    || lifecycleBlocked.length > 0
+    || authorizationBlocked.length > 0
+    || scopeBlocked.length > 0;
   const implementTestBlocking = hasImplementTestBlockingIssue(missingRoles, collisions);
   const auditBlocking = hasAuditBlockingIssue(missingRoles, collisions);
   const implementTestUnavailable = implementTestIssueUnavailable(missingRoles, collisions, roleAvailability);
   const auditUnavailable = !auditBlocking || roleUnavailable(roleAvailability.audit);
   const auditInsufficient = runtime.audit_verdict === "insufficient";
-  const hardBlocked = lifecycleBlocked.length > 0 || authorizationBlocked.length > 0;
+  const hardBlocked = lifecycleBlocked.length > 0 || authorizationBlocked.length > 0 || scopeBlocked.length > 0;
   const canProceed = policy.mode === "off"
     ? true
     : policy.mode === "recommended"
@@ -594,6 +599,7 @@ export function assessWorkerSeparationStatus(policyInput = {}, runtime = {}) {
     collisions,
     lifecycle_blocked: lifecycleBlocked,
     authorization_blocked: authorizationBlocked,
+    scope_blocked: scopeBlocked,
     degraded,
     can_proceed: canProceed,
     requires_confirmation: degraded && policy.mode !== "off" && policy.degradation.allow_with_confirmation,
@@ -607,7 +613,15 @@ export function assessWorkerSeparationStatus(policyInput = {}, runtime = {}) {
           || (auditBlocking && !auditUnavailable)
           || (policy.acceptance.audit_can_block_acceptance && auditInsufficient)
         ),
-    summary: buildWorkerSeparationSummary(policy, missingRoles, collisions, roleAvailability, lifecycleBlocked, authorizationBlocked),
+    summary: buildWorkerSeparationSummary(
+      policy,
+      missingRoles,
+      collisions,
+      roleAvailability,
+      lifecycleBlocked,
+      authorizationBlocked,
+      scopeBlocked,
+    ),
   };
 }
 
@@ -801,11 +815,25 @@ function workerIdentity(worker = {}) {
   return worker.session_id || worker.worker_id || worker.id || worker.name || null;
 }
 
-function buildWorkerSeparationSummary(policy, missingRoles, collisions, roleAvailability = {}, lifecycleBlocked = [], authorizationBlocked = []) {
+function buildWorkerSeparationSummary(
+  policy,
+  missingRoles,
+  collisions,
+  roleAvailability = {},
+  lifecycleBlocked = [],
+  authorizationBlocked = [],
+  scopeBlocked = [],
+) {
   if (policy.mode === "off") {
     return "Worker separation disabled for this project.";
   }
-  if (!missingRoles.length && !collisions.length && !lifecycleBlocked.length && !authorizationBlocked.length) {
+  if (
+    !missingRoles.length
+    && !collisions.length
+    && !lifecycleBlocked.length
+    && !authorizationBlocked.length
+    && !scopeBlocked.length
+  ) {
     return `Worker separation ${policy.mode} satisfied with implement/test/audit split.`;
   }
   const parts = [];
@@ -821,7 +849,154 @@ function buildWorkerSeparationSummary(policy, missingRoles, collisions, roleAvai
   if (authorizationBlocked.length) {
     parts.push(`authorization blocked: ${authorizationBlocked.join(", ")}`);
   }
+  if (scopeBlocked.length) {
+    const missingPromptScope = scopeBlocked
+      .filter((issue) => issue.endsWith("_missing_prompt_scope"))
+      .map((issue) => issue.replace(/_missing_prompt_scope$/, ""));
+    const missingChangedFiles = scopeBlocked
+      .filter((issue) => issue.endsWith("_missing_changed_files"))
+      .map((issue) => issue.replace(/_missing_changed_files$/, ""));
+    const scopeOwnership = scopeBlocked.filter(
+      (issue) => !issue.endsWith("_missing_prompt_scope") && !issue.endsWith("_missing_changed_files"),
+    );
+    if (missingPromptScope.length) {
+      parts.push(`missing persisted prompt scope: ${missingPromptScope.join(", ")}`);
+    }
+    if (missingChangedFiles.length) {
+      parts.push(`missing persisted changed-file evidence: ${missingChangedFiles.join(", ")}`);
+    }
+    if (scopeOwnership.length) {
+      parts.push(`scope/ownership blocked: ${scopeOwnership.join(", ")}`);
+    }
+  }
   return `Worker separation ${policy.mode} degraded: ${parts.join("; ")}.`;
+}
+
+function workerScopeIssues(worker = {}) {
+  const role = String(worker.role || "").trim().toLowerCase();
+  const hasChangedFiles = hasArrayEvidenceField(worker, "changed_files", "changedFiles");
+  const hasPromptScope = hasArrayEvidenceField(worker, "prompt_scope", "promptScope");
+  const changedFiles = normalizePathList(evidenceFieldValue(worker, "changed_files", "changedFiles"));
+  const promptScope = normalizePathList(evidenceFieldValue(worker, "prompt_scope", "promptScope"));
+  const issues = [];
+
+  if (role === "implement" || role === "test") {
+    if (!hasPromptScope) {
+      issues.push(`${role}_missing_prompt_scope`);
+    }
+    if (!hasChangedFiles) {
+      issues.push(`${role}_missing_changed_files`);
+    }
+  }
+
+  for (const file of changedFiles) {
+    if (role === "audit") {
+      issues.push(`audit_changed_file_not_allowed:${file}`);
+      continue;
+    }
+    if (role === "implement" && isTestOwnedFile(file)) {
+      issues.push(`implement_changed_test_owned_file:${file}`);
+    }
+    if (role === "test" && isImplementationOwnedFile(file)) {
+      issues.push(`test_changed_implementation_owned_file:${file}`);
+    }
+    if (promptScope.length > 0 && !pathMatchesAnyScope(file, promptScope)) {
+      issues.push(`${role}_changed_file_outside_prompt_scope:${file}`);
+    }
+  }
+
+  return issues;
+}
+
+function hasArrayEvidenceField(worker = {}, snakeKey, camelKey) {
+  return (
+    Object.prototype.hasOwnProperty.call(worker, snakeKey)
+    && Array.isArray(worker[snakeKey])
+  ) || (
+    Object.prototype.hasOwnProperty.call(worker, camelKey)
+    && Array.isArray(worker[camelKey])
+  );
+}
+
+function evidenceFieldValue(worker = {}, snakeKey, camelKey) {
+  if (Object.prototype.hasOwnProperty.call(worker, snakeKey)) return worker[snakeKey];
+  if (Object.prototype.hasOwnProperty.call(worker, camelKey)) return worker[camelKey];
+  return undefined;
+}
+
+function normalizePathList(value) {
+  return (Array.isArray(value) ? value : [])
+    .filter((item) => item !== null && item !== undefined)
+    .map((item) => normalizeEvidencePath(item))
+    .filter(Boolean);
+}
+
+function normalizeEvidencePath(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\\/g, "/")
+    .replace(/^\.\/+/, "")
+    .replace(/^\/+/, "")
+    .replace(/\/+/g, "/");
+}
+
+function pathMatchesAnyScope(file, scopes) {
+  return scopes.some((scope) => pathMatchesScope(file, scope));
+}
+
+function pathMatchesScope(file, scope) {
+  if (!scope) return false;
+  if (!/[*?[\]{}]/.test(scope)) return file === scope;
+  if (scope.endsWith("/**")) {
+    const prefix = scope.slice(0, -3);
+    return file === prefix || file.startsWith(`${prefix}/`);
+  }
+  return globToRegExp(scope).test(file);
+}
+
+function globToRegExp(glob) {
+  let source = "^";
+  for (let index = 0; index < glob.length; index += 1) {
+    const char = glob[index];
+    const next = glob[index + 1];
+    if (char === "*" && next === "*") {
+      source += ".*";
+      index += 1;
+    } else if (char === "*") {
+      source += "[^/]*";
+    } else if (char === "?") {
+      source += "[^/]";
+    } else {
+      source += escapeRegExp(char);
+    }
+  }
+  return new RegExp(`${source}$`);
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[|\\{}()[\]^$+*?.]/g, "\\$&");
+}
+
+function isTestOwnedFile(file) {
+  return pathMatchesAnyScope(file, [
+    "core/test/**",
+    "tests/**",
+    "**/fixtures/**",
+    "**/fixture/**",
+    "**/__fixtures__/**",
+    "**/snapshots/**",
+    "**/__snapshots__/**",
+    "**/assertions/**",
+    "**/assertion/**",
+  ]);
+}
+
+function isImplementationOwnedFile(file) {
+  return pathMatchesAnyScope(file, [
+    "core/src/**",
+    "src/**",
+    "cli/src/**",
+  ]);
 }
 
 function workerLifecycleIssues(role, worker = {}) {

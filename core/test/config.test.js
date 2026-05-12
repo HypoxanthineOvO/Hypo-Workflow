@@ -291,8 +291,8 @@ test("recommended mode requires explicit audit evidence before audit degradation
 
   const blocked = assessWorkerSeparationStatus(policy, {
     workers: [
-      { role: "implement", worker_id: "impl-1", lifecycle: DONE },
-      { role: "test", worker_id: "test-1", lifecycle: DONE },
+      { role: "implement", worker_id: "impl-1", lifecycle: DONE, prompt_scope: ["core/src/**"], changed_files: [] },
+      { role: "test", worker_id: "test-1", lifecycle: DONE, prompt_scope: ["core/test/**"], changed_files: [] },
     ],
   });
   assert.equal(blocked.can_proceed, false);
@@ -300,8 +300,8 @@ test("recommended mode requires explicit audit evidence before audit degradation
 
   const allowed = assessWorkerSeparationStatus(policy, {
     workers: [
-      { role: "implement", worker_id: "impl-1", lifecycle: DONE },
-      { role: "test", worker_id: "test-1", lifecycle: DONE },
+      { role: "implement", worker_id: "impl-1", lifecycle: DONE, prompt_scope: ["core/src/**"], changed_files: [] },
+      { role: "test", worker_id: "test-1", lifecycle: DONE, prompt_scope: ["core/test/**"], changed_files: [] },
     ],
     role_availability: {
       audit: { status: "unavailable", reason: "command_unavailable" },
@@ -313,8 +313,8 @@ test("recommended mode requires explicit audit evidence before audit degradation
 
 test("Codex worker authorization unknown or missing start resume scope blocks separated workers", () => {
   const workers = [
-    { role: "implement", worker_id: "impl-1", lifecycle: DONE },
-    { role: "test", worker_id: "test-1", lifecycle: DONE },
+    { role: "implement", worker_id: "impl-1", lifecycle: DONE, prompt_scope: ["core/src/**"], changed_files: [] },
+    { role: "test", worker_id: "test-1", lifecycle: DONE, prompt_scope: ["core/test/**"], changed_files: [] },
     { role: "audit", worker_id: "audit-1", lifecycle: DONE },
   ];
 
@@ -339,8 +339,8 @@ test("Codex worker authorization unknown or missing start resume scope blocks se
 
 test("OpenCode and Claude do not require Codex-only worker authorization gate", () => {
   const workers = [
-    { role: "implement", worker_id: "impl-1", lifecycle: DONE },
-    { role: "test", worker_id: "test-1", lifecycle: DONE },
+    { role: "implement", worker_id: "impl-1", lifecycle: DONE, prompt_scope: ["core/src/**"], changed_files: [] },
+    { role: "test", worker_id: "test-1", lifecycle: DONE, prompt_scope: ["core/test/**"], changed_files: [] },
     { role: "audit", worker_id: "audit-1", lifecycle: DONE },
   ];
 

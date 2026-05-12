@@ -71,6 +71,7 @@ export function evaluateAcceptanceReadiness(context = {}, options = {}) {
       || workerStatus.collisions.length
       || workerStatus.lifecycle_blocked.length
       || workerStatus.authorization_blocked.length
+      || workerStatus.scope_blocked.length
     ) {
       reasons.push(workerStatus.summary);
     }
@@ -97,6 +98,43 @@ export function createRejectionFeedbackTemplate(options = {}) {
     actual: "",
     context: options.context || "",
     created_at: options.created_at || new Date().toISOString(),
+  };
+}
+
+export function createStructuredRejectionArtifact(input = {}) {
+  return {
+    schema_version: 1,
+    cycle_id: input.cycle_id || input.cycleId || null,
+    feature_id: input.feature_id || input.featureId || null,
+    milestone_id: input.milestone_id || input.milestoneId || null,
+    scope: input.scope || "cycle",
+    verdict: input.verdict || "rejected",
+    reasons: Array.isArray(input.reasons) ? input.reasons : [],
+    required_rework: Array.isArray(input.required_rework) ? input.required_rework : [],
+    blocked_request: normalizeRejectionBlockedRequest(input.blocked_request),
+    audit: normalizeRejectionAudit(input.audit),
+    original_prompt_ref: input.original_prompt_ref || input.originalPromptRef || input.prompt_ref || null,
+    created_at: input.created_at || input.createdAt || new Date().toISOString(),
+  };
+}
+
+export function buildReworkPromptLinkage({ rejection_artifact: rejectionArtifact = {}, source_prompt_ref: sourcePromptRef = null } = {}) {
+  const promptRef = sourcePromptRef || rejectionArtifact.prompt_ref || rejectionArtifact.original_prompt_ref || null;
+  const requiredRework = Array.isArray(rejectionArtifact.required_rework) ? rejectionArtifact.required_rework : [];
+  const findings = Array.isArray(rejectionArtifact.audit?.findings) ? rejectionArtifact.audit.findings : [];
+
+  return {
+    original_prompt_ref: rejectionArtifact.original_prompt_ref || promptRef,
+    prompt_ref: promptRef,
+    scope_mode: "incremental",
+    required_roles: collectReworkRoles(requiredRework),
+    incremental_scope: {
+      scope: rejectionArtifact.scope || "cycle",
+      required_rework: requiredRework,
+      findings,
+      reasons: Array.isArray(rejectionArtifact.reasons) ? rejectionArtifact.reasons : [],
+      allow_unrelated_scope: false,
+    },
   };
 }
 
@@ -512,6 +550,7 @@ function deriveWorkerFromStep(role, step = {}) {
     return {
       role,
       worker_id: step.subagent_result?.worker_id || step.subagent_result?.session_id || step.subagent_tool || "subagent",
+      ...deriveWorkerScopeFromStep(step),
       ...deriveWorkerLifecycleFromStep(step),
     };
   }
@@ -521,6 +560,15 @@ function deriveWorkerFromStep(role, step = {}) {
 function deriveWorkerLifecycleFromStep(step = {}) {
   const lifecycle = step.worker_lifecycle || step.lifecycle || step.subagent_result?.lifecycle;
   return lifecycle ? { lifecycle } : {};
+}
+
+function deriveWorkerScopeFromStep(step = {}) {
+  const promptScope = step.prompt_scope || step.promptScope || step.subagent_result?.prompt_scope || step.subagent_result?.promptScope;
+  const changedFiles = step.changed_files || step.changedFiles || step.subagent_result?.changed_files || step.subagent_result?.changedFiles;
+  return {
+    ...(Array.isArray(promptScope) ? { prompt_scope: promptScope } : {}),
+    ...(Array.isArray(changedFiles) ? { changed_files: changedFiles } : {}),
+  };
 }
 
 function deriveRoleAvailabilityFromStep(step = {}) {
@@ -579,4 +627,34 @@ function compactTimestamp(value) {
 
 function toProjectPath(file, projectRoot) {
   return file.replace(`${projectRoot.replace(/\/+$/, "")}/`, "");
+}
+
+function normalizeRejectionBlockedRequest(value = {}) {
+  const result = {
+    status: value?.status || "none",
+    proposed_by_role: value?.proposed_by_role || value?.proposedByRole || null,
+    approved_by_role: value?.approved_by_role || value?.approvedByRole || null,
+  };
+  if (value?.reason) result.reason = value.reason;
+  if (value?.evidence) result.evidence = value.evidence;
+  return result;
+}
+
+function normalizeRejectionAudit(value = {}) {
+  return {
+    reviewer_role: value?.reviewer_role || value?.reviewerRole || "audit",
+    verdict: value?.verdict || "needs_changes",
+    findings: Array.isArray(value?.findings) ? value.findings : [],
+  };
+}
+
+function collectReworkRoles(requiredRework = []) {
+  const roles = new Set(["test", "implement"]);
+  for (const item of Array.isArray(requiredRework) ? requiredRework : []) {
+    for (const role of Array.isArray(item?.owner_roles) ? item.owner_roles : []) {
+      const normalized = String(role || "").trim();
+      if (normalized) roles.add(normalized);
+    }
+  }
+  return [...roles];
 }

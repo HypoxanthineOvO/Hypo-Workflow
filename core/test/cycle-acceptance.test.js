@@ -191,8 +191,20 @@ test("accept blocks when worker separation policy requires missing audit coverag
     acceptCycle(root, {
       now: "2026-05-03T00:14:00+08:00",
       workers: [
-        { role: "implement", worker_id: "impl-1", lifecycle: DONE },
-        { role: "test", worker_id: "test-1", lifecycle: DONE },
+        {
+          role: "implement",
+          worker_id: "impl-1",
+          lifecycle: DONE,
+          prompt_scope: ["core/src/**"],
+          changed_files: ["core/src/acceptance/index.js"],
+        },
+        {
+          role: "test",
+          worker_id: "test-1",
+          lifecycle: DONE,
+          prompt_scope: ["core/test/**"],
+          changed_files: ["core/test/cycle-acceptance.test.js"],
+        },
       ],
     }),
     /acceptance blocked by worker separation policy/i,
@@ -274,8 +286,20 @@ test("recommended mode may degrade audit while still requiring implement-test se
     current: { phase: "completed", prompt_name: "M01 / Demo", step: null },
     runtime_workers: {
       workers: [
-        { role: "implement", worker_id: "impl-1", lifecycle: DONE },
-        { role: "test", worker_id: "test-1", lifecycle: DONE },
+        {
+          role: "implement",
+          worker_id: "impl-1",
+          lifecycle: DONE,
+          prompt_scope: ["core/src/**"],
+          changed_files: ["core/src/acceptance/index.js"],
+        },
+        {
+          role: "test",
+          worker_id: "test-1",
+          lifecycle: DONE,
+          prompt_scope: ["core/test/**"],
+          changed_files: ["core/test/cycle-acceptance.test.js"],
+        },
       ],
       role_availability: {
         audit: { status: "unavailable", reason: "tool_unavailable" },

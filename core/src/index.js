@@ -28,6 +28,7 @@ export * from "./analysis/index.js";
 export * from "./knowledge/index.js";
 export * from "./actions/index.js";
 export * from "./acceptance/index.js";
+export * from "./audit-memory/index.js";
 export * from "./patches/index.js";
 export * from "./pr/index.js";
 export * from "./explore/index.js";

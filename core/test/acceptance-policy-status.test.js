@@ -160,8 +160,8 @@ test("acceptance readiness can block on audit-insufficient worker separation pol
         },
       },
       workers: [
-        { role: "implement", worker_id: "impl-1", lifecycle: DONE },
-        { role: "test", worker_id: "test-1", lifecycle: DONE },
+        { role: "implement", worker_id: "impl-1", lifecycle: DONE, prompt_scope: ["core/src/**"], changed_files: [] },
+        { role: "test", worker_id: "test-1", lifecycle: DONE, prompt_scope: ["core/test/**"], changed_files: [] },
         { role: "audit", worker_id: "audit-1", lifecycle: DONE },
       ],
       audit_verdict: "insufficient",
@@ -205,8 +205,8 @@ test("acceptance readiness blocks recommended mode when implement and test share
 
 test("acceptance readiness blocks Codex worker authorization unknown and missing start resume scope", () => {
   const workers = [
-    { role: "implement", worker_id: "impl-1", lifecycle: DONE },
-    { role: "test", worker_id: "test-1", lifecycle: DONE },
+    { role: "implement", worker_id: "impl-1", lifecycle: DONE, prompt_scope: ["core/src/**"], changed_files: [] },
+    { role: "test", worker_id: "test-1", lifecycle: DONE, prompt_scope: ["core/test/**"], changed_files: [] },
     { role: "audit", worker_id: "audit-1", lifecycle: DONE },
   ];
 
@@ -253,8 +253,8 @@ test("acceptance readiness blocks Codex worker authorization unknown and missing
 
 test("acceptance readiness does not apply Codex authorization gate to OpenCode or Claude", () => {
   const workers = [
-    { role: "implement", worker_id: "impl-1", lifecycle: DONE },
-    { role: "test", worker_id: "test-1", lifecycle: DONE },
+    { role: "implement", worker_id: "impl-1", lifecycle: DONE, prompt_scope: ["core/src/**"], changed_files: [] },
+    { role: "test", worker_id: "test-1", lifecycle: DONE, prompt_scope: ["core/test/**"], changed_files: [] },
     { role: "audit", worker_id: "audit-1", lifecycle: DONE },
   ];
 
