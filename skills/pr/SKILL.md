@@ -29,7 +29,7 @@ Read `.pipeline/config.yaml` and global config when available. User-facing expla
 10. For `close`, require a close reason, write it to `decisions.yaml`, and stop for confirmation.
 11. For `create`, guide the user through one of three modes:
    - `/hw:pr create`: ask whether local worktree changes already exist.
-   - `/hw:pr create --from-worktree`: inspect local changes, file scope, branch, commit, target branch, title/body, reviewer, and labels.
+   - `/hw:pr create --from-worktree`: inspect local changes, file scope, `.pipeline/` path policy, branch, commit, target branch, title/body, reviewer, and labels.
    - `/hw:pr create --plan`: hand off to `/hw:plan`, then return to `/hw:pr create --from-worktree` after implementation and validation.
 12. Before any create remote write, show a single confirmation summary that lists push branch, create pull request / merge request, reviewer writes, label writes, and target branch writes.
 
@@ -44,6 +44,7 @@ Read `.pipeline/config.yaml` and global config when available. User-facing expla
 - `/hw:pr` is not an auto-merge bot.
 - `.pipeline/pr/` is local evidence, not the remote source of truth.
 - `inspect` and `review` may write local archive files but must not write remote platform state.
+- PR/MR payloads must not include `.pipeline/` runtime/generated files by default. Treat `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, `.pipeline/log.yaml`, `.pipeline/PROGRESS.md`, `.pipeline/prompts/**`, `.pipeline/reports/**`, `.pipeline/archives/**`, compact views, and derived health as blocking unless the user explicitly asks for a workflow-state migration. `.pipeline/pr/**` is allowed as a local Change Request archive exception.
 - Remote writes are high-risk gates and require explicit user confirmation.
 - Redact secrets before writing evidence or lifecycle logs.
 - `/hw:pr create` may create a local proposal archive before confirmation, but provider write methods must not run until the user confirms the full remote write summary.

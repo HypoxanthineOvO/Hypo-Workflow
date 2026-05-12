@@ -8,6 +8,7 @@ import {
   prepareChangeRequestClose,
   prepareChangeRequestMerge,
   parseYaml,
+  reviewChangeRequest,
 } from "../src/index.js";
 
 test("fix records local changes and keeps push as a manual remote step", async () => {
@@ -34,6 +35,36 @@ test("fix records local changes and keeps push as a manual remote step", async (
   assert.equal(decisions.remote_write_gate, "confirm");
   assert.equal(decisions.proposed_operation, "fix");
   assert.equal(decisions.push_requires_confirmation, true);
+});
+
+test("review blocks pipeline runtime files in PR diff", async () => {
+  const root = await mkdtemp(join(tmpdir(), "hw-pr-review-pipeline-policy-"));
+  const provider = readonlyProvider({
+    diff: {
+      files: [
+        { path: "core/src/pr/index.js", additions: 20, deletions: 1 },
+        { path: ".pipeline/log.yaml", additions: 10, deletions: 0 },
+        { path: ".pipeline/pr/PR-20260512-001/summary.md", additions: 5, deletions: 0 },
+      ],
+    },
+  });
+
+  const result = await reviewChangeRequest(root, "https://github.com/hypo-ai/workflow/pull/42", {
+    provider,
+    date: "20260512",
+    now: "2026-05-12T14:20:00+08:00",
+  });
+
+  assert.equal(result.merge_recommendation, "blocked");
+  assert.ok(result.findings.some((finding) => (
+    finding.severity === "blocking"
+    && finding.source === "file-policy"
+    && finding.summary.includes(".pipeline/log.yaml")
+  )));
+  assert.ok(!result.findings.some((finding) => (
+    finding.source === "file-policy"
+    && finding.summary.includes(".pipeline/pr/PR-20260512-001/summary.md")
+  )));
 });
 
 test("merge proposal blocks on failed checks, missing approval, or conflicts", async () => {

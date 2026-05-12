@@ -1,0 +1,18 @@
+schema_version: 1
+archive_id: PR-20260512-001
+remote_write_gate: confirm
+allowed_without_confirmation:
+  - inspect
+  - review
+  - local_archive_write
+remote_writes_performed: []
+confirmation_required_for:
+  - push
+  - merge
+  - close
+  - reviewer_write
+  - label_write
+  - target_branch_write
+status: reviewed
+recommendation: do_not_direct_merge
+reason: "PR #7 contains valuable audit-governance implementation, but conflicts with local v12.4.0 main and mixes implementation with runtime/release/generated surfaces."

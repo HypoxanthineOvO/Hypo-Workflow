@@ -1,0 +1,28 @@
+schema_version: 1
+archive_id: PR-20260512-001
+provider: github
+kind: pull_request
+host: github.com
+owner: HypoxanthineOvO
+repository: Hypo-Workflow
+number: 7
+url: https://github.com/HypoxanthineOvO/Hypo-Workflow/pull/7
+title: "Complete C11 audit governance hardening"
+author: Heaticy
+source_branch: feat/hw-achieve-12.4.0
+source_owner: Heaticy
+target_branch: main
+head_ref_oid: 651d7af312760be7759417747f886836d50f90f2
+status_snapshot:
+  state: OPEN
+  draft: false
+  mergeable: MERGEABLE
+  merge_state_status: unknown
+  review_decision: ""
+  checks: none_reported
+  changed_files: 124
+  additions: 4176
+  deletions: 429
+created_at: "2026-05-11T14:57:32Z"
+updated_at: "2026-05-11T14:57:32Z"
+inspected_at: "2026-05-12T14:06:27+08:00"

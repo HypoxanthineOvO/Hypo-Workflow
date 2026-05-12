@@ -21,6 +21,11 @@ export const CHANGE_REQUEST_CREATE_REMOTE_WRITES = Object.freeze([
   "label_write",
   "target_branch_write",
 ]);
+export const CHANGE_REQUEST_PIPELINE_PATH_POLICY = Object.freeze({
+  default_action: "block",
+  allowed: [".pipeline/pr/**"],
+  blocked: [".pipeline/**"],
+});
 
 export function normalizeChangeRequestSource(source = {}) {
   if (typeof source === "object" && source.provider && source.url) return normalizeKnownChangeRequest(source);
@@ -247,23 +252,29 @@ export function summarizeWorktreeForCreate(input = {}) {
   const current = String(input.current_branch || "");
   const defaultBranch = String(input.default_branch || "main");
   const onDefault = current && current === defaultBranch;
+  const fileScope = files.map((file) => ({
+    path: String(file.path || file),
+    status: String(file.status || "modified"),
+  }));
+  const filePolicy = assessChangeRequestPathPolicy(fileScope);
   return {
     dirty: files.length > 0,
     current_branch: current || null,
     default_branch: defaultBranch,
     on_default_branch: onDefault,
     suggested_branch: onDefault || !current ? "feature/pr-create" : current,
-    file_scope: files.map((file) => ({
-      path: String(file.path || file),
-      status: String(file.status || "modified"),
-    })),
+    file_scope: fileScope,
+    file_policy: filePolicy,
     guidance: [
       "选择要进入 PR/MR 的文件范围，避免把无关 dirty worktree 一起提交。",
+      filePolicy.blocked.length
+        ? "默认不要把 `.pipeline/` runtime/generated 文件放进 PR/MR；先拆出实现改动，再从当前仓库重新生成 docs/adapters/runtime 证据。"
+        : null,
       onDefault
         ? "当前在默认分支上，建议先创建 feature branch。"
         : "确认当前 feature branch 是否就是本次 PR/MR 的 source branch。",
       "确认 commit message、target branch、title/body，再展示一次性远端写确认摘要。",
-    ],
+    ].filter(Boolean),
   };
 }
 
@@ -291,6 +302,7 @@ export function buildChangeRequestCreatePlan(input = {}) {
     };
   }
   const files = normalizeFileEntries(input.files || input.worktree?.files);
+  const filePolicy = assessChangeRequestPathPolicy(files);
   const dirty = input.dirty ?? input.worktree?.dirty ?? files.length > 0;
   const sourceBranch = input.source_branch || input.current_branch || input.worktree?.branch || suggestSourceBranch(input.title || input.summary);
   const targetBranch = input.target_branch || "main";
@@ -314,6 +326,8 @@ export function buildChangeRequestCreatePlan(input = {}) {
     kind: repository.provider === "gitlab" ? "merge_request" : "pull_request",
     dirty,
     files,
+    file_policy: filePolicy,
+    blocked: filePolicy.blocked.length > 0,
     source_branch: sourceBranch,
     target_branch: targetBranch,
     commit_message: input.commit_message || title,
@@ -328,6 +342,39 @@ export function buildChangeRequestCreatePlan(input = {}) {
       mode: "single_create_flow",
       summary: renderCreateConfirmationSummary({ source_branch: sourceBranch, target_branch: targetBranch, title }),
     },
+  };
+}
+
+export function assessChangeRequestPathPolicy(files = [], options = {}) {
+  const allowed = options.allowed || CHANGE_REQUEST_PIPELINE_PATH_POLICY.allowed;
+  const blockedPatterns = options.blocked || CHANGE_REQUEST_PIPELINE_PATH_POLICY.blocked;
+  const entries = normalizeFileEntries(files);
+  const blocked = [];
+  const warnings = [];
+  const allowedPaths = [];
+
+  for (const entry of entries) {
+    const path = normalizePath(entry.path || entry);
+    if (!path) continue;
+    if (matchesAny(path, allowed)) {
+      allowedPaths.push(path);
+      continue;
+    }
+    if (matchesAny(path, blockedPatterns)) {
+      blocked.push({
+        path,
+        reason: "pipeline_runtime_or_generated_path",
+        message: "Do not include `.pipeline/` runtime/generated files in PR/MR payloads; keep them local evidence or regenerate them after integration.",
+      });
+    }
+  }
+
+  return {
+    ok: blocked.length === 0,
+    blocked,
+    warnings,
+    allowed: allowedPaths,
+    policy: CHANGE_REQUEST_PIPELINE_PATH_POLICY,
   };
 }
 
@@ -411,7 +458,7 @@ export async function inspectChangeRequest(projectRoot = ".", source, options = 
 export async function reviewChangeRequest(projectRoot = ".", source, options = {}) {
   const inspected = await inspectChangeRequest(projectRoot, source, options);
   const findings = buildReviewFindings(inspected.evidence);
-  const mergeRecommendation = findings.some((finding) => finding.severity === "warning") ? "blocked" : "ready_for_human_review";
+  const mergeRecommendation = findings.some((finding) => ["blocking", "warning"].includes(finding.severity)) ? "blocked" : "ready_for_human_review";
   const notes = renderReviewFindings(inspected.archive.id, findings, mergeRecommendation);
   await writeFile(join(inspected.archive.path, "review-notes.md"), notes, "utf8");
   return {
@@ -813,6 +860,14 @@ function buildReviewFindings(evidence) {
   const files = Array.isArray(evidence.diff?.files) ? evidence.diff.files : [];
   const checks = Array.isArray(evidence.checks) ? evidence.checks : [];
   const comments = Array.isArray(evidence.comments) ? evidence.comments : [];
+  const filePolicy = assessChangeRequestPathPolicy(files);
+  for (const item of filePolicy.blocked) {
+    findings.push({
+      severity: "blocking",
+      source: "file-policy",
+      summary: redactSecrets(`${item.path}: ${item.message}`),
+    });
+  }
   for (const check of checks.filter((item) => String(item.status || "").toLowerCase() !== "passed")) {
     findings.push({ severity: "warning", source: "checks", summary: redactSecrets(`${check.name || "check"} is ${check.status || "unknown"}`) });
   }
@@ -904,6 +959,50 @@ async function writeDecisions(archivePath, decisions) {
 
 function normalizeFileEntries(files = []) {
   return (Array.isArray(files) ? files : []).map((file) => typeof file === "string" ? { path: file } : file).filter((file) => file?.path);
+}
+
+function normalizePath(value) {
+  return String(value || "").trim().replace(/\\/g, "/").replace(/^\.\/+/, "").replace(/\/+/g, "/");
+}
+
+function matchesAny(path, patterns) {
+  return patterns.some((pattern) => pathMatchesPattern(path, pattern));
+}
+
+function pathMatchesPattern(path, pattern) {
+  const normalized = normalizePath(pattern);
+  if (normalized.endsWith("/**")) {
+    const prefix = normalized.slice(0, -3);
+    return path === prefix || path.startsWith(`${prefix}/`);
+  }
+  if (normalized.endsWith("/")) {
+    return path.startsWith(normalized);
+  }
+  if (normalized.includes("*")) {
+    return globToRegExp(normalized).test(path);
+  }
+  return path === normalized;
+}
+
+function globToRegExp(glob) {
+  let source = "^";
+  for (let index = 0; index < glob.length; index += 1) {
+    const char = glob[index];
+    const next = glob[index + 1];
+    if (char === "*" && next === "*") {
+      source += ".*";
+      index += 1;
+    } else if (char === "*") {
+      source += "[^/]*";
+    } else {
+      source += escapeRegExp(char);
+    }
+  }
+  return new RegExp(`${source}$`);
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[|\\{}()[\]^$+*?.]/g, "\\$&");
 }
 
 function suggestSourceBranch(value) {

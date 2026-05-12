@@ -4,6 +4,7 @@ import { mkdtemp } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
+  assessChangeRequestPathPolicy,
   buildChangeRequestCreatePlan,
   executeChangeRequestCreatePlan,
 } from "../src/index.js";
@@ -39,6 +40,40 @@ test("builds a teaching-oriented create plan from a dirty worktree", () => {
     "reviewer_write",
     "label_write",
   ]);
+});
+
+test("create plan blocks pipeline runtime files by default while allowing local PR archives", () => {
+  const plan = buildChangeRequestCreatePlan({
+    provider: "github",
+    owner: "hypo-ai",
+    repository: "workflow",
+    files: [
+      "core/src/pr/index.js",
+      ".pipeline/state.yaml",
+      ".pipeline/prompts/00-feature.md",
+      ".pipeline/pr/PR-20260512-001/summary.md",
+    ],
+  });
+
+  assert.equal(plan.blocked, true);
+  assert.equal(plan.file_policy.ok, false);
+  assert.deepEqual(plan.file_policy.blocked.map((item) => item.path), [
+    ".pipeline/state.yaml",
+    ".pipeline/prompts/00-feature.md",
+  ]);
+  assert.deepEqual(plan.file_policy.allowed, [".pipeline/pr/PR-20260512-001/summary.md"]);
+});
+
+test("path policy is reusable for review and create flows", () => {
+  const result = assessChangeRequestPathPolicy([
+    { path: ".pipeline/cycle.yaml" },
+    { path: ".pipeline/pr/PR-20260512-001/evidence/snapshot.md" },
+    { path: "references/pr-spec.md" },
+  ]);
+
+  assert.equal(result.ok, false);
+  assert.deepEqual(result.blocked.map((item) => item.path), [".pipeline/cycle.yaml"]);
+  assert.deepEqual(result.allowed, [".pipeline/pr/PR-20260512-001/evidence/snapshot.md"]);
 });
 
 test("plan-first mode does not schedule remote writes before implementation exists", () => {

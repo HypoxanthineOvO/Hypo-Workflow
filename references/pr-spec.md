@@ -64,6 +64,7 @@ Each handling session creates or reuses a local archive:
 - failed or unknown checks become blocking or warning findings
 - reviewer comments are preserved as local evidence
 - large or risky diffs are called out by path
+- `.pipeline/` runtime/generated paths become blocking findings by default; `.pipeline/pr/**` is allowed as a local archive exception
 - merge recommendation is only advice for the human; it is not a remote merge action
 
 Fixture providers should implement only read methods:
@@ -114,6 +115,7 @@ Supported modes:
 The worktree flow teaches the user through:
 
 - dirty worktree inspection and file scope
+- `.pipeline/` runtime/generated path screening before commit or push
 - branch choice or new feature branch
 - commit message and local commit
 - target branch
@@ -123,6 +125,18 @@ The worktree flow teaches the user through:
 
 The final confirmation may be one single confirmation for the full create sequence, but it must list every remote write action first: push branch, create pull request / merge request, reviewer writes, label writes, and target branch writes. Until that confirmation is recorded, provider write methods must not be called.
 
+### File Scope Policy
+
+PR/MR payloads should not carry `.pipeline/` runtime authority, generated state, prompt history, reports, compact views, or archive moves by default. These files are high-conflict local workflow evidence and should usually stay out of remote feature branches. Durable implementation, tests, docs, Skills, references, templates, adapters, and scenario fixtures should be ported or regenerated on top of the target branch instead.
+
+Default policy:
+
+- block `.pipeline/**`
+- allow `.pipeline/pr/**` only as Change Request evidence archive
+- require an explicit scoped exception before including `.pipeline/config.yaml`, `.pipeline/cycle.yaml`, `.pipeline/state.yaml`, `.pipeline/log.yaml`, `.pipeline/PROGRESS.md`, `.pipeline/prompts/**`, `.pipeline/reports/**`, `.pipeline/archives/**`, compact views, or derived-health files
+
+When `/hw:pr review` sees blocked `.pipeline/` paths in a remote diff, it should record a blocking finding and recommend a clean integration branch. When `/hw:pr create --from-worktree` sees blocked paths locally, it should ask the user to split those files out before any commit, push, or create remote write.
+
 `create-proposal.yaml` or an equivalent archive field records the planned create operation under `.pipeline/pr/PR-YYYYMMDD-NNN/`. The archive remains local evidence and never becomes the GitHub/GitLab source of truth.
 
 GitLab support should include `gitlab.com` first. Self-hosted GitLab must have a provider seam for `host` / `base_url`; live API completeness can be phased in later without changing the archive contract.
@@ -130,6 +144,7 @@ GitLab support should include `gitlab.com` first. Self-hosted GitLab must have a
 ## Safety Rules
 
 - `.pipeline/pr/` is an evidence archive, not a platform state authority.
+- `.pipeline/` runtime/generated files are not ordinary feature payloads; do not include them in PR/MR branches unless the user explicitly asks for a workflow-state migration and the review records that exception.
 - `/hw:pr inspect` and `/hw:pr review` may write local archive files, but must be remote-readonly.
 - `/hw:pr fix` may plan or perform local fixes inside ordinary project boundaries, but push remains a remote write.
 - `/hw:pr merge` and `/hw:pr close` must stop for explicit human confirmation before any remote action.
