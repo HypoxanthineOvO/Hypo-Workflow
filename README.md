@@ -6,7 +6,7 @@
 
 规划 -> 执行 -> 审查 -> 报告 -> 恢复
 
-[![Version](https://img.shields.io/badge/version-12.4.0-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-12.5.0-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/reference/platforms.md)
 
@@ -111,7 +111,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | [Platforms Reference](docs/reference/platforms.md) | 六个平台能力表 |
 | [Generated Artifacts](docs/reference/generated-artifacts.md) | OpenCode、第三方适配、压缩视图和文档引用的生成来源 |
 | [OpenCode Guide](docs/platforms/opencode.md) | OpenCode 指令、智能体角色、模型矩阵和边界 |
-| [v12.4.0 Release Notes](docs/release/v12.4.0.md) | 中文化工作流界面、Plan 纪律、Subagent 注入和验证证据 |
+| [v12.5.0 发布说明](docs/release/v12.5.0.md) | PR #7 治理能力干净移植、`.pipeline` PR 路径策略、audit memory、rework 和 worker scope 证据 |
 | [Cursor Guide](docs/platforms/cursor.md) | Cursor 仓库规则 |
 | [GitHub Copilot Guide](docs/platforms/copilot.md) | GitHub Copilot 仓库指令 |
 | [Trae Guide](docs/platforms/trae.md) | Trae 项目规则 |

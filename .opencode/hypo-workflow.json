@@ -95,7 +95,7 @@
     }
   },
   "fileGuard": "standard",
-  "version": "12.4.0",
+  "version": "12.5.0",
   "commandMap": [
     {
       "canonical": "/hw:start",

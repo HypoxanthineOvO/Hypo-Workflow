@@ -1,5 +1,28 @@
 # Changelog
 
+## v12.5.0 - 2026-05-12
+
+### Features
+
+- 干净移植 GitHub PR #7 的 audit governance hardening：允许 audit 在 milestone 完成前介入，并明确 `milestone`、`feature`、`cycle` 三级 rejection scope。
+- 新增 audit memory runtime helper，支持 cycle-level audit memory、milestone-level audit delta 和 scoped audit summary，避免把 raw free-form conversation 当作 authority。
+- 新增 rejection rework 与 blocked runtime helper：`implement` 只能 propose blocked，`audit` 才能 approve blocked；rework prompt 保留原 prompt 引用和增量 scope。
+- 强化 worker separation acceptance：检查持久化 `prompt_scope` 和 `changed_files`，阻止跨角色 ownership、scope 越界和 audit 写文件。
+- 为 `/hw:pr` create/review 增加 `.pipeline` 路径策略，默认阻止 `.pipeline/**` runtime 文件进入 PR payload，同时允许 `.pipeline/pr/**` 本地证据归档。
+
+### Fixes
+
+- 没有直接合入 PR #7 原分支里的 `.pipeline/**` runtime state、prompts、release docs、README/CHANGELOG 大包和 `/hw:achieve` alias。
+- 补齐 acceptance/config 旧测试的 worker scope evidence fixture，使新 worker separation 规则与既有 audit-degradation 语义兼容。
+- 同步 package、plugin、adapter 和 Skill 版本到 `12.5.0`。
+
+### Tests
+
+- `uv run -- node --test core/test/*.test.js`: 436/436 passing.
+- `uv run -- node --test core/test/audit-governance-contract.test.js core/test/audit-memory-contract.test.js core/test/audit-regression-canonical-examples.test.js core/test/rejection-rework-blocked-runtime-loop.test.js core/test/worker-separation-spawn-enforcement.test.js core/test/cycle-acceptance.test.js core/test/config.test.js core/test/pr-create.test.js core/test/pr-manual-gates.test.js core/test/pr-contract.test.js core/test/pr-create-contract.test.js`: 71/71 passing.
+- `uv run python tests/run_regression.py`: 68/68 passing.
+- `uv run -- git diff --check`: passing.
+
 ## v12.4.0 - 2026-05-11
 
 ### Features
