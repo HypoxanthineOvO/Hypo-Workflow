@@ -1,5 +1,20 @@
 entries:
   -
+    id: P007-PATCH-FIX-20260513T135014+0800
+    type: patch_fix
+    patch: P007
+    status: closed
+    timestamp: "2026-05-13T13:50:14+08:00"
+    summary: Added shared Ask Questions guidance plus DeepSeek tool-calling rules to Claude and OpenCode generated prompts.
+    trigger: manual
+    worker_separation: implement=main-codex, test=Kierkegaard, audit=Kant
+    worker_lifecycle: test=requested/started/completed/closed, implement=requested/started/completed/closed, audit=requested/started/completed/closed
+    tests:
+      - "uv run -- node --test core/test/claude-model-routing.test.js core/test/claude-plugin-alias.test.js core/test/commands-rules-artifacts.test.js core/test/opencode-panels.test.js: 27/27 passing"
+      - "uv run -- node --test core/test/*.test.js: 493/493 passing"
+      - "uv run python tests/run_regression.py: 68/68 passing"
+      - "uv run -- git diff --check: passing"
+  -
     id: M6-IMPLEMENT-C12-20260513T011326+0800
     type: step_start
     ref: C12/M6/implement

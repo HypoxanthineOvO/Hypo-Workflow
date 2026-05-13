@@ -55,6 +55,7 @@ export async function runProjectSync(projectRoot = ".", options = {}) {
   } else if (platform === "claude-code") {
     claudeCodePlugin = await writeClaudeCodePluginArtifacts(root, {
       version: config.version || DEFAULT_GLOBAL_CONFIG.version,
+      model: config.claude_code?.model || DEFAULT_GLOBAL_CONFIG.claude_code.model,
     });
     operations.push("claude_code_plugin");
     claudeCodeAgents = await writeClaudeCodeAgentArtifacts(root, { config });

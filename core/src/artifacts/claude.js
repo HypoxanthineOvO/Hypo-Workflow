@@ -4,6 +4,7 @@ import { renderClaudeStatusMonitorManifest } from "../claude-status/index.js";
 import { planClaudeCodexDelegation } from "../claude-codex/index.js";
 import { commandMap } from "../commands/index.js";
 import { buildModelPoolClaudeAgents, loadConfig } from "../config/index.js";
+import { ASK_QUESTIONS_GUIDANCE, renderDeepSeekToolCallingRules } from "./agent-guidance.js";
 
 const HW_VERSION = "12.5.1";
 
@@ -29,7 +30,7 @@ export async function writeClaudeCodePluginArtifacts(outDir = ".", options = {})
     `${JSON.stringify(renderClaudeStatusMonitorManifest(), null, 2)}\n`,
     "utf8",
   );
-  const writtenCommands = await writeClaudeCodeSlashCommandArtifacts(outDir, commands);
+  const writtenCommands = await writeClaudeCodeSlashCommandArtifacts(outDir, commands, options);
   const removedAliases = await removeLegacyClaudeAliasSkills(outDir);
 
   return {
@@ -46,14 +47,14 @@ export async function writeClaudeCodePluginArtifacts(outDir = ".", options = {})
   };
 }
 
-async function writeClaudeCodeSlashCommandArtifacts(outDir, commands) {
+async function writeClaudeCodeSlashCommandArtifacts(outDir, commands, options = {}) {
   const written = [];
   for (const command of commands) {
     const relative = claudeSlashCommandRelativePath(command);
     if (!relative) continue;
     const absolute = join(outDir, relative);
     await mkdir(dirname(absolute), { recursive: true });
-    await writeFile(absolute, renderClaudeCodeSlashCommand(command), "utf8");
+    await writeFile(absolute, renderClaudeCodeSlashCommand(command, options), "utf8");
     written.push(relative);
   }
   return written;
@@ -69,7 +70,9 @@ function claudeSlashCommandRelativePath(command) {
   return join("commands", ...parts.slice(0, -1), `${parts.at(-1)}.md`);
 }
 
-export function renderClaudeCodeSlashCommand(command = {}) {
+export function renderClaudeCodeSlashCommand(command = {}, options = {}) {
+  const routeGuidance = claudeCommandSpecificGuidance(command);
+  const deepSeekRules = renderDeepSeekToolCallingRules(options.model || options.mainModel || "deepseek-v4-pro", "Claude Code");
   return [
     "---",
     `description: Hypo-Workflow mapping for ${command.canonical}`,
@@ -83,6 +86,11 @@ export function renderClaudeCodeSlashCommand(command = {}) {
     `Skill: \`${command.skill}\``,
     "",
     `Load the corresponding Hypo-Workflow skill instructions from \`${command.skill}\`, then execute \`${command.canonical}\` semantics with any user-provided arguments.`,
+    routeGuidance.trimEnd(),
+    "",
+    ASK_QUESTIONS_GUIDANCE,
+    "",
+    deepSeekRules,
     "",
     "Before acting, inspect the relevant context when present:",
     "",
@@ -95,7 +103,23 @@ export function renderClaudeCodeSlashCommand(command = {}) {
     "",
     "Keep this command as a Claude Code plugin slash-command mapping, not a separate runner. Claude Code performs the work; Hypo-Workflow files remain the source of truth.",
     "",
-  ].join("\n");
+  ].filter((line) => line !== undefined && line !== null).join("\n");
+}
+
+function claudeCommandSpecificGuidance(command) {
+  if (command.canonical === "/hw:plan") {
+    return "If the user provides `--deep`, route to `/hw:plan:deep` as an alias before ordinary decomposition. Ordinary `/hw:plan` keeps the full P1-P4 gates and must not skip P1-P4 because of Deep Plan context or conversion output.";
+  }
+  if (command.canonical === "/hw:plan:deep") {
+    return "This is also the target for the `/hw:plan --deep` alias. It creates or updates a durable discussion package before ordinary `/hw:plan` decomposition. It must not skip the ordinary `/hw:plan` P1-P4 gates after `convert`.";
+  }
+  if (command.canonical === "/hw:patch fix") {
+    return "Patch Fix lane: read the Patch first, preserve distinct `test`, `implement`, and `audit` worker identities for code/test changes, and do not close the Patch until worker lifecycle evidence is recorded.";
+  }
+  if (command.canonical === "/hw:pr create") {
+    return "Change Request lane: exclude `.pipeline/` runtime artifacts by default, ask before remote writes, and keep PR payloads separate from workflow state unless the user explicitly requests a workflow-state migration.";
+  }
+  return "";
 }
 
 async function removeLegacyClaudeAliasSkills(outDir) {
@@ -237,7 +261,8 @@ function normalizeCodexPluginCapability(config = {}) {
 export function renderClaudeCodeAgent(role, agent = {}) {
   const name = `hw-${role}`;
   const model = agent.model || "default";
-  return `---\nname: ${name}\ndescription: Hypo-Workflow Claude Code ${role} subagent.\nmodel: ${model}\nhypo_workflow_managed: true\n---\n\n# ${name}\n\nRole: \`${role}\`\nModel: \`${model}\`\n\nUse this Claude Code subagent for Hypo-Workflow ${role} work. The model is generated from the shared \`model_pool.roles\` contract, refined by \`claude_code.agents.${role}.model\` when explicitly configured.\n\nDo not call models directly from Hypo-Workflow core. Claude Code remains responsible for actual model invocation; this file only declares routing intent.\n`;
+  const deepSeekRules = renderDeepSeekToolCallingRules(model, "Claude Code");
+  return `---\nname: ${name}\ndescription: Hypo-Workflow Claude Code ${role} subagent.\nmodel: ${model}\nhypo_workflow_managed: true\n---\n\n# ${name}\n\nRole: \`${role}\`\nModel: \`${model}\`\n\nUse this Claude Code subagent for Hypo-Workflow ${role} work. The model is generated from the shared \`model_pool.roles\` contract, refined by \`claude_code.agents.${role}.model\` when explicitly configured.\n\n${ASK_QUESTIONS_GUIDANCE}\n\n${deepSeekRules ? `${deepSeekRules}\n\n` : ""}Do not call models directly from Hypo-Workflow core. Claude Code remains responsible for actual model invocation; this file only declares routing intent.\n`;
 }
 
 export function selectClaudeAgentRole(context = {}) {

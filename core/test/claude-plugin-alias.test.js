@@ -39,9 +39,26 @@ test("writeClaudeCodePluginArtifacts renders hw namespace plugin metadata", asyn
   assert.ok(marketplace.plugins[0].tags.includes("workflow"));
   assert.match(patchCommand, /Canonical command: `\/hw:patch`/);
   assert.match(patchCommand, /Skill: `skills\/patch\/SKILL\.md`/);
+  assert.match(patchCommand, /Ask Questions Discipline/);
+  assert.match(patchCommand, /DeepSeek Tool Calling Rules/);
   assert.match(planDiscoverCommand, /Canonical command: `\/hw:plan:discover`/);
   assert.match(setupCommand, /Canonical command: `\/hw:setup`/);
   assert.doesNotMatch(setupCommand, /\/hypo-workflow:setup/);
+});
+
+test("Claude slash commands preserve route-specific guidance and optional DeepSeek rules", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "hw-claude-command-guidance-"));
+  await writeClaudeCodePluginArtifacts(dir, { model: "claude-sonnet-4-6" });
+
+  const planCommand = await readFile(join(dir, "commands", "plan.md"), "utf8");
+  const planDeepCommand = await readFile(join(dir, "commands", "plan", "deep.md"), "utf8");
+  const patchFixCommand = await readFile(join(dir, "commands", "patch", "fix.md"), "utf8");
+
+  assert.match(planCommand, /If the user provides `--deep`/);
+  assert.match(planCommand, /Ask Questions Discipline/);
+  assert.doesNotMatch(planCommand, /DeepSeek Tool Calling Rules/);
+  assert.match(planDeepCommand, /target for the `\/hw:plan --deep` alias/);
+  assert.match(patchFixCommand, /Patch Fix lane/);
 });
 
 test("writeClaudeCodePluginArtifacts removes legacy hw-* alias skills", async () => {

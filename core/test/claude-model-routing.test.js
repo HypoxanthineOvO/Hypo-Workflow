@@ -30,7 +30,21 @@ test("Claude agent rendering exposes inspectable model routing", () => {
   assert.match(rendered, /^model: deepseek-v4-pro/m);
   assert.match(rendered, /^hypo_workflow_managed: true/m);
   assert.match(rendered, /Role: `docs`/);
+  assert.match(rendered, /Ask Questions Discipline/);
+  assert.match(rendered, /Use Ask Questions proactively/);
+  assert.match(rendered, /Use the `question` tool when it is available/);
+  assert.match(rendered, /DeepSeek Tool Calling Rules/);
+  assert.match(rendered, /When using DeepSeek through Claude Code/);
+  assert.match(rendered, /Omit optional fields you do not need/);
+  assert.match(rendered, /File paths, URLs, IDs/);
   assert.match(rendered, /Do not call models directly/);
+});
+
+test("Claude agent rendering does not inject DeepSeek tool rules for non-DeepSeek models", () => {
+  const rendered = renderClaudeCodeAgent("code", { model: "mimo-v2.5-pro" });
+
+  assert.match(rendered, /Ask Questions Discipline/);
+  assert.doesNotMatch(rendered, /DeepSeek Tool Calling Rules/);
 });
 
 test("writeClaudeCodeAgentArtifacts writes managed agents and metadata without overwriting user-owned agents", async () => {
@@ -107,5 +121,7 @@ test("claude-code project sync writes subagent artifacts and routing metadata", 
   assert.ok(result.operations.includes("claude_code_agents"));
   assert.equal(result.claude_code_agents.agent_count, 8);
   assert.match(docsAgent, /model: deepseek-v4-pro/);
+  assert.match(docsAgent, /Ask Questions Discipline/);
+  assert.match(docsAgent, /DeepSeek Tool Calling Rules/);
   assert.equal(metadata.agents.code.model, "mimo-v2.5-pro");
 });

@@ -57,6 +57,8 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
 
   assert.match(command, /\/hw:plan/);
   assert.match(command, /not a separate runner/);
+  assert.match(command, /Plan discipline: use `question` \/ Ask/);
+  assert.match(command, /every hard interactive gate/);
   assert.match(releaseCommand, /update_readme/);
   assert.match(releaseCommand, /readme-freshness/);
   assert.match(explainCommand, /evidence-first/);
@@ -81,8 +83,12 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
     assert.match(generatedCommand, /not a separate runner/);
   }
   assert.match(agent, /todowrite/);
+  assert.match(agent, /Ask Questions Discipline/);
+  assert.match(agent, /Use Ask Questions proactively/);
+  assert.match(agent, /Use the `question` tool when it is available/);
   assert.match(agent, /permission:/);
   assert.match(agent, /^model: openai\/gpt-5\.5$/m);
+  assert.doesNotMatch(agent, /DeepSeek Tool Calling Rules/);
   assert.doesNotMatch(agent, /^tools:/m);
   assert.match(plugin, /commandMap/);
   assert.equal(config.$schema, "https://opencode.ai/config.json");

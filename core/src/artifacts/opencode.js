@@ -10,6 +10,7 @@ import {
   renderStructuredRulesInstructionBlock,
   writeStructuredHabitsDocument,
 } from "../rules/index.js";
+import { ASK_QUESTIONS_GUIDANCE, renderDeepSeekToolCallingRules } from "./agent-guidance.js";
 
 const HW_VERSION = "12.5.1";
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
@@ -202,7 +203,8 @@ function commandSpecificGuidance(command) {
 
 export function renderAgent(agent, profile = {}) {
   const model = agent.model ? `model: ${renderOpenCodeModelId(agent.model, profile)}\n` : "";
-  return `---\ndescription: ${agent.description}\nmode: ${agent.mode}\n${model}permission:\n${renderAgentPermissions(agent.tools, profile)}---\n\n# ${agent.name}\n\n${agent.description}\n\nAnalysis boundary: read \`.opencode/hypo-workflow.json.analysis\` before executing an \`analysis\` preset. Manual mode denies code changes, hybrid mode confirms before code changes, and auto mode may change code within the configured boundaries. Always honor restart, system dependency, network, destructive, and external side-effect boundaries.\n\nUse \`question\` / Ask for required user interaction and \`todowrite\` for visible plan discipline when those tools are available. For Plan work, every P1/P2/P3/P4 checkpoint must be represented in the todo state before continuing.\n`;
+  const deepSeekRules = renderDeepSeekToolCallingRules(agent.model, "OpenCode");
+  return `---\ndescription: ${agent.description}\nmode: ${agent.mode}\n${model}permission:\n${renderAgentPermissions(agent.tools, profile)}---\n\n# ${agent.name}\n\n${agent.description}\n\nAnalysis boundary: read \`.opencode/hypo-workflow.json.analysis\` before executing an \`analysis\` preset. Manual mode denies code changes, hybrid mode confirms before code changes, and auto mode may change code within the configured boundaries. Always honor restart, system dependency, network, destructive, and external side-effect boundaries.\n\n${ASK_QUESTIONS_GUIDANCE}\n\nUse \`question\` / Ask for required user interaction and \`todowrite\` for visible plan discipline when those tools are available. For Plan work, every P1/P2/P3/P4 checkpoint must be represented in the todo state before continuing.\n${deepSeekRules ? `\n${deepSeekRules}\n` : ""}`;
 }
 
 export function renderOpenCodeModelId(model, profile = {}) {

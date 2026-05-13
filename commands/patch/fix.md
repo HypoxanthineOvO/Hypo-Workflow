@@ -1,16 +1,16 @@
 ---
-description: Hypo-Workflow mapping for /hw:plan:review
+description: Hypo-Workflow mapping for /hw:patch fix
 hypo_workflow_managed: true
 ---
 
-# /hw:plan:review
+# /hw:patch fix
 
-Canonical command: `/hw:plan:review`
-Route: `review`
-Skill: `skills/plan-review/SKILL.md`
+Canonical command: `/hw:patch fix`
+Route: `fix`
+Skill: `skills/patch/SKILL.md`
 
-Load the corresponding Hypo-Workflow skill instructions from `skills/plan-review/SKILL.md`, then execute `/hw:plan:review` semantics with any user-provided arguments.
-
+Load the corresponding Hypo-Workflow skill instructions from `skills/patch/SKILL.md`, then execute `/hw:patch fix` semantics with any user-provided arguments.
+Patch Fix lane: read the Patch first, preserve distinct `test`, `implement`, and `audit` worker identities for code/test changes, and do not close the Patch until worker lifecycle evidence is recorded.
 
 ## Ask Questions Discipline
 

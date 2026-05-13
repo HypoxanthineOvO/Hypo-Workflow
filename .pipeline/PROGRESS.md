@@ -27,6 +27,7 @@
 
 | Time | Event |
 |---|---|
+| 2026-05-13T13:50:14+08:00 | Patch P007 closed: Claude/OpenCode Ask guidance and DeepSeek tool-calling prompts added with independent test/audit validation. |
 | 2026-05-12T21:11:51+08:00 | P0 Configure 完成：复用 C11 策略，授权执行 Subagent，验收模式为 auto。 |
 | 2026-05-12T21:43:37+08:00 | P1 Discover 完成 6 轮访谈并进入 P2。 |
 | 2026-05-12T21:52:52+08:00 | P3 artifacts generated; waiting for P4 confirmation. |

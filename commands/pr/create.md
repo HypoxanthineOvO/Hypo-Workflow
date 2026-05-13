@@ -1,16 +1,16 @@
 ---
-description: Hypo-Workflow mapping for /hw:plan:review
+description: Hypo-Workflow mapping for /hw:pr create
 hypo_workflow_managed: true
 ---
 
-# /hw:plan:review
+# /hw:pr create
 
-Canonical command: `/hw:plan:review`
-Route: `review`
-Skill: `skills/plan-review/SKILL.md`
+Canonical command: `/hw:pr create`
+Route: `change-request`
+Skill: `skills/pr/SKILL.md`
 
-Load the corresponding Hypo-Workflow skill instructions from `skills/plan-review/SKILL.md`, then execute `/hw:plan:review` semantics with any user-provided arguments.
-
+Load the corresponding Hypo-Workflow skill instructions from `skills/pr/SKILL.md`, then execute `/hw:pr create` semantics with any user-provided arguments.
+Change Request lane: exclude `.pipeline/` runtime artifacts by default, ask before remote writes, and keep PR payloads separate from workflow state unless the user explicitly requests a workflow-state migration.
 
 ## Ask Questions Discipline
 

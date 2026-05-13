@@ -215,6 +215,28 @@ test("writeOpenCodeArtifacts renders model matrix into role agent files", async 
   assert.equal(rootConfig.agents, undefined);
 });
 
+test("writeOpenCodeArtifacts injects DeepSeek tool-calling rules only for DeepSeek agents", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "hw-opencode-deepseek-tools-"));
+  await writeOpenCodeArtifacts(dir, { profile: "standard" });
+
+  const planAgent = await readFile(join(dir, ".opencode", "agents", "hw-plan.md"), "utf8");
+  const buildAgent = await readFile(join(dir, ".opencode", "agents", "hw-build.md"), "utf8");
+  const testAgent = await readFile(join(dir, ".opencode", "agents", "hw-test.md"), "utf8");
+  const codeBAgent = await readFile(join(dir, ".opencode", "agents", "hw-code-b.md"), "utf8");
+  const reportAgent = await readFile(join(dir, ".opencode", "agents", "hw-report.md"), "utf8");
+
+  for (const deepSeekAgent of [testAgent, codeBAgent, reportAgent]) {
+    assert.match(deepSeekAgent, /DeepSeek Tool Calling Rules/);
+    assert.match(deepSeekAgent, /When using DeepSeek through OpenCode/);
+    assert.match(deepSeekAgent, /Omit optional fields you do not need/);
+    assert.match(deepSeekAgent, /File paths, URLs, IDs/);
+    assert.match(deepSeekAgent, /If a tool returns a validation error/);
+  }
+  assert.match(planAgent, /Ask Questions Discipline/);
+  assert.doesNotMatch(planAgent, /DeepSeek Tool Calling Rules/);
+  assert.doesNotMatch(buildAgent, /DeepSeek Tool Calling Rules/);
+});
+
 test("OpenCode metadata carries agent model matrix and compaction settings", () => {
   const metadata = renderHypoWorkflowMetadata({
     name: "standard",
