@@ -1,5 +1,1027 @@
 entries:
   -
+    id: M6-IMPLEMENT-C12-20260513T011326+0800
+    type: step_start
+    ref: C12/M6/implement
+    status: active
+    timestamp: "2026-05-13T01:13:26+08:00"
+    summary: Started C12/M6 implementation stage for first-class Deep Plan command map, generated adapters, help, docs, and skill specs.
+    report: .pipeline/reviews/C12/M6/test-evidence.md
+    trigger: auto
+    related_milestone: M6
+  -
+    id: M6-WRITE-TESTS-COMPLETE-C12-20260513T011326+0800
+    type: step_complete
+    ref: C12/M6/write_tests
+    status: completed
+    timestamp: "2026-05-13T01:13:26+08:00"
+    summary: C12/M6 test worker added Deep Plan first-class integration tests; RED validation failed as expected on 39-command legacy surfaces.
+    report: .pipeline/reviews/C12/M6/test-evidence.md
+    tests:
+      - "node --test core/test/deep-plan-integration.test.js: expected RED, 4 failing"
+      - "node --test core/test/commands-rules-artifacts.test.js core/test/skill-spec.test.js core/test/skill-quality.test.js core/test/docs-governance.test.js core/test/sync-standardization.test.js: expected RED, 7 failing"
+    trigger: auto
+    related_milestone: M6
+    worker:
+      role: test
+      id: "019e1d28-c56b-7570-b2c7-991d34bf3281"
+      status: closed
+  -
+    id: M6-TEST-WORKER-C12-20260513T011230+0800
+    type: worker_start
+    ref: C12/M6/test
+    status: started
+    timestamp: "2026-05-13T01:12:30+08:00"
+    summary: Started C12/M6 test worker for first-class Deep Plan command, docs, adapter, and status integration.
+    report: .pipeline/prompts/06-skills-commands-adapters-status.md
+    trigger: auto
+    related_milestone: M6
+    worker:
+      role: test
+      id: "019e1d28-c56b-7570-b2c7-991d34bf3281"
+      status: started
+  -
+    id: M6-WRITE-TESTS-C12-20260513T011200+0800
+    type: step_start
+    ref: C12/M6/write_tests
+    status: active
+    timestamp: "2026-05-13T01:12:00+08:00"
+    summary: Auto-continued into C12/M6 write_tests for skills, commands, adapters, and status integration.
+    report: .pipeline/prompts/06-skills-commands-adapters-status.md
+    trigger: auto
+    related_milestone: M6
+  -
+    id: M5-COMPLETE-C12-20260513T011200+0800
+    type: milestone_complete
+    ref: C12/M5
+    status: completed
+    timestamp: "2026-05-13T01:12:00+08:00"
+    summary: Completed Deep Plan drill, readiness, convert gate, archived active, package boundary, and repair audit.
+    report: .pipeline/reports/05-drill-readiness-convert.report.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-convert.test.js: 8/8 passing"
+      - "uv run -- node --test core/test/deep-plan-package.test.js core/test/deep-plan-ask.test.js core/test/deep-plan-research.test.js core/test/deep-plan-architecture.test.js core/test/deep-plan-convert.test.js: 35/35 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M5
+  -
+    id: M5-REPAIR-AUDIT-COMPLETE-C12-20260513T011200+0800
+    type: step_complete
+    ref: C12/M5/repair-audit
+    status: completed
+    timestamp: "2026-05-13T01:12:00+08:00"
+    summary: C12/M5 repair audit passed; convert target and ambiguous drill findings are closed.
+    report: .pipeline/reviews/C12/M5/repair-audit.md
+    trigger: auto
+    related_milestone: M5
+    worker:
+      role: audit
+      id: "019e1d24-bf37-7782-8c66-01827fab5f66"
+      status: closed
+  -
+    id: M5-REPAIR-AUDIT-WORKER-C12-20260513T010339+0800
+    type: worker_start
+    ref: C12/M5/repair-audit
+    status: started
+    timestamp: "2026-05-13T01:03:39+08:00"
+    summary: Started C12/M5 repair audit worker to verify convert target and ambiguous drill fixes.
+    report: .pipeline/reviews/C12/M5/repair-implementation-evidence.md
+    trigger: auto
+    related_milestone: M5
+    worker:
+      role: audit
+      id: "019e1d24-bf37-7782-8c66-01827fab5f66"
+      status: started
+  -
+    id: M5-REPAIR-IMPLEMENT-COMPLETE-C12-20260513T010208+0800
+    type: step_complete
+    ref: C12/M5/repair-implement
+    status: completed
+    timestamp: "2026-05-13T01:02:08+08:00"
+    summary: Repaired convert default target to implementation-ready and blocked ambiguous drill scope before writes.
+    report: .pipeline/reviews/C12/M5/repair-implementation-evidence.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-convert.test.js: 8/8 passing"
+      - "uv run -- node --test core/test/deep-plan-package.test.js core/test/deep-plan-ask.test.js core/test/deep-plan-research.test.js core/test/deep-plan-architecture.test.js core/test/deep-plan-convert.test.js: 35/35 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M5
+    worker:
+      role: implement
+      id: "019e1d1f-1b13-7d30-aab3-5c00b7baabb7"
+      status: closed
+  -
+    id: M5-REPAIR-IMPLEMENT-WORKER-C12-20260513T005745+0800
+    type: worker_start
+    ref: C12/M5/repair-implement
+    status: started
+    timestamp: "2026-05-13T00:57:45+08:00"
+    summary: Started C12/M5 repair implement worker for default convert target and ambiguous drill scope.
+    report: .pipeline/reviews/C12/M5/repair-test-evidence.md
+    trigger: auto
+    related_milestone: M5
+    worker:
+      role: implement
+      id: "019e1d1f-1b13-7d30-aab3-5c00b7baabb7"
+      status: started
+  -
+    id: M5-REPAIR-WRITE-TESTS-COMPLETE-C12-20260513T005608+0800
+    type: step_complete
+    ref: C12/M5/repair-write-tests
+    status: completed
+    timestamp: "2026-05-13T00:56:08+08:00"
+    summary: C12/M5 repair test worker added ambiguous drill and default convert target tests; RED validation failed as expected.
+    report: .pipeline/reviews/C12/M5/repair-test-evidence.md
+    tests: "uv run -- node --test core/test/deep-plan-convert.test.js: expected RED, 2 failing"
+    trigger: auto
+    related_milestone: M5
+    worker:
+      role: test
+      id: "019e1d1b-8715-7db3-9fa7-6ac1be9b1f59"
+      status: closed
+  -
+    id: M5-AUDIT-COMPLETE-C12-20260513T005500+0800
+    type: step_complete
+    ref: C12/M5/review_code
+    status: needs_changes
+    timestamp: "2026-05-13T00:55:00+08:00"
+    summary: C12/M5 audit found convert default target too low and ambiguous drill scope matching; opened repair round.
+    report: .pipeline/reviews/C12/M5/audit.md
+    trigger: auto
+    related_milestone: M5
+    worker:
+      role: audit
+      id: "019e1d17-77d9-7711-be75-a1f06abd7b3a"
+      status: closed
+  -
+    id: M5-AUDIT-WORKER-C12-20260513T004909+0800
+    type: worker_start
+    ref: C12/M5/audit
+    status: started
+    timestamp: "2026-05-13T00:49:09+08:00"
+    summary: Started C12/M5 read-only audit worker for drill/readiness/convert boundary review.
+    report: .pipeline/reviews/C12/M5/implementation-evidence.md
+    trigger: auto
+    related_milestone: M5
+    worker:
+      role: audit
+      id: "019e1d17-77d9-7711-be75-a1f06abd7b3a"
+      status: started
+  -
+    id: M5-IMPLEMENT-COMPLETE-C12-20260513T004747+0800
+    type: step_complete
+    ref: C12/M5/implement
+    status: completed
+    timestamp: "2026-05-13T00:47:47+08:00"
+    summary: Implemented Deep Plan drill, readiness depth gates, convert context, archived package blocking, and package path boundary validation.
+    report: .pipeline/reviews/C12/M5/implementation-evidence.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-convert.test.js: 6/6 passing"
+      - "uv run -- node --test core/test/deep-plan-package.test.js core/test/deep-plan-ask.test.js core/test/deep-plan-research.test.js core/test/deep-plan-architecture.test.js core/test/deep-plan-convert.test.js: 33/33 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M5
+    worker:
+      role: implement
+      id: "019e1d10-3308-7612-8508-db43e9466383"
+      status: closed
+  -
+    id: M5-IMPLEMENT-WORKER-C12-20260513T004111+0800
+    type: worker_start
+    ref: C12/M5/implement
+    status: started
+    timestamp: "2026-05-13T00:41:11+08:00"
+    summary: Started C12/M5 implement worker for Deep Plan drill, readiness, convert, and boundary helpers.
+    report: .pipeline/prompts/05-drill-readiness-convert.md
+    trigger: auto
+    related_milestone: M5
+    worker:
+      role: implement
+      id: "019e1d10-3308-7612-8508-db43e9466383"
+      status: started
+  -
+    id: M5-IMPLEMENT-C12-20260513T003942+0800
+    type: step_start
+    ref: C12/M5/implement
+    status: active
+    timestamp: "2026-05-13T00:39:42+08:00"
+    summary: Started C12/M5 implementation stage for drill, readiness, convert gate, archive block, and package path boundary after expected RED validation.
+    report: .pipeline/reviews/C12/M5/test-evidence.md
+    trigger: auto
+    related_milestone: M5
+  -
+    id: M5-WRITE-TESTS-COMPLETE-C12-20260513T003942+0800
+    type: step_complete
+    ref: C12/M5/write_tests
+    status: completed
+    timestamp: "2026-05-13T00:39:42+08:00"
+    summary: C12/M5 test worker added drill/readiness/convert/archive/boundary red tests; RED validation failed as expected on missing public APIs.
+    report: .pipeline/reviews/C12/M5/test-evidence.md
+    tests: "uv run -- node --test core/test/deep-plan-convert.test.js: expected RED, 6 failing"
+    trigger: auto
+    related_milestone: M5
+    worker:
+      role: test
+      id: "019e1d0a-4ea3-77d3-ac77-c3084f332b2b"
+      status: closed
+  -
+    id: M5-TEST-WORKER-C12-20260513T003630+0800
+    type: worker_start
+    ref: C12/M5/test
+    status: started
+    timestamp: "2026-05-13T00:36:30+08:00"
+    summary: Started C12/M5 test worker for drill, readiness depth, convert gate, archived active, and package path boundary red tests.
+    report: .pipeline/prompts/05-drill-readiness-convert.md
+    trigger: auto
+    related_milestone: M5
+    worker:
+      role: test
+      id: "019e1d0a-4ea3-77d3-ac77-c3084f332b2b"
+      status: started
+  -
+    id: M5-WRITE-TESTS-C12-20260513T003600+0800
+    type: step_start
+    ref: C12/M5/write_tests
+    status: active
+    timestamp: "2026-05-13T00:36:00+08:00"
+    summary: Auto-continued into C12/M5 write_tests for drill, readiness depth, and convert gate.
+    report: .pipeline/prompts/05-drill-readiness-convert.md
+    trigger: auto
+    related_milestone: M5
+  -
+    id: M4-COMPLETE-C12-20260513T003600+0800
+    type: milestone_complete
+    ref: C12/M4
+    status: completed
+    timestamp: "2026-05-13T00:36:00+08:00"
+    summary: Completed Deep Plan tracks, architecture map, source-rendered Markdown/Mermaid, and graph validation repair.
+    report: .pipeline/reports/04-tracks-architecture-map-rendering.report.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-architecture.test.js: 7/7 passing"
+      - "uv run -- node --test core/test/deep-plan-package.test.js core/test/deep-plan-ask.test.js core/test/deep-plan-research.test.js core/test/deep-plan-architecture.test.js: 27/27 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M4
+  -
+    id: M4-REPAIR-AUDIT-COMPLETE-C12-20260513T003600+0800
+    type: step_complete
+    ref: C12/M4/repair-audit
+    status: completed
+    timestamp: "2026-05-13T00:36:00+08:00"
+    summary: C12/M4 repair audit passed; architecture edge validation warning is closed.
+    report: .pipeline/reviews/C12/M4/repair-audit.md
+    trigger: auto
+    related_milestone: M4
+    worker:
+      role: audit
+      id: "019e1d06-a3b8-7f61-8813-c40c0f30b2f2"
+      status: closed
+  -
+    id: M4-REPAIR-AUDIT-WORKER-C12-20260513T003052+0800
+    type: worker_start
+    ref: C12/M4/repair-audit
+    status: started
+    timestamp: "2026-05-13T00:30:52+08:00"
+    summary: Started C12/M4 repair audit worker to verify architecture edge validation warning is closed.
+    report: .pipeline/reviews/C12/M4/repair-implementation-evidence.md
+    trigger: auto
+    related_milestone: M4
+    worker:
+      role: audit
+      id: "019e1d06-a3b8-7f61-8813-c40c0f30b2f2"
+      status: started
+  -
+    id: M4-REPAIR-IMPLEMENT-COMPLETE-C12-20260513T002934+0800
+    type: step_complete
+    ref: C12/M4/repair-implement
+    status: completed
+    timestamp: "2026-05-13T00:29:34+08:00"
+    summary: Repaired architecture graph validation to catch dangling and self edges.
+    report: .pipeline/reviews/C12/M4/repair-implementation-evidence.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-architecture.test.js: 7/7 passing"
+      - "uv run -- node --test core/test/deep-plan-package.test.js core/test/deep-plan-ask.test.js core/test/deep-plan-research.test.js core/test/deep-plan-architecture.test.js: 27/27 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M4
+    worker:
+      role: implement
+      id: "019e1d03-5b89-7993-82a4-5b2ff00252e4"
+      status: closed
+  -
+    id: M4-REPAIR-IMPLEMENT-WORKER-C12-20260513T002712+0800
+    type: worker_start
+    ref: C12/M4/repair-implement
+    status: started
+    timestamp: "2026-05-13T00:27:12+08:00"
+    summary: Started C12/M4 repair implement worker to validate architecture graph edges.
+    report: .pipeline/reviews/C12/M4/repair-test-evidence.md
+    trigger: auto
+    related_milestone: M4
+    worker:
+      role: implement
+      id: "019e1d03-5b89-7993-82a4-5b2ff00252e4"
+      status: started
+  -
+    id: M4-REPAIR-WRITE-TESTS-COMPLETE-C12-20260513T002557+0800
+    type: step_complete
+    ref: C12/M4/repair-write-tests
+    status: completed
+    timestamp: "2026-05-13T00:25:57+08:00"
+    summary: C12/M4 repair test worker added architecture edge dangling/self validation tests; RED validation failed as expected.
+    report: .pipeline/reviews/C12/M4/repair-test-evidence.md
+    tests: "uv run -- node --test core/test/deep-plan-architecture.test.js: expected RED, 1 failing"
+    trigger: auto
+    related_milestone: M4
+    worker:
+      role: test
+      id: "019e1d00-8ee9-7101-a4ed-3d083ebc4673"
+      status: closed
+  -
+    id: M4-AUDIT-COMPLETE-C12-20260513T002900+0800
+    type: step_complete
+    ref: C12/M4/review_code
+    status: needs_repair
+    timestamp: "2026-05-13T00:29:00+08:00"
+    summary: C12/M4 audit passed with warning but found missing architecture edge dangling/self validation; opened a repair round.
+    report: .pipeline/reviews/C12/M4/audit.md
+    trigger: auto
+    related_milestone: M4
+    worker:
+      role: audit
+      id: "019e1cfc-e741-7973-b9de-c181d835fa78"
+      status: closed
+  -
+    id: M4-AUDIT-WORKER-C12-20260513T002007+0800
+    type: worker_start
+    ref: C12/M4/audit
+    status: started
+    timestamp: "2026-05-13T00:20:07+08:00"
+    summary: Started C12/M4 read-only audit worker for tracks, architecture source-of-truth, and renderer consistency.
+    report: .pipeline/reviews/C12/M4/implementation-evidence.md
+    trigger: auto
+    related_milestone: M4
+    worker:
+      role: audit
+      id: "019e1cfc-e741-7973-b9de-c181d835fa78"
+      status: started
+  -
+    id: M4-IMPLEMENT-COMPLETE-C12-20260513T001842+0800
+    type: step_complete
+    ref: C12/M4/implement
+    status: completed
+    timestamp: "2026-05-13T00:18:42+08:00"
+    summary: Implemented Deep Plan tracks, relationship validation, module derivation, architecture map updates, and structured Markdown/Mermaid rendering.
+    report: .pipeline/reviews/C12/M4/implementation-evidence.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-architecture.test.js: 6/6 passing"
+      - "uv run -- node --test core/test/deep-plan-package.test.js core/test/deep-plan-ask.test.js core/test/deep-plan-research.test.js core/test/deep-plan-architecture.test.js: 26/26 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M4
+    worker:
+      role: implement
+      id: "019e1cf6-2416-76d3-afe0-f74f08261cab"
+      status: closed
+  -
+    id: M4-IMPLEMENT-WORKER-C12-20260513T001243+0800
+    type: worker_start
+    ref: C12/M4/implement
+    status: started
+    timestamp: "2026-05-13T00:12:43+08:00"
+    summary: Started C12/M4 implement worker for Deep Plan track graph, architecture map, and renderer helpers.
+    report: .pipeline/prompts/04-tracks-architecture-map-rendering.md
+    trigger: auto
+    related_milestone: M4
+    worker:
+      role: implement
+      id: "019e1cf6-2416-76d3-afe0-f74f08261cab"
+      status: started
+  -
+    id: M4-IMPLEMENT-C12-20260513T001111+0800
+    type: step_start
+    ref: C12/M4/implement
+    status: active
+    timestamp: "2026-05-13T00:11:11+08:00"
+    summary: Started C12/M4 implementation stage for track graph helpers, architecture map updates, and renderers after expected RED validation.
+    report: .pipeline/reviews/C12/M4/test-evidence.md
+    trigger: auto
+    related_milestone: M4
+  -
+    id: M4-WRITE-TESTS-COMPLETE-C12-20260513T001111+0800
+    type: step_complete
+    ref: C12/M4/write_tests
+    status: completed
+    timestamp: "2026-05-13T00:11:11+08:00"
+    summary: C12/M4 test worker added tracks, architecture map, relationship, render, and persistence red tests; RED validation failed as expected on missing public APIs.
+    report: .pipeline/reviews/C12/M4/test-evidence.md
+    tests: "uv run -- node --test core/test/deep-plan-architecture.test.js: expected RED, 6 failing"
+    trigger: auto
+    related_milestone: M4
+    worker:
+      role: test
+      id: "019e1cf1-4a25-7a10-b1e6-89f7871b26f2"
+      status: closed
+  -
+    id: M4-TEST-WORKER-C12-20260513T000826+0800
+    type: worker_start
+    ref: C12/M4/test
+    status: started
+    timestamp: "2026-05-13T00:08:26+08:00"
+    summary: Started C12/M4 test worker for tracks, architecture map, relationships, and renderer red tests.
+    report: .pipeline/prompts/04-tracks-architecture-map-rendering.md
+    trigger: auto
+    related_milestone: M4
+    worker:
+      role: test
+      id: "019e1cf1-4a25-7a10-b1e6-89f7871b26f2"
+      status: started
+  -
+    id: M4-WRITE-TESTS-C12-20260513T000800+0800
+    type: step_start
+    ref: C12/M4/write_tests
+    status: active
+    timestamp: "2026-05-13T00:08:00+08:00"
+    summary: Auto-continued into C12/M4 write_tests for requirement tracks, architecture map, and human-readable rendering.
+    report: .pipeline/prompts/04-tracks-architecture-map-rendering.md
+    trigger: auto
+    related_milestone: M4
+  -
+    id: M3-COMPLETE-C12-20260513T000800+0800
+    type: milestone_complete
+    ref: C12/M3
+    status: completed
+    timestamp: "2026-05-13T00:08:00+08:00"
+    summary: Completed Deep Plan local read-only research evidence flow with boundary repair and passing repair audit.
+    report: .pipeline/reports/03-research-readonly-evidence.report.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-research.test.js: 8/8 passing"
+      - "uv run -- node --test core/test/deep-plan-package.test.js core/test/deep-plan-ask.test.js core/test/deep-plan-research.test.js: 20/20 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M3
+  -
+    id: M3-REPAIR-AUDIT-COMPLETE-C12-20260513T000800+0800
+    type: step_complete
+    ref: C12/M3/repair-audit
+    status: completed
+    timestamp: "2026-05-13T00:08:00+08:00"
+    summary: C12/M3 repair audit passed; boundary bypass and evidence ref redaction findings are closed.
+    report: .pipeline/reviews/C12/M3/repair-audit.md
+    trigger: auto
+    related_milestone: M3
+    worker:
+      role: audit
+      id: "019e1cec-b626-7393-9a93-001ffa0dba92"
+      status: closed
+  -
+    id: M3-REPAIR-AUDIT-WORKER-C12-20260513T000232+0800
+    type: worker_start
+    ref: C12/M3/repair-audit
+    status: started
+    timestamp: "2026-05-13T00:02:32+08:00"
+    summary: Started C12/M3 repair audit worker to verify research boundary fixes.
+    report: .pipeline/reviews/C12/M3/repair-implementation-evidence.md
+    trigger: auto
+    related_milestone: M3
+    worker:
+      role: audit
+      id: "019e1cec-b626-7393-9a93-001ffa0dba92"
+      status: started
+  -
+    id: M3-REPAIR-IMPLEMENT-COMPLETE-C12-20260513T000111+0800
+    type: step_complete
+    ref: C12/M3/repair-implement
+    status: completed
+    timestamp: "2026-05-13T00:01:11+08:00"
+    summary: Repaired research action boundary ordering, confirmation scope, and Knowledge evidence ref redaction.
+    report: .pipeline/reviews/C12/M3/repair-implementation-evidence.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-research.test.js: 8/8 passing"
+      - "uv run -- node --test core/test/deep-plan-package.test.js core/test/deep-plan-ask.test.js core/test/deep-plan-research.test.js: 20/20 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M3
+    worker:
+      role: implement
+      id: "019e1ce6-ed92-7b61-99e3-93fe1a578bbd"
+      status: closed
+  -
+    id: M3-REPAIR-IMPLEMENT-WORKER-C12-20260512T235608+0800
+    type: worker_start
+    ref: C12/M3/repair-implement
+    status: started
+    timestamp: "2026-05-12T23:56:08+08:00"
+    summary: Started C12/M3 repair implement worker for action boundary order, confirmation scope, and evidence ref redaction.
+    report: .pipeline/reviews/C12/M3/repair-test-evidence.md
+    trigger: auto
+    related_milestone: M3
+    worker:
+      role: implement
+      id: "019e1ce6-ed92-7b61-99e3-93fe1a578bbd"
+      status: started
+  -
+    id: M3-REPAIR-WRITE-TESTS-COMPLETE-C12-20260512T235438+0800
+    type: step_complete
+    ref: C12/M3/repair-write-tests
+    status: completed
+    timestamp: "2026-05-12T23:54:38+08:00"
+    summary: C12/M3 repair test worker added boundary bypass and evidence ref redaction tests; RED validation failed as expected.
+    report: .pipeline/reviews/C12/M3/repair-test-evidence.md
+    tests: "uv run -- node --test core/test/deep-plan-research.test.js: expected RED, 3 failing"
+    trigger: auto
+    related_milestone: M3
+    worker:
+      role: test
+      id: "019e1ce3-a787-7ae0-bbfd-a826b00a1060"
+      status: closed
+  -
+    id: M3-AUDIT-COMPLETE-C12-20260512T235500+0800
+    type: step_complete
+    ref: C12/M3/review_code
+    status: needs_changes
+    timestamp: "2026-05-12T23:55:00+08:00"
+    summary: C12/M3 audit found boundary bypasses in allowed_actions, confirmation scope, and unredacted evidence refs; opened repair round.
+    report: .pipeline/reviews/C12/M3/audit.md
+    trigger: auto
+    related_milestone: M3
+    worker:
+      role: audit
+      id: "019e1ce0-085c-7ca3-aa38-a25cf379b32e"
+      status: closed
+  -
+    id: M3-AUDIT-WORKER-C12-20260512T234844+0800
+    type: worker_start
+    ref: C12/M3/audit
+    status: started
+    timestamp: "2026-05-12T23:48:44+08:00"
+    summary: Started C12/M3 read-only audit worker for local research evidence and side-effect boundary review.
+    report: .pipeline/reviews/C12/M3/implementation-evidence.md
+    trigger: auto
+    related_milestone: M3
+    worker:
+      role: audit
+      id: "019e1ce0-085c-7ca3-aa38-a25cf379b32e"
+      status: started
+  -
+    id: M3-IMPLEMENT-COMPLETE-C12-20260512T234718+0800
+    type: step_complete
+    ref: C12/M3/implement
+    status: completed
+    timestamp: "2026-05-12T23:47:18+08:00"
+    summary: Implemented Deep Plan local research evidence helpers, action boundary policy, and compact Knowledge refs; focused tests passed.
+    report: .pipeline/reviews/C12/M3/implementation-evidence.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-research.test.js: 6/6 passing"
+      - "uv run -- node --test core/test/deep-plan-package.test.js core/test/deep-plan-ask.test.js core/test/deep-plan-research.test.js: 18/18 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M3
+    worker:
+      role: implement
+      id: "019e1cd9-2d73-72d3-a583-a6acc4746d69"
+      status: closed
+  -
+    id: M3-IMPLEMENT-WORKER-C12-20260512T234108+0800
+    type: worker_start
+    ref: C12/M3/implement
+    status: started
+    timestamp: "2026-05-12T23:41:08+08:00"
+    summary: Started C12/M3 implement worker for Deep Plan local research evidence helpers.
+    report: .pipeline/prompts/03-research-readonly-evidence.md
+    trigger: auto
+    related_milestone: M3
+    worker:
+      role: implement
+      id: "019e1cd9-2d73-72d3-a583-a6acc4746d69"
+      status: started
+  -
+    id: M3-IMPLEMENT-C12-20260512T233900+0800
+    type: step_start
+    ref: C12/M3/implement
+    status: active
+    timestamp: "2026-05-12T23:39:00+08:00"
+    summary: Started C12/M3 implementation stage for Deep Plan local research evidence APIs after expected RED validation.
+    report: .pipeline/reviews/C12/M3/test-evidence.md
+    trigger: auto
+    related_milestone: M3
+  -
+    id: M3-WRITE-TESTS-COMPLETE-C12-20260512T233900+0800
+    type: step_complete
+    ref: C12/M3/write_tests
+    status: completed
+    timestamp: "2026-05-12T23:39:00+08:00"
+    summary: C12/M3 test worker added local research evidence and boundary red tests; RED validation failed as expected on missing public APIs.
+    report: .pipeline/reviews/C12/M3/test-evidence.md
+    tests: "uv run -- node --test core/test/deep-plan-research.test.js: expected RED, 6 failing"
+    trigger: auto
+    related_milestone: M3
+    worker:
+      role: test
+      id: "019e1cd3-cd70-73f1-8d0b-d640538677f0"
+      status: closed
+  -
+    id: M3-TEST-WORKER-C12-20260512T233515+0800
+    type: worker_start
+    ref: C12/M3/test
+    status: started
+    timestamp: "2026-05-12T23:35:15+08:00"
+    summary: Started C12/M3 test worker for local read-only research evidence and boundary red tests.
+    report: .pipeline/prompts/03-research-readonly-evidence.md
+    trigger: auto
+    related_milestone: M3
+    worker:
+      role: test
+      id: "019e1cd3-cd70-73f1-8d0b-d640538677f0"
+      status: started
+  -
+    id: M3-WRITE-TESTS-C12-20260512T233235+0800
+    type: step_start
+    ref: C12/M3/write_tests
+    status: active
+    timestamp: "2026-05-12T23:32:35+08:00"
+    summary: Auto-continued into C12/M3 write_tests for Deep Plan read-only research evidence.
+    report: .pipeline/prompts/03-research-readonly-evidence.md
+    trigger: auto
+    related_milestone: M3
+  -
+    id: M2-COMPLETE-C12-20260512T233235+0800
+    type: milestone_complete
+    ref: C12/M2
+    status: completed
+    timestamp: "2026-05-12T23:32:35+08:00"
+    summary: Completed Deep Plan first-principles ask engine, ask-round persistence, shallow-plan gate, and repeated-question repair.
+    report: .pipeline/reports/02-first-principles-ask-engine.report.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-ask.test.js: 8/8 passing"
+      - "uv run -- node --test core/test/deep-plan-package.test.js core/test/deep-plan-ask.test.js: 12/12 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M2
+  -
+    id: M2-REPAIR-IMPLEMENT-COMPLETE-C12-20260512T233235+0800
+    type: step_complete
+    ref: C12/M2/repair-implement
+    status: completed
+    timestamp: "2026-05-12T23:32:35+08:00"
+    summary: Repaired ask generator progression so persisted next questions and unanswered challenges become the default before answered review items.
+    report: .pipeline/reviews/C12/M2/repair-implementation-evidence.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-ask.test.js: 8/8 passing"
+      - "uv run -- node --test core/test/deep-plan-package.test.js core/test/deep-plan-ask.test.js: 12/12 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M2
+    worker:
+      role: implement
+      id: "019e1ccf-1d1f-7b40-a353-c0d398e22aea"
+      status: closed
+  -
+    id: M2-REPAIR-IMPLEMENT-WORKER-C12-20260512T233008+0800
+    type: worker_start
+    ref: C12/M2/repair-implement
+    status: started
+    timestamp: "2026-05-12T23:30:08+08:00"
+    summary: Started C12/M2 repair implement worker to advance ask generator default beyond answered challenges.
+    report: .pipeline/reviews/C12/M2/repair-test-evidence.md
+    trigger: auto
+    related_milestone: M2
+    worker:
+      role: implement
+      id: "019e1ccf-1d1f-7b40-a353-c0d398e22aea"
+      status: started
+  -
+    id: M2-REPAIR-WRITE-TESTS-COMPLETE-C12-20260512T232905+0800
+    type: step_complete
+    ref: C12/M2/repair-write-tests
+    status: completed
+    timestamp: "2026-05-12T23:29:05+08:00"
+    summary: C12/M2 repair test worker added generator progression regression tests; RED validation failed as expected on repeated necessity default.
+    report: .pipeline/reviews/C12/M2/repair-test-evidence.md
+    tests: "uv run -- node --test core/test/deep-plan-ask.test.js: expected RED, 2 failing"
+    trigger: auto
+    related_milestone: M2
+    worker:
+      role: test
+      id: "019e1ccb-312a-7730-98e9-8006351c0b9c"
+      status: closed
+  -
+    id: M2-REPAIR-TEST-WORKER-C12-20260512T232547+0800
+    type: worker_start
+    ref: C12/M2/repair-write-tests
+    status: started
+    timestamp: "2026-05-12T23:25:47+08:00"
+    summary: Started C12/M2 repair test worker for ask generator progression regression after audit finding.
+    report: .pipeline/reviews/C12/M2/audit.md
+    trigger: auto
+    related_milestone: M2
+    worker:
+      role: test
+      id: "019e1ccb-312a-7730-98e9-8006351c0b9c"
+      status: started
+  -
+    id: M2-AUDIT-COMPLETE-C12-20260512T232547+0800
+    type: step_complete
+    ref: C12/M2/review_code
+    status: needs_repair
+    timestamp: "2026-05-12T23:25:47+08:00"
+    summary: C12/M2 audit passed with follow-ups but found a medium repeated-question risk; opened a repair round before milestone close.
+    report: .pipeline/reviews/C12/M2/audit.md
+    trigger: auto
+    related_milestone: M2
+    worker:
+      role: audit
+      id: "019e1cc7-f12b-7131-b4f7-a86010c28bf6"
+      status: closed
+  -
+    id: M2-AUDIT-WORKER-C12-20260512T232217+0800
+    type: worker_start
+    ref: C12/M2/audit
+    status: started
+    timestamp: "2026-05-12T23:22:17+08:00"
+    summary: Started C12/M2 read-only audit worker for first-principles ask quality and shallow-plan rejection behavior.
+    report: .pipeline/reviews/C12/M2/implementation-evidence.md
+    trigger: auto
+    related_milestone: M2
+    worker:
+      role: audit
+      id: "019e1cc7-f12b-7131-b4f7-a86010c28bf6"
+      status: started
+  -
+    id: M2-IMPLEMENT-COMPLETE-C12-20260512T232031+0800
+    type: step_complete
+    ref: C12/M2/implement
+    status: completed
+    timestamp: "2026-05-12T23:20:31+08:00"
+    summary: Implemented Deep Plan first-principles ask APIs, ask-round persistence, and shallow-plan readiness gate; focused tests passed.
+    report: .pipeline/reviews/C12/M2/implementation-evidence.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-ask.test.js: 6/6 passing"
+      - "uv run -- node --test core/test/deep-plan-package.test.js core/test/deep-plan-ask.test.js: 10/10 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M2
+    worker:
+      role: implement
+      id: "019e1cc2-5801-7063-b5c2-cc908247e518"
+      status: closed
+  -
+    id: M2-IMPLEMENT-WORKER-C12-20260512T231614+0800
+    type: worker_start
+    ref: C12/M2/implement
+    status: started
+    timestamp: "2026-05-12T23:16:14+08:00"
+    summary: Started C12/M2 implement worker for Deep Plan ask engine helpers.
+    report: .pipeline/prompts/02-first-principles-ask-engine.md
+    trigger: auto
+    related_milestone: M2
+    worker:
+      role: implement
+      id: "019e1cc2-5801-7063-b5c2-cc908247e518"
+      status: started
+  -
+    id: M2-IMPLEMENT-C12-20260512T231450+0800
+    type: step_start
+    ref: C12/M2/implement
+    status: active
+    timestamp: "2026-05-12T23:14:50+08:00"
+    summary: Started C12/M2 implementation stage for Deep Plan ask APIs after expected RED validation.
+    report: .pipeline/reviews/C12/M2/test-evidence.md
+    trigger: auto
+    related_milestone: M2
+  -
+    id: M2-WRITE-TESTS-COMPLETE-C12-20260512T231450+0800
+    type: step_complete
+    ref: C12/M2/write_tests
+    status: completed
+    timestamp: "2026-05-12T23:14:50+08:00"
+    summary: C12/M2 test worker added focused Deep Plan ask loop and shallow-plan rejection red tests; RED validation failed as expected on missing public APIs.
+    report: .pipeline/reviews/C12/M2/test-evidence.md
+    tests: "uv run -- node --test core/test/deep-plan-ask.test.js: expected RED, 6 failing"
+    trigger: auto
+    related_milestone: M2
+    worker:
+      role: test
+      id: "019e1cbb-e6d5-7823-930a-b465cfe5c658"
+      status: closed
+  -
+    id: M2-TEST-WORKER-C12-20260512T230914+0800
+    type: worker_start
+    ref: C12/M2/test
+    status: started
+    timestamp: "2026-05-12T23:09:14+08:00"
+    summary: Started C12/M2 test worker for first-principles ask loop and shallow-plan rejection red tests.
+    report: .pipeline/prompts/02-first-principles-ask-engine.md
+    trigger: auto
+    related_milestone: M2
+    worker:
+      role: test
+      id: "019e1cbb-e6d5-7823-930a-b465cfe5c658"
+      status: started
+  -
+    id: M2-WRITE-TESTS-C12-20260512T230237+0800
+    type: step_start
+    ref: C12/M2/write_tests
+    status: active
+    timestamp: "2026-05-12T23:02:37+08:00"
+    summary: Auto-continued into C12/M2 write_tests for first-principles ask engine and shallow-plan rejection gates.
+    report: .pipeline/prompts/02-first-principles-ask-engine.md
+    trigger: auto
+    related_milestone: M2
+  -
+    id: M1-COMPLETE-C12-20260512T230237+0800
+    type: milestone_complete
+    ref: C12/M1
+    status: completed
+    timestamp: "2026-05-12T23:02:37+08:00"
+    summary: Completed Deep Plan Discussion Package persistence; audit passed with active archive semantics and package path boundary follow-ups carried into M5.
+    report: .pipeline/reports/01-discussion-package-model.report.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-package.test.js: 4/4 passing"
+      - "uv run -- node --test core/test/deep-plan-contract.test.js core/test/deep-plan-package.test.js: 8/8 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M1
+  -
+    id: M1-AUDIT-COMPLETE-C12-20260512T230237+0800
+    type: step_complete
+    ref: C12/M1/review_code
+    status: completed
+    timestamp: "2026-05-12T23:02:37+08:00"
+    summary: C12/M1 audit found no blocking issues; follow-ups recorded for M5.
+    report: .pipeline/reviews/C12/M1/audit.md
+    trigger: auto
+    related_milestone: M1
+    worker:
+      role: audit
+      id: "019e1caf-f813-7890-8577-dccff863c37a"
+      status: closed
+  -
+    id: M1-IMPLEMENT-COMPLETE-C12-20260512T225500+0800
+    type: step_complete
+    ref: C12/M1/implement
+    status: completed
+    timestamp: "2026-05-12T22:55:00+08:00"
+    summary: Implemented Deep Plan discussion package persistence helpers and exports; focused tests passed.
+    report: .pipeline/reviews/C12/M1/implementation-evidence.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-package.test.js: 4/4 passing"
+      - "uv run -- node --test core/test/deep-plan-contract.test.js core/test/deep-plan-package.test.js: 8/8 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M1
+    worker:
+      role: implement
+      id: "019e1ca8-18d5-7260-9200-1fd358f96137"
+      status: closed
+  -
+    id: C12-PLAN-UPDATE-RESEARCH-CODE-20260512T224500+0800
+    type: plan_update
+    ref: C12/M8
+    status: recorded
+    timestamp: "2026-05-12T22:45:00+08:00"
+    summary: "Added final-cycle research-code requirement: Deep Plan research may, after remote/network confirmation, download or clone referenced work and inspect implementation source rather than relying on README-only evidence."
+    report: .pipeline/prompts/08-real-scenario-regression-release.md
+    trigger: user
+  -
+    id: M1-WRITE-TESTS-COMPLETE-C12-20260512T224500+0800
+    type: step_complete
+    ref: C12/M1/write_tests
+    status: completed
+    timestamp: "2026-05-12T22:45:00+08:00"
+    summary: C12/M1 test worker added Deep Plan package model red tests; RED validation failed as expected on missing helper exports.
+    report: .pipeline/reviews/C12/M1/test-evidence.md
+    tests: "uv run -- node --test core/test/deep-plan-package.test.js: expected RED, missing archiveDeepPlanPackage export"
+    trigger: auto
+    related_milestone: M1
+    worker:
+      role: test
+      id: "019e1ca2-1644-79b3-98b1-21496268c85f"
+      status: closed
+  -
+    id: M1-TEST-WORKER-C12-20260512T223826+0800
+    type: worker_start
+    ref: C12/M1/test
+    status: started
+    timestamp: "2026-05-12T22:38:26+08:00"
+    summary: Started C12/M1 test worker for Deep Plan discussion package model red tests.
+    report: .pipeline/prompts/01-discussion-package-model.md
+    trigger: auto
+    related_milestone: M1
+    worker:
+      role: test
+      id: "019e1ca2-1644-79b3-98b1-21496268c85f"
+      status: started
+  -
+    id: M1-WRITE-TESTS-C12-20260512T223826+0800
+    type: step_start
+    ref: C12/M1/write_tests
+    status: active
+    timestamp: "2026-05-12T22:38:26+08:00"
+    summary: Auto-continued into C12/M1 write_tests for Deep Plan discussion package model.
+    report: .pipeline/prompts/01-discussion-package-model.md
+    trigger: auto
+    related_milestone: M1
+  -
+    id: M0-COMPLETE-C12-20260512T223826+0800
+    type: milestone_complete
+    ref: C12/M0
+    status: completed
+    timestamp: "2026-05-12T22:38:26+08:00"
+    summary: Completed Deep Plan command, alias, lifecycle, and boundary contract; tests and skill quality checks passed.
+    report: .pipeline/reports/00-deep-plan-contract-command-lifecycle.report.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-contract.test.js core/test/commands-rules-artifacts.test.js core/test/global-config-registry.test.js: 15/15 passing"
+      - "uv run -- node --test core/test/skill-quality.test.js core/test/skill-spec.test.js: 6/6 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M0
+  -
+    id: M0-IMPLEMENT-COMPLETE-C12-20260512T221829+0800
+    type: step_complete
+    ref: C12/M0/implement
+    status: completed
+    timestamp: "2026-05-12T22:18:29+08:00"
+    summary: Implemented C12/M0 Deep Plan command, skill, alias, and gate contracts; focused tests passed.
+    report: .pipeline/reviews/C12/M0/implementation-evidence.md
+    tests:
+      - "uv run -- node --test core/test/deep-plan-contract.test.js: 4/4 passing"
+      - "uv run -- node --test core/test/deep-plan-contract.test.js core/test/commands-rules-artifacts.test.js core/test/global-config-registry.test.js: 15/15 passing"
+      - "git diff --check: passing"
+    trigger: auto
+    related_milestone: M0
+    worker:
+      role: implement
+      id: "019e1c8a-154a-7a92-b483-102db9c8c357"
+      status: closed
+  -
+    id: M0-IMPLEMENT-C12-20260512T220829+0800
+    type: step_start
+    ref: C12/M0/implement
+    status: active
+    timestamp: "2026-05-12T22:08:29+08:00"
+    summary: Started C12/M0 implement worker to satisfy Deep Plan command, skill, alias, and P1-P4 gate contract tests.
+    report: .pipeline/reviews/C12/M0/test-evidence.md
+    trigger: auto
+    related_milestone: M0
+    worker:
+      role: implement
+      id: "019e1c8a-154a-7a92-b483-102db9c8c357"
+      status: started
+  -
+    id: M0-WRITE-TESTS-COMPLETE-C12-20260512T220829+0800
+    type: step_complete
+    ref: C12/M0/write_tests
+    status: completed
+    timestamp: "2026-05-12T22:08:29+08:00"
+    summary: C12/M0 test worker added focused Deep Plan contract red tests; RED validation failed as expected on missing command, skill, alias, and gate contracts.
+    report: .pipeline/reviews/C12/M0/test-evidence.md
+    tests: "uv run -- node --test core/test/deep-plan-contract.test.js: expected RED, 4 failing"
+    trigger: auto
+    related_milestone: M0
+    worker:
+      role: test
+      id: "019e1c84-1a0e-7d40-a40d-df6a8d9fac7d"
+      status: closed
+  -
+    id: M0-WRITE-TESTS-C12-20260512T220829+0800
+    type: step_start
+    ref: C12/M0/write_tests
+    status: active
+    timestamp: "2026-05-12T22:08:29+08:00"
+    summary: Started C12/M0 write_tests with authorized Codex test worker for Deep Plan contract red tests.
+    report: .pipeline/prompts/00-deep-plan-contract-command-lifecycle.md
+    trigger: user
+    related_milestone: M0
+    worker:
+      role: test
+      id: "019e1c84-1a0e-7d40-a40d-df6a8d9fac7d"
+      status: started
+  -
+    id: PLAN-GENERATE-C12-20260512T215252+0800
+    type: plan_generate
+    ref: C12
+    status: waiting_confirmation
+    timestamp: "2026-05-12T21:52:52+08:00"
+    summary: Generated C12 Deep Plan planning artifacts with 9 milestones, durable discussion package design, first-principles ask loop, readiness/convert gate, and Feature Queue handoff.
+    report: .pipeline/confirm-summary.md
+    trigger: user
+  -
+    id: CYCLE-NEW-C12-20260512T210133+0800
+    type: cycle_new
+    ref: C12
+    status: active
+    timestamp: "2026-05-12T21:01:33+08:00"
+    summary: Created C12 for Workflow deep planning/discussion capability and archived completed C11 artifacts.
+    report: .pipeline/archives/C11-workflow-experience-issues/summary.md
+    trigger: user
+    details:
+      previous_cycle: C11
+      archive: .pipeline/archives/C11-workflow-experience-issues
+      new_cycle_name: "Workflow 深度计划讨论功能"
+      new_cycle_type: feature
+      new_cycle_preset: tdd
+  -
     id: RELEASE-v12.4.0-20260511T152823+0800
     type: release
     ref: v12.4.0
@@ -135,7 +1157,7 @@ entries:
     timestamp: "2026-05-07T16:55:00+08:00"
     summary: Completed final C9 Agent Review and full regression; fixed Subagent audit blockers for Explain/PR secret redaction, PR local archive id support, and 38-command OpenCode scenario freshness.
     report: .pipeline/reports/11-c9-agent-review-and-full-regression.report.md
-    tests: node --test focused Explain/PR tests: 25/25 passing; npm test --prefix core: 349/349 passing; python3 tests/run_regression.py: 63/63 passing; bash scripts/validate-config.sh .pipeline/config.yaml: passing; node cli/bin/hypo-workflow sync --check-only --project .: derived=fresh; claude plugin validate .: passed; git diff --check: passed
+    tests: "node --test focused Explain/PR tests: 25/25 passing; npm test --prefix core: 349/349 passing; python3 tests/run_regression.py: 63/63 passing; bash scripts/validate-config.sh .pipeline/config.yaml: passing; node cli/bin/hypo-workflow sync --check-only --project .: derived=fresh; claude plugin validate .: passed; git diff --check: passed"
     trigger: auto
     related_milestone: M12
   -
@@ -187,7 +1209,7 @@ entries:
     timestamp: "2026-05-07T16:39:50+08:00"
     summary: Full core regression passed after docs language self-check and Chinese-body documentation updates.
     report: .pipeline/reports/10-chinese-human-docs-conversion.report.md
-    tests: npm test --prefix core: 345/345 passing
+    tests: "npm test --prefix core: 345/345 passing"
     trigger: auto
     related_milestone: M11
   -
@@ -208,7 +1230,7 @@ entries:
     timestamp: "2026-05-07T16:36:00+08:00"
     summary: Confirmed docs language self-check failed before generated docs and key references received Chinese-body summaries.
     report: core/test/docs-governance.test.js
-    tests: node --test core/test/docs-governance.test.js: expected failure before docs conversion
+    tests: "node --test core/test/docs-governance.test.js: expected failure before docs conversion"
     trigger: auto
     related_milestone: M11
   -
@@ -250,7 +1272,7 @@ entries:
     timestamp: "2026-05-07T16:33:50+08:00"
     summary: Full core regression passed after Claude resume metadata and docs fix.
     report: .pipeline/reports/09-claude-resume-adapter-fix-and-smoke.report.md
-    tests: npm test --prefix core: 344/344 passing
+    tests: "npm test --prefix core: 344/344 passing"
     trigger: auto
     related_milestone: M10
   -
@@ -271,7 +1293,7 @@ entries:
     timestamp: "2026-05-07T16:31:00+08:00"
     summary: Confirmed updated namespace expectations failed before docs regeneration and resume metadata repair.
     report: core/test/claude-resume-namespace.test.js
-    tests: node --test core/test/*claude*resume*.test.js core/test/claude-plugin-alias.test.js: expected failure before repair/docs regeneration
+    tests: "node --test core/test/*claude*resume*.test.js core/test/claude-plugin-alias.test.js: expected failure before repair/docs regeneration"
     trigger: auto
     related_milestone: M10
   -
@@ -280,7 +1302,7 @@ entries:
     ref: C9/M10/write_tests
     status: completed
     timestamp: "2026-05-07T16:30:30+08:00"
-    summary: Updated tests to require current Claude resume metadata to be autocomplete-safe while preserving a legacy fixture that catches bare name: resume.
+    summary: "Updated tests to require current Claude resume metadata to be autocomplete-safe while preserving a legacy fixture that catches bare name: resume."
     report: core/test/claude-resume-namespace.test.js
     trigger: auto
     related_milestone: M10
@@ -313,7 +1335,7 @@ entries:
     timestamp: "2026-05-07T16:29:50+08:00"
     summary: Full core regression passed after adding Claude resume namespace audit helper and tests.
     report: .pipeline/reports/08-claude-resume-conflict-audit.report.md
-    tests: npm test --prefix core: 343/343 passing
+    tests: "npm test --prefix core: 343/343 passing"
     trigger: auto
     related_milestone: M09
   -
@@ -334,7 +1356,7 @@ entries:
     timestamp: "2026-05-07T16:27:50+08:00"
     summary: Added Claude resume namespace audit fixture expectations before implementation to capture bare /resume registry and skill-name collision evidence.
     report: core/test/claude-resume-namespace.test.js
-    tests: node --test core/test/claude-resume-namespace.test.js: expected failure before audit helper existed
+    tests: "node --test core/test/claude-resume-namespace.test.js: expected failure before audit helper existed"
     trigger: auto
     related_milestone: M09
   -
@@ -376,7 +1398,7 @@ entries:
     timestamp: "2026-05-07T16:25:00+08:00"
     summary: Full core regression passed after adding Explain fixture inference and docs/adapter guidance.
     report: .pipeline/reports/07-explain-tests-and-docs.report.md
-    tests: npm test --prefix core: 340/340 passing
+    tests: "npm test --prefix core: 340/340 passing"
     trigger: auto
     related_milestone: M08
   -
@@ -397,7 +1419,7 @@ entries:
     timestamp: "2026-05-07T16:22:00+08:00"
     summary: Added fixture expectations for framework and recent-change Explain evidence plus OpenCode /hw-explain guidance before implementation.
     report: core/test/explain-contract.test.js
-    tests: node --test core/test/explain-contract.test.js core/test/commands-rules-artifacts.test.js: expected failure before helper/docs updates
+    tests: "node --test core/test/explain-contract.test.js core/test/commands-rules-artifacts.test.js: expected failure before helper/docs updates"
     trigger: auto
     related_milestone: M08
   -
@@ -439,7 +1461,7 @@ entries:
     timestamp: "2026-05-07T16:19:00+08:00"
     summary: Full core regression passed after adding Explain Subagent evidence handoff helpers.
     report: .pipeline/reports/06-explain-subagent-evidence-handoff.report.md
-    tests: npm test --prefix core: 338/338 passing
+    tests: "npm test --prefix core: 338/338 passing"
     trigger: auto
     related_milestone: M07
   -
@@ -460,7 +1482,7 @@ entries:
     timestamp: "2026-05-07T16:15:00+08:00"
     summary: Confirmed failing Explain Subagent tests before implementation because handoff, schema validation, and fallback helpers were absent.
     report: core/test/explain-subagent.test.js
-    tests: node --test core/test/explain-subagent.test.js: expected failure
+    tests: "node --test core/test/explain-subagent.test.js: expected failure"
     trigger: auto
     related_milestone: M07
   -
@@ -502,7 +1524,7 @@ entries:
     timestamp: "2026-05-07T16:12:29+08:00"
     summary: Full core regression passed after adding /hw:explain evidence-first contract.
     report: .pipeline/reports/05-evidence-first-explain-contract.report.md
-    tests: npm test --prefix core: 334/334 passing
+    tests: "npm test --prefix core: 334/334 passing"
     trigger: auto
     related_milestone: M06
   -
@@ -523,7 +1545,7 @@ entries:
     timestamp: "2026-05-07T16:08:00+08:00"
     summary: Confirmed failing Explain contract tests before implementation because Explain helpers and command metadata were absent.
     report: core/test/explain-contract.test.js
-    tests: node --test core/test/explain-contract.test.js: expected failure
+    tests: "node --test core/test/explain-contract.test.js: expected failure"
     trigger: auto
     related_milestone: M06
   -
@@ -565,7 +1587,7 @@ entries:
     timestamp: "2026-05-07T16:04:20+08:00"
     summary: Full core regression passed after adding PR/MR manual gate helpers.
     report: .pipeline/reports/04-pr-mr-fix-merge-close-manual-gates.report.md
-    tests: npm test --prefix core: 330/330 passing
+    tests: "npm test --prefix core: 330/330 passing"
     trigger: auto
     related_milestone: M05
   -
@@ -586,7 +1608,7 @@ entries:
     timestamp: "2026-05-07T16:01:00+08:00"
     summary: Confirmed failing manual gate tests before implementation because fix/merge/close proposal helpers were absent.
     report: core/test/pr-manual-gates.test.js
-    tests: node --test core/test/pr-manual-gates.test.js: expected failure
+    tests: "node --test core/test/pr-manual-gates.test.js: expected failure"
     trigger: auto
     related_milestone: M05
   -
@@ -628,7 +1650,7 @@ entries:
     timestamp: "2026-05-07T15:59:51+08:00"
     summary: Full core regression passed after adding remote-readonly inspect/review flow.
     report: .pipeline/reports/03-pr-mr-inspect-review-readonly-flow.report.md
-    tests: npm test --prefix core: 326/326 passing
+    tests: "npm test --prefix core: 326/326 passing"
     trigger: auto
     related_milestone: M04
   -
@@ -649,7 +1671,7 @@ entries:
     timestamp: "2026-05-07T15:57:00+08:00"
     summary: Confirmed failing readonly PR flow test before implementation because inspect/review helpers were absent.
     report: core/test/pr-readonly-flow.test.js
-    tests: node --test core/test/pr-readonly-flow.test.js: expected failure
+    tests: "node --test core/test/pr-readonly-flow.test.js: expected failure"
     trigger: auto
     related_milestone: M04
   -
@@ -691,7 +1713,7 @@ entries:
     timestamp: "2026-05-07T15:55:35+08:00"
     summary: Full core regression passed after adding /hw:pr and refreshing derived artifacts.
     report: .pipeline/reports/02-change-request-contract-and-local-archive.report.md
-    tests: npm test --prefix core: 323/323 passing
+    tests: "npm test --prefix core: 323/323 passing"
     trigger: auto
     related_milestone: M03
   -
@@ -712,7 +1734,7 @@ entries:
     timestamp: "2026-05-07T15:47:00+08:00"
     summary: Confirmed failing PR contract test before implementation because Change Request helpers and /hw:pr command metadata were absent.
     report: core/test/pr-contract.test.js
-    tests: node --test core/test/pr-contract.test.js: expected failure
+    tests: "node --test core/test/pr-contract.test.js: expected failure"
     trigger: auto
     related_milestone: M03
   -
@@ -764,7 +1786,7 @@ entries:
     timestamp: "2026-05-07T15:44:00+08:00"
     summary: Focused and full validation passed after adding configuration profiles and generated configuration documentation.
     report: .pipeline/reports/01-default-configuration-profiles.report.md
-    tests: npm test --prefix core: 319/319 passing
+    tests: "npm test --prefix core: 319/319 passing"
     trigger: auto
     related_milestone: M02
   -
@@ -785,7 +1807,7 @@ entries:
     timestamp: "2026-05-07T15:39:00+08:00"
     summary: Confirmed failing default profile tests before implementation because configuration profile exports and generated docs were missing.
     report: core/test/profile-platform.test.js
-    tests: node --test core/test/profile-platform.test.js: expected failure
+    tests: "node --test core/test/profile-platform.test.js: expected failure"
     trigger: auto
     related_milestone: M02
   -
@@ -4477,4 +5499,184 @@ entries:
     timestamp: "2026-05-09T00:30:30+08:00"
     summary: Completed C10 experience optimization Cycle with PR Create, P0 Configure, Subagent governance, docs/adapters, and regression evidence.
     report: .pipeline/reports/04-commands-docs-adapters-full-regression.report.md
+    trigger: auto
+  -
+    id: M6-IMPLEMENT-C12-20260513T012711+0800
+    type: step_complete
+    ref: C12/M6/implement
+    status: completed
+    timestamp: "2026-05-13T01:27:11+08:00"
+    summary: Integrated Deep Plan into canonical command, skill, docs, and generated adapter surfaces.
+    report: .pipeline/reviews/C12/M6/implementation-evidence.md
+    trigger: auto
+    related_milestone: M6
+    tests:
+      - "node --test core/test/deep-plan-integration.test.js: 4/4 passing"
+      - "node --test core/test/commands-rules-artifacts.test.js core/test/skill-spec.test.js core/test/skill-quality.test.js core/test/docs-governance.test.js core/test/sync-standardization.test.js: 23/23 passing"
+      - "git diff --check: passing"
+  -
+    id: M6-AUDIT-START-C12-20260513T012946+0800
+    type: worker_start
+    ref: C12/M6/audit
+    status: active
+    timestamp: "2026-05-13T01:29:46+08:00"
+    summary: Started independent audit for Deep Plan command, skill, docs, and adapter integration.
+    report: .pipeline/reviews/C12/M6/audit.md
+    trigger: auto
+    related_milestone: M6
+  -
+    id: M6-AUDIT-REPAIR-C12-20260513T013747+0800
+    type: step_complete
+    ref: C12/M6/review_code
+    status: revised
+    timestamp: "2026-05-13T01:37:47+08:00"
+    summary: Repaired M6 audit blockers by exposing /hw:plan:deep in root Skill and updating stale 39-command scenario expectations.
+    report: .pipeline/reviews/C12/M6/audit.md
+    trigger: auto
+    related_milestone: M6
+    tests:
+      - "tests/scenarios/v6/s19-help-list/run.sh: passing"
+      - "tests/scenarios/v9/s55-opencode-command-map/run.sh: passing"
+      - "uv run -- node --test core/test/codex-subagent-discipline.test.js: 10/10 passing"
+      - "uv run -- node --test core/test/deep-plan-integration.test.js core/test/commands-rules-artifacts.test.js core/test/skill-spec.test.js core/test/skill-quality.test.js core/test/docs-governance.test.js core/test/sync-standardization.test.js: 27/27 passing"
+  -
+    id: M6-COMPLETE-C12-20260513T013920+0800
+    type: milestone_complete
+    ref: C12/M6
+    status: completed
+    timestamp: "2026-05-13T01:39:20+08:00"
+    summary: Completed Deep Plan Skills, command, adapter, help, docs, and status-surface integration after audit repair.
+    report: .pipeline/reports/06-skills-commands-adapters-status.report.md
+    trigger: auto
+    related_milestone: M6
+  -
+    id: M7-START-C12-20260513T013920+0800
+    type: milestone_start
+    ref: C12/M7
+    status: active
+    timestamp: "2026-05-13T01:39:20+08:00"
+    summary: Started Feature Queue handoff and ordinary Plan integration milestone.
+    report: .pipeline/prompts/07-feature-queue-handoff-plan-integration.md
+    trigger: auto
+    related_milestone: M7
+  -
+    id: M7-WRITE-TESTS-START-C12-20260513T014118+0800
+    type: worker_start
+    ref: C12/M7/write_tests
+    status: active
+    timestamp: "2026-05-13T01:41:18+08:00"
+    summary: Started test worker for Deep Plan to Feature Queue and ordinary Plan handoff red tests.
+    report: .pipeline/reviews/C12/M7/test-evidence.md
+    trigger: auto
+    related_milestone: M7
+  -
+    id: M7-WRITE-TESTS-C12-20260513T014713+0800
+    type: step_complete
+    ref: C12/M7/write_tests
+    status: completed
+    timestamp: "2026-05-13T01:47:13+08:00"
+    summary: Added RED tests for Deep Plan to Feature Queue handoff, parked directional items, and pseudo-test rejection metadata.
+    report: .pipeline/reviews/C12/M7/test-evidence.md
+    trigger: auto
+    related_milestone: M7
+    tests: "node --test core/test/deep-plan-handoff.test.js core/test/deep-plan-convert.test.js core/test/feature-queue-ops.test.js: 17/20 passing, 3 expected RED failures"
+  -
+    id: M7-IMPLEMENT-C12-20260513T015052+0800
+    type: step_complete
+    ref: C12/M7/implement
+    status: completed
+    timestamp: "2026-05-13T01:50:52+08:00"
+    summary: Implemented structured Deep Plan handoff with Feature Queue draft, parked directional items, and pseudo-test rejection metadata.
+    report: .pipeline/reviews/C12/M7/implementation-evidence.md
+    trigger: auto
+    related_milestone: M7
+    tests:
+      - "uv run -- node --test core/test/deep-plan-handoff.test.js core/test/deep-plan-convert.test.js core/test/feature-queue-ops.test.js: 20/20 passing"
+      - "git diff --check: passing"
+  -
+    id: M7-AUDIT-START-C12-20260513T015208+0800
+    type: worker_start
+    ref: C12/M7/review_code
+    status: active
+    timestamp: "2026-05-13T01:52:08+08:00"
+    summary: Started independent audit for Deep Plan Feature Queue and ordinary Plan handoff.
+    report: .pipeline/reviews/C12/M7/audit.md
+    trigger: auto
+    related_milestone: M7
+  -
+    id: M7-COMPLETE-C12-20260513T015548+0800
+    type: milestone_complete
+    ref: C12/M7
+    status: completed
+    timestamp: "2026-05-13T01:55:48+08:00"
+    summary: Completed Deep Plan to Feature Queue and ordinary Plan handoff with non-blocking audit suggestions repaired.
+    report: .pipeline/reports/07-feature-queue-handoff-plan-integration.report.md
+    trigger: auto
+    related_milestone: M7
+    tests:
+      - "uv run -- node --test core/test/deep-plan-handoff.test.js core/test/deep-plan-convert.test.js core/test/feature-queue-ops.test.js: 21/21 passing"
+      - "git diff --check: passing"
+  -
+    id: M8-START-C12-20260513T015548+0800
+    type: milestone_start
+    ref: C12/M8
+    status: active
+    timestamp: "2026-05-13T01:55:48+08:00"
+    summary: Started real scenario regression and release-readiness milestone, including research-code requirement coverage.
+    report: .pipeline/prompts/08-real-scenario-regression-release.md
+    trigger: auto
+    related_milestone: M8
+  -
+    id: M8-WRITE-TESTS-START-C12-20260513T015805+0800
+    type: worker_start
+    ref: C12/M8/write_tests
+    status: active
+    timestamp: "2026-05-13T01:58:05+08:00"
+    summary: Started final real-scenario and research-code playbook test worker.
+    report: .pipeline/reviews/C12/M8/test-evidence.md
+    trigger: auto
+    related_milestone: M8
+  -
+    id: M8-IMPLEMENT-C12-20260513T021636+0800
+    type: step_complete
+    ref: C12/M8/implement
+    status: completed
+    timestamp: "2026-05-13T02:16:36+08:00"
+    summary: Implemented final Deep Plan real-scenario playbooks, research-code source inspection gate, and 40-command regression repairs.
+    report: .pipeline/reviews/C12/M8/implementation-evidence.md
+    trigger: auto
+    related_milestone: M8
+    tests:
+      - "uv run -- node --test core/test/deep-plan*.test.js core/test/progressive-discover.test.js core/test/batch-plan.test.js core/test/commands-rules-artifacts.test.js: 73/73 passing"
+      - "uv run python tests/run_regression.py: 68/68 passing"
+      - "uv run -- bash scripts/validate-config.sh .pipeline/config.yaml: passing"
+      - "git diff --check: passing"
+  -
+    id: M8-AUDIT-C12-20260513T022320+0800
+    type: step_complete
+    ref: C12/M8/review_code
+    status: completed
+    timestamp: "2026-05-13T02:23:20+08:00"
+    summary: Final audit found no blocking findings for C12 Deep Plan delivery; derived stale warning recorded as non-blocking.
+    report: .pipeline/reviews/C12/M8/audit.md
+    trigger: auto
+    related_milestone: M8
+  -
+    id: M8-COMPLETE-C12-20260513T022320+0800
+    type: milestone_complete
+    ref: C12/M8
+    status: completed
+    timestamp: "2026-05-13T02:23:20+08:00"
+    summary: Completed real scenario regression, research-code playbook, and final release-readiness validation.
+    report: .pipeline/reports/08-real-scenario-regression-release.report.md
+    trigger: auto
+    related_milestone: M8
+  -
+    id: CYCLE-COMPLETE-C12-20260513T022320+0800
+    type: cycle_complete
+    ref: C12
+    status: completed
+    timestamp: "2026-05-13T02:23:20+08:00"
+    summary: Completed C12 Workflow 深度计划讨论功能 with Deep Plan lifecycle, handoff, and research-code source inspection contracts.
+    report: .pipeline/reports/C12-final.report.md
     trigger: auto

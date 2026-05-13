@@ -1,16 +1,12 @@
 cycle:
-  number: 11
-  name: "Workflow 的一系列小体验问题"
+  number: 12
+  name: "Workflow 深度计划讨论功能"
   type: feature
-  status: completed
-  started: "2026-05-11T13:54:47+08:00"
-  finished: "2026-05-11T14:55:25+08:00"
+  status: active
+  started: "2026-05-12T21:01:33+08:00"
   preset: tdd
   workflow_kind: build
   context_sources: []
-  previous_cycle: 10
-  summary: "Completed C11 workflow experience improvements: Chinese-first Skills and references, two-layer Subagent rules/check injection, durable automation whitelist, human-readable response contracts, stronger Plan audit/example-abstraction behavior, sync and docs refresh, and full core regression."
-  lessons:
-    - "Skill quality checks must accept Chinese canonical headings when the project language policy is zh-CN."
-    - "Planning examples should become generalized requirements before Milestone decomposition."
-    - "Subagent prompt injection needs distinct host envelope and task-specific check layers."
+  previous_cycle: 11
+  summary: null
+  lessons: null

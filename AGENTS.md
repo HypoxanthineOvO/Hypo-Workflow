@@ -29,6 +29,7 @@ When `execution.steps.preset=analysis`, read `.opencode/hypo-workflow.json.analy
 
 Structured Rules/Habits are authority; Markdown habits and platform instructions are derived views.
 
+- claude-hw-command-namespace (project/error/workflow): Claude Code integration must expose Hypo-Workflow commands through the `hw` plugin namespace as `/hw:*` slash commands while keeping Claude native `/resume` separate from Hypo `/hw:resume`.
 - conflict-check (builtin/warn/guard): Detect incompatible local agent plugins or hook systems at session start.
 - plan-tool-required (builtin/warn/workflow): Complex planning and execution work must maintain a visible plan/todo state.
 - prefer-chinese-output (project/warn/style): 面向用户的说明、README 更新、PROGRESS 摘要和交互提示优先使用中文。命令名、配置键、文件名和专有英文术语保持英文。

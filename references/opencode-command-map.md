@@ -16,6 +16,7 @@ OpenCode uses dash-style native slash commands. Each command remains traceable t
 | `/hw:report` | `/hw-report` | `hw-report` | `skills/report/SKILL.md` |
 | `/hw:chat` | `/hw-chat` | `hw-build` | `skills/chat/SKILL.md` |
 | `/hw:plan` | `/hw-plan` | `hw-plan` | `skills/plan/SKILL.md` |
+| `/hw:plan:deep` | `/hw-plan-deep` | `hw-plan` | `skills/plan-deep/SKILL.md` |
 | `/hw:plan:discover` | `/hw-plan-discover` | `hw-plan` | `skills/plan-discover/SKILL.md` |
 | `/hw:plan:decompose` | `/hw-plan-decompose` | `hw-plan` | `skills/plan-decompose/SKILL.md` |
 | `/hw:plan:generate` | `/hw-plan-generate` | `hw-plan` | `skills/plan-generate/SKILL.md` |

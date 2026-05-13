@@ -24,9 +24,9 @@ test("skill spec documents required sections and quality contract", async () => 
   }
 
   for (const requiredPhrase of [
-    "39 local Skill files",
-    "37 user-facing Skill paths",
-    "39 user-facing commands",
+    "40 local Skill files",
+    "38 user-facing Skill paths",
+    "40 user-facing commands",
     "watchdog",
     "internal",
     "no merge or delete",
@@ -44,8 +44,8 @@ test("skill spec keeps command map and local skill inventory traceable", async (
   const commands = commandMap("opencode");
   const userSkillPaths = [...new Set(commands.map((command) => command.skill))];
 
-  assert.equal(commands.length, 39);
-  assert.equal(userSkillPaths.length, 37);
+  assert.equal(commands.length, 40);
+  assert.equal(userSkillPaths.length, 38);
 
   for (const skillPath of userSkillPaths) {
     assert.ok(existsSync(skillPath), `command map references missing skill: ${skillPath}`);
@@ -53,6 +53,9 @@ test("skill spec keeps command map and local skill inventory traceable", async (
   }
 
   assert.match(spec, /skills\/watchdog\/SKILL\.md/);
+  assert.match(spec, /skills\/plan-deep\/SKILL\.md/);
+  assert.doesNotMatch(spec, /\/hw:plan:deep[\s\S]{0,120}(deferred|outside the legacy OpenCode `commandMap\(\)` count)/i);
+  assert.doesNotMatch(spec, /Full Deep Plan command docs[\s\S]{0,80}deferred to M6/i);
   assert.match(spec, /cron-only/i);
 });
 

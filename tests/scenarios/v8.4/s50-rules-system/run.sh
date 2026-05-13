@@ -20,7 +20,7 @@ rg -q 'rules.extends' references/config-spec.md
 rg -q 'rules:' config.schema.yaml
 rg -q '\| `/hw:rules` \|' docs/reference/commands.md
 rg -q '/hw:rules' README.md
-rg -q '39 个用户指令' README.md
+rg -q '40 个用户指令' README.md
 rg -q '"version": "[0-9]+\.[0-9]+\.[0-9]+"' .claude-plugin/plugin.json
 
 summary="$(bash scripts/rules-summary.sh "$repo_root")"

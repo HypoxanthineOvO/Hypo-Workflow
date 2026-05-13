@@ -71,6 +71,13 @@ const metadata = {
     "skill": "skills/plan/SKILL.md"
   },
   {
+    "canonical": "/hw:plan:deep",
+    "opencode": "/hw-plan-deep",
+    "agent": "hw-plan",
+    "route": "plan",
+    "skill": "skills/plan-deep/SKILL.md"
+  },
+  {
     "canonical": "/hw:plan:discover",
     "opencode": "/hw-plan-discover",
     "agent": "hw-plan",

@@ -64,6 +64,7 @@ See also [`external-docs-index.md`](./external-docs-index.md) for the cross-plat
 | `/hw:report` | `/hw-report` | `hw-report` | Native slash command, HW-specific report contract. |
 | `/hw:chat` | `/hw-chat` | `hw-build` | Native slash command, lightweight append conversation lane. |
 | `/hw:plan` | `/hw-plan` | `hw-plan` | Native slash command, OpenCode question/todowrite required. |
+| `/hw:plan:deep` | `/hw-plan-deep` | `hw-plan` | Native slash command, durable Deep Plan discussion package before ordinary Plan. |
 | `/hw:plan:discover` | `/hw-plan-discover` | `hw-plan` | Native slash command, Ask-gated discovery. |
 | `/hw:plan:decompose` | `/hw-plan-decompose` | `hw-plan` | Native slash command, todowrite mirrors milestone draft. |
 | `/hw:plan:generate` | `/hw-plan-generate` | `hw-plan` | Native slash command, core artifact generation. |

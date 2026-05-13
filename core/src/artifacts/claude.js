@@ -63,8 +63,8 @@ function claudeSlashCommandRelativePath(command) {
   const canonical = String(command.canonical || "");
   if (!canonical.startsWith("/hw:")) return null;
   const commandName = canonical.slice("/hw:".length).trim();
-  if (!commandName || /\s/.test(commandName)) return null;
-  const parts = commandName.split(":").filter(Boolean);
+  if (!commandName) return null;
+  const parts = commandName.split(/[:\s]+/).filter(Boolean);
   if (parts.length === 0) return null;
   return join("commands", ...parts.slice(0, -1), `${parts.at(-1)}.md`);
 }

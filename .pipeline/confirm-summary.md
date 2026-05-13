@@ -1,31 +1,31 @@
-# C11 规划确认摘要
+# C12 Plan Confirm Summary
 
-## 结论
+C12 将实现 Hypo-Workflow 的深度计划/讨论能力：在普通 `/hw:plan` 前提供长期 discussion package，通过第一性原理追问、只读调研、架构映射、模块 drilldown、readiness 检查和显式 convert，把模糊需求逐步收敛成可进入 Feature Queue 的计划上下文。
 
-C11 将交付一组 Workflow 体验治理改动：中文主体 Skill/reference、Subagent 检查注入、长期自动化白名单、用户可见“说人话”输出契约、Plan 审计问题和例子抽象规则。
+## Entry
 
-## Milestone 拆分
+- Canonical: `/hw:plan:deep`
+- Alias: `/hw:plan --deep`
+- Core operations: `new`, `ask`, `research`, `map`, `drill`, `readiness`, `convert`
 
-1. M0 - P0 Configure 与规划授权记录
-2. M1 - 用户可见输出契约
-3. M2 - Plan Discover 访谈升级
-4. M3 - 自动化授权白名单
-5. M4 - Subagent 规则与检查点注入闭环
-6. M5 - Skills 中文化：核心执行链
-7. M6 - Skills 中文化：规划与辅助链
-8. M7 - References 中文化与回归
+## Milestones
 
-## 验证策略
+1. M0 - Deep Plan 合同、命令入口与生命周期
+2. M1 - Discussion Package 数据模型与持久化
+3. M2 - First-Principles Ask Engine 与浅层计划拒绝
+4. M3 - Research 只读证据流
+5. M4 - Requirement Tracks、Architecture Map 与人读渲染
+6. M5 - Drill、Readiness Depth 与 Convert Gate
+7. M6 - Skills、Commands、Adapters 与状态面集成
+8. M7 - Feature Queue Handoff 与普通 Plan 集成
+9. M8 - 真实场景验收、回归与发布准备
 
-- 每个 Milestone 使用 TDD preset，先写或更新可观察测试，再实现。
-- 每个 Milestone 必须记录审计字段：`audit_target`、`risk_hypotheses`、`test_scenarios`、`evidence_required`、`independent_validator`、`manual_checks`、`known_limits`。
-- Subagent 审计已获授权；实现/测试 Subagent 在 `/hw:start` 或 `/hw:resume` 执行前仍需按 prompt 边界确认。
-- Subagent 注入按两层建模：host/orchestrator 先生成 rules/authorization/role envelope，每个 Subagent 任务再注入用户检查点、审计字段和证据要求。
+## Validation
 
-## 用户手动操作建议
-
-确认后可运行 `/hw:start` 开始 M0。执行中重点观察：
-
-- Agent 是否在中间更新里说明正在做什么、发现了什么、下一步是什么。
-- Milestone 完成时是否给出“做了什么、怎么验证、你怎么手动试、已知风险”。
-- Subagent prompt 是否包含规则摘要和本轮检查点。
+- `uv run -- node --test core/test/deep-plan*.test.js core/test/progressive-discover.test.js core/test/batch-plan.test.js core/test/commands-rules-artifacts.test.js`
+- `uv run python tests/run_regression.py`
+- `uv run -- bash scripts/validate-config.sh .pipeline/config.yaml`
+- `uv run -- node cli/bin/hypo-workflow sync --platform opencode --project /home/heyx/Hypo-Workflow --check-only`
+- `uv run -- git diff --check`
+- Manual: use deep planning to plan Hypo-Agent again and confirm Feature Queue order plus acceptance depth are clear before ordinary Plan.
+- Manual: research a referenced external project with explicit remote/network confirmation and verify downloaded source code evidence is inspected, not only README summaries.

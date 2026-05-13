@@ -12,7 +12,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 - Claude Code exposes canonical commands through plugin-root `commands/` files under a plugin whose namespace is `hw`; those slash-command files must load the existing Hypo-Workflow skill files instead of duplicating a second implementation
 - Claude Code `/hw:*` entries are plugin slash-command mappings backed by the existing `skills/*/SKILL.md` authority
 - Claude Code native `/resume` remains owned by Claude Code; Hypo-Workflow must never register or document bare `/resume` as an alias for `/hw:resume`
-- V12 canonical namespace contains 39 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups, plus an internal cron-only watchdog skill
+- V12 canonical namespace contains user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups, plus an internal cron-only watchdog skill
 - slash commands are exact and namespace-scoped
 - slash commands take precedence over fuzzy natural-language matching
 - natural-language commands remain valid for backward compatibility
@@ -43,6 +43,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 - `/hw:debug`
 - `/hw:chat`
 - `/hw:plan`
+   - `/hw:plan:deep`
    - `/hw:plan:discover`
    - `/hw:plan:decompose`
    - `/hw:plan:generate`
@@ -61,12 +62,12 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 3. parse remaining tokens as command arguments
 4. flags are order-independent
 5. if a command is unknown, return exactly:
-   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 6. if a known command receives an unsupported flag, stop and report the unsupported flag explicitly instead of guessing
 7. if a prompt selector is ambiguous, list the candidates and stop
 8. plan and review commands load `plan/PLAN-SKILL.md` before execution
 9. if a command starts with `/hw:plan:` and is unknown, return exactly:
-   `Unknown command: /hw:plan:xxx. Available: /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review`
+   `Unknown command: /hw:plan:xxx. Available: /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review`
 10. append-mode conflicts must never silently renumber executed prompts
 11. `/hw:review` is a compatibility alias that prints a migration warning instead of running the review directly
 
@@ -248,7 +249,7 @@ Supported forms:
 Behavior:
 
 - read `SKILL.md` command tables as the source of truth
-- `/hw:help` lists all 39 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility
+- `/hw:help` lists all 40 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility
 - `/hw:help --quick` returns a compact cheat sheet
 - `/hw:help <cmd>` returns detailed usage, flags, and examples for the requested command
 
@@ -410,6 +411,7 @@ Supported flags:
 
 - none
 - `--batch`
+- `--deep`
 - `--insert <natural language>`
 - `--context audit,patches,deferred,debug`
 
@@ -417,9 +419,11 @@ Behavior:
 
 - load `plan/PLAN-SKILL.md`
 - enter Plan Mode using the Discover-first flow
+- with `--deep`, route to `/hw:plan:deep` before ordinary decomposition; `/hw:plan --deep` is an alias for the Deep Plan discussion package lifecycle
 - honor `--template <name>` as an initial template hint when present
 - honor `--context` as comma-separated P1 context sources, including `explore:E001` refs created by `/hw:explore upgrade plan E001`
 - single-feature /hw:plan behavior is unchanged when `--batch` is absent
+- ordinary `/hw:plan` keeps P1-P4 gates; Deep Plan context, `--deep`, or converted discussion output must not skip P1-P4
 - with `--batch`, Discover covers multiple Features in one interview and generates a Feature Queue after confirmation
 - Progressive Discover starts by asking task category, desired effect, and verification method before deeper implementation detail
 - map task category to Test Profile expectations when applicable; webapp, agent-service, and research each require different validation evidence
@@ -434,6 +438,32 @@ Behavior:
 - honor `plan.mode=auto|interactive` from project config, falling back to global `plan.default_mode` when available
 - default to `/hw:plan:discover` when no explicit sub-phase is given
 - do not start normal pipeline execution yet
+
+### `/hw:plan:deep`
+
+Supported operations:
+
+- `new`
+- `ask`
+- `research`
+- `map`
+- `drill`
+- `readiness`
+- `convert`
+
+Behavior:
+
+- load `skills/plan-deep/SKILL.md`
+- execute Deep Plan operations only: `new`, `ask`, `research`, `map`, `drill`, `readiness`, and `convert`
+- create or update a durable discussion package under `.pipeline/deep-plans/DPxxx-slug/`
+- maintain machine-readable source files plus Mermaid/Markdown views for humans
+- keep Deep Plan distinct from `/hw:guide` onboarding and `/hw:explore` hypothesis exploration
+- honor analysis boundaries and protected file boundaries when reading, researching, or updating package artifacts
+- must not directly execute implementation milestones
+- require `readiness` and explicit `convert` before using the package as ordinary Plan context
+- after conversion, ordinary `/hw:plan` still runs P1-P4 and must not skip P1-P4 gates
+- for external code research, remote clone/download requires a concrete action authorization: either per-run `confirmed_remote_actions` from the user or trusted local config `local_config_trusted_remote_actions`; portable project defaults must continue to ask the user
+- even when locally trusted, remote code research still requires bounded `.pipeline/deep-plans/.../research-cache/...` storage and implementation-code `evidence_refs`; README-only evidence remains insufficient
 
 ### `/hw:plan:discover`
 

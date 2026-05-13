@@ -65,7 +65,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 - 完成前做交付前检查：格式、派生产物、README/文档新鲜度、secret marker、测试证据和报告证据。
 - 自动化等级由 `.pipeline/config.yaml` 的 `automation.level` 决定；发布、破坏性操作和外部副作用仍按配置确认点执行。
 
-当前版本提供 **39 个用户指令**，另有 **1 个内部 watchdog** skill。
+当前版本提供 **40 个用户指令**，另有 **1 个内部 watchdog** skill。
 
 ## 常用命令
 
@@ -107,7 +107,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 |---|---|
 | [User Guide](docs/user-guide.md) | 常见流程、恢复、Feature Queue |
 | [Developer Guide](docs/developer.md) | 核心 helper、权限边界、派生产物和测试约定 |
-| [Commands Reference](docs/reference/commands.md) | 39 个标准命令和 OpenCode 映射 |
+| [Commands Reference](docs/reference/commands.md) | 40 个标准命令和 OpenCode 映射 |
 | [Platforms Reference](docs/reference/platforms.md) | 六个平台能力表 |
 | [Generated Artifacts](docs/reference/generated-artifacts.md) | OpenCode、第三方适配、压缩视图和文档引用的生成来源 |
 | [OpenCode Guide](docs/platforms/opencode.md) | OpenCode 指令、智能体角色、模型矩阵和边界 |

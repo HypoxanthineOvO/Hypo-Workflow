@@ -62,7 +62,7 @@ Third-party IDE adapters are repository instruction files. They teach the host I
 - Run pre-delivery checks for formatting, stale derived artifacts, README/docs freshness, secret markers, tests, and report evidence.
 - Automation is governed by `.pipeline/config.yaml`; release, destructive operations, external side effects, and PR/MR remote writes still follow explicit confirmation gates.
 
-Current version exposes **39 user-facing commands** and **1 internal watchdog** skill.
+Current version exposes **40 user-facing commands** and **1 internal watchdog** skill.
 
 ## Common Commands
 

@@ -42,6 +42,10 @@ export const LIFECYCLE_LOG_STATUSES = Object.freeze([
   "pending_acceptance",
   "waiting_confirmation",
   "confirmed",
+  "started",
+  "needs_changes",
+  "needs_repair",
+  "recorded",
 ]);
 
 const RECENT_FAMILIES = new Set([
@@ -181,6 +185,7 @@ export function logFamily(type) {
   if (normalized.startsWith("feature")) return "feature";
   if (normalized.startsWith("milestone")) return "milestone";
   if (normalized.startsWith("step")) return "step";
+  if (normalized.startsWith("worker")) return "step";
   if (normalized.startsWith("patch")) return "patch";
   if (normalized.startsWith("acceptance") || normalized.startsWith("cycle_accept") || normalized.startsWith("cycle_reject")) return "acceptance";
   if (normalized.startsWith("sync")) return "sync";

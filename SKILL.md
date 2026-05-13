@@ -1,7 +1,7 @@
 ---
 name: hypo-workflow
 version: 12.5.1
-description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:plan`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
+description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:plan`, `/hw:plan:deep`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
 ---
 
 # Hypo-Workflow v12.5.1
@@ -22,6 +22,7 @@ description: Run a serialized prompt execution pipeline from a local `.pipeline/
 | `/hw:report` | Show compact report summaries, latest scores, or `--view <M>` full report |
 | `/hw:chat` | Enter lightweight append conversation mode |
 | `/hw:plan` | Enter Plan Mode through `plan/PLAN-SKILL.md` |
+| `/hw:plan:deep` | Maintain Deep Plan discussion packages before ordinary Plan conversion |
 | `/hw:plan:discover` | Run the Discover phase of Plan Mode |
 | `/hw:plan:decompose` | Run the Decompose phase of Plan Mode |
 | `/hw:plan:generate` | Run the Generate phase of Plan Mode |
@@ -236,6 +237,8 @@ Handle these commands directly:
   Investigate a concrete symptom, generate ranked root-cause hypotheses, validate them, and optionally apply `--auto-fix` only after verification passes.
 - `/hw:plan`, `/hw:plan:discover`, `/hw:plan:decompose`, `/hw:plan:generate`, `/hw:plan:confirm`, `/hw:plan:extend`, `/hw:plan:review`
   Load [`plan/PLAN-SKILL.md`](./plan/PLAN-SKILL.md) and route execution to the corresponding Plan Mode phase.
+- `/hw:plan:deep`
+  Load [`skills/plan-deep/SKILL.md`](./skills/plan-deep/SKILL.md). Maintain a durable Deep Plan discussion package with `new`, `ask`, `research`, `map`, `drill`, `readiness`, and `convert`; it is not an execution runner.
 - `/hw:cycle`
   Load [`skills/cycle/SKILL.md`](./skills/cycle/SKILL.md). Manage explicit Cycles, archives, deferred items, and project summaries. Old projects without `.pipeline/cycle.yaml` remain compatible as implicit `C1`.
 - `/hw:sync`
@@ -263,7 +266,7 @@ Handle these commands directly:
 
 If a command starts with `/hw:` and is not listed above, return:
 
-`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 
 Slash commands are exact and take precedence over fuzzy natural-language matching. Detailed parsing and option semantics live in [`references/commands-spec.md`](./references/commands-spec.md).
 

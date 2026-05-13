@@ -1,5 +1,5 @@
 pipeline:
-  name: "C11 Workflow 的一系列小体验问题"
+  name: "C12 Workflow 深度计划讨论功能"
   source: local
   output: local
   prompts_dir: .pipeline/prompts
@@ -27,6 +27,14 @@ execution:
       executor: subagent
       subagent_tool: codex
       strict: false
+
+deep_plan:
+  research_code:
+    local_config_trusted_remote_actions:
+      - remote_clone
+      - remote_download
+    require_bounded_research_cache: true
+    require_implementation_code_evidence: true
 
 batch:
   decompose_mode: upfront

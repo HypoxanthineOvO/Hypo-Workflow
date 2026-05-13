@@ -1,6 +1,6 @@
 version: 1
-cycle_id: C11
-current_feature: null
+cycle_id: C12
+current_feature: F001
 defaults:
   decompose_mode: upfront
   failure_policy: skip_defer
@@ -8,47 +8,61 @@ defaults:
   default_gate: auto
 features:
   - id: F001
-    title: Workflow 体验契约治理
+    title: Deep Plan 讨论包与 Plan Handoff
     priority: 10
-    status: done
+    status: decomposed
     gate: auto
     decompose_mode: upfront
     source: plan-discover
     workflow_kind: build
-    category: workflow-experience
-    desired_effect: 中文主体 Skill/reference、Subagent 检查注入、自动化白名单、说人话输出和 Plan 审计能力全部形成可测试契约。
-    verification: 8 个 Milestone 的 contract tests、scenario checks、Subagent audit、manual QA guidance 和 full regression。
+    category: workflow-product-planning
+    desired_effect: >
+      Hypo-Workflow 支持 Plan 前的深度讨论小周期，可以长期沉淀需求、架构、模块 drilldown、测试矩阵和 readiness，再显式转入普通 Plan / Feature Queue。
+    verification:
+      method: automated-and-manual
+      scenario: >
+        自动 fixture 覆盖 multi-round deep plan lifecycle；手动用 Hypo-Agent 重新规划，确认后续 Feature Queue 执行顺序、验收深度、风险和未知项在 convert 前清楚可见。
+        后段验收还要覆盖 research-code：经确认后下载/克隆参考项目源码并读取实现证据，不能只接受 README 摘要。
+      pass_signal: deep-plan tests, regression, sync checks, and Hypo-Agent manual playbook pass
+      independent_validator: test worker plus audit worker
+      audit_policy:
+        reject_pseudo_tests: true
+        pseudo_test_rule: Reject static-doc-only or one-shot shallow planning evidence.
     dependencies: []
     milestones:
       - id: M0
-        status: done
-        title: P0 Configure 与规划授权记录
-        prompt_file: .pipeline/prompts/00-p0-configure-and-cycle-authorization.md
+        status: pending
+        title: Deep Plan 合同、命令入口与生命周期
+        prompt_file: .pipeline/prompts/00-deep-plan-contract-command-lifecycle.md
       - id: M1
-        status: done
-        title: 用户可见输出契约
-        prompt_file: .pipeline/prompts/01-human-readable-response-contract.md
+        status: pending
+        title: Discussion Package 数据模型与持久化
+        prompt_file: .pipeline/prompts/01-discussion-package-model.md
       - id: M2
-        status: done
-        title: Plan Discover 访谈升级
-        prompt_file: .pipeline/prompts/02-plan-discover-audit-and-example-abstraction.md
+        status: pending
+        title: First-Principles Ask Engine 与浅层计划拒绝
+        prompt_file: .pipeline/prompts/02-first-principles-ask-engine.md
       - id: M3
-        status: done
-        title: 自动化授权白名单
-        prompt_file: .pipeline/prompts/03-automation-permission-whitelist.md
+        status: pending
+        title: Research 只读证据流
+        prompt_file: .pipeline/prompts/03-research-readonly-evidence.md
       - id: M4
-        status: done
-        title: Subagent 规则与检查点注入闭环
-        prompt_file: .pipeline/prompts/04-subagent-rules-checks-injection.md
+        status: pending
+        title: Requirement Tracks、Architecture Map 与人读渲染
+        prompt_file: .pipeline/prompts/04-tracks-architecture-map-rendering.md
       - id: M5
-        status: done
-        title: Skills 中文化：核心执行链
-        prompt_file: .pipeline/prompts/05-skills-zh-core-execution-chain.md
+        status: pending
+        title: Drill、Readiness Depth 与 Convert Gate
+        prompt_file: .pipeline/prompts/05-drill-readiness-convert.md
       - id: M6
-        status: done
-        title: Skills 中文化：规划与辅助链
-        prompt_file: .pipeline/prompts/06-skills-zh-planning-and-support-chain.md
+        status: pending
+        title: Skills、Commands、Adapters 与状态面集成
+        prompt_file: .pipeline/prompts/06-skills-commands-adapters-status.md
       - id: M7
-        status: done
-        title: References 中文化与回归
-        prompt_file: .pipeline/prompts/07-references-zh-and-regression.md
+        status: pending
+        title: Feature Queue Handoff 与普通 Plan 集成
+        prompt_file: .pipeline/prompts/07-feature-queue-handoff-plan-integration.md
+      - id: M8
+        status: pending
+        title: 真实场景验收、回归与发布准备
+        prompt_file: .pipeline/prompts/08-real-scenario-regression-release.md

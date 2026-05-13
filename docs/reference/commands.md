@@ -1,6 +1,6 @@
 # 命令参考
 
-本页由 `core/src/commands/index.js` 生成。当前用户命令数量：39。命令名、平台映射和 Skill 路径保留英文/代码格式。阅读时以 Canonical 列为用户入口，以 OpenCode 列为平台映射；新增或删除命令必须先修改 command registry，再刷新本页。
+本页由 `core/src/commands/index.js` 生成。当前用户命令数量：40。命令名、平台映射和 Skill 路径保留英文/代码格式。阅读时以 Canonical 列为用户入口，以 OpenCode 列为平台映射；新增或删除命令必须先修改 command registry，再刷新本页。
 
 | Canonical | OpenCode | Agent | Skill |
 |---|---|---|---|
@@ -12,6 +12,7 @@
 | `/hw:report` | `/hw-report` | `hw-report` | `skills/report/SKILL.md` |
 | `/hw:chat` | `/hw-chat` | `hw-build` | `skills/chat/SKILL.md` |
 | `/hw:plan` | `/hw-plan` | `hw-plan` | `skills/plan/SKILL.md` |
+| `/hw:plan:deep` | `/hw-plan-deep` | `hw-plan` | `skills/plan-deep/SKILL.md` |
 | `/hw:plan:discover` | `/hw-plan-discover` | `hw-plan` | `skills/plan-discover/SKILL.md` |
 | `/hw:plan:decompose` | `/hw-plan-decompose` | `hw-plan` | `skills/plan-decompose/SKILL.md` |
 | `/hw:plan:generate` | `/hw-plan-generate` | `hw-plan` | `skills/plan-generate/SKILL.md` |

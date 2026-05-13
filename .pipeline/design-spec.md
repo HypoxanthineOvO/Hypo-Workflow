@@ -1,37 +1,53 @@
-# C11 Design Spec - Workflow 的一系列小体验问题
+# C12 Design Spec - Workflow 深度计划讨论功能
 
 ## Goal
 
-本 Cycle 要把 Hypo-Workflow 的中文交互、规划质量、Subagent 检查注入、自动化授权和完成汇报改成可执行、可测试、可持续维护的契约。
+为 Hypo-Workflow 增加 Plan 前的长期“深度计划/讨论”能力。它用于绿地项目架构发现和已有项目长期路线规划，先通过多轮第一性原理追问、只读调研、架构映射和模块 drilldown 沉淀讨论包，再显式转换为普通 `/hw:plan` / Feature Queue 输入。
 
-## Project Shape
+## Product Shape
 
-- Project type: CLI/workflow orchestration framework
-- Primary deliverable: behavior specs, Skill instructions, tests, prompts, and documentation updates
-- Target platform: Codex, OpenCode, Claude Code adapters
-- Expected users: 使用 `/hw:*` 管理长期工程 Cycle 的中文用户和多 Agent 工作流用户
+- Primary entry: `/hw:plan:deep`
+- Alias: `/hw:plan --deep`
+- Core operations: `new`, `ask`, `research`, `map`, `drill`, `readiness`, `convert`
+- Durable package root: `.pipeline/deep-plans/DPxxx-slug/`
+- Ordinary Plan handoff: compact structured context, not raw long conversation
+- Not a replacement for `/hw:explore`: explore validates ideas in isolated worktrees; deep planning shapes requirements and architecture before experiments.
 
 ## Functional Requirements
 
-1. 所有 `SKILL.md` 使用中文主体骨架，保留命令名、路径、配置键、状态字段和专业英文术语。
-2. 行为相关 `references/*.md` 作为独立 Milestone 中文化，避免 Skill 与 spec 语义漂移。
-3. Subagent prompt 必须采用两层注入：host/orchestrator 层先生成 `compact_rules_summary`、authorization state、role boundary 和 out-of-scope stop rule；每个 Subagent 任务层再注入 `user_requested_checks`、Milestone 审计字段、evidence requirements 和 output artifact。
-4. 自动化授权支持长期白名单，按 `safe_local`、`stateful_local`、`external` 三档管理。
-5. 用户可见回复采用“结论 / 解释 / 下一步”的强 schema；复杂完成态必须包含手动操作说明、已知风险和验证方式。
-6. 长时间执行的中间更新必须说明正在做什么、发现了什么、下一步是什么。
-7. `/hw:plan` 必须问审计/验证问题，并把用户例子抽象为泛化需求后确认。
+1. Deep planning has a lightweight lifecycle and durable discussion package.
+2. A package may contain multiple parallel tracks.
+3. Track model is mixed: requirement/theme tracks first, then architecture-derived module tracks.
+4. Architecture has machine-readable source data and human-readable Mermaid/Markdown rendering.
+5. `ask` challenges unclear requirements from first principles: necessity, minimum viable loop, falsifying evidence, and essential-vs-habitual requirements. It must not default to asking “who is the user”.
+6. `research` is local read-only by default and records evidence refs, findings, unknowns, and boundaries.
+   - When the user asks to research or reference an external work, Deep Plan should support an explicit research-code path: after the required remote/network confirmation, download or clone the source into a bounded research cache, inspect the implementation rather than only the README, and record code evidence refs in the discussion package.
+7. `drill` explicitly focuses on a named module or topic and updates only scoped cards/tracks.
+8. `readiness` supports depth levels:
+   - `directional`: direction and question map may be enough; blanks are allowed.
+   - `architecture-ready`: requirements, core components, relationships, and key risks are clear.
+   - `implementation-ready`: requirements, architecture, module cards, test matrix, risk handling, and acceptance depth are complete enough for Feature Queue / Milestone planning.
+9. `convert` is an explicit, auditable boundary from discussion state into ordinary Plan context.
 
-## Testing Expectations
+## Validation Contract
 
-- Contract tests for response schemas, status/report/explain/cycle completion output, Plan audit fields, example abstraction, automation whitelist behavior, and Subagent prompt injection.
-- Scenario checks covering Skill/reference Chinese skeleton preservation and command semantics.
-- Full regression: core tests, config validation, Python scenario regression, and diff whitespace check.
+- Automated: `uv run -- node --test core/test/deep-plan*.test.js core/test/progressive-discover.test.js core/test/batch-plan.test.js core/test/commands-rules-artifacts.test.js`
+- Regression: `uv run python tests/run_regression.py`
+- Manual: use deep planning to plan Hypo-Agent again from an unclear high-level request; pass only when Feature Queue order, acceptance depth, risks, and unresolved items are visible before ordinary Plan.
+- Manual research-code check: ask Deep Plan to research a referenced external project and confirm it reads downloaded source implementation evidence, not only README-level summaries.
+- Audit must reject pseudo-deep plans that only add static docs or shallow fixtures without proving multi-round challenge, readiness depth, and conversion handoff behavior.
 
 ## Milestone Strategy
 
-- Proposed milestone count: 8
-- Expected preset: tdd
-- Rationale: first establish behavior contracts, then update planning/authorization/Subagent mechanics, then convert Skill/reference content in controlled groups, then run regression.
+1. M0: Deep Plan contract, command entry, lifecycle.
+2. M1: Durable discussion package model.
+3. M2: First-principles ask engine and shallow-plan rejection.
+4. M3: Local read-only research evidence flow.
+5. M4: Requirement tracks, architecture map, and human rendering.
+6. M5: Drill, readiness depth, and convert gate.
+7. M6: Skills, commands, adapters, and status/docs integration.
+8. M7: Feature Queue handoff and ordinary Plan integration.
+9. M8: Real scenario validation, regression, and release readiness.
 
 ## Audit Requirements
 

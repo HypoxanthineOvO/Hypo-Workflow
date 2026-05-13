@@ -1,55 +1,20 @@
-cycle_id: C11
-cycles:
-  - id: C11
-    status: completed
-    updated_at: "2026-05-11T14:55:25+08:00"
-    token_count: telemetry_unavailable
-    cost: telemetry_unavailable
-    currency: telemetry_unavailable
+cycle_id: C12
+updated_at: "2026-05-12T21:52:52+08:00"
 features:
-  - id: F001
-    title: Workflow 体验契约治理
-    status: done
-    token_count: telemetry_unavailable
-    cost: telemetry_unavailable
+  total: 1
+  done: 0
+  active: 0
+  pending: 1
 milestones:
-  - id: M0
-    feature_id: F001
-    status: done
-    token_count: telemetry_unavailable
-    cost: telemetry_unavailable
-  - id: M1
-    feature_id: F001
-    status: done
-    token_count: telemetry_unavailable
-    cost: telemetry_unavailable
-  - id: M2
-    feature_id: F001
-    status: done
-    token_count: telemetry_unavailable
-    cost: telemetry_unavailable
-  - id: M3
-    feature_id: F001
-    status: done
-    token_count: telemetry_unavailable
-    cost: telemetry_unavailable
-  - id: M4
-    feature_id: F001
-    status: done
-    token_count: telemetry_unavailable
-    cost: telemetry_unavailable
-  - id: M5
-    feature_id: F001
-    status: done
-    token_count: telemetry_unavailable
-    cost: telemetry_unavailable
-  - id: M6
-    feature_id: F001
-    status: done
-    token_count: telemetry_unavailable
-    cost: telemetry_unavailable
-  - id: M7
-    feature_id: F001
-    status: done
-    token_count: telemetry_unavailable
-    cost: telemetry_unavailable
+  total: 9
+  done: 0
+  active: 0
+  pending: 9
+validation:
+  required:
+    - deep-plan focused node tests
+    - full regression scenario suite
+    - config validation
+    - sync check
+    - diff check
+    - Hypo-Agent manual planning playbook

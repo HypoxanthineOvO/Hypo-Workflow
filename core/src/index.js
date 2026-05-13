@@ -32,6 +32,7 @@ export * from "./audit-memory/index.js";
 export * from "./patches/index.js";
 export * from "./pr/index.js";
 export * from "./explore/index.js";
+export * from "./deep-plan/index.js";
 export * from "./explain/index.js";
 export * from "./sync/index.js";
 export * from "./guide/index.js";

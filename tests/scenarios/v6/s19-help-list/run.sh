@@ -12,9 +12,9 @@ count="$(awk '
   in_table && /^Internal runtime skill:/ {print c; exit}
 ' SKILL.md)"
 
-test "$count" = "39"
-rg -q '39 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups' references/commands-spec.md
-rg -q 'lists all 39 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility' references/commands-spec.md
+test "$count" = "40"
+rg -q 'V12 canonical namespace contains user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups' references/commands-spec.md
+rg -q 'lists all 40 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility' references/commands-spec.md
 rg -q '\| `/hw:cycle` \|' SKILL.md
 rg -q '\| `/hw:accept` \|' SKILL.md
 rg -q '\| `/hw:reject` \|' SKILL.md
@@ -30,6 +30,7 @@ rg -q '\| `/hw:guide` \|' SKILL.md
 rg -q '\| `/hw:showcase` \|' SKILL.md
 rg -q '\| `/hw:rules` \|' SKILL.md
 rg -q '\| `/hw:plan:extend` \|' SKILL.md
+rg -q '\| `/hw:plan:deep` \|' SKILL.md
 rg -q '^## 命令概览$' README.md
 rg -q '\| Pipeline \|' README.md
 rg -q '\| Plan \|' README.md

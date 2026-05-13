@@ -6,10 +6,11 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { commandByCanonical, commandMap, loadRulesSummary, writeOpenCodeArtifacts } from "../src/index.js";
 
-test("commandMap contains 39 OpenCode mappings", () => {
+test("commandMap contains 40 OpenCode mappings", () => {
   const commands = commandMap("opencode");
-  assert.equal(commands.length, 39);
+  assert.equal(commands.length, 40);
   assert.equal(commandByCanonical("/hw:plan").opencode, "/hw-plan");
+  assert.equal(commandByCanonical("/hw:plan:deep").opencode, "/hw-plan-deep");
   assert.equal(commandByCanonical("/hw:report").agent, "hw-report");
   assert.equal(commandByCanonical("/hw:compact").agent, "hw-compact");
   assert.equal(commandByCanonical("/hw:debug").agent, "hw-debug");

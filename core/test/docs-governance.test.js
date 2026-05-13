@@ -14,7 +14,7 @@ import {
 } from "../src/index.js";
 
 test("docs command is exposed and mapped to OpenCode", async () => {
-  assert.equal(commandMap("opencode").length, 39);
+  assert.equal(commandMap("opencode").length, 40);
   assert.equal(commandByCanonical("/hw:docs").opencode, "/hw-docs");
   assert.equal(commandByCanonical("/hw:docs").agent, "hw-docs");
   assert.equal(commandByCanonical("/hw:docs").skill, "skills/docs/SKILL.md");
@@ -90,7 +90,7 @@ test("docs repair writes docs IA and generated references without silently rewri
   assert.ok(result.generated.includes("docs/en/platforms/opencode.md"));
   assert.ok(result.managed_blocks.includes("command-count"));
   assert.match(await readFile(join(root, "README.md"), "utf8"), /Manual README/);
-  assert.match(await readFile(join(root, "README.md"), "utf8"), /39 个用户指令/);
+  assert.match(await readFile(join(root, "README.md"), "utf8"), /40 个用户指令/);
   assert.match(await readFile(join(root, "README.en.md"), "utf8"), /docs\/en\/user-guide\.md/);
   assert.match(await readFile(join(root, "README.en.md"), "utf8"), /docs\/en\/platforms\/opencode\.md/);
   assert.match(await readFile(join(root, "docs/en/user-guide.md"), "utf8"), /\/hw:pr create/);
@@ -168,7 +168,7 @@ test("v12.5.1 release coverage is Chinese-first and linked from entrypoints", as
   const readme = await readFile("README.md", "utf8");
   const englishReadme = await readFile("README.en.md", "utf8");
 
-  for (const item of ["Claude Code", "/hw:resume", "claude-hw-command-namespace", "437/437", "commands/*.md"]) {
+  for (const item of ["Claude Code", "/hw:resume", "/hw:plan:deep", "claude-hw-command-namespace", "490/490", "commands/*.md"]) {
     assert.match(chineseRelease, new RegExp(escapeRegExp(item)), `Chinese release note missing ${item}`);
     assert.match(englishRelease, new RegExp(escapeRegExp(item)), `mirror release note missing ${item}`);
   }

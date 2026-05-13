@@ -7,6 +7,10 @@ This file is generated from structured Rules/Habits authority. Edit structured r
 - **auto-continue-threshold** [builtin/warn/workflow]
   - Govern automatic continuation decisions after evaluation.
   - hooks: on-evaluate
+- **claude-hw-command-namespace** [project/error/workflow]
+  - Claude Code integration must expose Hypo-Workflow commands through the `hw` plugin namespace as `/hw:*` slash commands while keeping Claude native `/resume` separate from Hypo `/hw:resume`.
+  - hooks: always, pre-commit, pre-release
+  - source: .pipeline/rules/structured/project/claude-hw-command-namespace.yaml
 - **config-valid** [builtin/warn/guard]
   - Validate project configuration before milestone execution.
   - hooks: pre-milestone

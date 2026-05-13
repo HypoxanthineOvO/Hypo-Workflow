@@ -15,6 +15,8 @@ description: Enter Hypo-Workflow planning mode when the user wants to design mil
 
 Use this skill for the full P1-P4 planning flow.
 
+The ordinary `/hw:plan` command keeps the full P1-P4 planning flow. If the user passes `--deep`, route to `/hw:plan:deep` before ordinary decomposition. The `--deep` alias starts a Deep Plan discussion package and must not skip P1-P4; after Deep Plan `convert`, ordinary `/hw:plan` still runs P0 Configure, P1 Discover, P2 Decompose, P3 Generate, and P4 Confirm.
+
 Before P1 Discover, run or confirm `P0 Configure` for a new Cycle unless the current Cycle already has a configure decision. `P0 Configure` runs after `cycle new` and before `P1 Discover`; it asks about automation, Subagent authorization, acceptance mode, PR/MR remote write confirmation, full regression, analysis boundaries, and worker separation. Users may reuse prior settings, resolved in the order `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default`, and the reuse must leave an auditable note or `.plan-state/p0-configure.yaml`.
 
 Without `--batch`, preserve the existing single-feature P1-P4 flow. The ordinary `/hw:plan` command still runs one Discover interview, one Decompose checkpoint, one Generate phase, and one Confirm gate.

@@ -11,6 +11,8 @@ Skill: `skills/plan/SKILL.md`
 
 Load the corresponding Hypo-Workflow skill instructions from `skills/plan/SKILL.md`, then execute `/hw:plan` semantics with any user-provided arguments.
 
+If the user provides `--deep`, route to `/hw:plan:deep` as an alias before ordinary decomposition. Ordinary `/hw:plan` keeps the full P1-P4 gates and must not skip P1-P4 because of Deep Plan context or conversion output.
+
 Before acting, inspect the relevant context when present:
 
 - `.pipeline/config.yaml`
