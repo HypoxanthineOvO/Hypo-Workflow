@@ -79,7 +79,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | 查看报告 | `/hw:report` |
 | 带证据解释代码/配置/改动 | `/hw:explain "为什么这样设计"` |
 | 小修复不进完整 Milestone | `/hw:patch` / `/hw:patch fix P001` |
-| 处理已有 PR/MR | `/hw:pr inspect|review|fix|merge|close <url|id>` |
+| 处理已有 PR/MR | `/hw:pr inspect|review|fix|merge|close` |
 | 创建 PR/MR | `/hw:pr create` / `/hw:pr create --from-worktree` / `/hw:pr create --plan` |
 | 修复派生上下文 | `/hw:sync --repair` |
 | 检查或修复文档 | `/hw:docs check` / `/hw:docs repair` |
