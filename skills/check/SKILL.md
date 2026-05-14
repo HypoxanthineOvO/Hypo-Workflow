@@ -13,30 +13,30 @@ description: Run a health check over config, state, prompts, and architecture wh
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill for the seven-surface health check.
+使用此技能进行七层健康检查。
 
-## 前置条件
+## Prerequisites
 
-- if `.pipeline/` is missing, instruct the user to run init first
+- 如果 `.pipeline/` 缺失，指示用户先运行 init
 
-## 执行流程
+## Steps
 
-1. Read `~/.hypo-workflow/config.yaml` if present and warn if it is malformed.
-2. Resolve `output.language` and `output.timezone`.
-3. Run the checks from `references/check-spec.md` plus built-in quality helpers:
+1. 读取 `~/.hypo-workflow/config.yaml`（如果存在），如果格式错误则发出警告。
+2. 解析 `output.language` 和 `output.timezone`。
+3. 运行 `references/check-spec.md` 中的检查以及内置质量助手：
    - Config
    - Pipeline
    - State
    - Prompts
    - Notion
    - Architecture
-   - Skill quality via `checkSkillQuality`
-  - Execution lease: parse `.pipeline/.lock` when present, report fresh/stale/malformed status, and show repair guidance for malformed leases.
-4. Print `✅`, `⚠️`, or `❌` for each surface.
-5. Summarize overall health, effective config source, and recommended next action in `output.language`.
-6. Set `current.phase=lifecycle_check` when tracking this command through state.
+   - 通过 `checkSkillQuality` 检查技能质量
+   - 执行租约：解析 `.pipeline/.lock`（如果存在），报告 fresh/stale/malformed 状态，并显示格式错误租约的修复指导。
+4. 为每层打印 `✅`、`⚠️` 或 `❌`。
+5. 使用 `output.language` 总结整体健康状况、有效配置源和建议的下一步操作。
+6. 当通过状态跟踪此命令时，设置 `current.phase=lifecycle_check`。
 
-## 参考文件
+## References
 
 - `references/check-spec.md`
 - `references/commands-spec.md`

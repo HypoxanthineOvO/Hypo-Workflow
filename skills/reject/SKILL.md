@@ -4,7 +4,7 @@ description: Reject pending Hypo-Workflow Cycle work with structured feedback an
 ---
 
 # /hw:reject
-## 输出语言规则
+## Output Language Rules
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,30 +15,30 @@ description: Reject pending Hypo-Workflow Cycle work with structured feedback an
 
 Use this skill when the user invokes `/hw:reject`.
 
-## 语义
+## Semantics
 
-- Read `.pipeline/cycle.yaml` and `.pipeline/state.yaml`.
-- Require Cycle acceptance state `pending_acceptance` or `acceptance.state: pending`.
-- Parse the user feedback as plain text unless a structured file is supplied.
-- Write full feedback to `.pipeline/acceptance/cycle-C{N}-rejection-<timestamp>.yaml`.
-- Mark `cycle.status: active`.
-- Mark `cycle.acceptance.state: rejected`, `rejected_at`, and `feedback_ref`.
-- Mirror only compact acceptance state in `state.yaml`:
+- 读取 `.pipeline/cycle.yaml` 和 `.pipeline/state.yaml`。
+- 要求 Cycle 验收状态为 `pending_acceptance` 或 `acceptance.state: pending`。
+- 除非提供结构化文件，否则将用户反馈解析为纯文本。
+- 将完整反馈写入 `.pipeline/acceptance/cycle-C{N}-rejection-<timestamp>.yaml`。
+- 标记 `cycle.status: active`。
+- 标记 `cycle.acceptance.state: rejected`、`rejected_at` 和 `feedback_ref`。
+- 在 `state.yaml` 中仅镜像紧凑的验收状态：
   - `acceptance.scope: cycle`
   - `acceptance.state: rejected`
   - `acceptance.cycle_id`
   - `acceptance.feedback_ref`
   - `acceptance.updated_at`
-- Set `pipeline.status: running`.
-- By default, route rejection through `cycle.lifecycle_policy.reject.default_action=needs_revision`:
-  - set `current.phase: needs_revision`
-  - set `current.step: revise`
-  - preserve `acceptance.feedback_ref` as revision input
-  - status next action is `resume_revision`
-- Only use `current.phase: executing` when the Cycle policy explicitly chooses a non-revision reject action.
-- Use the workflow commit helper so authoritative rejection facts commit atomically before derived refreshes.
-- Append a `cycle_reject` entry to `.pipeline/log.yaml` through the derived refresh path.
-- Update `.pipeline/PROGRESS.md` with a compact board row through the derived refresh path.
-- If a derived refresh fails after authority commits, keep the rejection facts, write `.pipeline/derived-refresh.yaml`, and surface a warning with repair guidance.
+- 设置 `pipeline.status: running`。
+- 默认情况下，通过 `cycle.lifecycle_policy.reject.default_action=needs_revision` 路由拒绝：
+  - 设置 `current.phase: needs_revision`
+  - 设置 `current.step: revise`
+  - 保留 `acceptance.feedback_ref` 作为修订输入
+  - 状态下一个动作是 `resume_revision`
+- 仅当 Cycle 策略明确选择非修订拒绝操作时，才使用 `current.phase: executing`。
+- 使用工作流提交助手，以便权威拒绝事实在派生刷新之前原子提交。
+- 通过派生刷新路径将 `cycle_reject` 条目追加到 `.pipeline/log.yaml`。
+- 通过派生刷新路径用紧凑的板行更新 `.pipeline/PROGRESS.md`。
+- 如果权威提交后派生刷新失败，请保留拒绝事实，写入 `.pipeline/derived-refresh.yaml`，并显示带有修复指导的警告。
 
-Never store full rejection feedback in `state.yaml`; use `feedback_ref`.
+切勿在 `state.yaml` 中存储完整的拒绝反馈；使用 `feedback_ref`。

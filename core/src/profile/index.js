@@ -85,17 +85,23 @@ export const CONFIGURATION_PROFILE_DEFAULTS = Object.freeze({
           release_publish: "confirm",
         },
       },
+      execution: {
+        bash: {
+          mode: "allow_local",
+          confirm_external: true,
+          confirm_destructive: true,
+          confirm_system_install: true,
+        },
+        worker_separation: {
+          mode: "recommended",
+        },
+      },
       evaluation: {
         auto_continue: true,
       },
       batch: {
         auto_chain: true,
         default_gate: "auto",
-      },
-      execution: {
-        worker_separation: {
-          mode: "recommended",
-        },
       },
     },
     cycle_gates: CONFIRM_HIGH_RISK_GATES,

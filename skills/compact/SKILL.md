@@ -13,15 +13,15 @@ description: Generate compact context views for large Hypo-Workflow runtime file
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill when the user invokes `/hw:compact` or `/hypo-workflow:compact`.
+当用户调用 `/hw:compact` 或 `/hypo-workflow:compact` 时使用此技能。
 
-Compact files are derived context views. They reduce SessionStart context size while keeping the source files unchanged.
+Compact 文件是派生的上下文视图。它们减少 SessionStart 上下文大小，同时保持源文件不变。
 
-Compact output is recovery and index context. Agents must restart from stable prompt/design artifacts such as `.pipeline/prompts/*.md`, `.pipeline/design-spec.md`, `.pipeline/design-concepts.yaml`, `.pipeline/glossary.md`, and durable Knowledge indexes. Compact summaries are not design authority and must not replace those stable artifacts when making implementation decisions.
+Compact 输出是恢复和索引上下文。Agent 必须从稳定的 prompt/设计产物重新开始，例如 `.pipeline/prompts/*.md`、`.pipeline/design-spec.md`、`.pipeline/design-concepts.yaml`、`.pipeline/glossary.md` 和持久的 Knowledge 索引。Compact 摘要不是设计权威，在做出实现决策时不得替代这些稳定产物。
 
-## 路径
+## Paths
 
-All compact files are written next to their source files:
+所有 compact 文件写入其源文件旁边：
 
 - `.pipeline/PROGRESS.compact.md`
 - `.pipeline/state.compact.yaml`
@@ -30,11 +30,11 @@ All compact files are written next to their source files:
 - `.pipeline/patches.compact.md`
 - `.pipeline/knowledge/knowledge.compact.md`
 
-Never delete or rewrite the original files while generating compact views.
+在生成 compact 视图时，永远不要删除或重写原始文件。
 
-## 配置
+## Config
 
-Resolve `compact.*` from project config > global config > defaults:
+从项目配置 > 全局配置 > 默认值解析 `compact.*`：
 
 ```yaml
 compact:
@@ -47,59 +47,59 @@ compact:
   reports_summary_lines: 3
 ```
 
-If config is missing, use these defaults.
+如果配置缺失，使用这些默认值。
 
-## 指令
+## Commands
 
-Supported form:
+支持的形式：
 
 - `/hw:compact`
 
-## 执行流程
+## Steps
 
-1. Read `~/.hypo-workflow/config.yaml` if present.
-2. Read `.pipeline/config.yaml` if present.
-3. Resolve `output.language`, `output.timezone`, and `compact.*`.
-4. Scan `.pipeline/` for compressible source files.
-5. Generate a `.compact` file only when the source file exists.
-6. Report the number of files generated and estimated token savings, for example `已生成 4 个 .compact 文件，预计节省 ~92% context token`.
+1. 读取 `~/.hypo-workflow/config.yaml`（如果存在）。
+2. 读取 `.pipeline/config.yaml`（如果存在）。
+3. 解析 `output.language`、`output.timezone` 和 `compact.*`。
+4. 扫描 `.pipeline/` 中可压缩的源文件。
+5. 仅在源文件存在时生成 `.compact` 文件。
+6. 报告生成的文件数量和预计的 token 节省，例如 `已生成 4 个 .compact 文件，预计节省 ~92% context token`。
 
 ## Compact 策略
 
 ### `PROGRESS.compact.md`
 
-Source: `.pipeline/PROGRESS.md`
+源文件：`.pipeline/PROGRESS.md`
 
-Keep:
+保留：
 
-- the current Cycle header or current status block when present
-- the most recent `compact.progress_recent` progress entries; default `15`
-- one summary line per archived Cycle, extracted from `.pipeline/archives/*/summary.md`
+- 当前 Cycle 标题或当前状态块（如果存在）
+- 最近的 `compact.progress_recent` 个进度条目；默认 `15`
+- 每个已归档 Cycle 一行摘要，从 `.pipeline/archives/*/summary.md` 提取
 
-Do not include full archived progress files.
+不包含完整的已归档进度文件。
 
 ### `state.compact.yaml`
 
-Source: `.pipeline/state.yaml`
+源文件：`.pipeline/state.yaml`
 
-Keep:
+保留：
 
-- `pipeline` and `current` sections completely
-- `last_heartbeat` when present
-- the latest `compact.state_history_full` completed milestones in full; default `1`
-- older `history.completed_prompts` entries reduced to `{prompt, status, score_summary}`
-- current `milestones` list with names and statuses
+- 完整的 `pipeline` 和 `current` 部分
+- `last_heartbeat`（如果存在）
+- 最新的 `compact.state_history_full` 个已完成的 milestone 完整内容；默认 `1`
+- 较旧的 `history.completed_prompts` 条目简化为 `{prompt, status, score_summary}`
+- 当前 `milestones` 列表，包含名称和状态
 
-`state.compact.yaml` is read-only context and must not be used as the canonical state file for mutations.
+`state.compact.yaml` 是只读上下文，不得用作变更的规范状态文件。
 
 ### `log.compact.yaml`
 
-Source: `.pipeline/log.yaml`
+源文件：`.pipeline/log.yaml`
 
-Keep:
+保留：
 
-- the latest `compact.log_recent` lifecycle events in full; default `20`
-- older events compressed into:
+- 最新的 `compact.log_recent` 个生命周期事件完整内容；默认 `20`
+- 较旧的事件压缩为：
 
 ```yaml
 older:
@@ -111,68 +111,68 @@ older:
 
 ### `reports.compact.md`
 
-Source: `.pipeline/reports/`
+源文件：`.pipeline/reports/`
 
-For each historical report, extract at most `compact.reports_summary_lines` lines; default `3`.
+对于每个历史报告，最多提取 `compact.reports_summary_lines` 行；默认 `3`。
 
-Prefer these facts when present:
+优先保留以下事实（如果存在）：
 
-- final conclusion or decision
-- evaluation scores
-- key change summary
+- 最终结论或决策
+- 评估分数
+- 关键变更摘要
 
-Skip the current Milestone report so SessionStart can load it in full when it exists.
+跳过当前 Milestone 报告，以便 SessionStart 在其存在时可以完整加载。
 
 ### `patches.compact.md`
 
-Source: `.pipeline/patches/P*.md`
+源文件：`.pipeline/patches/P*.md`
 
-Include only closed Patches. For each closed Patch, keep:
+仅包含已关闭的 Patch。对于每个已关闭的 Patch，保留：
 
 - Patch ID
-- title
-- one-line change summary or commit hash
+- 标题
+- 一行变更摘要或 commit hash
 
-Open Patch files remain loaded separately in full by SessionStart.
+打开的 Patch 文件仍由 SessionStart 单独完整加载。
 
 ### `knowledge.compact.md`
 
-Source: `.pipeline/knowledge/records/*.yaml` plus generated category indexes.
+源文件：`.pipeline/knowledge/records/*.yaml` 加上生成的类别索引。
 
-Keep:
+保留：
 
-- recent durable decisions
-- reusable pitfalls
-- important dependencies
-- config notes
-- redacted secret refs
+- 最近的持久决策
+- 可重用的陷阱
+- 重要的依赖关系
+- 配置说明
+- 脱敏的密钥引用
 
-Full raw knowledge records are not loaded by default. SessionStart loads `.pipeline/knowledge/knowledge.compact.md` and `.pipeline/knowledge/index/*.yaml` only.
+默认不加载完整的原始知识记录。SessionStart 仅加载 `.pipeline/knowledge/knowledge.compact.md` 和 `.pipeline/knowledge/index/*.yaml`。
 
 ## 自动生成
 
-When `compact.auto: true`:
+当 `compact.auto: true` 时：
 
-- regenerate dirty compact views after `/hw:start` or `/hw:resume` finishes successfully, after validation, report, state, log, and progress updates have all passed
-- do not compact repeatedly during ordinary step execution; keep full authoritative files available while development and validation are still in progress
-- regenerate `.pipeline/knowledge/knowledge.compact.md` when Knowledge Ledger records or indexes changed
-- regenerate compact views during `/hw:cycle close` before or immediately after archive summary generation
+- 在 `/hw:start` 或 `/hw:resume` 成功完成后，在验证、报告、状态、日志和进度更新都通过后重新生成脏的 compact 视图
+- 在普通步骤执行期间不要重复 compact；在开发和验证仍在进行时保持完整的权威文件可用
+- 当 Knowledge Ledger 记录或索引更改时重新生成 `.pipeline/knowledge/knowledge.compact.md`
+- 在 `/hw:cycle close` 期间，在归档摘要生成之前或之后立即重新生成 compact 视图
 
-When `compact.auto: false`, do not generate compact files unless the user explicitly invokes `/hw:compact`.
+当 `compact.auto: false` 时，除非用户明确调用 `/hw:compact`，否则不生成 compact 文件。
 
-End-of-run automatic compact is dirty-only: refresh only compact targets whose full authoritative sources are newer or whose compact target is missing. Each refreshed compact target must be regenerated from the full source file or source directory, never from the previous `.compact` output.
+运行结束时的自动 compact 仅处理脏数据：仅刷新完整权威源更新或 compact 目标缺失的 compact 目标。每个刷新的 compact 目标必须从完整源文件或源目录重新生成，永远不要从之前的 `.compact` 输出生成。
 
-`compact.refresh_policy=always` may be used by explicit maintenance commands when a full derived rebuild is desired. The default end-of-run policy is `dirty_only`.
+`compact.refresh_policy=always` 可用于明确的维护命令，当需要完整的派生重建时。默认的运行结束策略是 `dirty_only`。
 
 ## Git 跟踪
 
-Compact files are derived artifacts. `.gitignore` must include `*.compact.*` so they are not tracked.
+Compact 文件是派生产物。`.gitignore` 必须包含 `*.compact.*`，以便不被跟踪。
 
-## 参考文件
+## References
 
-- `hooks/session-start.sh` — compact-first context loading
-- `skills/status/SKILL.md` — `--full` status behavior
-- `skills/log/SKILL.md` — `--full` log behavior
-- `skills/report/SKILL.md` — report summary and `--view`
-- `references/config-spec.md` — config defaults
-- `SKILL.md` — root command routing
+- `hooks/session-start.sh` — compact-first 上下文加载
+- `skills/status/SKILL.md` — `--full` 状态行为
+- `skills/log/SKILL.md` — `--full` 日志行为
+- `skills/report/SKILL.md` — 报告摘要和 `--view`
+- `references/config-spec.md` — 配置默认值
+- `SKILL.md` — 根命令路由

@@ -13,7 +13,7 @@ description: Show the full Hypo-Workflow command map when the user needs a quick
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill to explain the 40 user-facing Hypo-Workflow commands and the internal watchdog skill.
+使用此技能来解释 40 个面向用户的 Hypo-Workflow 命令和内部 watchdog 技能。
 
 ## 指令分组
 
@@ -30,26 +30,26 @@ Use this skill to explain the 40 user-facing Hypo-Workflow commands and the inte
 - Utility:
   - `sync`, `docs`, `compact`, `knowledge`, `guide`, `showcase`, `rules`, `help`, `reset`, `log`, `setup`, `explore`
 - Internal:
-  - `watchdog` (cron-only; hidden from normal quick help unless explicitly requested)
+  - `watchdog`（仅 cron；除非明确请求，否则对正常快速帮助隐藏）
 
 ## 执行流程
 
-1. By default, list all 40 user-facing commands grouped by category.
-2. For a specific command, explain:
-   - when to use it
-   - required inputs or flags
-   - reference files
-3. Mention that `/hypo-workflow:setup` creates `~/.hypo-workflow/config.yaml` and that project config overrides global defaults.
-4. Include a short subagent hint:
-   - Codex Subagents are Codex/GPT runtime workers and must not be described as Claude, DeepSeek, Mimo, or other external model routing
-   - Claude Code and other non-Codex platforms may use their own native delegation surfaces when configured
-   - mixed mode can delegate individual steps through `step_overrides` only within the current platform's supported boundary
-5. Mention that Codex still uses the root `SKILL.md` and `/hw:*` compatibility path.
-6. Include `/hw:cycle`, `/hw:patch`, `/hw:patch fix`, `/hw:compact`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, and `/hw:plan:extend` in normal help output.
-7. Mention `/hw:watchdog` only when the user asks about watchdog or auto resume internals.
+1. 默认情况下，按类别分组列出所有 40 个面向用户的命令。
+2. 对于特定命令，解释：
+   - 何时使用它
+   - 所需的输入或标志
+   - 参考文件
+3. 提及 `/hypo-workflow:setup` 创建 `~/.hypo-workflow/config.yaml`，并且项目配置覆盖全局默认值。
+4. 包含简短的 subagent 提示：
+   - Codex Subagents 是 Codex/GPT 运行时工作者，不得被描述为 Claude、DeepSeek、Mimo 或其他外部模型路由
+   - Claude Code 和其他非 Codex 平台在配置时可以使用它们自己的原生委派表面
+   - 混合模式只能在当前平台支持的边界内通过 `step_overrides` 委派单个步骤
+5. 提及 Codex 仍然使用根 `SKILL.md` 和 `/hw:*` 兼容性路径。
+6. 在正常帮助输出中包含 `/hw:cycle`、`/hw:patch`、`/hw:patch fix`、`/hw:compact`、`/hw:guide`、`/hw:showcase`、`/hw:rules` 和 `/hw:plan:extend`。
+7. 仅在用户询问 watchdog 或自动恢复内部机制时提及 `/hw:watchdog`。
 
 ## 参考文件
 
-- `SKILL.md` — full command list and system context
-- `references/commands-spec.md` — parsing details
-- `references/config-spec.md` — global config and subagent fallback rules
+- `SKILL.md` — 完整命令列表和系统上下文
+- `references/commands-spec.md` — 解析细节
+- `references/config-spec.md` — 全局配置和 subagent 回退规则

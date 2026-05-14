@@ -12,7 +12,7 @@ import {
 
 const metadata = {
   name: "hypo-workflow",
-  version: "12.5.1",
+  version: "12.5.2",
   commandMap: [
   {
     "canonical": "/hw:start",
@@ -319,6 +319,13 @@ const autoContinue = {
   mode: "safe",
 };
 
+const bashExecution = {
+  "mode": "allow_local",
+  "confirm_external": true,
+  "confirm_destructive": true,
+  "confirm_system_install": true
+};
+
 const server = async ({ client }) => {
   const log = createLogger(client);
   return {
@@ -346,7 +353,7 @@ const server = async ({ client }) => {
       log("tool.execute.after heartbeat bridge");
     },
     "permission.ask": async (input, output) => {
-      const permission = decideOpenCodePermission({ args: input?.args || input?.input || input });
+      const permission = decideOpenCodePermission({ ...(input || {}), args: input?.args || input?.input || input, bash: bashExecution });
       output.status = permission.status;
       recordPermissionEvent("permission.ask", { ...input, decision: permission.status }, log);
     },

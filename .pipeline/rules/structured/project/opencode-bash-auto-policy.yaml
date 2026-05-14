@@ -1,0 +1,32 @@
+id: opencode-bash-auto-policy
+scope: project
+label: guard
+severity: error
+hooks:
+  - always
+  - pre-commit
+  - pre-release
+source:
+  captured_from: chat
+  author: user
+  date: 2026-05-14
+content:
+  instruction: "OpenCode execution auto-approval must be represented through Hypo-Workflow `execution.bash.mode=allow_local`; generated `opencode.json` must stay schema-compatible and must not use `permission: bypass` or `permission.*: bypass`."
+  rationale: "OpenCode 1.14.30 rejects `bypass` as a permission value, which prevents project config, commands, plugins, and TUI panels from loading. Local bash auto-execution belongs in the Hypo policy/plugin layer while external, destructive, release, and system-install actions remain Ask-gated."
+  examples:
+    good:
+      - "opencode.json keeps `*: ask`, `edit: ask`, `bash: ask`, and `question: allow`."
+      - ".opencode/hypo-workflow.json records `execution_bash.mode: allow_local`."
+      - "The OpenCode plugin auto-allows local test/build/lint commands and asks for git push, curl/wget, remote clone, publish, rm -rf, reset --hard, and system installs."
+    bad:
+      - "writing `bypass` under `permission` in opencode.json"
+      - "using `--dangerously-skip-permissions` as a persisted project default"
+      - "auto-approving remote writes, destructive commands, release publish, or system dependency installation"
+enforcement:
+  check_kind: checklist
+  evidence_required: true
+  checklist:
+    - "Run `opencode debug config` in an OpenCode project; it must parse successfully."
+    - "Inspect generated `opencode.json`; it must not contain `bypass`."
+    - "Verify `execution_bash.mode` is present in `.opencode/hypo-workflow.json` when OpenCode artifacts are regenerated."
+    - "Verify bash policy tests cover local allow plus external/destructive/system-install Ask gates."

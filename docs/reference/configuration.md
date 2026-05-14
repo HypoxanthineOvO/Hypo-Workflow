@@ -20,6 +20,7 @@
 | `automation.gates.execution` | `auto` | 普通 Milestone 可自动推进 | strict review 仍可阻塞 | 仅适用于普通本地执行 |
 | `automation.gates.destructive_external` | `confirm` | 破坏性或外部副作用不可自动执行 | 所有 profile 都保持确认 | destructive commands、external side effects |
 | `automation.gates.release_publish` | `confirm` | release publish 不自动执行 | release/tag/push 前确认 | tag、push、publish |
+| `execution.bash.mode` | `allow_local` | 本地 bash 执行默认放行 | 不能写成 OpenCode `bypass` | external/destructive/system install 仍确认 |
 | `cycle.lifecycle_policy.gates.high_risk` | `confirm` | 当前 Cycle 的高风险动作 gate | 高风险动作不得因 auto_continue 放开 | PR/MR remote write、plugin install、user-level config write |
 | `cycle.lifecycle_policy.gates.pr_remote_write` | `confirm` | PR/MR 写远端需要确认 | 比普通 execution 更严格 | push、merge、close、reviewer/label/target branch 写入 |
 | `cycle.lifecycle_policy.gates.plugin_install` | `confirm` | 插件安装需要确认 | user-level 或 remote install 不自动 | Claude/Codex/OpenCode plugin install |
@@ -42,6 +43,8 @@
 ## P0 Configure 与 Subagent 授权
 
 `P0 Configure` 是每个新 Cycle 在 `P1 Discover` 前的配置阶段。用户可以重新选择，也可以明确沿用上一轮或项目/全局默认。该阶段覆盖 automation、Subagent authorization、acceptance、PR/MR remote write、full regression、analysis boundaries 和 worker separation，并把来源记录为 `cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config` 或 `built_in_default`。
+
+OpenCode 的 bash 自动继续通过 Hypo-Workflow policy 表达，不通过 OpenCode permission 非法值表达。项目可以使用 `execution.bash.mode: allow_local` 让测试、lint、build、format、sync、docs repair、`git status/diff/log` 和本地检索命令默认继续；`git push`、PR/MR 远端写、`curl/wget`、remote clone、publish、`rm -rf`、`git reset --hard`、系统级安装和 release publish 仍必须 Ask。生成的 `opencode.json` 应显式保留 `*: ask`、`bash: ask`、`edit: ask`、`question: allow`，只能使用 OpenCode 原生 `ask`/`allow`/`deny`，不得写入 `bypass`。
 
 strict worker separation 要求 implementation Subagent 与 test/review/audit 角色隔离。implementation worker 不读取 test source、fixtures、snapshots 或 assertion details；它只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若宿主平台不能提供这种隔离，必须在执行前说明 degraded mode，获得 explicit user confirmation，并记录 role isolation degradation。
 
@@ -99,6 +102,11 @@ batch:
   auto_chain: true
   default_gate: auto
 execution:
+  bash:
+    mode: allow_local
+    confirm_external: true
+    confirm_destructive: true
+    confirm_system_install: true
   worker_separation:
     mode: recommended
 cycle:

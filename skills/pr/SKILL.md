@@ -5,58 +5,58 @@ description: Manage GitHub PRs or GitLab MRs through a local Change Request arch
 
 # /hypo-workflow:pr
 
-## 输出语言规则
+## Output Language Rules
 
-Read `.pipeline/config.yaml` and global config when available. User-facing explanations, archive summaries, and confirmation prompts should follow `output.language`; command names, provider names, config keys, and file names stay literal.
+读取 `.pipeline/config.yaml` 和全局配置（如果可用）。面向用户的说明、存档摘要和确认提示应遵循 `output.language`；命令名称、提供商名称、配置键和文件名保持原样。
 
-## 前置条件
+## Prerequisites
 
-- A project-local `.pipeline/` workspace should exist.
-- Input should be an existing GitHub Pull Request URL, GitLab Merge Request URL, a local archive id under `.pipeline/pr/`, or `/hw:pr create` with guided creation details.
-- Do not require live GitHub/GitLab access for tests or local archive creation.
+- 项目本地的 `.pipeline/` 工作区应已存在。
+- 输入应为现有的 GitHub Pull Request URL、GitLab Merge Request URL、`.pipeline/pr/` 下的本地存档 ID，或 `/hw:pr create` 的引导创建详情。
+- 测试或本地存档创建不需要实时的 GitHub/GitLab 访问。
 
-## 执行流程
+## Execution Flow
 
-1. Load `references/pr-spec.md` for the Change Request contract.
-2. Parse the subcommand: `inspect`, `review`, `fix`, `merge`, `close`, or `create`.
-3. Normalize GitHub PR / GitLab MR terminology into a Change Request record.
-4. Create or reuse `.pipeline/pr/PR-YYYYMMDD-NNN/`.
-5. Write local evidence to `request.yaml`, `summary.md`, `review-notes.md`, `changes.md`, `decisions.yaml`, and `evidence/`.
-6. For `inspect`, read metadata, diff, comments, and checks, then write `summary.md` plus redacted evidence.
-7. For `review`, use inspect evidence to write `review-notes.md` with findings, failed checks, risky files, comments, unknowns, and human merge advice.
-8. For `fix`, keep local changes traceable in `changes.md`, record tests, and mark push as confirmation-required.
-9. For `merge`, check CI/checks, approvals, conflicts, mergeability, target branch, and archive evidence; write a proposal and stop for confirmation.
-10. For `close`, require a close reason, write it to `decisions.yaml`, and stop for confirmation.
-11. For `create`, guide the user through one of three modes:
-   - `/hw:pr create`: ask whether local worktree changes already exist.
-   - `/hw:pr create --from-worktree`: inspect local changes, file scope, `.pipeline/` path policy, branch, commit, target branch, title/body, reviewer, and labels.
-   - `/hw:pr create --plan`: hand off to `/hw:plan`, then return to `/hw:pr create --from-worktree` after implementation and validation.
-12. Before any create remote write, show a single confirmation summary that lists push branch, create pull request / merge request, reviewer writes, label writes, and target branch writes.
+1. 加载 `references/pr-spec.md` 以获取 Change Request 契约。
+2. 解析子命令：`inspect`、`review`、`fix`、`merge`、`close` 或 `create`。
+3. 将 GitHub PR / GitLab MR 术语规范化为 Change Request 记录。
+4. 创建或重用 `.pipeline/pr/PR-YYYYMMDD-NNN/`。
+5. 将本地证据写入 `request.yaml`、`summary.md`、`review-notes.md`、`changes.md`、`decisions.yaml` 和 `evidence/`。
+6. 对于 `inspect`，读取元数据、diff、评论和检查，然后写入 `summary.md` 加上编辑后的证据。
+7. 对于 `review`，使用检查证据写入 `review-notes.md`，包含发现、失败的检查、风险文件、评论、未知项和人工合并建议。
+8. 对于 `fix`，在 `changes.md` 中保持本地更改可追溯，记录测试，并将推送标记为需要确认。
+9. 对于 `merge`，检查 CI/检查、批准、冲突、可合并性、目标分支和存档证据；写入提案并停止等待确认。
+10. 对于 `close`，需要关闭原因，将其写入 `decisions.yaml`，并停止等待确认。
+11. 对于 `create`，引导用户通过以下三种模式之一：
+   - `/hw:pr create`：询问本地工作树更改是否已存在。
+   - `/hw:pr create --from-worktree`：检查本地更改、文件范围、`.pipeline/` 路径策略、分支、提交、目标分支、标题/正文、审查者和标签。
+   - `/hw:pr create --plan`：移交给 `/hw:plan`，然后在实现和验证后返回到 `/hw:pr create --from-worktree`。
+12. 在任何创建远程写入之前，显示一个确认摘要，列出推送分支、创建 Pull Request / Merge Request、审查者写入、标签写入和目标分支写入。
 
-## 交互行为
+## Interaction Behavior
 
-- Ask for the PR/MR URL or archive id if missing.
-- Ask before live network reads unless the current analysis/network boundary already permits them.
-- Always ask before push, create, merge, close, reviewer/label writes, or target branch writes.
+- 如果缺少 PR/MR URL 或存档 ID，请询问。
+- 在实时网络读取之前询问，除非当前分析/网络边界已允许。
+- 在推送、创建、合并、关闭、审查者/标签写入或目标分支写入之前始终询问。
 
-## 安全规则
+## Safety Rules
 
-- `/hw:pr` is not an auto-merge bot.
-- `.pipeline/pr/` is local evidence, not the remote source of truth.
-- `inspect` and `review` may write local archive files but must not write remote platform state.
-- PR/MR payloads must not include `.pipeline/` runtime/generated files by default. Treat `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, `.pipeline/log.yaml`, `.pipeline/PROGRESS.md`, `.pipeline/prompts/**`, `.pipeline/reports/**`, `.pipeline/archives/**`, compact views, and derived health as blocking unless the user explicitly asks for a workflow-state migration. `.pipeline/pr/**` is allowed as a local Change Request archive exception.
-- Remote writes are high-risk gates and require explicit user confirmation.
-- Redact secrets before writing evidence or lifecycle logs.
-- `/hw:pr create` may create a local proposal archive before confirmation, but provider write methods must not run until the user confirms the full remote write summary.
+- `/hw:pr` 不是自动合并机器人。
+- `.pipeline/pr/` 是本地证据，不是远程真实来源。
+- `inspect` 和 `review` 可以写入本地存档文件，但不能写入远程平台状态。
+- PR/MR 载荷默认不得包含 `.pipeline/` 运行时/生成的文件。将 `.pipeline/state.yaml`、`.pipeline/cycle.yaml`、`.pipeline/log.yaml`、`.pipeline/PROGRESS.md`、`.pipeline/prompts/**`、`.pipeline/reports/**`、`.pipeline/archives/**`、紧凑视图和派生健康视为阻塞，除非用户明确要求工作流状态迁移。`.pipeline/pr/**` 作为本地 Change Request 存档例外被允许。
+- 远程写入是高风险门控，需要明确的用户确认。
+- 在写入证据或生命周期日志之前编辑密钥。
+- `/hw:pr create` 可以在确认之前创建本地方案存档，但在用户确认完整的远程写入摘要之前，提供商写入方法不得运行。
 
-## 失败处理
+## Failure Handling
 
-- Unsupported providers or malformed URLs should stop with a clear error.
-- Missing local archive ids should list nearby `.pipeline/pr/` candidates when possible.
-- If CI/checks, approvals, or mergeability are unknown, say they are unknown instead of guessing.
-- If evidence contains secret markers that cannot be redacted safely, stop and ask for sanitized input.
+- 不支持的提供商或格式错误的 URL 应停止并显示清晰的错误。
+- 缺少的本地存档 ID 应尽可能列出附近的 `.pipeline/pr/` 候选项。
+- 如果 CI/检查、批准或可合并性未知，则说明未知而不是猜测。
+- 如果证据包含无法安全编辑的密钥标记，请停止并要求提供清理后的输入。
 
-## 参考文件
+## Reference Files
 
 - `references/pr-spec.md`
 - `references/commands-spec.md`

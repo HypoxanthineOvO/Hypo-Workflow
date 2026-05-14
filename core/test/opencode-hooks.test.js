@@ -5,7 +5,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   collectOpenCodeToolPaths,
+  classifyOpenCodeBashCommand,
   decideOpenCodePermission,
+  evaluateOpenCodeBashPolicy,
   evaluateOpenCodeFileGuard,
   isOpenCodeStopEquivalent,
   serializeOpenCodePermissionEvent,
@@ -37,6 +39,9 @@ test("OpenCode permission and auto-continue policies are conservative by default
   assert.equal(decideOpenCodePermission({ args: { path: ".pipeline/state.yaml" } }).status, "deny");
   assert.equal(decideOpenCodePermission({ args: { path: ".pipeline/knowledge/index/decisions.yaml" } }).status, "allow");
   assert.equal(decideOpenCodePermission({ args: { path: ".pipeline/config.yaml" } }).status, "ask");
+  assert.equal(decideOpenCodePermission({ permission: "bash", args: { command: "uv run node --test core/test/config.test.js" } }).status, "allow");
+  assert.equal(decideOpenCodePermission({ permission: "bash", args: { command: "git push origin main" } }).status, "ask");
+  assert.equal(decideOpenCodePermission({ permission: "bash", args: { command: "rm -rf .pipeline" } }).status, "ask");
 
   assert.equal(shouldOpenCodeAutoContinue({ mode: "ask", testsPassed: true }), false);
   assert.equal(shouldOpenCodeAutoContinue({ mode: "safe", testsPassed: true, errorRules: false, interactiveGateOpen: false, protectedFileDirty: false }), true);
@@ -46,6 +51,20 @@ test("OpenCode permission and auto-continue policies are conservative by default
 
   assert.equal(isOpenCodeStopEquivalent({ status: "idle", unfinishedMilestones: 0, missingReport: false, stepRunning: false }), true);
   assert.equal(isOpenCodeStopEquivalent({ status: "idle", unfinishedMilestones: 1, missingReport: false, stepRunning: false }), false);
+});
+
+test("OpenCode bash policy allows local execution but gates external, destructive, and system commands", () => {
+  assert.equal(classifyOpenCodeBashCommand("uv run pytest"), "local");
+  assert.equal(classifyOpenCodeBashCommand("git status --short"), "local");
+  assert.equal(classifyOpenCodeBashCommand("git push origin main"), "external");
+  assert.equal(classifyOpenCodeBashCommand("curl https://example.com"), "external");
+  assert.equal(classifyOpenCodeBashCommand("sudo apt install ripgrep"), "system_install");
+  assert.equal(classifyOpenCodeBashCommand("git reset --hard HEAD"), "destructive");
+
+  assert.equal(evaluateOpenCodeBashPolicy({ permission: "bash", args: { command: "npm test" } }).status, "allow");
+  assert.equal(evaluateOpenCodeBashPolicy({ permission: "bash", args: { command: "npm publish" } }).status, "ask");
+  assert.equal(evaluateOpenCodeBashPolicy({ permission: "bash", args: { command: "uv run node --test" }, bash: { mode: "ask" } }).status, "ask");
+  assert.equal(evaluateOpenCodeBashPolicy({ permission: "bash" }).status, "ask");
 });
 
 test("OpenCode permission events serialize without leaking secret values", () => {
@@ -77,9 +96,11 @@ test("generated OpenCode plugin imports runtime hook policy helpers", async () =
 
     assert.match(plugin, /from "\.\.\/runtime\/hypo-workflow-hooks\.js"/);
     assert.match(plugin, /decideOpenCodePermission/);
+    assert.match(plugin, /const bashExecution =/);
     assert.match(plugin, /output\.status = permission\.status/);
     assert.match(plugin, /isOpenCodeStopEquivalent/);
     assert.match(runtime, /export function evaluateOpenCodeFileGuard/);
+    assert.match(runtime, /export function evaluateOpenCodeBashPolicy/);
     assert.match(runtime, /export function shouldOpenCodeAutoContinue/);
   } finally {
     await rm(dir, { recursive: true, force: true });

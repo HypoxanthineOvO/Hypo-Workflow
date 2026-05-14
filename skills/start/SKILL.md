@@ -13,152 +13,152 @@ description: Start Hypo-Workflow execution when the user wants to begin running 
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill to start execution from a local `.pipeline/` workspace. This is the platform-specific entrypoint for the same behavior described by the root `SKILL.md` `/hw:start` command.
+使用此技能从本地 `.pipeline/` 工作区启动执行。这是根 `SKILL.md` `/hw:start` 命令描述的相同行为的平台特定入口点。
 
 ## 前置条件
 
-- `.pipeline/config.yaml` exists and should be validated before mutating state
-- prompt files exist under the configured prompts directory
-- if `.pipeline/state.yaml` already contains unfinished work, resume it unless the user explicitly asks for a clean restart
+- `.pipeline/config.yaml` 存在，并且在变更状态之前应进行验证
+- 提示文件存在于配置的提示目录下
+- 如果 `.pipeline/state.yaml` 已包含未完成的工作，除非用户明确要求干净重启，否则恢复它
 
 ## 执行流程
 
-1. Read `~/.hypo-workflow/config.yaml` if present.
-2. Read `.pipeline/config.yaml`, normalize defaults, and validate it against `config.schema.yaml`.
-3. Resolve effective config as project > global > defaults:
-   - `execution.mode` falls back to global `execution.default_mode`, then `self`
-   - `execution.subagent_tool` falls back to global `subagent.provider`, then `auto`
-   - `dashboard.*` and `plan.*` use the same priority when relevant
-4. Read `.pipeline/state.yaml` if present; otherwise initialize state from `assets/state-init.yaml`.
-5. Read `.pipeline/continuation.yaml` when present. If it has `status: active`, prefer its `next_action`, `reason`, and `safe_resume_command` before falling back to generic `current.*` state.
-6. Read `.pipeline/cycle.yaml` when present and derive Cycle behavior from `cycle.workflow_kind` and `cycle.lifecycle_policy`.
-7. Default step preset from workflow kind when no explicit compatible preset exists: `build -> tdd`, `analysis -> analysis`, `showcase -> implement-only`.
-8. If `watchdog.enabled=true`, register the project watchdog cron entry before long-running execution begins.
-9. Create a structured execution lease at `.pipeline/.lock` before entering active execution. The lease must include platform, session id, owner, command, phase, created_at, heartbeat_at, expires_at, workflow kind, cycle id, and handoff_allowed.
-10. Set `current.phase=executing` and update top-level `last_heartbeat` with an ISO-8601 timestamp before running milestones.
-11. Use the workflow commit helper for any protected lifecycle write so authority facts commit atomically before derived refreshes.
-12. Treat the main agent as the orchestrator:
-   - the main agent coordinates the current step
-   - the main agent delegates concrete sub-work to serial Subagent tasks when appropriate
-   - Codex should prefer Codex Subagents for substantial work when available, without external model routing
-   - when worker separation is `off`, testing/review and implementation should still be separated when practical; when `recommended` or `strict`, follow the mandatory role ownership below
-   - the main agent verifies results, updates state, logging, and progress artifacts
-13. Before role-sensitive worker-separated work begins, resolve platform-specific Subagent/delegation authorization:
-   - on Codex, if the host requires explicit authorization before spawning Subagents, Ask before starting `write_tests`, `review_tests`, `implement`, `review_code`, or audit-like validation workers
-   - when `execution.worker_separation.mode` is `recommended` or `strict`, `write_tests` and `review_tests` belong to the independent `test` worker; the main agent must not write red tests locally first and then ask a subworker to review them
-   - when `execution.worker_separation.mode` is `recommended` or `strict`, `implement` belongs to the independent implementation worker; the main agent must not implement locally first and then ask a subworker to review or certify it
-   - on Codex, plan-time authorization is valid only when its saved scope explicitly includes `/hw:start` or execution/start-resume roles
-   - on Codex, if authorization is absent or declined and worker separation is `recommended` or `strict`, stop before role-sensitive work unless the generated plan explicitly selected the fastest single-agent `execution.worker_separation.mode=off` lane with user-confirmed downgrade evidence
-   - on Codex, if the plan selected fast/off mode, continue locally only after that explicit downgrade confirmation is present, and record that worker-separation gates are intentionally disabled for speed
-   - on Claude Code and OpenCode, no extra subworker authorization gate is required; use the configured backend/agents, with Claude Code honoring the saved `subcodex` or `subclaude` choice
-   - every spawned worker prompt must declare role-specific explicit scope: default spawned workers may edit only `.pipeline/` files and explicitly scoped root-level non-project documentation such as `README.md`, `CHANGELOG.md`, and `PROJECT-SUMMARY.md`; `test` may edit only named test/fixture/snapshot/assertion paths in its explicit scope; `implement` may edit only named production/runtime/documentation paths in its explicit scope; `audit` is read-only
-   - `test` worker owns reproduction, red tests, validation commands, fixtures, snapshots, assertions, and test evidence before implementation begins
-   - `implement` worker owns only production/runtime/documentation implementation; it must not create, edit, or rewrite tests, fixtures, snapshots, assertions, or validation evidence, and it must not spawn or impersonate `test` or `audit`
-   - if a worker needs to touch an out-of-scope path, stop that worker and report the path and owning role; do not let the worker edit first and explain later
-   - spawned workers must not revert or overwrite another worker's changes unless that exact action is explicitly authorized in the worker prompt scope
-   - do not perform the work locally first and explain missing independent worker evidence afterward
-   - record every worker lifecycle as `requested`, `started`, `completed|failed|blocked`, and `closed|close_failed`; wait for the worker whose evidence gates the next step, then close/release it when its result is integrated
-   - when `/hw:start` stops, blocks, aborts, or completes, close/release any workers it opened or record `close_failed` with the worker id and reason
-14. Execute the active milestone serially:
-   - `write_tests`
-   - `review_tests`
-   - `run_tests_red`
-   - `implement`
-   - `run_tests_green`
-   - `review_code`
-   - report and commit work if the prompt requires it
-15. For review stages, create or reference secret-safe artifacts under `.pipeline/reviews/<feature>/<milestone>/<stage>/`:
-   - validate `verdict` and non-empty `reviewed_refs`
-   - record checked/unchecked rules, issues, retry round, and fallback reason when applicable
-   - retry `needs_changes` through repair/review up to 3 total rounds by default
-   - when strict review policy blocks a verdict, stop continuation and summarize the artifact path
-   - for Skill/artifact coverage reviews, record checked/skipped evidence for Skills, hooks, agents, commands, and generated adapter surfaces
-16. After every meaningful step, update:
-   - `.pipeline/state.yaml`
-- `.pipeline/log.yaml`
-- `.pipeline/PROGRESS.md`
-- top-level `last_heartbeat`
-17. Before declaring a milestone complete, run the Codex preflight/runtime checklist when platform is Codex or hooks are unavailable: protected authority writes, YAML/JSON/Markdown validity, stale derived artifacts, README freshness, output language, secret markers, and report/progress/log evidence.
-18. During execution, do not compact after every step. Track which compact source files changed (`PROGRESS.md`, `state.yaml`, `log.yaml`, `metrics.yaml`, `reports/`, `patches/`, and Knowledge records) while keeping full authoritative files available for development and validation. After the complete `/hw:start` run has finished successfully and validation/report/state updates have all passed, run end-of-run dirty-only compact refresh when `compact.auto=true` and `compact.end_of_run=true`; default `compact.refresh_policy=dirty_only`.
-19. If `.pipeline/feature-queue.yaml` exists, apply batch auto-chain after a Feature's final Milestone passes:
-   - mark the completed Feature `done`
-   - advance to the next queued Feature when `auto_chain=true`
-   - pause before the next Feature when it has `gate: confirm`
-   - when the next Feature uses `just_in_time`, decompose its Milestones before starting execution
-   - sync queue metric summaries from `.pipeline/metrics.yaml`, using `n/a` when token/cost telemetry is unavailable
-20. When `execution.test_profiles` or Feature-level Test Profiles are active, require the matching profile evidence before declaring GREEN:
-   - `webapp`: E2E + browser interaction + visual evidence
-   - `agent-service`: CLI plan + shared core + real CLI run
-   - `research`: baseline + script execution + before/after/delta
-21. When `execution.worker_separation.mode` is `recommended` or `strict`, resolve implement/test/audit role coverage before acceptance:
-   - start distinct workers for `test`, `implement`, and `audit` only after authorization is resolved
-   - `write_tests` and `review_tests` are steps owned by the `test` worker, and that worker must be distinct from the `implement` worker for non-trivial changes
-   - implementation Subagent workers must not read test source, fixtures, snapshots, or assertion details; provide only requirements, public interfaces, allowed edit scope, test command, pass/fail status, and sanitized failure summary
-   - the main agent may integrate returned changes and resolve conflicts, but it must not be the primary `test`, `implement`, or `audit` worker when worker separation is enabled
-   - if `implement` and `test` collapse onto one worker identity, `recommended` must block; objective subworker-unavailable evidence may justify `retry`, `deferred`, `stop`, or an explicit user-confirmed downgrade to `off`, but it must not count as accepted worker-separated completion
-   - in `recommended`, `audit` may degrade with explicit evidence when subworker capability is unavailable
-   - `strict` must not treat degraded execution as fully accepted
-   - incomplete, missing, or `close_failed` worker lifecycle evidence blocks worker-separated completion until repaired or explicitly downgraded where policy allows
-22. On failure, the main agent must choose one of:
-   - `retry`: revise instructions and rerun the failed step
-   - `deferred`: mark the milestone deferred if downstream work can continue safely
-   - `stop`: stop and surface the blocking reason to the user
-23. If a derived refresh fails after authority commits, keep the authoritative fact committed, write `.pipeline/derived-refresh.yaml`, and surface repair guidance instead of rolling back the lifecycle write.
-24. If a Feature fails and the resolved `failure_policy=skip_defer`, mark the Feature `deferred`, preserve its report and metrics, then auto-chain to the next queued Feature unless blocked by `gate: confirm`.
-25. Keep moving automatically between milestones while unfinished work remains.
-26. Before any natural turn end with unfinished work, write or refresh `.pipeline/continuation.yaml` with `status: active`, `next_action`, `reason`, `updated_at`, `safe_resume_command: /hw:resume`, and focused `context`.
-27. Remove `.pipeline/.lock` when the execution turn completes, stops, blocks, aborts, or finishes.
-28. If the pipeline completes or stops intentionally, unregister the watchdog cron entry.
-29. Only allow the turn to end naturally when all milestones are complete or the main agent has explicitly chosen the `stop` outcome.
+1. 如果存在，读取 `~/.hypo-workflow/config.yaml`。
+2. 读取 `.pipeline/config.yaml`，规范化默认值，并根据 `config.schema.yaml` 验证它。
+3. 将有效配置解析为 project > global > defaults：
+   - `execution.mode` 回退到全局 `execution.default_mode`，然后 `self`
+   - `execution.subagent_tool` 回退到全局 `subagent.provider`，然后 `auto`
+   - `dashboard.*` 和 `plan.*` 在相关时使用相同的优先级
+4. 如果存在，读取 `.pipeline/state.yaml`；否则从 `assets/state-init.yaml` 初始化状态。
+5. 如果存在，读取 `.pipeline/continuation.yaml`。如果其 `status: active`，在回退到通用 `current.*` 状态之前，优先选择其 `next_action`、`reason` 和 `safe_resume_command`。
+6. 如果存在，读取 `.pipeline/cycle.yaml`，并从 `cycle.workflow_kind` 和 `cycle.lifecycle_policy` 派生 Cycle 行为。
+7. 当没有明确兼容的预设存在时，从工作流类型默认步骤预设：`build -> tdd`、`analysis -> analysis`、`showcase -> implement-only`。
+8. 如果 `watchdog.enabled=true`，在长时间运行的执行开始之前注册项目 watchdog cron 条目。
+9. 在进入活动执行之前，在 `.pipeline/.lock` 创建结构化执行租约。租约必须包括平台、会话 ID、所有者、命令、阶段、created_at、heartbeat_at、expires_at、工作流类型、cycle ID 和 handoff_allowed。
+10. 设置 `current.phase=executing` 并在运行里程碑之前使用 ISO-8601 时间戳更新顶层 `last_heartbeat`。
+11. 对任何受保护的生命周期写入使用工作流提交助手，以便权威事实在派生刷新之前原子提交。
+12. 将主代理视为编排器：
+    - 主代理协调当前步骤
+    - 主代理在适当时将具体的子工作委托给串行 Subagent 任务
+    - Codex 应优先使用 Codex Subagents 进行实质性工作（如果可用），无需外部模型路由
+    - 当 Worker Separation 为 `off` 时，测试/审查和实现仍应在可行时分离；当为 `recommended` 或 `strict` 时，遵循以下强制角色所有权
+    - 主代理验证结果，更新状态、日志和进度工件
+13. 在角色敏感的 Worker Separation 工作开始之前，解析平台特定的 Subagent/委托授权：
+    - 在 Codex 上，如果主机在生成 Subagents 之前需要明确授权，在启动 `write_tests`、`review_tests`、`implement`、`review_code` 或类似审计的验证工作者之前询问
+    - 当 `execution.worker_separation.mode` 为 `recommended` 或 `strict` 时，`write_tests` 和 `review_tests` 属于独立的 `test` 工作者；主代理不得先在本地编写红色测试，然后要求子工作者审查
+    - 当 `execution.worker_separation.mode` 为 `recommended` 或 `strict` 时，`implement` 属于独立的实现工作者；主代理不得先在本地实现，然后要求子工作者审查或认证
+    - 在 Codex 上，计划时授权仅在其保存的范围明确包含 `/hw:start` 或执行/启动-恢复角色时有效
+    - 在 Codex 上，如果授权缺失或被拒绝，且 Worker Separation 为 `recommended` 或 `strict`，在角色敏感工作之前停止，除非生成的计划明确选择了用户确认降级证据的最快单代理 `execution.worker_separation.mode=off` 通道
+    - 在 Codex 上，如果计划选择了快速/关闭模式，仅在该明确降级确认存在后继续在本地进行，并记录 Worker Separation 门控被有意禁用以提高速度
+    - 在 Claude Code 和 OpenCode 上，不需要额外的子工作者授权门控；使用配置的后端/代理，Claude Code 遵循保存的 `subcodex` 或 `subclaude` 选择
+    - 每个生成的工作者提示必须声明特定角色的明确范围：默认生成的工作者只能编辑 `.pipeline/` 文件和明确范围的根级非项目文档，如 `README.md`、`CHANGELOG.md` 和 `PROJECT-SUMMARY.md`；`test` 只能编辑其明确范围中的命名测试/夹具/快照/断言路径；`implement` 只能编辑其明确范围中的命名生产/运行时/文档路径；`audit` 是只读的
+    - `test` 工作者拥有复现、红色测试、验证命令、夹具、快照、断言和测试证据，然后才能开始实现
+    - `implement` 工作者仅拥有生产/运行时/文档实现；它不得创建、编辑或重写测试、夹具、快照、断言或验证证据，也不得生成或冒充 `test` 或 `audit`
+    - 如果工作者需要接触范围外的路径，停止该工作者并报告路径和拥有角色；不要让工作者先编辑再解释
+    - 生成的工作者不得恢复或覆盖另一个工作者的更改，除非该确切操作在工作者提示范围中被明确授权
+    - 不要先在本地执行工作，然后解释缺失的独立工作者证据
+    - 将每个工作者生命周期记录为 `requested`、`started`、`completed|failed|blocked` 和 `closed|close_failed`；等待其证据关卡下一步的工作者，然后在其结果集成后关闭/释放它
+    - 当 `/hw:start` 停止、阻塞、中止或完成时，关闭/释放它打开的任何工作者，或记录带有工作者 ID 和原因的 `close_failed`
+14. 串行执行活动的 Milestone：
+    - `write_tests`
+    - `review_tests`
+    - `run_tests_red`
+    - `implement`
+    - `run_tests_green`
+    - `review_code`
+    - 如果提示要求，报告并提交工作
+15. 对于审查阶段，在 `.pipeline/reviews/<feature>/<milestone>/<stage>/` 下创建或引用安全的秘密工件：
+    - 验证 `verdict` 和非空的 `reviewed_refs`
+    - 记录已检查/未检查的规则、问题、重试轮次和回退原因（如果适用）
+    - 通过修复/审查重试 `needs_changes`，默认最多 3 轮
+    - 当严格审查策略阻止裁决时，停止继续并总结工件路径
+    - 对于 Skill/工件覆盖审查，记录 Skills、hooks、代理、命令和生成的适配器表面的已检查/跳过证据
+16. 在每个有意义的步骤之后，更新：
+    - `.pipeline/state.yaml`
+    - `.pipeline/log.yaml`
+    - `.pipeline/PROGRESS.md`
+    - 顶层 `last_heartbeat`
+17. 在声明 Milestone 完成之前，当平台为 Codex 或钩子不可用时，运行 Codex 预检/运行时检查清单：受保护的权威写入、YAML/JSON/Markdown 有效性、过时的派生工件、README 新鲜度、输出语言、秘密标记和报告/进度/日志证据。
+18. 在执行期间，不要在每一步后压缩。跟踪哪些紧凑源文件发生了变化（`PROGRESS.md`、`state.yaml`、`log.yaml`、`metrics.yaml`、`reports/`、`patches/` 和 Knowledge 记录），同时保持完整的权威文件可用于开发和验证。在完整的 `/hw:start` 运行成功完成且验证/报告/状态更新全部通过后，当 `compact.auto=true` 和 `compact.end_of_run=true` 时，运行结束时仅脏压缩刷新；默认 `compact.refresh_policy=dirty_only`。
+19. 如果 `.pipeline/feature-queue.yaml` 存在，在 Feature 的最终 Milestone 通过后应用批量自动链：
+    - 将完成的 Feature 标记为 `done`
+    - 当 `auto_chain=true` 时，前进到下一个排队的 Feature
+    - 当下一个 Feature 有 `gate: confirm` 时，在下一个 Feature 之前暂停
+    - 当下一个 Feature 使用 `just_in_time` 时，在开始执行之前分解其 Milestones
+    - 从 `.pipeline/metrics.yaml` 同步队列指标摘要，当令牌/成本遥测不可用时使用 `n/a`
+20. 当 `execution.test_profiles` 或 Feature 级别的 Test Profiles 活动时，在声明 GREEN 之前要求匹配的配置文件证据：
+    - `webapp`：E2E + 浏览器交互 + 视觉证据
+    - `agent-service`：CLI 计划 + 共享核心 + 真实 CLI 运行
+    - `research`：基线 + 脚本执行 + 前后/差异
+21. 当 `execution.worker_separation.mode` 为 `recommended` 或 `strict` 时，在验收之前解析实现/测试/审计角色覆盖：
+    - 仅在授权解析后为 `test`、`implement` 和 `audit` 启动不同的工作者
+    - `write_tests` 和 `review_tests` 是 `test` 工作者拥有的步骤，对于非平凡更改，该工作者必须与 `implement` 工作者不同
+    - 实现 Subagent 工作者不得读取测试源、夹具、快照或断言详细信息；仅提供需求、公共接口、允许的编辑范围、测试命令、通过/失败状态和 sanitized 失败摘要
+    - 主代理可以集成返回的更改并解决冲突，但当 Worker Separation 启用时，它不得是主要的 `test`、`implement` 或 `audit` 工作者
+    - 如果 `implement` 和 `test` 坍缩到一个工作者身份上，`recommended` 必须阻塞；客观的子工作者不可用证据可能证明 `retry`、`deferred`、`stop` 或明确的用户确认降级到 `off` 是合理的，但它不得被视为已接受的 Worker Separation 完成
+    - 在 `recommended` 中，当子工作者能力不可用时，`audit` 可以带有明确证据降级
+    - `strict` 不得将降级的执行视为完全接受
+    - 不完整、缺失或 `close_failed` 的工作者生命周期证据会阻塞 Worker Separation 完成，直到修复或在策略允许的情况下明确降级
+22. 在失败时，主代理必须选择以下之一：
+    - `retry`：修订指令并重跑失败的步骤
+    - `deferred`：如果下游工作可以安全继续，将 Milestone 标记为延迟
+    - `stop`：停止并向用户显示阻塞原因
+23. 如果在权威提交后派生刷新失败，保持已提交的权威事实，写入 `.pipeline/derived-refresh.yaml`，并提供修复指导，而不是回滚生命周期写入。
+24. 如果 Feature 失败且解析的 `failure_policy=skip_defer`，将 Feature 标记为 `deferred`，保留其报告和指标，然后自动链到下一个排队的 Feature，除非被 `gate: confirm` 阻塞。
+25. 在未完成的工作剩余时，继续在 Milestones 之间自动移动。
+26. 在任何有未完成工作的自然轮次结束之前，写入或刷新 `.pipeline/continuation.yaml`，包含 `status: active`、`next_action`、`reason`、`updated_at`、`safe_resume_command: /hw:resume` 和聚焦的 `context`。
+27. 当执行轮次完成、停止、阻塞、中止或结束时，移除 `.pipeline/.lock`。
+28. 如果 pipeline 完成或有意停止，注销 watchdog cron 条目。
+29. 仅当所有 Milestones 完成或主代理明确选择了 `stop` 结果时，才允许轮次自然结束。
 
 ## 续跑与 Preflight
 
-- `.pipeline/continuation.yaml` is a recovery pointer for Codex turns and other environments without Stop hooks.
-- `safe_resume_command` must be `/hw:resume` or another documented natural-language resume alias, never a shell command.
-- `notify` may display the continuation `next_action`; it must not execute the resume command.
-- Preflight blocking checks: uncommitted protected authority writes, invalid authority YAML/JSON, secret markers, missing required report/progress/log evidence, malformed leases, and invalid resume pointers.
-- Preflight warning checks: stale derived artifacts, README freshness gaps, optional Codex notify absence, adapter staleness, and non-final output language mismatches.
+- `.pipeline/continuation.yaml` 是 Codex 轮次和其他没有 Stop 钩子的环境的恢复指针。
+- `safe_resume_command` 必须是 `/hw:resume` 或另一个记录的自然语言恢复别名，永远不是 shell 命令。
+- `notify` 可以显示 continuation `next_action`；它不得执行恢复命令。
+- Preflight 阻塞检查：未提交的受保护权威写入、无效的权威 YAML/JSON、秘密标记、缺失的必需报告/进度/日志证据、格式错误的租约和无效的恢复指针。
+- Preflight 警告检查：过时的派生工件、README 新鲜度差距、可选的 Codex 通知缺失、适配器过时和非最终输出语言不匹配。
 
 ## Watchdog 集成
 
-- resolve `watchdog.*` from project > global > defaults
-- when `watchdog.enabled=false`, do not register cron
-- when enabled, register `scripts/watchdog.sh <project-root>` with marker `# hypo-workflow-watchdog:<project-root>`
-- write `last_heartbeat` every time state is persisted during execution
-- create `.pipeline/.lock` as a structured lease before executing steps so watchdog cannot reenter a fresh run
-- update the lease heartbeat/expiry whenever `last_heartbeat` is persisted
-- remove `.pipeline/.lock` on all clean exits and blocking exits
-- stale lease takeover must log `lease_takeover`; platform failure hooks should record `reported_failure`, while heartbeat-only timeout records `inferred_stall`
+- 从 project > global > defaults 解析 `watchdog.*`
+- 当 `watchdog.enabled=false` 时，不注册 cron
+- 当启用时，注册 `scripts/watchdog.sh <project-root>`，标记为 `# hypo-workflow-watchdog:<project-root>`
+- 在执行期间每次持久化状态时写入 `last_heartbeat`
+- 在执行步骤之前创建 `.pipeline/.lock` 作为结构化租约，以便 watchdog 不能重新进入新运行
+- 每次持久化 `last_heartbeat` 时更新租约心跳/到期
+- 在所有干净退出和阻塞退出时移除 `.pipeline/.lock`
+- 过时的租约接管必须记录 `lease_takeover`；平台失败钩子应记录 `reported_failure`，而仅心跳超时记录 `inferred_stall`
 
 ## 失败处理
 
-- `retry` is allowed without a fixed numeric cap when the main agent believes another strategy can work
-- `deferred` requires writing `milestones[].status=deferred` and `deferred_reason`
-- `stop` should leave a clear reason in state, log, and progress summary
+- 当主代理相信另一个策略可以工作时，允许没有固定数字上限的 `retry`
+- `deferred` 需要写入 `milestones[].status=deferred` 和 `deferred_reason`
+- `stop` 应在状态、日志和进度摘要中留下明确的原因
 
 ## 进度跟踪
 
-- create `.pipeline/PROGRESS.md` if it does not exist
-- update current milestone status after every step
-- summarize recent activity and deferred items for human readers
+- 如果不存在，创建 `.pipeline/PROGRESS.md`
+- 在每个步骤之后更新当前 Milestone 状态
+- 为人类读者总结最近的活动和延迟项
 
 ## Template Language
 
-When loading report or TDD step templates, resolve `output.language` from project > global > defaults.
+当加载报告或 TDD 步骤模板时，从 project > global > defaults 解析 `output.language`。
 
-- `zh-CN` / `zh` -> load `templates/zh/...`
-- `en` / `en-US` -> load `templates/en/...`
-- any missing localized template -> fall back to root `templates/...`
+- `zh-CN` / `zh` -> 加载 `templates/zh/...`
+- `en` / `en-US` -> 加载 `templates/en/...`
+- 任何缺失的本地化模板 -> 回退到根 `templates/...`
 
-All user-visible report and PROGRESS prose must follow `output.language`. Internal `state.yaml` and `log.yaml` keys remain English.
+所有用户可见的报告和 PROGRESS 散文必须遵循 `output.language`。内部 `state.yaml` 和 `log.yaml` 键保持英文。
 
 ## 参考文件
 
-- `references/tdd-spec.md` — step sequencing and TDD rules
-- `references/evaluation-spec.md` — scoring and continuation gates
-- `references/state-contract.md` — required state fields, including `current.phase`
-- `references/progress-spec.md` — `PROGRESS.md` format and update timing
-- `references/review-artifacts-spec.md` — review artifact schema, retry policy, and coverage checklist
-- `references/commands-spec.md` — exact command semantics
-- `references/config-spec.md` — global/project config fallback rules
-- `SKILL.md` — full system reference if broader pipeline context is needed
+- `references/tdd-spec.md` — 步骤排序和 TDD 规则
+- `references/evaluation-spec.md` — 评分和继续门控
+- `references/state-contract.md` — 必需的状态字段，包括 `current.phase`
+- `references/progress-spec.md` — `PROGRESS.md` 格式和更新时机
+- `references/review-artifacts-spec.md` — 审查工件架构、重试策略和覆盖检查清单
+- `references/commands-spec.md` — 精确的命令语义
+- `references/config-spec.md` — 全局/项目配置回退规则
+- `SKILL.md` — 完整系统参考（如果需要更广泛的 pipeline 上下文）

@@ -101,13 +101,18 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
   assert.equal("plugin" in adapterConfig, false);
   assert.equal(config.compaction.auto, true);
   assert.equal(config.compaction.prune, true);
+  assert.equal(config.permission["*"], "ask");
+  assert.equal(config.permission.bash, "ask");
   assert.equal(config.compaction.effective_context_target, undefined);
   assert.equal(config.agents, undefined);
   assert.equal(metadata.autoContinue, true);
   assert.equal(metadata.auto_continue.mode, "safe");
+  assert.equal(metadata.execution_bash.mode, "allow_local");
+  assert.equal(metadata.execution_bash.confirm_external, true);
   assert.equal(metadata.compaction.effective_context_target, 900000);
   assert.equal(metadata.providers, undefined);
   assert.equal(config.provider, undefined);
+  assert.doesNotMatch(JSON.stringify(config), /bypass/);
   assert.equal(metadata.agents.test.model, "deepseek-v4-pro");
 });
 

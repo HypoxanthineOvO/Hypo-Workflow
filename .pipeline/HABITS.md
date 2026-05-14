@@ -26,6 +26,10 @@ This file is generated from structured Rules/Habits authority. Edit structured r
 - **knowledge-ledger-self-check** [builtin/warn/hook]
   - Require a Knowledge Ledger self-check after work that changes reusable project knowledge.
   - hooks: post-step, post-milestone
+- **opencode-bash-auto-policy** [project/error/guard]
+  - OpenCode execution auto-approval must be represented through Hypo-Workflow `execution.bash.mode=allow_local`; generated `opencode.json` must stay schema-compatible and must not use `permission: bypass` or `permission.*: bypass`.
+  - hooks: always, pre-commit, pre-release
+  - source: .pipeline/rules/structured/project/opencode-bash-auto-policy.yaml
 - **plan-tool-required** [builtin/warn/workflow]
   - Complex planning and execution work must maintain a visible plan/todo state.
   - hooks: always, pre-milestone

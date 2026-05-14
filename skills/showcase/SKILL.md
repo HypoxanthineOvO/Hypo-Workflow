@@ -5,9 +5,9 @@ description: "Generate a complete project showcase package for introduction docs
 
 # /hypo-workflow:showcase
 
-Use this skill when the user invokes `/hw:showcase` or `/hypo-workflow:showcase`.
+当用户调用 `/hw:showcase` 或 `/hypo-workflow:showcase` 时使用此技能。
 
-Showcase is a non-development preset that proves Hypo-Workflow can run structured AI work beyond code implementation. It generates project introduction material under `.pipeline/showcase/` and keeps the normal Pipeline state machine untouched.
+Showcase 是一个非开发预设，证明 Hypo-Workflow 可以运行超越代码实现的结构化 AI 工作。它在 `.pipeline/showcase/` 下生成项目介绍材料，并保持正常的 Pipeline 状态机不变。
 
 ## 输出语言规则
 
@@ -18,11 +18,11 @@ Showcase is a non-development preset that proves Hypo-Workflow can run structure
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Showcase artifacts must follow `showcase.language` when set. `showcase.language: auto` follows `output.language`.
+当设置时，Showcase 工件必须遵循 `showcase.language`。`showcase.language: auto` 遵循 `output.language`。
 
 ## 指令列表
 
-Supported forms:
+支持的形式：
 
 - `/hw:showcase`
 - `/hw:showcase --all`
@@ -46,29 +46,29 @@ sequence:
   - review
 ```
 
-Step meanings:
+步骤含义：
 
-- `analyze`: read the project and extract features, architecture, strengths, and statistics
-- `intro_doc`: generate `.pipeline/showcase/PROJECT-INTRO.md`
-- `tech_doc`: generate `.pipeline/showcase/TECHNICAL-DOC.md`
-- `slides`: generate `.pipeline/showcase/slides.md`
-- `poster`: call GPT Image API and write `.pipeline/showcase/poster.png`
-- `review`: validate completeness, accuracy, consistency, and language
+- `analyze`：读取项目并提取特性、架构、优势和统计信息
+- `intro_doc`：生成 `.pipeline/showcase/PROJECT-INTRO.md`
+- `tech_doc`：生成 `.pipeline/showcase/TECHNICAL-DOC.md`
+- `slides`：生成 `.pipeline/showcase/slides.md`
+- `poster`：调用 GPT Image API 并写入 `.pipeline/showcase/poster.png`
+- `review`：验证完整性、准确性、一致性和语言
 
-`analyze` always runs because every artifact depends on it. `review` always runs because Showcase is user-facing material.
+`analyze` 始终运行，因为每个工件都依赖它。`review` 始终运行，因为 Showcase 是面向用户的材料。
 
 ## 选择逻辑
 
-| Flags | Steps |
+| 标志 | 步骤 |
 |---|---|
-| none | interactive selection, then `analyze + selected steps + review` |
-| `--all` | all 6 steps |
+| 无 | 交互式选择，然后 `analyze + 选定步骤 + review` |
+| `--all` | 全部 6 个步骤 |
 | `--doc` | `analyze + intro_doc + tech_doc + review` |
 | `--slides` | `analyze + slides + review` |
 | `--poster` | `analyze + poster + review` |
-| combined flags | union of selected artifact steps, plus `analyze` and `review` |
+| 组合标志 | 选定工件步骤的并集，加上 `analyze` 和 `review` |
 
-When no selection flag is provided, ask and wait:
+当没有提供选择标志时，询问并等待：
 
 ```text
 🎨 Showcase — 本次要生成哪些物料？
@@ -81,50 +81,50 @@ When no selection flag is provided, ask and wait:
   输入编号（如 1,3,4）或回复「全部」：
 ```
 
-Do not auto-generate all artifacts in interactive mode. Wait for the user response before continuing.
+不要在交互模式下自动生成所有工件。在继续之前等待用户响应。
 
 ## 目录初始化
 
-Canonical directory:
+规范目录：
 
 - `.pipeline/showcase/`
 
-On first run:
+首次运行时：
 
-1. Create `.pipeline/showcase/`.
-2. Create `.pipeline/showcase/showcase.yaml` with `version: 1`.
-3. Run selected steps.
+1. 创建 `.pipeline/showcase/`。
+2. 创建 `.pipeline/showcase/showcase.yaml`，包含 `version: 1`。
+3. 运行选定的步骤。
 
-On later runs without `--new`:
+后续运行（没有 `--new`）时：
 
-1. Read existing `showcase.yaml`.
-2. Tell the user that selected artifacts will be overwritten.
-3. Keep unselected artifacts unchanged.
-4. Keep the same Showcase version.
-5. Update `last_run` and generated timestamps for overwritten artifacts.
+1. 读取现有的 `showcase.yaml`。
+2. 告诉用户选定的工件将被覆盖。
+3. 保持未选定的工件不变。
+4. 保持相同的 Showcase 版本。
+5. 更新被覆盖工件的 `last_run` 和生成时间戳。
 
-## Lifecycle: `--new`
+## Lifecycle：`--new`
 
-When `--new` is present:
+当存在 `--new` 时：
 
-1. Read current Showcase version `N`; default to `1` if missing.
-2. Move current artifacts into `.pipeline/showcase/history/v{N}/`.
-3. Increment version to `N+1`.
-4. Start from a clean artifact set.
-5. Run the selected steps.
+1. 读取当前 Showcase 版本 `N`；如果缺失则默认为 `1`。
+2. 将当前工件移至 `.pipeline/showcase/history/v{N}/`。
+3. 将版本递增到 `N+1`。
+4. 从干净的工件集开始。
+5. 运行选定的步骤。
 
-Archive these files when they exist:
+当存在时归档这些文件：
 
 - `PROJECT-INTRO.md`
 - `TECHNICAL-DOC.md`
 - `slides.md`
 - `poster.png`
 
-Preserve `.pipeline/showcase/history/`.
+保留 `.pipeline/showcase/history/`。
 
 ## `showcase.yaml`
 
-Use this shape:
+使用此形状：
 
 ```yaml
 showcase:
@@ -145,85 +145,85 @@ showcase:
       generated: "2026-04-29T19:10:00+08:00"
 ```
 
-Use ISO-8601 timestamps converted to `output.timezone`.
+使用转换为 `output.timezone` 的 ISO-8601 时间戳。
 
 ## Analyze 步骤
 
-Read project files in this priority:
+按此优先级读取项目文件：
 
-1. `README.md` (required)
-2. `.pipeline/config.yaml` or `config.yaml` for project name, preset, and command count when present
-3. `.pipeline/architecture.md` or `architecture.md` for architecture
-4. root `SKILL.md` for command and capability overview
-5. `src/` or main code directories for file tree and key modules
-6. `.pipeline/PROGRESS.md` for current progress
-7. `.pipeline/state.yaml` for current development state
-8. `.pipeline/archives/*/summary.md` for version history
+1. `README.md`（必需）
+2. `.pipeline/config.yaml` 或 `config.yaml` 用于项目名称、预设和命令计数（如果存在）
+3. `.pipeline/architecture.md` 或 `architecture.md` 用于架构
+4. 根 `SKILL.md` 用于命令和能力概述
+5. `src/` 或主要代码目录用于文件树和关键模块
+6. `.pipeline/PROGRESS.md` 用于当前进度
+7. `.pipeline/state.yaml` 用于当前开发状态
+8. `.pipeline/archives/*/summary.md` 用于版本历史
 
-Extract an in-memory summary only. Do not write an intermediate analyze file.
+仅提取内存中的摘要。不要写入中间分析文件。
 
-Summary fields:
+摘要字段：
 
-- project name and one-sentence description
-- core features, at most 10
-- tech stack: languages, frameworks, tools
-- differentiators, at most 5
-- statistics: command count, file count, code lines, tests, scenarios
-- version history from README, PROGRESS, or archives
+- 项目名称和一句话描述
+- 核心特性，最多 10 个
+- 技术栈：语言、框架、工具
+- 差异化因素，最多 5 个
+- 统计信息：命令计数、文件计数、代码行数、测试、场景
+- 来自 README、PROGRESS 或档案的版本历史
 
 ## `intro_doc` 步骤
 
-Write `.pipeline/showcase/PROJECT-INTRO.md` for non-developer users.
+为非开发人员用户写入 `.pipeline/showcase/PROJECT-INTRO.md`。
 
-Required structure:
+必需结构：
 
-- title and one-line tagline
-- problem solved: pain point -> solution
-- core highlights with concise emoji markers
-- quick start in 3-5 steps
-- version milestones
-- suitable use cases
+- 标题和一行标语
+- 解决的问题：痛点 -> 解决方案
+- 带有简洁表情符号标记的核心亮点
+- 3-5 步快速开始
+- 版本里程碑
+- 适用用例
 
-Style: concise, attractive, non-technical. Follow `output.language`.
+风格：简洁、有吸引力、非技术性。遵循 `output.language`。
 
 ## `tech_doc` 步骤
 
-Write `.pipeline/showcase/TECHNICAL-DOC.md` for developers and contributors.
+为开发人员和贡献者写入 `.pipeline/showcase/TECHNICAL-DOC.md`。
 
-Required structure:
+必需结构：
 
-- architecture overview with directory tree and module responsibilities
-- core design decisions and rationale
-- key data flow / state machine
-- compact API / command reference pointing to README for details
-- extension guide for adding a preset or adapter
-- tech stack and dependencies
+- 带有目录树和模块职责的架构概述
+- 核心设计决策和原理
+- 关键数据流/状态机
+- 指向 README 获取详细信息的紧凑 API/命令参考
+- 添加预设或适配器的扩展指南
+- 技术栈和依赖项
 
-Style: accurate, deep enough to be useful, and clearly structured. Follow `output.language`.
+风格：准确、足够深入以有用，并且结构清晰。遵循 `output.language`。
 
 ## `slides` 步骤
 
-Write `.pipeline/showcase/slides.md` as Markdown slides separated by `---`.
+将 `.pipeline/showcase/slides.md` 写入为由 `---` 分隔的 Markdown 幻灯片。
 
-Suggested pages:
+建议页面：
 
-1. title page with project name and tagline
-2. pain point / problem
-3. solution overview with a simple flow
-4. two to three core feature pages
-5. architecture diagram using Mermaid
-6. demo / usage flow
-7. version history / achievement data
-8. next steps / roadmap
-9. closing page with link/contact
+1. 带有项目名称和标语的标题页
+2. 痛点/问题
+3. 带有简单流程的解决方案概述
+4. 两到三个核心特性页面
+5. 使用 Mermaid 的架构图
+6. 演示/使用流程
+7. 版本历史/成就数据
+8. 下一步/路线图
+9. 带有链接/联系方式的结束页
 
-Each page should have one clear topic, a title, and 3-5 bullets or one short paragraph.
+每个页面应有一个清晰的主题、标题和 3-5 个要点或一个简短段落。
 
 ## `poster` 步骤
 
-Generate `.pipeline/showcase/poster.png` with GPT Image when available.
+当可用时使用 GPT Image 生成 `.pipeline/showcase/poster.png`。
 
-Resolve config:
+解析配置：
 
 ```yaml
 showcase:
@@ -235,53 +235,53 @@ showcase:
   language: auto
 ```
 
-Prompt strategy:
+提示策略：
 
-- emphasize project name
-- visualize core features with simple icon-like motifs
-- include technology labels only when they help
-- adapt style by project type:
-  - CLI/tooling: minimal technical poster
-  - Web/UI: modern product UI style
-  - library/framework: architecture-forward style
+- 强调项目名称
+- 用简单的图标状图案可视化核心特性
+- 仅在有帮助时包含技术标签
+- 按项目类型调整风格：
+  - CLI/工具：最小技术海报
+  - Web/UI：现代产品 UI 风格
+  - 库/框架：架构优先风格
 
-API options:
+API 选项：
 
-- use `curl` against `https://api.openai.com/v1/images/generations`, or
-- use Python OpenAI client when installed
+- 对 `https://api.openai.com/v1/images/generations` 使用 `curl`，或
+- 当安装时使用 Python OpenAI 客户端
 
-Failure handling:
+失败处理：
 
-- if the configured API key env var is missing, skip poster and say `⚠️ OPENAI_API_KEY 未设置，跳过海报生成` in Chinese or the equivalent in configured language
-- if API call fails, skip poster and continue other artifacts
-- poster failure must not fail the whole Showcase run
+- 如果配置的 API key 环境变量缺失，跳过海报并用中文说 `⚠️ OPENAI_API_KEY 未设置，跳过海报生成` 或配置语言中的等效内容
+- 如果 API 调用失败，跳过海报并继续其他工件
+- 海报失败不得使整个 Showcase 运行失败
 
 ## `review` 步骤
 
-Run after all selected artifacts have been attempted.
+在所有选定工件被尝试后运行。
 
-Check:
+检查：
 
-- completeness: selected artifacts exist unless poster was skipped for missing API
-- accuracy: data matches the analyze summary
-- consistency: artifacts do not contradict each other
-- language: artifacts follow `output.language` / `showcase.language`
+- 完整性：选定工件存在，除非海报因缺失 API 而被跳过
+- 准确性：数据匹配分析摘要
+- 一致性：工件之间不矛盾
+- 语言：工件遵循 `output.language` / `showcase.language`
 
-Refresh `.pipeline/PROGRESS.md` with a concise Showcase result.
+用简洁的 Showcase 结果刷新 `.pipeline/PROGRESS.md`。
 
-Progress table format:
+进度表格式：
 
 ```markdown
 | 19:00 | Showcase | /hw:showcase --all | v3: 4 artifacts generated, review ✅ |
 ```
 
-Update the top metadata timestamp and keep `PROGRESS.md` as a board-style summary instead of appending loose one-line events.
+更新顶部元数据时间戳，并将 `PROGRESS.md` 保持为看板风格摘要，而不是追加松散的单行事件。
 
-Use the compact time format required by `output.timezone`.
+使用 `output.timezone` 要求的紧凑时间格式。
 
 ## 参考文件
 
-- `config.schema.yaml` — `showcase.*` config
-- `references/config-spec.md` — config fallback rules
-- `references/progress-spec.md` — PROGRESS language and time rules
-- `SKILL.md` — command routing and global language rules
+- `config.schema.yaml` — `showcase.*` 配置
+- `references/config-spec.md` — 配置回退规则
+- `references/progress-spec.md` — PROGRESS 语言和时间规则
+- `SKILL.md` — 命令路由和全局语言规则

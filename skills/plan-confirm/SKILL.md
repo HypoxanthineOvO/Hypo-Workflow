@@ -13,35 +13,35 @@ description: Confirm the generated Hypo-Workflow plan when the user wants a fina
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill for P4 Confirm only.
+仅在 P4 Confirm 阶段使用此 skill。
 
 ## 前置条件
 
-- planning artifacts already exist or have just been generated
+- 规划产物已存在或刚刚生成
 
 ## 执行流程
 
-1. Resolve plan mode as project `plan.mode` > global `plan.default_mode` > `interactive`, and resolve `automation.gates.planning` as project > global > default `confirm`.
-2. Summarize:
-   - project name
-   - stack
+1. 解析 plan mode：项目 `plan.mode` > 全局 `plan.default_mode` > `interactive`，并解析 `automation.gates.planning`：项目 > 全局 > 默认 `confirm`。
+2. 摘要展示：
+   - 项目名称
+   - 技术栈
    - preset
-   - milestone count
-   - generated files
-   - greenfield vs append mode
-3. If `automation.gates.planning=confirm`, treat Confirm as a hard gate and wait for explicit approval before execution, even when `plan.mode=auto`.
-4. If `automation.gates.planning=auto`, `plan.mode=auto` may treat confirm as a summary checkpoint and continue without requiring approval.
-5. Set `current.phase=plan_confirm` while this checkpoint is active.
+   - Milestone 数量
+   - 生成的文件
+   - greenfield vs append 模式
+3. 如果 `automation.gates.planning=confirm`，将 Confirm 视为硬门禁，即使 `plan.mode=auto` 也要等待明确批准后才能执行。
+4. 如果 `automation.gates.planning=auto`，`plan.mode=auto` 可将 confirm 视为摘要检查点，无需批准即可继续。
+5. 在此检查点激活期间设置 `current.phase=plan_confirm`。
 
 ## 交互硬门禁
 
-Interactive Confirm must not be collapsed into a passive summary. The agent must stop and wait until the user explicitly says「确认」or an unambiguous equivalent approval such as「确认，开始执行」. A vague acknowledgement, a request to "check once more", or silence is not approval.
+交互式 Confirm 不得被压缩为被动摘要。Agent 必须停下来等待，直到用户明确说「确认」或无歧义的等效批准（如「确认，开始执行」）。模糊的确认、"再检查一遍"的请求或沉默都不构成批准。
 
-When `automation.gates.planning=confirm`, or when `plan.interactive.require_explicit_confirm=true` or the field is missing in interactive mode, this gate is mandatory. Automation level must not silently downgrade the planning confirm gate.
+当 `automation.gates.planning=confirm`，或当 `plan.interactive.require_explicit_confirm=true` 或交互模式中该字段缺失时，此门禁是强制性的。自动化级别不得静默降级规划确认门禁。
 
 ## 参考文件
 
-- `plan/PLAN-SKILL.md` — Confirm phase rules
+- `plan/PLAN-SKILL.md` — Confirm 阶段规则
 - `references/commands-spec.md`
 - `references/config-spec.md`
 - `SKILL.md`

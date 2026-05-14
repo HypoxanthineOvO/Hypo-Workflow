@@ -13,27 +13,27 @@ description: Read the unified lifecycle log when the user wants milestone, fix, 
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill to inspect `.pipeline/log.yaml`.
+使用此 skill 检查 `.pipeline/log.yaml`。
 
 ## 执行流程
 
-1. If the user passed `--full`, read `.pipeline/log.yaml` directly and print `加载完整版 log.yaml (<N> 行)` when line counts are available.
-2. If `--full` is absent, prefer `.pipeline/log.compact.yaml` when it exists; otherwise read `.pipeline/log.yaml`.
-3. Resolve `output.language` and `output.timezone`.
-4. Show the latest 10 entries by default, with timestamps converted to `output.timezone`.
-5. Support:
+1. 如果用户传入 `--full`，直接读取 `.pipeline/log.yaml`，并在行数可用时打印 `加载完整版 log.yaml (<N> 行)`。
+2. 如果未传入 `--full`，优先使用 `.pipeline/log.compact.yaml`（如果存在）；否则读取 `.pipeline/log.yaml`。
+3. 解析 `output.language` 和 `output.timezone`。
+4. 默认显示最近 10 条记录，时间戳转换为 `output.timezone`。
+5. 支持以下参数：
    - `--all`
    - `--type <type>`
    - `--since <milestone>`
    - `--full`
-6. If the log file is missing, state that no lifecycle log has been created yet in `output.language`.
+6. 如果日志文件不存在，使用 `output.language` 说明尚未创建生命周期日志。
 
-Recent/status readers must sort by timestamp rather than file order and must use the shared secret-safe redaction helper before showing summaries. `/hw:log --full` may show complete lifecycle history, but status/dashboard Recent should remain a filtered user activity feed.
+Recent/status 读取器必须按时间戳排序（而非文件顺序），并在显示摘要前使用共享的密钥安全脱敏辅助函数。`/hw:log --full` 可以显示完整的生命周期历史，但 status/dashboard 的 Recent 部分应保持为过滤后的用户活动流。
 
 ## Flags 参数
 
-- `/hw:log --full`: ignore `.pipeline/log.compact.yaml` and load the complete lifecycle log.
-- `/hw:log`: use compact log context when available, with full-file fallback when compact is absent.
+- `/hw:log --full`：忽略 `.pipeline/log.compact.yaml`，加载完整的生命周期日志。
+- `/hw:log`：在 compact 日志可用时使用 compact 日志上下文，compact 不存在时回退到完整文件。
 
 ## 参考文件
 

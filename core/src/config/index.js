@@ -5,13 +5,19 @@ import { DEFAULT_ANALYSIS_INTERACTION } from "../analysis/index.js";
 import { DEFAULT_KNOWLEDGE_CONFIG } from "../knowledge/index.js";
 
 export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
-  version: "12.5.1",
+  version: "12.5.2",
   agent: {
     platform: "codex",
     model: "default",
   },
   execution: {
     default_mode: "self",
+    bash: {
+      mode: "allow_local",
+      confirm_external: true,
+      confirm_destructive: true,
+      confirm_system_install: true,
+    },
     analysis: DEFAULT_ANALYSIS_INTERACTION,
     test_profiles: {
       enabled: true,
@@ -333,6 +339,10 @@ export async function loadConfig(file, defaults = DEFAULT_GLOBAL_CONFIG) {
   const merged = mergeConfig(defaults, parseYaml(raw));
   return {
     ...merged,
+    execution: {
+      ...merged.execution,
+      bash: normalizeExecutionBashPolicy(merged.execution?.bash),
+    },
     automation: normalizeAutomationPolicy(merged.automation),
   };
 }
@@ -390,8 +400,26 @@ export function migrateGlobalConfigShape(config = {}, defaults = DEFAULT_GLOBAL_
   }
   return {
     ...merged,
+    execution: {
+      ...merged.execution,
+      bash: normalizeExecutionBashPolicy(merged.execution?.bash),
+    },
     automation: normalizeAutomationPolicy(merged.automation),
     version: DEFAULT_GLOBAL_CONFIG.version,
+  };
+}
+
+export function normalizeExecutionBashPolicy(policy = {}) {
+  const merged = mergeConfig(DEFAULT_GLOBAL_CONFIG.execution.bash, policy || {});
+  const mode = String(merged.mode || "allow_local").trim().toLowerCase();
+  if (!["ask", "allow_local"].includes(mode)) {
+    throw new Error(`Unsupported execution bash mode: ${merged.mode}`);
+  }
+  return {
+    mode,
+    confirm_external: true,
+    confirm_destructive: true,
+    confirm_system_install: true,
   };
 }
 

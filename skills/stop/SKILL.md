@@ -13,31 +13,31 @@ description: Gracefully stop Hypo-Workflow when the user wants to pause executio
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill to pause the current run while preserving resumable state.
+使用此技能暂停当前运行，同时保留可恢复状态。
 
 ## 前置条件
 
-- active unfinished pipeline work exists
+- 存在活跃的未完成 pipeline 工作
 
 ## 执行流程
 
-1. Read `.pipeline/state.yaml` and confirm the current run is unfinished.
-2. Persist current prompt and step state.
-3. Set `pipeline.status=stopped`.
-4. Preserve `current.phase` so a future resume can restore intent cleanly.
-5. Optionally write an intermediate report if the command does not disable report generation.
-6. Append a stop event to `.pipeline/log.yaml`.
-7. Update `.pipeline/PROGRESS.md` to show the paused status in the top metadata, current status block, and timeline table.
-8. Update top-level `last_heartbeat`.
-9. Remove `.pipeline/.lock` if it belongs to the current execution.
-10. Unregister the watchdog cron entry because this stop is intentional.
+1. 读取 `.pipeline/state.yaml` 并确认当前运行未完成。
+2. 持久化当前 prompt 和步骤状态。
+3. 设置 `pipeline.status=stopped`。
+4. 保留 `current.phase`，以便未来的恢复可以干净地恢复意图。
+5. 如果命令未禁用报告生成，可选择写入中间报告。
+6. 向 `.pipeline/log.yaml` 追加一个停止事件。
+7. 更新 `.pipeline/PROGRESS.md`，在顶部元数据、当前状态块和时间线表中显示暂停状态。
+8. 更新顶层 `last_heartbeat`。
+9. 如果 `.pipeline/.lock` 属于当前执行，则移除它。
+10. 注销 watchdog cron 条目，因为此停止是有意的。
 
 ## 安全规则
 
-- do not mark the prompt aborted
-- do not discard partial work
-- stop should be resumable, not destructive
-- do not leave `.pipeline/.lock` behind after a successful stop
+- 不要将 prompt 标记为中止
+- 不要丢弃部分工作
+- 停止应该是可恢复的，而不是破坏性的
+- 成功停止后不要留下 `.pipeline/.lock`
 
 ## 参考文件
 

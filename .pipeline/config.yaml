@@ -16,6 +16,11 @@ plan:
 
 execution:
   mode: self
+  bash:
+    mode: allow_local
+    confirm_external: true
+    confirm_destructive: true
+    confirm_system_install: true
   steps:
     preset: tdd
   step_overrides:
@@ -35,6 +40,9 @@ deep_plan:
       - remote_download
     require_bounded_research_cache: true
     require_implementation_code_evidence: true
+
+automation:
+  level: full
 
 batch:
   decompose_mode: upfront

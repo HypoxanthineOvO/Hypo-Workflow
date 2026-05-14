@@ -13,32 +13,32 @@ description: Run a preventive code audit when the user wants graded findings acr
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill for deep project auditing.
+使用此技能进行深度项目审计。
 
-When an audit is used as acceptance or worker-separation evidence, resolve Subagent/delegation authorization before scanning starts. The audit worker must be independent from the worker that implemented the audited change. If authorization is absent, declined, or unavailable, stop or record a degraded audit that cannot satisfy acceptance gates; do not audit locally first and then claim independent review was missing.
+当 audit 用作验收或 worker-separation 证据时，在扫描开始前解决 Subagent/delegation 授权问题。audit worker 必须独立于实现被审计更改的 worker。如果授权缺失、被拒绝或不可用，停止或记录无法满足验收 gate 的降级审计；不要先在本地审计，然后声称缺少独立审查。
 
-## 前置条件
+## Prerequisites
 
-- source code and architecture baseline should be available
+- 源代码和架构基线应该可用
 
-## 执行流程
+## Steps
 
-1. Determine scope:
-   - full project
+1. 确定范围：
+   - 全项目
    - `--scope <dir>`
    - `--since <milestone>`
-2. Read the architecture baseline first.
-3. Resolve `output.language` and `output.timezone`.
-4. If the audit will count as acceptance evidence, confirm the independent audit worker is authorized and distinct from implementation before scanning.
-5. Scan the six audit dimensions.
-6. Grade findings as `Critical`, `Warning`, or `Info`.
-7. Write the report to `.pipeline/audits/audit-NNN.md` in `output.language`.
-8. Render report timestamps in `output.timezone`.
-9. Apply the shared secret-safe evidence redaction helper before durable writes; do not store raw API keys, tokens, Authorization headers, cookies, passwords, or private keys.
-10. Append a lifecycle log entry.
-11. Set `current.phase=lifecycle_audit` when state tracking is used.
+2. 首先读取架构基线。
+3. 解析 `output.language` 和 `output.timezone`。
+4. 如果 audit 将作为验收证据，请在扫描前确认独立 audit worker 已授权且与实现分离。
+5. 扫描六个审计维度。
+6. 将发现分级为 `Critical`、`Warning` 或 `Info`。
+7. 将报告写入 `.pipeline/audits/audit-NNN.md`，使用 `output.language`。
+8. 使用 `output.timezone` 渲染报告时间戳。
+9. 在持久写入前应用共享的密钥安全证据脱敏助手；不要存储原始 API 密钥、令牌、Authorization 头、cookie、密码或私钥。
+10. 追加生命周期日志条目。
+11. 当使用状态跟踪时，设置 `current.phase=lifecycle_audit`。
 
-## 参考文件
+## References
 
 - `references/audit-spec.md`
 - `references/log-spec.md`

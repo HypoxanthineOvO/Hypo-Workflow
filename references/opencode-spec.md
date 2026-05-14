@@ -32,7 +32,7 @@ See also [`external-docs-index.md`](./external-docs-index.md) for the cross-plat
 | Todo and plan tracking | native | `todowrite` tool | Translate milestones and steps into useful todo groups. |
 | Primary agents | native | `agent: plan`, `agent: build`, custom `hw-*` agents | Generate agent definitions and model frontmatter from HW profiles. |
 | Subagents | native | markdown agents with `mode: subagent` | Map HW test/code/debug/explore/reviewer roles. |
-| Permissions | native | `permission` allow/ask/deny config | Provide safe presets and file-guard policy. |
+| Permissions | native | `permission` allow/ask/deny config | Provide safe presets and file-guard policy; never persist `bypass` because OpenCode schema rejects it. |
 | Rules and instructions | native | `AGENTS.md`, `opencode.json.instructions` | Export HW rules into native instruction sources. |
 | Model selection | native | provider/model/variant config | Prefer OpenCode config; HW only supplies profile defaults. |
 | MCP servers | native | `mcp` config | Optional setup integration, not required for command parity. |
@@ -215,6 +215,8 @@ OpenCode cannot be described as exact Claude Stop Hook parity. Stop-equivalent b
 | `todo.updated` | Mirror OpenCode todos into PROGRESS summaries where useful. |
 
 Default auto-continue is on for OpenCode with `safe` policy: continue after green tests, explicit low-risk report/evaluation, no open error-severity rules, no dirty protected HW files, and no pending Ask/question gate.
+
+`execution.bash.mode=allow_local` is the Hypo-Workflow default for OpenCode bash auto-execution. It auto-approves ordinary local test, lint, build, format, sync, and inspection commands through the plugin permission hook while the root `opencode.json` stays native-schema-compatible with `* : ask`, `bash: ask`, `edit: ask`, and `question: allow`. External or remote side effects (`git push`, `gh pr`, `curl`, `wget`, remote clone, publish), destructive commands (`rm -rf`, `git reset --hard`, force push), release publication, and system dependency installation remain Ask-gated. Do not encode this behavior as `permission: bypass`; `bypass` is not an OpenCode permission action.
 
 ## TUI Status Model
 

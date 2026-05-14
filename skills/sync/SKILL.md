@@ -5,45 +5,45 @@ description: Synchronize Hypo-Workflow project adapters and lightweight derived 
 
 # /hw:sync
 
-Use this skill when the user invokes `/hw:sync` or asks to run project sync from inside a Hypo-Workflow workspace.
+当用户调用 `/hw:sync` 或要求从 Hypo-Workflow 工作区内运行项目同步时，使用此技能。
 
 ## 输出语言规则
 
-Follow the root Hypo-Workflow output language config. Use Chinese for user-facing output when `output.language` is `zh-CN` or `zh`, English when it is `en`, and follow the conversation language when it is `auto`.
+遵循根 Hypo-Workflow 输出语言配置。当 `output.language` 为 `zh-CN` 或 `zh` 时，使用中文进行面向用户的输出；当为 `en` 时使用英语；当为 `auto` 时跟随对话语言。
 
 ## 契约
 
-`/hw:sync` is an explicit project synchronization entrypoint. It shares semantics with `hypo-workflow sync` and never executes pipeline milestones.
+`/hw:sync` 是一个显式的项目同步入口点。它与 `hypo-workflow sync` 共享语义，并且从不执行 pipeline milestones。
 
-Supported modes:
+支持的模式：
 
-- `/hw:sync --light`: refresh registry status, refresh Knowledge Ledger compact/index when source records changed, detect external changes, and report what needs attention.
-- `/hw:sync`: run light sync, sync OpenCode adapters, validate config loading, check declared derived artifacts, and refresh lightweight compact views.
-- `/hw:sync --check-only`: detect external changes and declared stale derived artifacts without writing adapters, compact files, reports, or protected authority files.
-- `/hw:sync --repair`: run standard sync plus safe refresh of declared derived artifacts such as `PROGRESS.compact.md`, metrics/report compact views, `PROJECT-SUMMARY.md`, and derived health.
-- `/hw:sync --deep`: run standard repair sync plus dependency scan and architecture rescan hints.
+- `/hw:sync --light`：刷新注册表状态，当源记录更改时刷新 Knowledge Ledger compact/index，检测外部变化，并报告需要关注的内容。
+- `/hw:sync`：运行轻量同步，同步 OpenCode 适配器，验证配置加载，检查声明的派生产物，并刷新轻量级 compact 视图。
+- `/hw:sync --check-only`：检测外部变化和声明的过时派生产物，而不写入适配器、compact 文件、报告或受保护的权威文件。
+- `/hw:sync --repair`：运行标准同步加上声明的派生产物的安全刷新，例如 `PROGRESS.compact.md`、指标/报告 compact 视图、`PROJECT-SUMMARY.md` 和派生健康状态。
+- `/hw:sync --deep`：运行标准修复同步加上依赖扫描和架构重新扫描提示。
 
 ## 派生产物映射
 
-The sync contract distinguishes protected authority files from derived views.
+同步契约区分受保护的权威文件和派生视图。
 
-- Protected authority files: `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, `.pipeline/rules.yaml`.
-- Safe derived views: compact files, metrics/report mirrors, project summary, OpenCode status inputs, generated references, and managed doc blocks.
-- Authority conflicts must be reported as repair-needed and must not be guessed or silently fixed.
-- Derived health is written to `.pipeline/derived-health.yaml` only during repair/deep sync, then surfaced by status/dashboard readers.
+- 受保护的权威文件：`.pipeline/state.yaml`、`.pipeline/cycle.yaml`、`.pipeline/rules.yaml`。
+- 安全的派生视图：compact 文件、指标/报告镜像、项目摘要、OpenCode 状态输入、生成的参考文献和托管的文档块。
+- 权威冲突必须报告为需要修复，不得猜测或静默修复。
+- 派生健康状态仅在修复/深度同步期间写入 `.pipeline/derived-health.yaml`，然后由状态/仪表板读取器显示。
 
 ## SessionStart
 
-SessionStart performs only light external-change detection. It may prompt the user to run `/hw:sync --light` or standard `/hw:sync`, but it must not run adapter generation, compact refresh, dependency scans, or pipeline milestones by itself.
+SessionStart 仅执行轻量级的外部变化检测。它可能会提示用户运行 `/hw:sync --light` 或标准 `/hw:sync`，但它本身不得运行适配器生成、compact 刷新、依赖扫描或 pipeline milestones。
 
 ## 边界
 
-- Do not execute pipeline prompts or milestone steps.
-- Do not mutate `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, or `.pipeline/rules.yaml`.
-- `--check-only` must not write.
-- `--repair` may only write declared safe derived artifacts.
-- Deep sync must be explicit.
-- Heavy scans, adapter writes, and compact writes are not allowed from SessionStart light detection.
+- 不要执行 pipeline prompts 或 milestone 步骤。
+- 不要修改 `.pipeline/state.yaml`、`.pipeline/cycle.yaml` 或 `.pipeline/rules.yaml`。
+- `--check-only` 不得写入。
+- `--repair` 只能写入声明的安全派生产物。
+- 深度同步必须是显式的。
+- SessionStart 轻量检测不允许进行重度扫描、适配器写入和 compact 写入。
 
 ## 参考文件
 

@@ -13,40 +13,40 @@ description: Accept pending Hypo-Workflow Cycle work and complete the manual acc
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill when the user invokes `/hw:accept`.
+当用户调用 `/hw:accept` 时使用此技能。
 
-## 语义
+## Semantics
 
-- Read `.pipeline/cycle.yaml` and `.pipeline/state.yaml`.
-- Require Cycle acceptance state `pending_acceptance` or `acceptance.state: pending`.
-- Evaluate worker separation readiness before final acceptance:
-  - read `state.runtime_workers`, prompt step evidence, review artifacts, and lifecycle log pointers when present
-  - `recommended` requires distinct `test` and `implement` evidence unless objective unavailability plus an explicit allowed degradation is recorded
-  - `strict` requires distinct `test`, `implement`, and `audit` evidence
-  - each required worker must have lifecycle evidence for requested, started, terminal `completed`, and closed/released state
-  - any missing worker, failed/blocked worker, `close_failed`, runtime-only subtask observation, or missing Codex `/hw:start` + `/hw:resume` authorization scope blocks acceptance
-- If project worker separation policy requires audit-backed acceptance, ensure audit did not mark test coverage as insufficient before final acceptance.
-- Mark `cycle.status: completed`.
-- Mark `cycle.acceptance.state: accepted` and store `accepted_at`.
-- If `cycle.lifecycle_policy.accept.next=follow_up_plan` or a planned `cycle.continuations[]` follow-up plan exists:
-  - mark `cycle.status: follow_up_planning`
-  - mark that continuation `status: active`
-  - set `pipeline.status: stopped`
-  - set `current.phase: follow_up_planning`
-  - mirror only the active continuation in `state.yaml`
-  - status next action is `start_follow_up_plan`
-- Mirror only compact acceptance state in `state.yaml`:
+- 读取 `.pipeline/cycle.yaml` 和 `.pipeline/state.yaml`。
+- 要求 Cycle 验收状态为 `pending_acceptance` 或 `acceptance.state: pending`。
+- 在最终验收前评估 worker separation 准备情况：
+  - 读取 `state.runtime_workers`、prompt 步骤证据、审查产物以及生命周期日志指针（如果存在）
+  - `recommended` 策略要求不同的 `test` 和 `implement` 证据，除非记录了客观不可用性加上明确允许的降级
+  - `strict` 策略要求不同的 `test`、`implement` 和 `audit` 证据
+  - 每个必需的 worker 必须具有 requested、started、terminal `completed` 和 closed/released 状态的生命周期证据
+  - 任何缺失的 worker、失败/阻塞的 worker、`close_failed`、仅运行时的子任务观察，或缺失的 Codex `/hw:start` + `/hw:resume` 授权范围都会阻止验收
+- 如果项目 worker separation 策略要求 audit 支持的验收，请确保 audit 在最终验收前未将测试覆盖率标记为不足。
+- 标记 `cycle.status: completed`。
+- 标记 `cycle.acceptance.state: accepted` 并存储 `accepted_at`。
+- 如果 `cycle.lifecycle_policy.accept.next=follow_up_plan` 或存在计划的 `cycle.continuations[]` 后续计划：
+  - 标记 `cycle.status: follow_up_planning`
+  - 标记该 continuation `status: active`
+  - 设置 `pipeline.status: stopped`
+  - 设置 `current.phase: follow_up_planning`
+  - 仅在 `state.yaml` 中镜像活跃的 continuation
+  - 状态下一步操作为 `start_follow_up_plan`
+- 仅在 `state.yaml` 中镜像紧凑的验收状态：
   - `acceptance.scope: cycle`
   - `acceptance.state: accepted`
   - `acceptance.cycle_id`
   - `acceptance.updated_at`
-- Without a follow-up continuation, set `pipeline.status: completed` and `current.phase: completed`.
-- Use the workflow commit helper so authority facts are written atomically before derived refreshes.
-- Append a `cycle_accept` entry to `.pipeline/log.yaml` through the derived refresh path.
-- Update `.pipeline/PROGRESS.md` with a compact board row through the derived refresh path.
-- If a derived refresh fails after authority commits, keep the accepted cycle facts, write `.pipeline/derived-refresh.yaml`, and surface a warning with repair guidance.
-- Archive only when the Cycle close/archive flow is explicitly requested or configured; accepting the gate itself is not a separate runner.
+- 没有后续 continuation 时，设置 `pipeline.status: completed` 和 `current.phase: completed`。
+- 使用工作流提交助手，确保权威事实原子性写入后再进行派生刷新。
+- 通过派生刷新路径将 `cycle_accept` 条目追加到 `.pipeline/log.yaml`。
+- 通过派生刷新路径更新 `.pipeline/PROGRESS.md` 的紧凑看板行。
+- 如果派生刷新在权威提交后失败，保留已验收的 Cycle 事实，写入 `.pipeline/derived-refresh.yaml`，并显示带有修复指导的警告。
+- 仅在明确请求或配置 Cycle 关闭/归档流程时才进行归档；验收 gate 本身不是独立的 runner。
 
-Do not store full review notes in `state.yaml`.
+不要在 `state.yaml` 中存储完整的审查笔记。
 
-`audit` may ask for re-test or re-implementation without blocking the whole execution by default, but it may still block acceptance when project policy requires it.
+`audit` 可以要求重新测试或重新实现，默认情况下不会阻止整个执行，但当项目策略要求时仍可能阻止验收。

@@ -24,7 +24,7 @@ Start from the platform guide for your host Agent. The README stays as a compact
 - Use `/hw:status` for progress and `/hw:report` for reports.
 - Use `/hw:explain [question]` for evidence-first answers about code, config, commands, or recent changes.
 - Use `/hw:explain --subagent [question]` to request independent read-only evidence collection when the platform supports it.
-- Use `/hw:pr inspect|review|fix|merge|close <url|id>` for existing GitHub PRs or GitLab MRs, with local archives under `.pipeline/pr/`.
+- Use subcommands such as `/hw:pr inspect URL`, `/hw:pr review URL`, and `/hw:pr fix URL` for existing GitHub PRs or GitLab MRs, with local archives under `.pipeline/pr/`.
 - Use `/hw:pr create` for guided PR/MR creation; existing local changes use `--from-worktree`, while plan-first work uses `--plan`.
 - Use `/hw:sync --repair` to repair derived context and `/hw:docs repair` to refresh documentation.
 - Use `/hw:accept` or `/hw:reject` at lifecycle gates.

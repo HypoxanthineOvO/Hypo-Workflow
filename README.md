@@ -6,7 +6,7 @@
 
 规划 -> 执行 -> 审查 -> 报告 -> 恢复
 
-[![Version](https://img.shields.io/badge/version-12.5.1-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-12.5.2-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/reference/platforms.md)
 
@@ -79,7 +79,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | 查看报告 | `/hw:report` |
 | 带证据解释代码/配置/改动 | `/hw:explain "为什么这样设计"` |
 | 小修复不进完整 Milestone | `/hw:patch` / `/hw:patch fix P001` |
-| 处理已有 PR/MR | `/hw:pr inspect|review|fix|merge|close` |
+| 处理已有 PR/MR | `/hw:pr inspect URL`、`/hw:pr review URL`、`/hw:pr fix URL` |
 | 创建 PR/MR | `/hw:pr create` / `/hw:pr create --from-worktree` / `/hw:pr create --plan` |
 | 修复派生上下文 | `/hw:sync --repair` |
 | 检查或修复文档 | `/hw:docs check` / `/hw:docs repair` |
@@ -111,7 +111,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | [Platforms Reference](docs/reference/platforms.md) | 六个平台能力表 |
 | [Generated Artifacts](docs/reference/generated-artifacts.md) | OpenCode、第三方适配、压缩视图和文档引用的生成来源 |
 | [OpenCode Guide](docs/platforms/opencode.md) | OpenCode 指令、智能体角色、模型矩阵和边界 |
-| [v12.5.1 发布说明](docs/release/v12.5.1.md) | Claude Code `/hw:*` slash commands、resume namespace guard、structured rule enforcement 和 release note cleanup |
+| [v12.5.2 发布说明](docs/release/v12.5.2.md) | OpenCode bash 自动批准策略改为合法 schema + plugin policy，并同步本地分发 |
 | [Cursor Guide](docs/platforms/cursor.md) | Cursor 仓库规则 |
 | [GitHub Copilot Guide](docs/platforms/copilot.md) | GitHub Copilot 仓库指令 |
 | [Trae Guide](docs/platforms/trae.md) | Trae 项目规则 |

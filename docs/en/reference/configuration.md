@@ -22,6 +22,7 @@ Configuration resolution is project config > global config > built-in default. P
 | `automation.gates.execution` | `auto` | Ordinary Milestones may continue | Strict review can still block |
 | `automation.gates.destructive_external` | `confirm` | Destructive or external side effects stay gated | Destructive commands and external side effects |
 | `automation.gates.release_publish` | `confirm` | Release publish stays gated | tag, push, publish |
+| `execution.bash.mode` | `allow_local` | Local bash may auto-approve | Never encode this as OpenCode `bypass`; external, destructive, and system-install actions stay gated |
 | `cycle.lifecycle_policy.gates.pr_remote_write` | `confirm` | PR/MR remote writes stay gated | push, merge, close, reviewer/label/target branch writes |
 
 ## Planning And Execution Strictness
@@ -37,6 +38,8 @@ Configuration resolution is project config > global config > built-in default. P
 ## P0 Configure And Subagent Authorization
 
 `P0 Configure` runs after `cycle new` and before `P1 Discover`. It lets the user select or reuse automation, Subagent authorization, acceptance, PR/MR remote-write policy, full regression, analysis boundaries, and worker separation. Reuse sources are recorded as `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, or `built_in_default`.
+
+OpenCode bash auto-execution is expressed through Hypo-Workflow policy, not through invalid OpenCode permission values. `execution.bash.mode: allow_local` lets local test, lint, build, format, sync, docs repair, `git status/diff/log`, and local search commands continue by default; `git push`, PR/MR remote writes, `curl/wget`, remote clone, publish, `rm -rf`, `git reset --hard`, system installs, and release publication still Ask. Generated `opencode.json` should explicitly keep `*: ask`, `bash: ask`, `edit: ask`, and `question: allow`; it must only use native OpenCode `ask`/`allow`/`deny` values and must not contain `bypass`.
 
 Strict worker separation requires implementation Subagents to stay isolated from test/review/audit roles. Implementation workers do not read test source, fixtures, snapshots, or assertion details; they may receive requirements, public interfaces, allowed edit scope, test command, pass/fail status, and sanitized failure summaries. If the host cannot preserve isolation, the run must explain degraded mode, obtain explicit user confirmation, and record role isolation degradation.
 

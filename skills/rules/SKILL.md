@@ -13,13 +13,13 @@ description: Manage Hypo-Workflow rule severities, custom natural-language rules
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill when the user invokes `/hw:rules` or `/hypo-workflow:rules`.
+当用户调用 `/hw:rules` 或 `/hypo-workflow:rules` 时使用此技能。
 
-Rules are a standalone Hypo-Workflow dimension alongside skills, commands, hooks, and config. They collect behavior constraints that were previously scattered across `SKILL.md`, hooks, and `config.yaml`.
+Rules 是 Hypo-Workflow 的独立维度，与 skills、commands、hooks 和 config 并列。它们收集了先前分散在 `SKILL.md`、hooks 和 `config.yaml` 中的行为约束。
 
 ## 路径
 
-Plugin-distributed rules:
+插件分发的 rules：
 
 - `rules/builtin/*.yaml`
 - `rules/presets/recommended.yaml`
@@ -27,7 +27,7 @@ Plugin-distributed rules:
 - `rules/presets/minimal.yaml`
 - `rules/template/custom-rule-template.md`
 
-Project-local rules:
+项目本地的 rules：
 
 - `.pipeline/rules.yaml`
 - `.pipeline/rules/custom/*.md`
@@ -35,38 +35,38 @@ Project-local rules:
 - `.pipeline/rules/structured/cycle/*.yaml`
 - `.pipeline/rules/packs/<pack-name>/`
 
-User-level structured habits:
+用户级结构化 habits：
 
 - `~/.hypo-workflow/rules/structured/*.yaml`
 
-Global habits are user-level authority and should be loaded only when explicitly configured or selected by the active rules command. Do not make project behavior depend silently on whatever exists in the operator's home directory.
+全局 habits 是用户级权限，应仅在明确配置或由活动 rules 命令选择时才加载。不要让项目行为静默依赖于操作者主目录中存在的任何内容。
 
 ## Severity 模型
 
-Use the ESLint-style severity model:
+使用 ESLint 风格的 severity 模型：
 
-| Severity | Behavior |
+| Severity | 行为 |
 |---|---|
-| `off` | Disabled; do not load or enforce. |
-| `warn` | Print a warning and continue. |
-| `error` | Treat as a hard gate and stop execution until resolved or downgraded. |
+| `off` | 禁用；不加载或强制执行。 |
+| `warn` | 打印警告并继续。 |
+| `error` | 视为硬门控，停止执行直到解决或降级。 |
 
-The severity decides behavior. Labels are metadata only.
+Severity 决定行为。标签仅为元数据。
 
 ## Structured Rules/Habits 权威
 
-C8 introduces structured Rules/Habits as the preferred authority for durable user preferences and project behavior. Markdown files and adapter instruction text are generated or compatibility views.
+C8 引入了结构化 Rules/Habits 作为持久用户偏好和项目行为的首选权威。Markdown 文件和适配器指令文本是生成的或兼容性视图。
 
-Supported scopes, from highest to lowest priority:
+支持的范围，从最高到最低优先级：
 
 1. `cycle`
 2. `project`
 3. `global`
 4. `builtin`
 
-When several records share an `id`, resolve the winner by that scope order and report the overridden scopes/source paths. Do not silently hide conflicts; Agent Review should record which rules were checked and which could not be checked automatically.
+当多个记录共享一个 `id` 时，按该范围顺序解析获胜者，并报告被覆盖的范围/源路径。不要静默隐藏冲突；Agent Review 应记录检查了哪些规则以及哪些无法自动检查。
 
-Structured rule shape:
+结构化 rule 形状：
 
 ```yaml
 id: user-frontend-layout-density
@@ -92,24 +92,24 @@ enforcement:
   evidence_required: true
 ```
 
-Use structured records for new "remember this rule" behavior. Keep `.pipeline/rules.yaml` for preset and severity overrides.
+对新的 "记住此规则" 行为使用结构化记录。保留 `.pipeline/rules.yaml` 用于预设和 severity 覆盖。
 
 ## Labels
 
-Supported semantic labels:
+支持的语义标签：
 
-- `guard`: pre-execution gates such as `git-clean-check`
-- `style`: output and language preferences
-- `hook`: hook behavior wrapped as rules
-- `workflow`: process preferences such as commit and review policy
-- `quality`: repository asset quality checks such as `skill-quality`
-- `release`: publication gates such as `readme-freshness`
+- `guard`：预执行门控，如 `git-clean-check`
+- `style`：输出和语言偏好
+- `hook`：包装为 rules 的 hook 行为
+- `workflow`：流程偏好，如提交和审查策略
+- `quality`：仓库资产质量检查，如 `skill-quality`
+- `release`：发布门控，如 `readme-freshness`
 
-Custom rules may use these labels or a concise project-specific label.
+自定义 rules 可以使用这些标签或简洁的项目特定标签。
 
 ## Hooks
 
-Supported lifecycle hook points:
+支持的生命周期 hook 点：
 
 - `on-session-start`
 - `pre-milestone`
@@ -122,11 +122,11 @@ Supported lifecycle hook points:
 - `on-evaluate`
 - `always`
 
-Rules may bind to multiple hooks. `always` rules are injected into execution context and should be followed for the whole session.
+Rules 可以绑定到多个 hooks。`always` rules 被注入执行上下文，应在整个会话期间遵循。
 
 ## 指令列表
 
-Supported forms:
+支持的形式：
 
 ```text
 /hw:rules
@@ -145,27 +145,27 @@ Supported forms:
 
 ## 加载算法
 
-Build the effective rule table in this priority order, low to high:
+按此优先级顺序（从低到高）构建有效的 rule 表：
 
-1. Built-in rule metadata from `rules/builtin/`.
-2. Preset severities from `rules/presets/<extends>.yaml`.
-3. Custom rules from `.pipeline/rules/custom/`.
-4. Structured Rules/Habits from user, project, and Cycle scopes.
-5. Overrides from `.pipeline/rules.yaml` under `rules:`.
-6. Temporary command overrides from `--rule name=severity` when a command supports them.
+1. 来自 `rules/builtin/` 的内置 rule 元数据。
+2. 来自 `rules/presets/<extends>.yaml` 的预设 severity。
+3. 来自 `.pipeline/rules/custom/` 的自定义 rules。
+4. 来自用户、项目和 Cycle 范围的结构化 Rules/Habits。
+5. 来自 `.pipeline/rules.yaml` 中 `rules:` 的覆盖。
+6. 当命令支持时，来自 `--rule name=severity` 的临时命令覆盖。
 
-When `.pipeline/rules.yaml` is missing, behave as if:
+当 `.pipeline/rules.yaml` 缺失时，行为如下：
 
 ```yaml
 extends: recommended
 rules: {}
 ```
 
-Custom rules with the same name as a built-in rule override the built-in content, but normal severity priority still applies.
+与内置 rule 同名的自定义 rules 覆盖内置内容，但正常的 severity 优先级仍然适用。
 
 ## `.pipeline/rules.yaml`
 
-Canonical shape:
+规范形状：
 
 ```yaml
 extends: recommended
@@ -177,58 +177,58 @@ rules:
   my-lint-rule: warn
 ```
 
-`extends` may be a string or list. Built-in values are `recommended`, `strict`, and `minimal`. Git rule packs may be referenced as `github:owner/repo` or `gitee:owner/repo`.
+`extends` 可以是字符串或列表。内置值为 `recommended`、`strict` 和 `minimal`。Git rule 包可以引用为 `github:owner/repo` 或 `gitee:owner/repo`。
 
 ## 列出规则
 
-For `/hw:rules` or `/hw:rules list`:
+对于 `/hw:rules` 或 `/hw:rules list`：
 
-1. Load the effective rule table.
-2. Group by label in this order: guard, style, hook, workflow, quality, release, custom.
-3. Show name, severity, hooks, and whether the rule is enabled.
-4. Apply filters:
-   - `--active`: exclude `off`
-   - `--label <label>`: include only that label
-5. Finish with totals: enabled count, error count, warn count, off count.
+1. 加载有效的 rule 表。
+2. 按以下顺序按标签分组：guard、style、hook、workflow、quality、release、custom。
+3. 显示名称、severity、hooks 以及 rule 是否启用。
+4. 应用过滤器：
+   - `--active`：排除 `off`
+   - `--label <label>`：仅包含该标签
+5. 以总计结束：启用计数、error 计数、warn 计数、off 计数。
 
-When shell execution is available, use `scripts/rules-summary.sh` as the deterministic summary helper, then present the result in the configured output language.
+当 shell 执行可用时，使用 `scripts/rules-summary.sh` 作为确定性摘要助手，然后以配置的输出语言呈现结果。
 
 ## 启用、禁用与设置规则
 
-For `/hw:rules enable <name>`:
+对于 `/hw:rules enable <name>`：
 
-1. Ensure `.pipeline/` exists; if not, tell the user to run `/hw:init`.
-2. Create `.pipeline/rules.yaml` if missing.
-3. Set `rules.<name>: warn`.
+1. 确保 `.pipeline/` 存在；如果不存在，告诉用户运行 `/hw:init`。
+2. 如果缺失，创建 `.pipeline/rules.yaml`。
+3. 设置 `rules.<name>: warn`。
 
-For `/hw:rules disable <name>`:
+对于 `/hw:rules disable <name>`：
 
-1. Ensure `.pipeline/rules.yaml` exists.
-2. Set `rules.<name>: off`.
+1. 确保 `.pipeline/rules.yaml` 存在。
+2. 设置 `rules.<name>: off`。
 
-For `/hw:rules set <name> <severity>`:
+对于 `/hw:rules set <name> <severity>`：
 
-1. Validate severity is one of `off`, `warn`, `error`.
-2. Set `rules.<name>` to that severity.
-3. Preserve unrelated rules and `extends`.
+1. 验证 severity 是 `off`、`warn` 或 `error` 之一。
+2. 将 `rules.<name>` 设置为该 severity。
+3. 保留不相关的 rules 和 `extends`。
 
-Use structured YAML edits where possible. Do not rewrite unrelated project config.
+尽可能使用结构化 YAML 编辑。不要重写不相关的项目配置。
 
 ## 创建自定义规则
 
-For `/hw:rules create <name>`:
+对于 `/hw:rules create <name>`：
 
-1. Validate the name matches `^[a-z0-9][a-z0-9-]*$`.
-2. Ask interactively for:
-   - label: `guard`, `style`, `hook`, or `workflow`
-   - severity: `off`, `warn`, or `error`
-   - hook point: one or more supported hooks
-   - natural-language rule body
-3. Create `.pipeline/rules/custom/<name>.md`.
-4. Add or update `.pipeline/rules.yaml` with `rules.<name>: <severity>`.
-5. Show the created file path.
+1. 验证名称匹配 `^[a-z0-9][a-z0-9-]*$`。
+2. 交互式询问：
+   - label：`guard`、`style`、`hook` 或 `workflow`
+   - severity：`off`、`warn` 或 `error`
+   - hook 点：一个或多个支持的 hooks
+   - 自然语言 rule 正文
+3. 创建 `.pipeline/rules/custom/<name>.md`。
+4. 在 `.pipeline/rules.yaml` 中添加或更新 `rules.<name>: <severity>`。
+5. 显示创建的文件路径。
 
-Generated Markdown format:
+生成的 Markdown 格式：
 
 ```markdown
 # my-test-rule
@@ -242,35 +242,35 @@ Generated Markdown format:
 每次 commit 前检查是否有超过 3 个 TODO 注释。如果有，提醒我处理。
 ```
 
-Do not auto-create a custom rule without the user's natural-language content.
+不要在没有用户自然语言内容的情况下自动创建自定义 rule。
 
 ## 创建结构化规则
 
-For new remembered preferences, prefer structured YAML over Markdown custom rules. Use this path selection:
+对于新的记住的偏好，优先使用结构化 YAML 而不是 Markdown 自定义 rules。使用此路径选择：
 
 - `scope=cycle` -> `.pipeline/rules/structured/cycle/<id>.yaml`
 - `scope=project` -> `.pipeline/rules/structured/project/<id>.yaml`
 - `scope=global` -> `~/.hypo-workflow/rules/structured/<id>.yaml`
 
-Ordinary inferred candidates should be presented for confirmation at the end of the current discussion or checkpoint. Do not interrupt the user's main task just because a possible rule was detected. Explicit force-write wording may write immediately, but must still use the selected scope and log the action.
+普通的推断候选项应在当前讨论或检查点结束时呈现确认。不要仅仅因为检测到可能的 rule 就中断用户的主任务。明确的强制写入措辞可以立即写入，但仍必须使用选定的范围并记录操作。
 
 ## 编辑与删除自定义规则
 
-For `/hw:rules edit <name>`:
+对于 `/hw:rules edit <name>`：
 
-1. Locate `.pipeline/rules/custom/<name>.md` or pack/custom YAML with the same name.
-2. If shell editor access is not appropriate, print the file path and explain the editable fields.
-3. Do not edit built-in rules in `rules/builtin/`; tell the user to override severity or create a custom rule instead.
+1. 定位 `.pipeline/rules/custom/<name>.md` 或具有相同名称的 pack/custom YAML。
+2. 如果 shell 编辑器访问不合适，打印文件路径并解释可编辑字段。
+3. 不要编辑 `rules/builtin/` 中的内置 rules；告诉用户改为覆盖 severity 或创建自定义 rule。
 
-For `/hw:rules delete <name>`:
+对于 `/hw:rules delete <name>`：
 
-1. Delete only project-local custom rule files.
-2. Remove or set off the `.pipeline/rules.yaml` override.
-3. Never delete built-in distributed rules.
+1. 仅删除项目本地的自定义 rule 文件。
+2. 移除或设置 off `.pipeline/rules.yaml` 覆盖。
+3. 永远不要删除内置分发的 rules。
 
 ## Rule Packs
 
-Rule pack format:
+Rule 包格式：
 
 ```text
 hw-rules-example/
@@ -280,7 +280,7 @@ hw-rules-example/
 └── README.md
 ```
 
-`pack.yaml`:
+`pack.yaml`：
 
 ```yaml
 name: hw-rules-example
@@ -291,39 +291,39 @@ rules:
   prefer-chinese-comments: warn
 ```
 
-For `/hw:rules pack export <name>`:
+对于 `/hw:rules pack export <name>`：
 
-1. Create `.pipeline/rules/packs/<name>/`.
-2. Copy active custom rules into `<pack>/rules/`.
-3. Generate `pack.yaml` from current effective severities.
-4. Generate a short README with import instructions.
+1. 创建 `.pipeline/rules/packs/<name>/`。
+2. 将活动的自定义 rules 复制到 `<pack>/rules/`。
+3. 从当前有效的 severity 生成 `pack.yaml`。
+4. 生成带有导入说明的简短 README。
 
-For `/hw:rules pack import <url>`:
+对于 `/hw:rules pack import <url>`：
 
-1. Accept `github:owner/repo`, `gitee:owner/repo`, or a direct Git URL.
-2. Clone or copy into `.pipeline/rules/packs/<pack-name>/`.
-3. Add the pack reference to `.pipeline/rules.yaml extends`.
-4. Report imported rules and effective severities.
+1. 接受 `github:owner/repo`、`gitee:owner/repo` 或直接的 Git URL。
+2. 克隆或复制到 `.pipeline/rules/packs/<pack-name>/`。
+3. 将包引用添加到 `.pipeline/rules.yaml extends`。
+4. 报告导入的 rules 和有效的 severity。
 
-Network access may be unavailable; if import cannot run, provide the exact Git command and target path.
+网络访问可能不可用；如果导入无法运行，提供确切的 Git 命令和目标路径。
 
 ## 运行时执行约束
 
-At each lifecycle hook point:
+在每个生命周期 hook 点：
 
-1. Select effective rules whose severity is not `off` and whose hooks include the current point.
-2. Execute built-in `check` logic or read custom Markdown rule body.
-3. For `warn`, print a warning and continue.
-4. For `error`, stop execution and explain:
-   - rule name
-   - failed condition
-   - how to fix, disable, or downgrade it
+1. 选择 severity 不为 `off` 且 hooks 包含当前点的有效 rules。
+2. 执行内置 `check` 逻辑或读取自定义 Markdown rule 正文。
+3. 对于 `warn`，打印警告并继续。
+4. 对于 `error`，停止执行并解释：
+   - rule 名称
+   - 失败的条件
+   - 如何修复、禁用或降级
 
-`always` rules are injected during SessionStart and should be obeyed continuously. `hooks/session-start.sh` uses `scripts/rules-summary.sh` to include active always rules in `additionalContext`.
+`always` rules 在 SessionStart 期间注入，应持续遵守。`hooks/session-start.sh` 使用 `scripts/rules-summary.sh` 将活动的 always rules 包含在 `additionalContext` 中。
 
 ## 内置规则
 
-The distributed built-ins are:
+分发的内置 rules：
 
 | Rule | Label | Default | Hooks |
 |---|---|---|---|
@@ -343,9 +343,9 @@ The distributed built-ins are:
 | `stop-hook-self-check` | hook | error | post-step |
 | `session-start-context-load` | hook | error | on-session-start |
 
-## `/hw:init` Integration
+## `/hw:init` 集成
 
-During project initialization, offer a rules preset:
+在项目初始化期间，提供 rules 预设：
 
 ```text
 📏 Rules 配置
@@ -355,7 +355,7 @@ During project initialization, offer a rules preset:
   [4] 跳过（后续用 /hw:rules 配置）
 ```
 
-When selected, write `.pipeline/rules.yaml`. Skipping leaves old behavior compatible, which is equivalent to recommended defaults at runtime.
+选择后，写入 `.pipeline/rules.yaml`。跳过会保持旧行为兼容，这在运行时等同于 recommended 默认值。
 
 ## 参考文件
 

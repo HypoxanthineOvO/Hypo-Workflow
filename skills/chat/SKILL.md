@@ -13,26 +13,26 @@ description: Enter lightweight append conversation mode when the user wants to c
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill when the user invokes `/hw:chat` or `/hypo-workflow:chat`.
+当用户调用 `/hw:chat` 或 `/hypo-workflow:chat` 时使用此技能。
 
-## 前置条件
+## Prerequisites
 
-- `.pipeline/state.yaml` exists
-- there is an existing Workflow context to reload
+- `.pipeline/state.yaml` 存在
+- 存在可重新加载的现有 Workflow 上下文
 
-## 执行流程
+## Steps
 
-1. Read `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, `.pipeline/PROGRESS.md`, and the most recent report when present.
-2. Enter lightweight append conversation mode without opening a new Milestone.
-3. Keep discussion and small edits in chat log rather than Milestone report.
-4. On `/hw:chat end`, write a summary when needed or keep minimal chat entry persistence.
-5. When the chat scope stops being lightweight, recommend upgrading to `/hw:patch`.
+1. 读取 `.pipeline/state.yaml`、`.pipeline/cycle.yaml`、`.pipeline/PROGRESS.md` 以及最新的报告（如果存在）。
+2. 进入轻量级追加对话模式，不打开新的 Milestone。
+3. 将讨论和小编辑保留在聊天日志中，而不是 Milestone 报告中。
+4. 在 `/hw:chat end` 时，根据需要写入摘要或保持最小的聊天条目持久化。
+5. 当聊天范围不再轻量级时，建议升级到 `/hw:patch`。
 
-## 参考文件
+## References
 
-- `references/chat-spec.md` — chat mode contract
-- `references/commands-spec.md` — command semantics
-- `references/state-contract.md` — `chat:` state shape
-- `references/log-spec.md` — `chat_entry` and `chat_session`
-- `references/progress-spec.md` — `💬 Chat` timeline rows
-- `SKILL.md` — broader system context
+- `references/chat-spec.md` — 聊天模式契约
+- `references/commands-spec.md` — 命令语义
+- `references/state-contract.md` — `chat:` 状态形状
+- `references/log-spec.md` — `chat_entry` 和 `chat_session`
+- `references/progress-spec.md` — `💬 Chat` 时间线行
+- `SKILL.md` — 更广泛的系统上下文

@@ -22,7 +22,7 @@ Hypo-Workflow 围绕 `.pipeline/` 的状态、提示、报告、日志和恢复�
 - 用 `/hw:status` 查看进度，用 `/hw:report` 查看报告。
 - 用 `/hw:explain [question]` 提问代码、配置、命令或近期改动原因；回答必须引用本地文件证据，证据不足时要明确 unknowns。
 - 用 `/hw:explain --subagent [question]` 让独立 Subagent 先做只读取证，主 Agent 校验 evidence packet 后再回答；平台不支持 Subagent 时记录 `fallback_reason` 并降级为 self evidence-first。
-- 用 `/hw:pr inspect|review|fix|merge|close <url|id>` 处理已有 GitHub PR 或 GitLab MR，并把本地证据归档到 `.pipeline/pr/`。
+- 用 `/hw:pr inspect URL`、`/hw:pr review URL`、`/hw:pr fix URL` 等子命令处理已有 GitHub PR 或 GitLab MR，并把本地证据归档到 `.pipeline/pr/`。
 - 用 `/hw:pr create` 进入问答式 PR/MR 创建；已有本地改动走 `--from-worktree`，还没开始的工作走 `--plan`，所有 push、create、reviewer/label/target branch 远端写都要一次性确认。
 - 用 `/hw:sync --repair` 修复派生上下文，用 `/hw:docs repair` 修复文档。
 - 生命周期 gate 处用 `/hw:accept` 或 `/hw:reject` 明确验收。

@@ -3,7 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { normalizeAnalysisInteraction } from "../analysis/index.js";
 import { commandMap } from "../commands/index.js";
-import { DEFAULT_GLOBAL_CONFIG, buildModelPoolOpenCodeAgents, mergeConfig } from "../config/index.js";
+import { DEFAULT_GLOBAL_CONFIG, buildModelPoolOpenCodeAgents, mergeConfig, normalizeExecutionBashPolicy } from "../config/index.js";
 import { normalizeProfile, selectProfile } from "../profile/index.js";
 import {
   loadStructuredRulesAuthority,
@@ -12,7 +12,7 @@ import {
 } from "../rules/index.js";
 import { ASK_QUESTIONS_GUIDANCE, renderDeepSeekToolCallingRules } from "./agent-guidance.js";
 
-const HW_VERSION = "12.5.1";
+const HW_VERSION = "12.5.2";
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(MODULE_DIR, "..", "..", "..");
 
@@ -144,7 +144,7 @@ export async function writeOpenCodeArtifacts(outDir, options = {}) {
   }
   await writeFile(join(projectRoot, "AGENTS.md"), await renderAgentsInstruction(projectRoot, { ...options, rulesAuthority }), "utf8");
   await writeFile(join(adapterDir, "package.json"), await renderTemplate("package.json"), "utf8");
-  await writeFile(join(adapterDir, "plugins", "hypo-workflow.ts"), await renderPluginTemplate(), "utf8");
+  await writeFile(join(adapterDir, "plugins", "hypo-workflow.ts"), await renderPluginTemplate(profile), "utf8");
   await writeFile(
     join(adapterDir, "runtime", "hypo-workflow-status.js"),
     await renderOpenCodeStatusModule(),
@@ -264,6 +264,7 @@ export function renderOpenCodeConfig(profile, options = {}) {
     permission: profile.permissions === "allow-safe"
       ? "allow"
       : {
+          "*": "ask",
           edit: "ask",
           bash: "ask",
           question: "allow",
@@ -303,6 +304,7 @@ export function renderHypoWorkflowMetadata(profile) {
     agents: normalized.agents,
     model_pool: normalized.model_pool,
     analysis: normalizeAnalysisInteraction(normalized.analysis || {}),
+    execution_bash: normalizeExecutionBashPolicy(normalized.execution_bash || normalized.execution?.bash || {}),
     fileGuard: normalized.file_guard,
     version: HW_VERSION,
     commandMap: commandMap("opencode"),
@@ -325,6 +327,7 @@ function normalizeArtifactProfile(options = {}) {
       agents: buildModelPoolOpenCodeAgents(config),
       model_pool: config.model_pool,
       analysis: normalizeAnalysisInteraction(config),
+      execution_bash: normalizeExecutionBashPolicy(config.execution?.bash || {}),
     });
   }
   return withOpenCodeRenderingDefaults(normalizeProfile(options.profile || "standard"));
@@ -366,9 +369,11 @@ async function loadArtifactRulesAuthority(projectRoot, options = {}) {
   }
 }
 
-async function renderPluginTemplate() {
+async function renderPluginTemplate(profile = {}) {
   const template = await renderTemplate("plugin.ts");
-  return template.replace("__COMMAND_MAP_JSON__", JSON.stringify(commandMap("opencode"), null, 2));
+  return template
+    .replace("__COMMAND_MAP_JSON__", JSON.stringify(commandMap("opencode"), null, 2))
+    .replace("__BASH_POLICY_JSON__", JSON.stringify(normalizeExecutionBashPolicy(profile.execution_bash || profile.execution?.bash || {}), null, 2));
 }
 
 export async function renderOpenCodeStatusTuiPlugin() {

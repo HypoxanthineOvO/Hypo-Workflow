@@ -4,7 +4,7 @@ description: Summarize the latest Hypo-Workflow report when the user asks for th
 ---
 
 # /hypo-workflow:report
-## 输出语言规则
+## Output Language Rules
 
 📌 输出语言规则：
 读取 config.yaml → output.language
@@ -15,41 +15,41 @@ description: Summarize the latest Hypo-Workflow report when the user asks for th
 
 Use this skill to summarize the latest generated report file.
 
-## 前置条件
+## Prerequisites
 
-- a report exists in `.pipeline/reports/`, or the current state points to the latest report
+- `.pipeline/reports/` 中存在报告，或当前状态指向最新报告
 
-## 执行流程
+## Execution Flow
 
-1. Read `.pipeline/state.yaml` if present.
-2. Resolve `output.language` and `output.timezone` from project > global > defaults.
-3. If the user passed `/hw:report --view M<N>`, locate the matching report in `.pipeline/reports/` or archived Cycle report directories and load the complete report content. Do not use `reports.compact.md` for `--view`.
-4. If no `--view` target is provided and `.pipeline/reports.compact.md` exists, show the compact report summary list first.
-5. Locate the latest report when a detailed latest summary is needed:
-   - prefer `history.completed_prompts[-1].report_file`
-   - otherwise use the newest report in `.pipeline/reports/`
-6. Summarize in `output.language`:
-   - milestone or prompt name
-   - final decision
-   - key scores
-   - warnings
-   - deferred or blocking notes if present
-7. If `.pipeline/PROGRESS.md` exists, keep its summary consistent conceptually, but do not mutate it from a read-only report command.
-8. Before displaying report snippets or summaries, apply the shared secret-safe evidence redaction helper. If generating or marking a report successful, block success when raw secret evidence is detected.
+1. 如果存在，读取 `.pipeline/state.yaml`。
+2. 从项目 > 全局 > 默认值解析 `output.language` 和 `output.timezone`。
+3. 如果用户传递了 `/hw:report --view M<N>`，则在 `.pipeline/reports/` 或已存档的 Cycle 报告目录中定位匹配的报告，并加载完整的报告内容。不要将 `reports.compact.md` 用于 `--view`。
+4. 如果未提供 `--view` 目标且 `.pipeline/reports.compact.md` 存在，则首先显示紧凑报告摘要列表。
+5. 当需要详细的最新摘要时，定位最新报告：
+   - 优先使用 `history.completed_prompts[-1].report_file`
+   - 否则使用 `.pipeline/reports/` 中的最新报告
+6. 以 `output.language` 摘要：
+   - Milestone 或提示名称
+   - 最终决定
+   - 关键分数
+   - 警告
+   - 如果存在，则延迟或阻止注释
+7. 如果 `.pipeline/PROGRESS.md` 存在，请在概念上保持其摘要一致，但不要从只读报告命令对其进行修改。
+8. 在显示报告片段或摘要之前，应用共享的密钥安全证据编辑助手。如果生成或标记报告成功，则在检测到原始密钥证据时阻止成功。
 
-## Flags 参数
+## Flags
 
-- `/hw:report --view M3`: load and display the complete report for Milestone `M3`.
-- `/hw:report`: list compact report summaries from `.pipeline/reports.compact.md` when available; otherwise summarize the latest report.
+- `/hw:report --view M3`：加载并显示 Milestone `M3` 的完整报告。
+- `/hw:report`：当可用时，列出 `.pipeline/reports.compact.md` 中的紧凑报告摘要；否则摘要最新报告。
 
-## 输出规则
+## Output Rules
 
-- report summaries must use `output.language`; default is `zh-CN`
-- timestamps must be converted to `output.timezone`; default is `Asia/Shanghai`
-- for Chinese output, use compact progress times: same day `HH:MM`, cross-day `DD日 HH:MM`
-- template loading maps `zh-CN` / `zh` to `templates/zh/report.md`, maps `en` / `en-US` to `templates/en/report.md`, and falls back to `templates/report.md` when localized templates are missing
+- 报告摘要必须使用 `output.language`；默认为 `zh-CN`
+- 时间戳必须转换为 `output.timezone`；默认为 `Asia/Shanghai`
+- 对于中文输出，使用紧凑的进度时间：同一天 `HH:MM`，跨天 `DD日 HH:MM`
+- 模板加载将 `zh-CN` / `zh` 映射到 `templates/zh/report.md`，将 `en` / `en-US` 映射到 `templates/en/report.md`，当本地化模板缺失时回退到 `templates/report.md`
 
-## 参考文件
+## Reference Files
 
 - `references/evaluation-spec.md` — score interpretation
 - `references/commands-spec.md` — report selection behavior

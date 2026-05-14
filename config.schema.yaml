@@ -405,6 +405,34 @@ $defs:
         items:
           type: string
           minLength: 1
+  execution_bash_policy:
+    type: object
+    additionalProperties: false
+    description: "Hypo-Workflow bash auto-execution policy. OpenCode permission values still use native ask/allow/deny; never write bypass into opencode.json."
+    properties:
+      mode:
+        type: string
+        enum:
+          - ask
+          - allow_local
+        default: allow_local
+      confirm_external:
+        type: boolean
+        const: true
+        default: true
+      confirm_destructive:
+        type: boolean
+        const: true
+        default: true
+      confirm_system_install:
+        type: boolean
+        const: true
+        default: true
+    default:
+      mode: allow_local
+      confirm_external: true
+      confirm_destructive: true
+      confirm_system_install: true
   worker_separation_mode:
     type: string
     enum:
@@ -1640,6 +1668,8 @@ properties:
           - claude
           - auto
         default: auto
+      bash:
+        $ref: "#/$defs/execution_bash_policy"
       analysis:
         $ref: "#/$defs/analysis_interaction"
         default:

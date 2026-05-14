@@ -7,6 +7,7 @@ import {
   assessWorkerSeparationStatus,
   DEFAULT_GLOBAL_CONFIG,
   loadConfig,
+  normalizeExecutionBashPolicy,
   isAutomationActionAllowed,
   normalizeAutomationPolicy,
   normalizeAutomationWhitelist,
@@ -56,6 +57,8 @@ test("loadConfig merges defaults and writeConfig persists yaml", async () => {
 
   assert.equal(loaded.agent.platform, "opencode");
   assert.equal(loaded.execution.default_mode, "self");
+  assert.equal(loaded.execution.bash.mode, "allow_local");
+  assert.equal(loaded.execution.bash.confirm_external, true);
   assert.equal(loaded.output.timezone, "Asia/Shanghai");
   assert.equal(loaded.release.readme.mode, "loose");
   assert.equal(loaded.release.readme.full_regen, "auto");
@@ -116,6 +119,25 @@ test("default config exposes automation policy levels and safe gates", () => {
   assert.ok(DEFAULT_GLOBAL_CONFIG.automation.local_whitelist.safe_local.actions.includes("restart_dev_server"));
   assert.ok(DEFAULT_GLOBAL_CONFIG.automation.local_whitelist.stateful_local.actions.includes("reset_test_database"));
   assert.ok(DEFAULT_GLOBAL_CONFIG.automation.local_whitelist.external.actions.includes("remote_pr_write"));
+  assert.equal(DEFAULT_GLOBAL_CONFIG.execution.bash.mode, "allow_local");
+  assert.equal(DEFAULT_GLOBAL_CONFIG.execution.bash.confirm_external, true);
+  assert.equal(DEFAULT_GLOBAL_CONFIG.execution.bash.confirm_destructive, true);
+  assert.equal(DEFAULT_GLOBAL_CONFIG.execution.bash.confirm_system_install, true);
+});
+
+test("execution bash policy defaults to local auto-execution while preserving hard gates", () => {
+  const policy = normalizeExecutionBashPolicy({
+    mode: "allow_local",
+    confirm_external: false,
+    confirm_destructive: false,
+    confirm_system_install: false,
+  });
+
+  assert.equal(policy.mode, "allow_local");
+  assert.equal(policy.confirm_external, true);
+  assert.equal(policy.confirm_destructive, true);
+  assert.equal(policy.confirm_system_install, true);
+  assert.throws(() => normalizeExecutionBashPolicy({ mode: "bypass" }), /Unsupported execution bash mode/);
 });
 
 test("normalizeAutomationPolicy preserves planning gates under full automation", () => {
@@ -211,6 +233,9 @@ test("config schema documents worker separation authorization and backend fields
   const schema = await readFile("config.schema.yaml", "utf8");
 
   assert.match(schema, /worker_separation_policy:/);
+  assert.match(schema, /execution_bash_policy:/);
+  assert.match(schema, /allow_local/);
+  assert.match(schema, /never write bypass into opencode\.json/);
   assert.match(schema, /local_whitelist:/);
   assert.match(schema, /restart_dev_server/);
   assert.match(schema, /reset_test_database/);

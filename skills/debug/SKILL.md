@@ -13,44 +13,44 @@ description: Investigate a concrete failure when the user wants symptom-driven r
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill for the five-step debug workflow.
+当用户需要症状驱动的根因分析而非预防性审计扫描时，使用此技能进行五步调试工作流。
 
-When project `execution.worker_separation.mode` is enabled:
+当项目 `execution.worker_separation.mode` 启用时：
 
-- when `execution.worker_separation.mode=off`, keep implementation help separate from test reproduction when practical
-- when `execution.worker_separation.mode=recommended`, debug may not claim worker-separated validation if reproduction/test and implementation collapse onto one worker; stop, retry, defer, or require explicit user-confirmed downgrade before local role-sensitive edits
-- when `execution.worker_separation.mode=strict`, debug must keep reproduction/test, implementation, and audit/validation workers distinct before claiming completion evidence
-- resolve Subagent/delegation authorization before role-sensitive reproduction, auto-fix implementation, or validation work starts
-- `test` or reproduction workers own failure reproduction, failing tests, fixtures, snapshots, assertions, validation commands, and evidence; `implement` workers must not create, edit, or rewrite that test evidence
-- `implement` workers own only production/runtime/documentation fixes and must not spawn or impersonate `test` or `audit`
-- audit or validation workers are independent; `/hw:audit` remains the canonical audit lane and debug must not silently collapse audit into the fixer
-- the main agent owns worker lifecycle: record `requested`, `started`, `completed|failed|blocked`, and `closed|close_failed`; wait for evidence before advancing and close/release workers when debug stops, blocks, aborts, or completes
-- if authorization is absent or declined, stop or record a documented degraded path that cannot satisfy worker-separation gates; degraded debug work must remain blocked/pending for worker-separated completion
-- do not reproduce, fix, and validate locally first and then report that the independent worker was unavailable
-- if debug work degrades role separation, record that limitation explicitly
+- 当 `execution.worker_separation.mode=off` 时，在可行的情况下将实现帮助与测试复现分开
+- 当 `execution.worker_separation.mode=recommended` 时，如果复现/测试和实现合并到一个 Worker 上，调试不得声称 Worker 分离验证；停止、重试、推迟或要求用户明确确认降级后才能进行本地角色敏感编辑
+- 当 `execution.worker_separation.mode=strict` 时，调试必须在声称完成证据前保持复现/测试、实现和审计/验证 Worker 的独立性
+- 在角色敏感的复现、自动修复实现或验证工作开始前，解决 Subagent/委派授权
+- `test` 或复现 Worker 拥有失败复现、失败测试、夹具、快照、断言、验证命令和证据；`implement` Worker 不得创建、编辑或重写该测试证据
+- `implement` Worker 仅拥有生产/运行时/文档修复，不得生成或冒充 `test` 或 `audit`
+- 审计或验证 Worker 是独立的；`/hw:audit` 仍是规范的审计通道，调试不得将审计静默合并到修复器中
+- 主代理拥有 Worker 生命周期：记录 `requested`、`started`、`completed|failed|blocked` 和 `closed|close_failed`；在推进前等待证据，并在调试停止、阻塞、中止或完成时关闭/释放 Worker
+- 如果授权缺失或被拒绝，停止或记录无法满足 Worker 分离门控的已记录降级路径；降级的调试工作必须保持阻塞/待处理状态以实现 Worker 分离完成
+- 不要先在本地复现、修复和验证，然后报告独立 Worker 不可用
+- 如果调试工作降级了角色分离，明确记录该限制
 
 ## 前置条件
 
-- a concrete symptom, failing test, trace, or abnormal behavior is available
+- 有具体的症状、失败测试、跟踪或异常行为可用
 
 ## 执行流程
 
-1. Collect symptoms.
-2. Gather context:
-   - architecture baseline
-   - lifecycle log
-   - recent milestone report
-   - recent git changes
-3. Resolve `output.language` and `output.timezone`.
-4. Generate 3-5 ranked hypotheses.
-5. Validate them in order.
-6. Produce a root-cause report and optional fix suggestion in `output.language`.
-7. Before `--auto-fix` edits or independent validation, confirm required worker authorization or stop with a blocking reason.
-8. With `--auto-fix`, only claim success after validation passes.
-9. Before leaving the debug turn, close/release any workers opened by debug or record `close_failed` with worker id and reason; unresolved worker lifecycle cannot satisfy debug validation evidence.
-10. Apply the shared secret-safe evidence redaction helper before durable writes; do not store raw API keys, tokens, Authorization headers, cookies, passwords, or private keys.
-11. Write the report to `.pipeline/debug/` with timestamps in `output.timezone` and append a debug lifecycle entry.
-12. Set `current.phase=lifecycle_debug` when state tracking is used.
+1. 收集症状。
+2. 收集上下文：
+   - 架构基线
+   - 生命周期日志
+   - 最近的 Milestone 报告
+   - 最近的 Git 变更
+3. 解析 `output.language` 和 `output.timezone`。
+4. 生成 3-5 个排序假设。
+5. 按顺序验证它们。
+6. 使用 `output.language` 生成根因报告和可选的修复建议。
+7. 在 `--auto-fix` 编辑或独立验证前，确认所需的 Worker 授权或停止并给出阻塞原因。
+8. 使用 `--auto-fix` 时，仅在验证通过后才声称成功。
+9. 在离开调试轮次前，关闭/释放调试打开的任何 Worker 或记录 `close_failed` 及 Worker ID 和原因；未解决的 Worker 生命周期无法满足调试验证证据。
+10. 在持久写入前应用共享的密钥安全证据脱敏助手；不要存储原始 API 密钥、令牌、Authorization 头、Cookie、密码或私钥。
+11. 将报告写入 `.pipeline/debug/`，时间戳使用 `output.timezone`，并追加调试生命周期条目。
+12. 当使用状态跟踪时，设置 `current.phase=lifecycle_debug`。
 
 ## 参考文件
 

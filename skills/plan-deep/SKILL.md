@@ -7,102 +7,102 @@ description: Run a durable Deep Plan discussion package before ordinary Hypo-Wor
 
 ## 输出语言规则
 
-Read `.pipeline/config.yaml` -> `output.language`.
+读取 `.pipeline/config.yaml` -> `output.language`。
 
-- `zh-CN` / `zh`: user-visible discussion notes, readiness reports, and summaries use Chinese.
-- `en`: use English.
-- `auto`: follow the user's conversation language.
-- Internal YAML keys remain English.
+- `zh-CN` / `zh`：用户可见的讨论笔记、readiness 报告和摘要使用中文。
+- `en`：使用英文。
+- `auto`：跟随用户的对话语言。
+- 内部 YAML key 保持英文。
 
-Use this skill when the user invokes `/hw:plan:deep` or `/hw:plan --deep`.
+当用户调用 `/hw:plan:deep` 或 `/hw:plan --deep` 时使用此 Skill。
 
-Deep Plan is a durable pre-plan discussion lifecycle. It is for cases where requirements, product shape, architecture, module boundaries, or long-term development order are not ready for ordinary `/hw:plan` decomposition yet.
+Deep Plan 是一个持久化的 pre-plan 讨论生命周期。适用于需求、产品形态、架构、模块边界或长期开发顺序尚未准备好进行普通 `/hw:plan` 分解的场景。
 
 ## Boundary
 
-- Deep Plan is not `/hw:guide`; `/hw:guide` remains the onboarding and routing surface, while Deep Plan is an explicit discussion package lifecycle.
-- Deep Plan is not `/hw:explore`; `/hw:explore` remains bounded hypothesis validation and codebase exploration, while Deep Plan captures requirements, architecture reasoning, decisions, and readiness.
-- Deep Plan must not directly execute implementation milestones.
-- Deep Plan must not bypass the ordinary `/hw:plan` P1-P4 gates. Conversion creates Plan input; ordinary Plan still controls decomposition, generation, and confirmation.
+- Deep Plan 不是 `/hw:guide`；`/hw:guide` 仍然是引导和路由入口，而 Deep Plan 是一个显式的 discussion package 生命周期。
+- Deep Plan 不是 `/hw:explore`；`/hw:explore` 仍然是有界的假设验证和代码库探索，而 Deep Plan 捕获需求、架构推理、决策和 readiness。
+- Deep Plan 不得直接执行 implementation milestones。
+- Deep Plan 不得绕过普通 `/hw:plan` 的 P1-P4 gates。Conversion 创建 Plan 输入；普通 Plan 仍然控制 decomposition、generation 和 confirmation。
 
 ## Durable Discussion Package
 
-Create and maintain a durable discussion package under:
+创建并维护一个持久化的 discussion package：
 
 ```text
 .pipeline/deep-plans/DP001-slug/
 ```
 
-The package is the source of truth for the discussion cycle. Use the next available `DPxxx` number, slugified from the user's title.
+该 package 是 discussion cycle 的 source of truth。使用下一个可用的 `DPxxx` 编号，从用户标题 slugify 而来。
 
-Recommended package files:
+推荐的 package 文件：
 
-- `deep-plan.yaml`: machine-readable source of truth for status, target depth, tracks, decisions, open questions, risks, and conversion state.
-- `summary.md`: compact human-readable discussion summary.
-- `architecture.yaml`: machine-readable components, edges, relationships, assumptions, and unresolved architecture questions.
-- `architecture.md`: Mermaid and Markdown views rendered from the machine-readable source.
-- `tracks.yaml`: active requirement and module tracks, including dependencies and conflicts.
-- `readiness.md`: readiness report and blockers.
-- `plan-context.md`: compact context for ordinary `/hw:plan` after `convert`.
+- `deep-plan.yaml`：机器可读的 source of truth，包含 status、target depth、tracks、decisions、open questions、risks 和 conversion state。
+- `summary.md`：紧凑的人类可读讨论摘要。
+- `architecture.yaml`：机器可读的 components、edges、relationships、assumptions 和未解决的架构问题。
+- `architecture.md`：从机器可读源渲染的 Mermaid 和 Markdown 视图。
+- `tracks.yaml`：活跃的 requirement 和 module tracks，包括 dependencies 和 conflicts。
+- `readiness.md`：readiness 报告和 blockers。
+- `plan-context.md`：`convert` 后用于普通 `/hw:plan` 的紧凑上下文。
 
-Machine-readable source files are authoritative. Mermaid/Markdown views are derived for humans and should be refreshed from the structured source when possible.
+机器可读的源文件是 authoritative。Mermaid/Markdown 视图是为人类生成的派生内容，应尽可能从结构化源刷新。
 
 ## Operations
 
-Supported operations:
+支持的操作：
 
-- `new`: create a new durable discussion package and initialize `drafting`.
-- `ask`: continue first-principles questioning and update tracks, decisions, risks, and open questions.
-- `research`: perform local read-only research and add evidence to the package.
-- `map`: generate or refresh architecture components, relationships, and Mermaid/Markdown views.
-- `drill`: enter one requirement, theme, component, or module for focused questioning.
-- `readiness`: evaluate whether the package is ready for directional, architecture-ready, or implementation-ready conversion.
-- `convert`: create compact ordinary Plan input while preserving readiness blockers and unresolved questions.
+- `new`：创建新的持久化 discussion package 并初始化 `drafting`。
+- `ask`：继续 first-principles questioning 并更新 tracks、decisions、risks 和 open questions。
+- `research`：执行本地只读研究并将证据添加到 package。
+- `map`：生成或刷新 architecture components、relationships 和 Mermaid/Markdown 视图。
+- `drill`：进入一个 requirement、theme、component 或 module 进行聚焦提问。
+- `readiness`：评估 package 是否准备好进行 directional、architecture-ready 或 implementation-ready conversion。
+- `convert`：创建紧凑的普通 Plan 输入，同时保留 readiness blockers 和未解决的问题。
 
 ## Lifecycle States
 
-Allowed lifecycle states:
+允许的 lifecycle states：
 
-- `drafting`: initial problem framing, first-principles questioning, and rough tracks.
-- `researching`: local read-only evidence collection is active.
-- `architecture_mapping`: structured architecture components and relationships are being formed.
-- `module_drilldown`: one or more tracks or modules are under focused drilldown.
-- `ready_for_plan`: readiness criteria for the selected target depth are satisfied or consciously waived.
-- `converted`: compact Plan context has been generated for ordinary `/hw:plan`.
-- `archived`: the discussion package is closed for future reference.
+- `drafting`：初始问题框架、first-principles questioning 和粗略 tracks。
+- `researching`：本地只读证据收集正在进行中。
+- `architecture_mapping`：结构化的 architecture components 和 relationships 正在形成。
+- `module_drilldown`：一个或多个 tracks 或 modules 正在进行聚焦 drilldown。
+- `ready_for_plan`：所选 target depth 的 readiness 标准已满足或被有意识地放弃。
+- `converted`：已为普通 `/hw:plan` 生成紧凑的 Plan context。
+- `archived`：discussion package 已关闭供将来参考。
 
 ## Target Depth
 
-Readiness is target-depth based:
+Readiness 基于 target depth：
 
-- `directional`: direction, problem map, core assumptions, and unknowns are explicit; details may remain open.
-- `architecture-ready`: requirements, core components, relationships, and major risks are clear enough to reason about architecture.
-- `implementation-ready`: requirements, architecture, module cards, testing matrix, execution order, and risk handling are ready to feed ordinary Plan.
+- `directional`：方向、问题地图、核心假设和未知数已明确；细节可能仍然开放。
+- `architecture-ready`：需求、核心组件、relationships 和主要风险已足够清晰，可以进行架构推理。
+- `implementation-ready`：需求、架构、module cards、testing matrix、执行顺序和风险处理已准备好输入普通 Plan。
 
-Missing fields are blockers only when they are required by the selected target depth. A package may intentionally stay directional and later return to `ask`, `research`, `map`, or `drill`.
+缺失的字段仅在所选 target depth 要求时才是 blockers。一个 package 可以有意保持 directional 状态，稍后返回 `ask`、`research`、`map` 或 `drill`。
 
 ## First-Principles Questioning
 
-Deep Plan should pressure-test unclear requirements before decomposition:
+Deep Plan 应在分解之前对不明确的需求进行压力测试：
 
-- what real pain or constraint makes this necessary
-- why the proposed shape is necessary now
-- what the smallest viable closed loop is
-- what evidence would disprove the direction
-- which statements are implementation habit rather than essential need
-- what acceptance signal proves the discussion is ready for the selected depth
+- 什么真正的痛点或约束使这成为必要
+- 为什么提议的形态现在是必要的
+- 最小可行的闭环是什么
+- 什么证据会推翻这个方向
+- 哪些陈述是实现习惯而非本质需求
+- 什么验收信号证明讨论已为所选深度做好准备
 
-Do not use a fixed "who is the user" checklist unless the user asks for persona analysis.
+除非用户要求进行 persona 分析，否则不要使用固定的 "who is the user" 检查清单。
 
 ## Convert Contract
 
-`convert` is an explicit auditable boundary from discussion state into ordinary Plan input.
+`convert` 是从 discussion state 到普通 Plan 输入的显式可审计边界。
 
-Before conversion:
+转换前：
 
-1. Run `readiness`.
-2. Show blockers, conscious waivers, unresolved questions, and selected target depth.
-3. Ask for user confirmation.
-4. Write `plan-context.md` and update `deep-plan.yaml` to `converted`.
+1. 运行 `readiness`。
+2. 展示 blockers、有意识的放弃、未解决的问题和所选 target depth。
+3. 请求用户确认。
+4. 写入 `plan-context.md` 并将 `deep-plan.yaml` 更新为 `converted`。
 
-After conversion, invoke or recommend ordinary `/hw:plan` with the generated context. Ordinary `/hw:plan` must still run P0/P1/P2/P3/P4 gates and must not skip Discover, Decompose, Generate, or Confirm just because the context came from Deep Plan.
+转换后，调用或推荐使用生成的上下文运行普通 `/hw:plan`。普通 `/hw:plan` 仍然必须运行 P0/P1/P2/P3/P4 gates，不得仅因为上下文来自 Deep Plan 就跳过 Discover、Decompose、Generate 或 Confirm。

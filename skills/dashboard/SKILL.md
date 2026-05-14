@@ -13,18 +13,18 @@ description: Internal legacy dashboard launcher removed from the active command 
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-This Skill is deprecated and kept only for compatibility notes.
+此技能已弃用，仅保留用于兼容性说明。
 
 ## 前置条件
 
-- none
+- 无
 
 ## 执行流程
 
-1. Inform the user that `/hw:dashboard` has been removed from the active command surface.
-2. Direct the user to `/hw:start`, `/hw:resume`, or `/hw:status` for current workflow control.
-3. If the user needs browser-based status later, defer to the planned Claude Code plugin/Web surface.
+1. 通知用户 `/hw:dashboard` 已从活跃命令表面移除。
+2. 引导用户使用 `/hw:start`、`/hw:resume` 或 `/hw:status` 进行当前工作流控制。
+3. 如果用户稍后需要基于浏览器的状态显示，请推迟到计划中的 Claude Code 插件/Web 界面。
 
 ## 参考文件
 
-- `SKILL.md` — broader pipeline context if needed
+- `SKILL.md` — 需要时的更广泛 Pipeline 上下文

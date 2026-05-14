@@ -38,6 +38,8 @@ const autoContinue = {
   mode: "safe",
 };
 
+const bashExecution = __BASH_POLICY_JSON__;
+
 const server = async ({ client }) => {
   const log = createLogger(client);
   return {
@@ -65,7 +67,7 @@ const server = async ({ client }) => {
       log("tool.execute.after heartbeat bridge");
     },
     "permission.ask": async (input, output) => {
-      const permission = decideOpenCodePermission({ args: input?.args || input?.input || input });
+      const permission = decideOpenCodePermission({ ...(input || {}), args: input?.args || input?.input || input, bash: bashExecution });
       output.status = permission.status;
       recordPermissionEvent("permission.ask", { ...input, decision: permission.status }, log);
     },

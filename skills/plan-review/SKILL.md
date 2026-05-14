@@ -13,29 +13,29 @@ description: Review architecture changes after a completed milestone when the us
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill for Plan Review after execution changes project reality.
+当执行改变项目现实后，在 Plan Review 后使用此 skill。
 
 ## 前置条件
 
-- a milestone has completed
-- architecture tracking is active or an architecture baseline exists
+- Milestone 已完成
+- 架构跟踪处于活动状态或架构基线存在
 
 ## 执行流程
 
-1. Read the architecture baseline.
-2. Resolve `output.language` and `output.timezone`.
-3. Summarize what the completed milestone actually changed in `output.language`.
-4. Record:
+1. 读取架构基线。
+2. 解析 `output.language` 和 `output.timezone`。
+3. 用 `output.language` 总结已完成 Milestone 实际改变了什么。
+4. 记录：
    - `ADDED`
    - `CHANGED`
    - `REASON`
    - `IMPACT`
-5. Check downstream prompts for stale assumptions.
-6. Propose edits in `.plan-state/prompt-patch-queue.yaml` instead of silently rewriting prompts.
-7. Append a lifecycle log entry and update progress context if this review materially changes the plan.
+5. 检查下游提示是否存在过时假设。
+6. 在 `.plan-state/prompt-patch-queue.yaml` 中提出编辑建议，而不是静默重写提示。
+7. 如果此审查实质性地改变了计划，则附加生命周期日志条目并更新进度上下文。
 
 ## 参考文件
 
-- `references/plan-review-spec.md` — full review format
-- `plan/PLAN-SKILL.md` — planning context
-- `SKILL.md` — broader system context
+- `references/plan-review-spec.md` — 完整审查格式
+- `plan/PLAN-SKILL.md` — 规划上下文
+- `SKILL.md` — 更广泛的系统上下文

@@ -94,8 +94,14 @@
       "destructive_or_external_side_effects": "ask"
     }
   },
+  "execution_bash": {
+    "mode": "allow_local",
+    "confirm_external": true,
+    "confirm_destructive": true,
+    "confirm_system_install": true
+  },
   "fileGuard": "standard",
-  "version": "12.5.1",
+  "version": "12.5.2",
   "commandMap": [
     {
       "canonical": "/hw:start",

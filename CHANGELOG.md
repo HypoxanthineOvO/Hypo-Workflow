@@ -1,5 +1,17 @@
 # Changelog
 
+## v12.5.2 - 2026-05-14
+
+### Fixes
+
+- 将 OpenCode bash 自动批准从无效 `permission: bypass` 配置改为合法的 `ask`/`allow` schema + Hypo-Workflow plugin policy。
+- 新增 `execution.bash.mode=allow_local` 配置、schema、profile 默认值和 OpenCode metadata 注入。
+- 保留 `git push`、PR/MR remote write、网络命令、破坏性命令、系统安装和 release publish 的 Ask gate。
+
+### Tests
+
+- 通过 OpenCode bash policy、config/profile、adapter artifacts 和 `opencode debug config` 验证。
+
 ## v12.5.1 - 2026-05-12
 
 ### Features

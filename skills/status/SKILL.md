@@ -13,9 +13,9 @@ description: Show current Hypo-Workflow progress when the user wants a concise s
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-Use this skill to inspect pipeline progress only.
+使用此技能仅检查 pipeline 进度。
 
-Status is strictly read-only. If state, logs, progress, or step pointers are inconsistent, report the inconsistency and the recommended repair command; do not repair files, do not advance the current step, and do not make Stop hooks pass as a side effect of showing status.
+Status 是严格只读的。如果 state、logs、progress 或 step 指针不一致，报告不一致性和建议的修复命令；不要修复文件，不要推进当前步骤，也不要让 Stop hooks 作为显示状态的副作用而通过。
 
 ## 前置条件
 
@@ -27,47 +27,47 @@ Status is strictly read-only. If state, logs, progress, or step pointers are inc
 2. Read `.pipeline/config.yaml` if present.
 3. If the user passed `--full`, read `.pipeline/state.yaml` and `.pipeline/PROGRESS.md` directly and print `加载完整版 state.yaml` / `加载完整版 PROGRESS.md` with line counts when possible.
 4. If `--full` is absent, prefer `.pipeline/state.compact.yaml` and `.pipeline/PROGRESS.compact.md` when they exist; otherwise fall back to `.pipeline/state.yaml` and `.pipeline/PROGRESS.md`.
-5. Resolve effective defaults as project > global > defaults without mutating either config file.
-6. Prefer `scripts/state-summary.sh` for a quick summary when shell access is available; use compact files only as supplemental context because canonical state mutations still belong to `state.yaml`.
-7. Report:
-   - pipeline name
-   - overall status
-   - canonical phase and next action derived from Cycle workflow/lifecycle policy
-   - current milestone or prompt
-   - current step and step index
-   - effective execution mode and subagent provider
-   - active Cycle when `.pipeline/cycle.yaml` exists
-   - latest completed milestone
-   - deferred items if any
-   - `last_heartbeat` and watchdog state when present
-8. If `.pipeline/PROGRESS.md` or `.pipeline/PROGRESS.compact.md` exists, use it as a human-facing summary source, but do not rewrite it during status inspection.
-9. If `.pipeline/feature-queue.yaml` contains Feature DAG dependencies, show a concise board summary with ready, blocked, and parallel candidates. Hide DAG concepts for ordinary single-feature queues.
-10. Include derived health from `.pipeline/derived-health.yaml` when present and route stale derived views to `/hw:sync --repair` or `/hw:docs repair` as appropriate.
-11. Show Recent Events from `.pipeline/log.yaml` sorted by timestamp newest-first, filtered to user-relevant lifecycle events, and redacted through the shared secret-safe evidence helper.
-12. If project-root `PROJECT-SUMMARY.md` exists, include its top summary line and Open Patches / Deferred counts.
-13. When running through Claude Code or `/hw:status`, prefer the shared Claude status surface shape: compact milestone table, current phase/next action, automation/profile basics, and recent events. Do not dump the full raw `PROGRESS.md` unless `--full` is requested.
+5. 解析有效默认值为 project > global > defaults，不修改任一配置文件。
+6. 当 shell 访问可用时，优先使用 `scripts/state-summary.sh` 进行快速摘要；仅将 compact 文件作为补充上下文使用，因为规范的状态变更仍属于 `state.yaml`。
+7. 报告：
+   - pipeline 名称
+   - 整体状态
+   - 从 Cycle workflow/lifecycle policy 派生的规范阶段和下一步操作
+   - 当前 milestone 或 prompt
+   - 当前步骤和步骤索引
+   - 有效执行模式和 subagent 提供者
+   - 当 `.pipeline/cycle.yaml` 存在时的活跃 Cycle
+   - 最近完成的 milestone
+   - 延迟项目（如有）
+   - `last_heartbeat` 和 watchdog 状态（如存在）
+8. 如果 `.pipeline/PROGRESS.md` 或 `.pipeline/PROGRESS.compact.md` 存在，将其作为面向用户的摘要来源，但在状态检查期间不要重写它。
+9. 如果 `.pipeline/feature-queue.yaml` 包含 Feature DAG 依赖，显示一个简洁的看板摘要，包含就绪、阻塞和并行候选项。对于普通的单功能队列，隐藏 DAG 概念。
+10. 当存在时，包含来自 `.pipeline/derived-health.yaml` 的派生健康状态，并将过时的派生视图路由到 `/hw:sync --repair` 或 `/hw:docs repair`（视情况而定）。
+11. 显示来自 `.pipeline/log.yaml` 的最近事件，按时间戳最新优先排序，过滤为用户相关的生命周期事件，并通过共享的密钥安全证据助手进行编辑。
+12. 如果项目根目录存在 `PROJECT-SUMMARY.md`，包含其顶部摘要行和 Open Patches / Deferred 计数。
+13. 当通过 Claude Code 或 `/hw:status` 运行时，优先使用共享的 Claude 状态表面形状：紧凑的 milestone 表、当前阶段/下一步操作、自动化/配置文件基础信息以及最近事件。除非请求 `--full`，否则不要转储完整的原始 `PROGRESS.md`。
 
-Status must expose one user-facing canonical phase and one next action. Derive these from `.pipeline/cycle.yaml`, `.pipeline/state.yaml`, acceptance state, and active continuation state. Important phases:
+Status 必须暴露一个面向用户的规范阶段和一个下一步操作。从 `.pipeline/cycle.yaml`、`.pipeline/state.yaml`、接受状态和活跃的继续状态中派生这些信息。重要阶段：
 
 - `needs_revision` -> next action `resume_revision`
 - `follow_up_planning` -> next action `start_follow_up_plan`
 - `pending_acceptance` -> next action `accept_or_reject`
 
-Do not make the user reconcile separate execution, acceptance, continuation, and lock axes on the first screen.
+不要让用户在第一个屏幕上协调单独的执行、接受、继续和锁定轴。
 
 ## Flags 参数
 
-- `/hw:status --full`: ignore compact files and load the complete `.pipeline/state.yaml` and `.pipeline/PROGRESS.md`.
-- `/hw:status`: use compact files when available, with full-file fallback when compact files are absent.
+- `/hw:status --full`：忽略 compact 文件，加载完整的 `.pipeline/state.yaml` 和 `.pipeline/PROGRESS.md`。
+- `/hw:status`：当 compact 文件可用时使用它们，当 compact 文件不存在时回退到完整文件。
 
 ## 安全规则
 
-- do not mutate `state.yaml`
-- do not mutate logs or reports
-- do not create missing log/progress files
-- do not advance any step or milestone
-- do not repair workflow inconsistencies during status display
-- do not display raw secrets from logs, reports, Knowledge records, or status sources
+- 不要修改 `state.yaml`
+- 不要修改日志或报告
+- 不要创建缺失的日志/进度文件
+- 不要推进任何步骤或 milestone
+- 在状态显示期间不要修复工作流不一致性
+- 不要显示来自日志、报告、Knowledge 记录或状态源的原始密钥
 
 ## 参考文件
 
