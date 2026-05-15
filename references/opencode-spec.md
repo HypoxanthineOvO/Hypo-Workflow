@@ -32,7 +32,7 @@ See also [`external-docs-index.md`](./external-docs-index.md) for the cross-plat
 | Todo and plan tracking | native | `todowrite` tool | Translate milestones and steps into useful todo groups. |
 | Primary agents | native | `agent: plan`, `agent: build`, custom `hw-*` agents | Generate agent definitions and model frontmatter from HW profiles. |
 | Subagents | native | markdown agents with `mode: subagent` | Map HW test/code/debug/explore/reviewer roles. |
-| Permissions | native | `permission` allow/ask/deny config | Provide safe presets and file-guard policy; never persist `bypass` because OpenCode schema rejects it. |
+| Permissions | native | `permission` allow/ask/deny config | Use schema-compatible `allow` for local YOLO mode; never persist `bypass` because OpenCode schema rejects it. |
 | Rules and instructions | native | `AGENTS.md`, `opencode.json.instructions` | Export HW rules into native instruction sources. |
 | Model selection | native | provider/model/variant config | Prefer OpenCode config; HW only supplies profile defaults. |
 | MCP servers | native | `mcp` config | Optional setup integration, not required for command parity. |
@@ -121,10 +121,6 @@ Hypo-Workflow treats OpenCode model routing as a setup/sync contract, not as a m
 ```yaml
 opencode:
   providers:
-    openai:
-      models:
-        gpt-5.5:
-          name: GPT 5.5
     anthropic:
       models:
         claude-opus-4.6:
@@ -145,7 +141,7 @@ opencode:
     effective_context_target: 900000
   agents:
     plan:
-      model: gpt-5.5
+      model: deepseek-v4-pro
     compact:
       model: deepseek-v4-flash
     test:
@@ -155,7 +151,7 @@ opencode:
     code-b:
       model: deepseek-v4-pro
     debug:
-      model: gpt-5.5
+      model: deepseek-v4-pro
     report:
       model: deepseek-v4-flash
 ```
@@ -216,7 +212,7 @@ OpenCode cannot be described as exact Claude Stop Hook parity. Stop-equivalent b
 
 Default auto-continue is on for OpenCode with `safe` policy: continue after green tests, explicit low-risk report/evaluation, no open error-severity rules, no dirty protected HW files, and no pending Ask/question gate.
 
-`execution.bash.mode=allow_local` is the Hypo-Workflow default for OpenCode bash auto-execution. It auto-approves ordinary local test, lint, build, format, sync, and inspection commands through the plugin permission hook while the root `opencode.json` stays native-schema-compatible with `* : ask`, `bash: ask`, `edit: ask`, and `question: allow`. External or remote side effects (`git push`, `gh pr`, `curl`, `wget`, remote clone, publish), destructive commands (`rm -rf`, `git reset --hard`, force push), release publication, and system dependency installation remain Ask-gated. Do not encode this behavior as `permission: bypass`; `bypass` is not an OpenCode permission action.
+`execution.bash.mode=allow_local` is the Hypo-Workflow default for OpenCode bash auto-execution. In local YOLO mode, the plugin permission hook returns `allow` for local commands, external or remote side effects (`git push`, `gh pr`, `curl`, `wget`, remote clone, publish), destructive commands (`rm -rf`, `git reset --hard`, force push), release publication, and system dependency installation. The root `opencode.json` stays native-schema-compatible with `* : allow`, `bash: allow`, `edit: allow`, and `question: allow`. Do not encode this behavior as `permission: bypass`; `bypass` is not an OpenCode permission action.
 
 ## TUI Status Model
 

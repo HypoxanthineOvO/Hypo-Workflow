@@ -12,7 +12,7 @@ import {
 
 const metadata = {
   name: "hypo-workflow",
-  version: "12.5.2",
+  version: "12.7.0",
   commandMap: [
   {
     "canonical": "/hw:start",
@@ -321,9 +321,9 @@ const autoContinue = {
 
 const bashExecution = {
   "mode": "allow_local",
-  "confirm_external": true,
-  "confirm_destructive": true,
-  "confirm_system_install": true
+  "confirm_external": false,
+  "confirm_destructive": false,
+  "confirm_system_install": false
 };
 
 const server = async ({ client }) => {

@@ -225,7 +225,7 @@ test("writeOpenCodeArtifacts injects DeepSeek tool-calling rules only for DeepSe
   const codeBAgent = await readFile(join(dir, ".opencode", "agents", "hw-code-b.md"), "utf8");
   const reportAgent = await readFile(join(dir, ".opencode", "agents", "hw-report.md"), "utf8");
 
-  for (const deepSeekAgent of [testAgent, codeBAgent, reportAgent]) {
+  for (const deepSeekAgent of [planAgent, testAgent, codeBAgent, reportAgent]) {
     assert.match(deepSeekAgent, /DeepSeek Tool Calling Rules/);
     assert.match(deepSeekAgent, /When using DeepSeek through OpenCode/);
     assert.match(deepSeekAgent, /Omit optional fields you do not need/);
@@ -233,7 +233,6 @@ test("writeOpenCodeArtifacts injects DeepSeek tool-calling rules only for DeepSe
     assert.match(deepSeekAgent, /If a tool returns a validation error/);
   }
   assert.match(planAgent, /Ask Questions Discipline/);
-  assert.doesNotMatch(planAgent, /DeepSeek Tool Calling Rules/);
   assert.doesNotMatch(buildAgent, /DeepSeek Tool Calling Rules/);
 });
 
@@ -246,24 +245,24 @@ test("OpenCode metadata carries agent model matrix and compaction settings", () 
       effective_context_target: 900000,
     },
     agents: {
-      plan: { model: "gpt-5.5" },
+      plan: { model: "deepseek-v4-pro" },
       compact: { model: "deepseek-v4-flash" },
       test: { model: "deepseek-v4-pro" },
       "code-a": { model: "mimo-v2.5-pro" },
       "code-b": { model: "deepseek-v4-pro" },
-      debug: { model: "gpt-5.5" },
+      debug: { model: "deepseek-v4-pro" },
       docs: { model: "deepseek-v4-pro" },
       report: { model: "deepseek-v4-flash" },
     },
   });
 
   assert.equal(metadata.compaction.effective_context_target, 900000);
-  assert.equal(metadata.agents.plan.model, "gpt-5.5");
+  assert.equal(metadata.agents.plan.model, "deepseek-v4-pro");
   assert.equal(metadata.agents.compact.model, "deepseek-v4-flash");
   assert.equal(metadata.agents.test.model, "deepseek-v4-pro");
   assert.equal(metadata.agents["code-a"].model, "mimo-v2.5-pro");
   assert.equal(metadata.agents["code-b"].model, "deepseek-v4-pro");
-  assert.equal(metadata.agents.debug.model, "gpt-5.5");
+  assert.equal(metadata.agents.debug.model, "deepseek-v4-pro");
   assert.equal(metadata.agents.docs.model, "deepseek-v4-pro");
   assert.equal(metadata.agents.report.model, "deepseek-v4-flash");
 });
@@ -273,7 +272,7 @@ test("OpenCode spec documents model matrix contract without runner semantics", a
 
   assert.match(spec, /## OpenCode Model Matrix Contract/);
   assert.match(spec, /effective_context_target: 900000/);
-  assert.match(spec, /plan:\n\s+model: gpt-5\.5/);
+  assert.match(spec, /plan:\n\s+model: deepseek-v4-pro/);
   assert.match(spec, /compact:\n\s+model: deepseek-v4-flash/);
   assert.match(spec, /not as a model-calling runner/);
 });
@@ -288,7 +287,7 @@ test("OpenCode agent frontmatter uses provider-qualified model ids for known pro
   const reportAgent = await readFile(join(dir, ".opencode", "agents", "hw-report.md"), "utf8");
   const metadata = JSON.parse(await readFile(join(dir, ".opencode", "hypo-workflow.json"), "utf8"));
 
-  assert.match(planAgent, /^model: openai\/gpt-5\.5$/m);
+  assert.match(planAgent, /^model: deepseek\/deepseek-v4-pro$/m);
   assert.match(buildAgent, /^model: mimo\/mimo-v2\.5-pro$/m);
   assert.match(testAgent, /^model: deepseek\/deepseek-v4-pro$/m);
   assert.match(reportAgent, /^model: deepseek\/deepseek-v4-flash$/m);

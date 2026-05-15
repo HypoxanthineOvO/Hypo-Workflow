@@ -10,6 +10,15 @@ description: Run a serialized prompt execution pipeline from a local `.pipeline/
 >
 > **Codex 用户**：本文件是完整的 Skill 入口，继续使用 `/hw:*` 指令。
 
+## Role of this file
+
+This SKILL.md serves as the **index and routing summary** for Hypo-Workflow. For the complete execution specification of each command, refer to its dedicated skill file under `skills/*/SKILL.md`. The sections below provide:
+- A command routing table
+- Global rules (output language, plan discipline, analysis boundary)
+- Cross-cutting conventions
+
+**Do not edit behavior here that exists in the dedicated skill files — keep them in sync, or prefer the dedicated file.**
+
 ## 指令列表
 
 | Command | Description |
@@ -53,24 +62,27 @@ description: Run a serialized prompt execution pipeline from a local `.pipeline/
 | `/hw:help` | Show command help, grouped quick reference, or per-command usage |
 | `/hw:reset` | Reset pipeline runtime state with safe, full, or hard modes |
 | `/hw:log` | Read the unified lifecycle log; use `--full` to bypass compact log context |
-| `/hw:setup` | Create or update `~/.hypo-workflow/config.yaml` for environment, execution, subagent, plan, and dashboard defaults |
+| `/hw:setup` | Create or update `~/.hypo-workflow/config.yaml` for environment, execution, subagent, and plan defaults |
 
 Internal runtime skill: `/hw:watchdog` is cron-only and should not be presented as a normal user command.
 
 When the user types any `/hw:*` command, execute the corresponding action.
 Unrecognized `/hw:*` commands should be reported as unknown.
-Load [`references/commands-spec.md`](./references/commands-spec.md) when you need parsing rules, parameter semantics, or state-mutation details for slash commands.
+Load [`references/commands-spec.md`](./references/commands-spec.md) when you need parsing rules, parameter semantics, or state-mutation details for slash commands. For the full semantic spec, see `references/commands-spec.md`.
 
 Compatibility alias: `/hw:review` now prints `⚠️ \`/hw:review\` 已迁移到 \`/hw:plan:review\`。请使用新命令。`
 
-## 输出语言规则
+## @include: output-language-rule
 
-📌 输出语言规则：
-读取 config.yaml → output.language
-- zh-CN / zh：所有用户可见的输出使用中文（PROGRESS、报告、状态提示、错误消息、交互提问）
-- en：使用英文
-- auto：跟随用户对话语言
-内部日志（log.yaml、state.yaml）始终英文。
+📌 Every skill file SHOULD reference this rule instead of duplicating it inline.
+When platform capabilities allow `@include` or similar templating, skill files may use this reference.
+Until then, manual duplication is the fallback.
+
+Rule: Read config.yaml → output.language
+- zh-CN / zh: all user-visible output in Chinese (PROGRESS, reports, status prompts, error messages, interactive questions)
+- en: English
+- auto: follow conversation language
+Internal logs (log.yaml, state.yaml) always in English.
 
 Template loading maps `zh-CN` / `zh` to `templates/zh/`, maps `en` / `en-US` to `templates/en/`, and falls back to root `templates/` when the localized template is missing.
 
@@ -291,8 +303,6 @@ Key fallbacks:
 - `execution.subagent_tool` falls back to global `subagent.provider`, then `auto`
 - `plan.mode` falls back to global `plan.default_mode`, then `interactive`
 - `plan.interaction_depth` falls back to global `plan.interaction_depth`, then `medium`
-- `dashboard.enabled` falls back to global `dashboard.enabled`, then `false`
-- `dashboard.port` falls back to global `dashboard.port`, then `7700`
 - `output.language` falls back to global `output.language`, then `en`
 - `output.timezone` falls back to global `output.timezone`, then `UTC`
 - `watchdog.enabled` falls back to global `watchdog.enabled`, then `false`
@@ -359,10 +369,6 @@ Key defaults:
 - `showcase.poster.quality=high`
 - `showcase.poster.style=auto`
 - `rules.extends=recommended`
-- `dashboard.enabled=false`
-- `dashboard.port=7700`
-- `dashboard.auto_start=false`
-- `dashboard.shutdown_delay=30`
 - `execution.mode=self`
 - `execution.subagent_tool=auto`
 - `execution.steps.preset=tdd`
@@ -419,14 +425,6 @@ Planning now supports two modes through `plan.mode`:
   - hooks should block premature turn end so planning continues automatically
 
 `/hw:plan --context audit,patches,deferred,debug` injects existing evidence into P1 Discover. Context sharpens the interview; it does not skip Discover.
-
-## Dashboard
-
-The dashboard is an optional WebUI for `.pipeline/` state, config, progress, and reports.
-
-- treat it as a background service that must not block normal agent execution
-- keep its configuration under the `dashboard` config block and plugin-level setup defaults
-- resolve the preferred port as project `dashboard.port` > global `dashboard.port` > `7700`
 
 ## Cycle 与 Patch
 

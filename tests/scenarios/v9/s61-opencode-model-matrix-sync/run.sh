@@ -68,7 +68,7 @@ NODE
 
 legacy="$(mktemp -d)"
 HOME="$home" node cli/bin/hypo-workflow sync --platform opencode --project "$legacy" >/dev/null
-grep -Fq "model: openai/gpt-5.5" "$legacy/.opencode/agents/hw-plan.md"
+grep -Fq "model: deepseek/deepseek-v4-pro" "$legacy/.opencode/agents/hw-plan.md"
 grep -Fq "model: mimo/mimo-v2.5-pro" "$legacy/.opencode/agents/hw-build.md"
 grep -Fq "model: deepseek/deepseek-v4-pro" "$legacy/.opencode/agents/hw-test.md"
 grep -Fq "model: deepseek/deepseek-v4-pro" "$legacy/.opencode/agents/hw-code-b.md"

@@ -84,10 +84,10 @@ test("OpenCode active subtask is runtime-only and not worker evidence", async ()
 
   const model = await buildOpenCodeStatusModel(root, {
     opencode: {
-      current: { agent: "hw-build", model: "openai/gpt-5.5" },
+      current: { agent: "hw-build", model: "deepseek/deepseek-v4-pro" },
       active_subagent: {
         agent: "codex-subcodex",
-        model: "openai/gpt-5.5-mini",
+        model: "deepseek/deepseek-v4-flash",
         source: "codex_internal_subtask",
       },
     },
@@ -316,12 +316,12 @@ async function writeOpenCodeMetadata(root) {
   await writeFile(join(root, ".opencode", "hypo-workflow.json"), JSON.stringify({
     profile: "standard",
     agents: {
-      plan: { model: "gpt-5.5" },
+      plan: { model: "deepseek-v4-pro" },
       compact: { model: "deepseek-v4-flash" },
       test: { model: "deepseek-v4-pro" },
       "code-a": { model: "mimo-v2.5-pro" },
       "code-b": { model: "deepseek-v4-pro" },
-      debug: { model: "gpt-5.5" },
+      debug: { model: "deepseek-v4-pro" },
       report: { model: "deepseek-v4-flash" },
     },
   }, null, 2), "utf8");

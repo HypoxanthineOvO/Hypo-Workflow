@@ -87,8 +87,8 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
   assert.match(agent, /Use Ask Questions proactively/);
   assert.match(agent, /Use the `question` tool when it is available/);
   assert.match(agent, /permission:/);
-  assert.match(agent, /^model: openai\/gpt-5\.5$/m);
-  assert.doesNotMatch(agent, /DeepSeek Tool Calling Rules/);
+  assert.match(agent, /^model: deepseek\/deepseek-v4-pro$/m);
+  assert.match(agent, /DeepSeek Tool Calling Rules/);
   assert.doesNotMatch(agent, /^tools:/m);
   assert.match(plugin, /commandMap/);
   assert.equal(config.$schema, "https://opencode.ai/config.json");
@@ -101,14 +101,15 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
   assert.equal("plugin" in adapterConfig, false);
   assert.equal(config.compaction.auto, true);
   assert.equal(config.compaction.prune, true);
-  assert.equal(config.permission["*"], "ask");
-  assert.equal(config.permission.bash, "ask");
+  assert.equal(config.permission["*"], "allow");
+  assert.equal(config.permission.edit, "allow");
+  assert.equal(config.permission.bash, "allow");
   assert.equal(config.compaction.effective_context_target, undefined);
   assert.equal(config.agents, undefined);
   assert.equal(metadata.autoContinue, true);
   assert.equal(metadata.auto_continue.mode, "safe");
   assert.equal(metadata.execution_bash.mode, "allow_local");
-  assert.equal(metadata.execution_bash.confirm_external, true);
+  assert.equal(metadata.execution_bash.confirm_external, false);
   assert.equal(metadata.compaction.effective_context_target, 900000);
   assert.equal(metadata.providers, undefined);
   assert.equal(config.provider, undefined);
@@ -122,11 +123,11 @@ test("writeOpenCodeArtifacts renders explicit provider placeholders when configu
     profile: {
       name: "standard",
       providers: {
-        openai: {
-          name: "OpenAI",
-          options: { apiKey: "{env:OPENAI_API_KEY}" },
+        deepseek: {
+          name: "DeepSeek",
+          options: { apiKey: "{env:DEEPSEEK_API_KEY}" },
           models: {
-            "gpt-5.5": { name: "GPT 5.5" },
+            "deepseek-v4-pro": { name: "DeepSeek V4 Pro" },
           },
         },
       },
@@ -136,9 +137,9 @@ test("writeOpenCodeArtifacts renders explicit provider placeholders when configu
   const config = JSON.parse(await readFile(join(dir, "opencode.json"), "utf8"));
   const metadata = JSON.parse(await readFile(join(dir, ".opencode", "hypo-workflow.json"), "utf8"));
 
-  assert.equal(config.provider.openai.options.apiKey, "{env:OPENAI_API_KEY}");
-  assert.equal(config.provider.openai.models["gpt-5.5"].name, "GPT 5.5");
-  assert.equal(metadata.providers.openai.models["gpt-5.5"].name, "GPT 5.5");
+  assert.equal(config.provider.deepseek.options.apiKey, "{env:DEEPSEEK_API_KEY}");
+  assert.equal(config.provider.deepseek.models["deepseek-v4-pro"].name, "DeepSeek V4 Pro");
+  assert.equal(metadata.providers.deepseek.models["deepseek-v4-pro"].name, "DeepSeek V4 Pro");
 });
 
 test("OpenCode artifact rendering resolves templates from the installed package, not cwd", async () => {

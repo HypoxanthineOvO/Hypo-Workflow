@@ -170,6 +170,21 @@ extract_state_chat_active() {
   ' "$file"
 }
 
+# Inject Workflow state summary if in a Cycle
+if [ -f "$pipeline_dir/state.yaml" ] && [ -f "$pipeline_dir/cycle.yaml" ]; then
+  CYCLE=$(grep "name:" "$pipeline_dir/cycle.yaml" | head -1 | cut -d'"' -f2)
+  STATUS=$(grep "status:" "$pipeline_dir/state.yaml" | head -1 | awk '{print $2}')
+  MILESTONE=$(grep "prompt_name:" "$pipeline_dir/state.yaml" | head -1 | cut -d'"' -f2)
+  STEP=$(grep "step:" "$pipeline_dir/state.yaml" | head -1 | awk '{print $2}')
+  echo "--- Hypo-Workflow Active ---"
+  echo "Cycle: $CYCLE"
+  echo "Status: $STATUS"
+  echo "Current: $MILESTONE"
+  echo "Step: $STEP"
+  echo "Run /hw:status for details"
+  echo "--- End Workflow State ---"
+fi
+
 summary="$("$scripts_dir/state-summary.sh" "$pipeline_dir" 2>/dev/null || true)"
 if [[ -z "$summary" || "$summary" == "No active pipeline" ]]; then
   emit_empty

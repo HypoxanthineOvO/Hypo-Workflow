@@ -1,8 +1,35 @@
 # Changelog
 
-## v12.5.2 - 2026-05-14
+## v12.7.0 - 2026-05-15
+
+### Features
+
+- C14 兼容性审查：Workflow 语义、跨平台适配、Prompt/规则冗余、测试健壮性、文档/引导 5 个审查域，24 项正式发现（P0=6, P1=11, P2=14）。
+- 修复 `code_quality` 评分方向矛盾（V1 vs V4 量表方向统一）。
+- 明确 V4 STOP 规则在 `adaptive_threshold=false` 时的兼容性行为。
+- 创建 `.opencode/hypo-workflow.json.analysis` analysis sidecar 文件。
+- 创建 `rules/builtin/claude-hw-command-namespace.yaml` Claude Code 命名空间规则。
+- 输出语言规则集中化为 `@include: output-language-rule`。
+- SKILL.md 角色分层：索引 + 路由摘要，指向独立 Skill 文件。
 
 ### Fixes
+
+- 移除退役的 `skills/dashboard/SKILL.md`。
+- 同步 SKILL.md 与 commands-spec.md 命令列表（补 `/hw:chat`）。
+- commandMap 增加 source-of-truth 注释。
+- Core 生成器 `HW_VERSION` 常量从 12.5.2 更新到 12.7.0。
+- 测试：i18n 正则双语化，`readme-update.test.js` 命令计数动态化（5 文件/31 测试通过）。
+- 模板级 TUI 颜色方案持久化（sync 不再清除颜色）。
+
+### Docs
+
+- 创建 CONTRIBUTING.md（159 行）。
+- 扩展 developer.md 从 10 行到 211 行（zh+en）。
+- 同步 configuration.md 英文版从 64 行到 261 行。
+- AGENTS.md 增加 Workflow state persistence 段落。
+- session-start hook 增加 Hypo-Workflow 状态注入。
+
+## v12.6.0 - 2026-05-14
 
 - 将 OpenCode bash 自动批准从无效 `permission: bypass` 配置改为合法的 `ask`/`allow` schema + Hypo-Workflow plugin policy。
 - 新增 `execution.bash.mode=allow_local` 配置、schema、profile 默认值和 OpenCode metadata 注入。

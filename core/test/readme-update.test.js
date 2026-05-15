@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { commandMap } from "../src/index.js";
 import {
   checkReadmeFreshness,
   defaultReadmeConfig,
@@ -20,8 +21,9 @@ test("defaultReadmeConfig exposes loose marker-safe defaults", () => {
 });
 
 test("renderReadmeBlock derives command and platform content from assets", async () => {
+  const userCommandCount = commandMap("opencode").length;
   const commandCount = renderReadmeBlock("command-count");
-  assert.match(commandCount, /40 个用户指令/);
+  assert.match(commandCount, new RegExp(`${userCommandCount} 个用户指令`));
   assert.match(commandCount, /1 个内部 watchdog/);
 
   const commandReference = renderReadmeBlock("command-reference");
@@ -212,11 +214,12 @@ test("updateReadme replaces requested managed blocks and reports a summary", asy
   });
   const updated = await readFile(file, "utf8");
 
+  const userCommandCount2 = commandMap("opencode").length;
   assert.equal(summary.changedBlocks.length, 1);
   assert.deepEqual(summary.changedBlocks, ["command-count"]);
   assert.equal(summary.fullRegenerated, false);
   assert.match(updated, /manual intro/);
-  assert.match(updated, /40 个用户指令/);
+  assert.match(updated, new RegExp(`${userCommandCount2} 个用户指令`));
   assert.match(updated, /manual outro/);
 });
 

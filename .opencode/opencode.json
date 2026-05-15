@@ -9,9 +9,9 @@
     "prune": true
   },
   "permission": {
-    "*": "ask",
-    "edit": "ask",
-    "bash": "ask",
+    "*": "allow",
+    "edit": "allow",
+    "bash": "allow",
     "question": "allow"
   }
 }

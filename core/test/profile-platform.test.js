@@ -40,7 +40,7 @@ test("configuration profiles preserve high-risk confirmation gates", () => {
 
   assert.equal(configurationProfile("solo-auto").config.automation.level, "full");
   assert.equal(configurationProfile("solo-auto").config.execution.bash.mode, "allow_local");
-  assert.equal(configurationProfile("solo-auto").config.execution.bash.confirm_external, true);
+  assert.equal(configurationProfile("solo-auto").config.execution.bash.confirm_external, false);
   assert.equal(configurationProfile("manual-review").config.plan.mode, "interactive");
   assert.equal(configurationProfile("team-strict").config.execution.worker_separation.mode, "strict");
   assert.equal(configurationProfile("team-strict").config.execution.step_overrides.review_code.strict, true);

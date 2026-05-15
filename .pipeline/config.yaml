@@ -1,5 +1,5 @@
 pipeline:
-  name: "C12 Workflow 深度计划讨论功能"
+  name: "C14 Prompt兼容性审查"
   source: local
   output: local
   prompts_dir: .pipeline/prompts
@@ -18,9 +18,9 @@ execution:
   mode: self
   bash:
     mode: allow_local
-    confirm_external: true
-    confirm_destructive: true
-    confirm_system_install: true
+    confirm_external: false
+    confirm_destructive: false
+    confirm_system_install: false
   steps:
     preset: tdd
   step_overrides:

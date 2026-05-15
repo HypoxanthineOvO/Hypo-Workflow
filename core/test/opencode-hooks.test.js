@@ -15,7 +15,7 @@ import {
   writeOpenCodeArtifacts,
 } from "../src/index.js";
 
-test("OpenCode hook policy guards protected, knowledge, worktree, and secret paths", () => {
+test("OpenCode hook policy keeps file guards informational under YOLO permissions", () => {
   const context = {
     projectRoot: "/repo/project",
     homeDir: "/home/heyx",
@@ -27,21 +27,21 @@ test("OpenCode hook policy guards protected, knowledge, worktree, and secret pat
     edits: [{ path: ".pipeline/config.yaml" }],
   }), [".pipeline/state.yaml", ".pipeline/cycle.yaml", ".pipeline/config.yaml"]);
 
-  assert.equal(evaluateOpenCodeFileGuard({ args: { filePath: ".pipeline/state.yaml" }, ...context }).behavior, "deny");
+  assert.equal(evaluateOpenCodeFileGuard({ args: { filePath: ".pipeline/state.yaml" }, ...context }).behavior, "allow");
   assert.equal(evaluateOpenCodeFileGuard({ args: { filePath: ".pipeline/state.yaml" }, workflowMutationActive: true, ...context }).behavior, "allow");
   assert.equal(evaluateOpenCodeFileGuard({ args: { path: ".pipeline/knowledge/records/M03.yaml" }, ...context }).behavior, "allow");
-  assert.equal(evaluateOpenCodeFileGuard({ args: { path: ".pipeline/config.yaml" }, ...context }).severity, "warn");
+  assert.equal(evaluateOpenCodeFileGuard({ args: { path: ".pipeline/config.yaml" }, ...context }).severity, "info");
   assert.equal(evaluateOpenCodeFileGuard({ args: { path: "/home/heyx/.hypo-workflow/worktrees/project/E001/file.js" }, ...context }).behavior, "allow");
-  assert.equal(evaluateOpenCodeFileGuard({ args: { path: "/home/heyx/.hypo-workflow/secrets.yaml" }, ...context }).behavior, "deny");
+  assert.equal(evaluateOpenCodeFileGuard({ args: { path: "/home/heyx/.hypo-workflow/secrets.yaml" }, ...context }).behavior, "allow");
 });
 
-test("OpenCode permission and auto-continue policies are conservative by default", () => {
-  assert.equal(decideOpenCodePermission({ args: { path: ".pipeline/state.yaml" } }).status, "deny");
+test("OpenCode permission policy allows all tool requests under YOLO defaults", () => {
+  assert.equal(decideOpenCodePermission({ args: { path: ".pipeline/state.yaml" } }).status, "allow");
   assert.equal(decideOpenCodePermission({ args: { path: ".pipeline/knowledge/index/decisions.yaml" } }).status, "allow");
-  assert.equal(decideOpenCodePermission({ args: { path: ".pipeline/config.yaml" } }).status, "ask");
+  assert.equal(decideOpenCodePermission({ args: { path: ".pipeline/config.yaml" } }).status, "allow");
   assert.equal(decideOpenCodePermission({ permission: "bash", args: { command: "uv run node --test core/test/config.test.js" } }).status, "allow");
-  assert.equal(decideOpenCodePermission({ permission: "bash", args: { command: "git push origin main" } }).status, "ask");
-  assert.equal(decideOpenCodePermission({ permission: "bash", args: { command: "rm -rf .pipeline" } }).status, "ask");
+  assert.equal(decideOpenCodePermission({ permission: "bash", args: { command: "git push origin main" } }).status, "allow");
+  assert.equal(decideOpenCodePermission({ permission: "bash", args: { command: "rm -rf .pipeline" } }).status, "allow");
 
   assert.equal(shouldOpenCodeAutoContinue({ mode: "ask", testsPassed: true }), false);
   assert.equal(shouldOpenCodeAutoContinue({ mode: "safe", testsPassed: true, errorRules: false, interactiveGateOpen: false, protectedFileDirty: false }), true);
@@ -53,7 +53,7 @@ test("OpenCode permission and auto-continue policies are conservative by default
   assert.equal(isOpenCodeStopEquivalent({ status: "idle", unfinishedMilestones: 1, missingReport: false, stepRunning: false }), false);
 });
 
-test("OpenCode bash policy allows local execution but gates external, destructive, and system commands", () => {
+test("OpenCode bash policy classifies commands but allows every category", () => {
   assert.equal(classifyOpenCodeBashCommand("uv run pytest"), "local");
   assert.equal(classifyOpenCodeBashCommand("git status --short"), "local");
   assert.equal(classifyOpenCodeBashCommand("git push origin main"), "external");
@@ -62,9 +62,9 @@ test("OpenCode bash policy allows local execution but gates external, destructiv
   assert.equal(classifyOpenCodeBashCommand("git reset --hard HEAD"), "destructive");
 
   assert.equal(evaluateOpenCodeBashPolicy({ permission: "bash", args: { command: "npm test" } }).status, "allow");
-  assert.equal(evaluateOpenCodeBashPolicy({ permission: "bash", args: { command: "npm publish" } }).status, "ask");
-  assert.equal(evaluateOpenCodeBashPolicy({ permission: "bash", args: { command: "uv run node --test" }, bash: { mode: "ask" } }).status, "ask");
-  assert.equal(evaluateOpenCodeBashPolicy({ permission: "bash" }).status, "ask");
+  assert.equal(evaluateOpenCodeBashPolicy({ permission: "bash", args: { command: "npm publish" } }).status, "allow");
+  assert.equal(evaluateOpenCodeBashPolicy({ permission: "bash", args: { command: "uv run node --test" }, bash: { mode: "ask" } }).status, "allow");
+  assert.equal(evaluateOpenCodeBashPolicy({ permission: "bash" }).status, "allow");
 });
 
 test("OpenCode permission events serialize without leaking secret values", () => {

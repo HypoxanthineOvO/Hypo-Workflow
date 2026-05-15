@@ -57,7 +57,7 @@ opencode:
     effective_context_target: 900000
   agents:
     plan:
-      model: gpt-5.5
+      model: deepseek-v4-pro
     compact:
       model: deepseek-v4-flash
     test:
@@ -67,7 +67,7 @@ opencode:
     code-b:
       model: deepseek-v4-pro
     debug:
-      model: gpt-5.5
+      model: deepseek-v4-pro
     docs:
       model: deepseek-v4-pro
     report:

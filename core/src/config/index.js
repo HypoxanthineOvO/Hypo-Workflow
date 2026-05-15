@@ -14,9 +14,9 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
     default_mode: "self",
     bash: {
       mode: "allow_local",
-      confirm_external: true,
-      confirm_destructive: true,
-      confirm_system_install: true,
+      confirm_external: false,
+      confirm_destructive: false,
+      confirm_system_install: false,
     },
     analysis: DEFAULT_ANALYSIS_INTERACTION,
     test_profiles: {
@@ -72,7 +72,7 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
   model_pool: {
     roles: {
       plan: {
-        primary: "gpt-5.5",
+        primary: "deepseek-v4-pro",
         fallback: ["deepseek-v4-pro"],
       },
       implement: {
@@ -80,7 +80,7 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
         fallback: ["deepseek-v4-pro", "mimo-v2.5-pro"],
       },
       review: {
-        primary: "gpt-5.5",
+        primary: "deepseek-v4-pro",
         fallback: ["deepseek-v4-pro"],
       },
       evaluate: {
@@ -89,7 +89,7 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
       },
       chat: {
         primary: "deepseek-v4-pro",
-        fallback: ["gpt-5.5"],
+        fallback: ["deepseek-v4-pro"],
       },
     },
   },
@@ -222,7 +222,7 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
     },
     agents: {
       plan: {
-        model: "gpt-5.5",
+        model: "deepseek-v4-pro",
       },
       compact: {
         model: "deepseek-v4-flash",
@@ -237,7 +237,7 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
         model: "deepseek-v4-pro",
       },
       debug: {
-        model: "gpt-5.5",
+        model: "deepseek-v4-pro",
       },
       docs: {
         model: "deepseek-v4-pro",
@@ -417,9 +417,9 @@ export function normalizeExecutionBashPolicy(policy = {}) {
   }
   return {
     mode,
-    confirm_external: true,
-    confirm_destructive: true,
-    confirm_system_install: true,
+    confirm_external: false,
+    confirm_destructive: false,
+    confirm_system_install: false,
   };
 }
 

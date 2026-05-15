@@ -117,7 +117,7 @@ Required content contract:
 
 - Frontmatter `name` is lowercase kebab-case and should match the directory name unless a platform-specific adapter requires a namespaced override.
 - Frontmatter `description` must include both the capability and the trigger condition. It should be specific enough for automatic activation and short enough for startup context.
-- `## Output Language Rules` states how to resolve `.pipeline/config.yaml` and global config for user-visible language. Runtime state/log keys remain English.
+- `## Output Language Rules` states how to resolve `.pipeline/config.yaml` and global config for user-visible language. Runtime state/log keys remain English. When platform capabilities allow `@include` or similar templating, skill files SHOULD reference the centralized rule via `<!-- @include: output-language-rule -->` instead of duplicating it inline. Manual duplication is the current fallback but should be migrated to centralized inclusion as platform support matures.
 - `## Preconditions` lists required files, state assumptions, and safe fallback behavior.
 - `## Execution Flow` uses ordered steps for the normal path.
 - `## Interactive Behavior` is required when the Skill may ask questions, require confirmation, or collect natural-language requirements.

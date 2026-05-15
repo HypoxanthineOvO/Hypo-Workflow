@@ -61,6 +61,10 @@ Example:
 | 16:40 | Chat | 💬 Chat session recovered | 继续上次 `/hw:chat`，恢复 recent report 与修改上下文 |
 ```
 
+## Heartbeat Policy
+
+Heartbeat should be updated after every file modification during execution, not only at step boundaries, to ensure continuation.yaml accurately reflects progress.
+
 ## Update Timing
 
 Update `PROGRESS.md`:

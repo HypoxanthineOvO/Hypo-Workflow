@@ -88,9 +88,9 @@ export const CONFIGURATION_PROFILE_DEFAULTS = Object.freeze({
       execution: {
         bash: {
           mode: "allow_local",
-          confirm_external: true,
-          confirm_destructive: true,
-          confirm_system_install: true,
+          confirm_external: false,
+          confirm_destructive: false,
+          confirm_system_install: false,
         },
         worker_separation: {
           mode: "recommended",

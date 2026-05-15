@@ -58,7 +58,7 @@ test("loadConfig merges defaults and writeConfig persists yaml", async () => {
   assert.equal(loaded.agent.platform, "opencode");
   assert.equal(loaded.execution.default_mode, "self");
   assert.equal(loaded.execution.bash.mode, "allow_local");
-  assert.equal(loaded.execution.bash.confirm_external, true);
+  assert.equal(loaded.execution.bash.confirm_external, false);
   assert.equal(loaded.output.timezone, "Asia/Shanghai");
   assert.equal(loaded.release.readme.mode, "loose");
   assert.equal(loaded.release.readme.full_regen, "auto");
@@ -69,12 +69,12 @@ test("default config exposes OpenCode model matrix defaults", () => {
   assert.equal(DEFAULT_GLOBAL_CONFIG.opencode.auto_continue, true);
   assert.equal(DEFAULT_GLOBAL_CONFIG.opencode.profile, "standard");
   assert.equal(DEFAULT_GLOBAL_CONFIG.opencode.compaction.effective_context_target, 900000);
-  assert.equal(DEFAULT_GLOBAL_CONFIG.opencode.agents.plan.model, "gpt-5.5");
+  assert.equal(DEFAULT_GLOBAL_CONFIG.opencode.agents.plan.model, "deepseek-v4-pro");
   assert.equal(DEFAULT_GLOBAL_CONFIG.opencode.agents.compact.model, "deepseek-v4-flash");
   assert.equal(DEFAULT_GLOBAL_CONFIG.opencode.agents.test.model, "deepseek-v4-pro");
   assert.equal(DEFAULT_GLOBAL_CONFIG.opencode.agents["code-a"].model, "mimo-v2.5-pro");
   assert.equal(DEFAULT_GLOBAL_CONFIG.opencode.agents["code-b"].model, "deepseek-v4-pro");
-  assert.equal(DEFAULT_GLOBAL_CONFIG.opencode.agents.debug.model, "gpt-5.5");
+  assert.equal(DEFAULT_GLOBAL_CONFIG.opencode.agents.debug.model, "deepseek-v4-pro");
   assert.equal(DEFAULT_GLOBAL_CONFIG.opencode.agents.docs.model, "deepseek-v4-pro");
   assert.equal(DEFAULT_GLOBAL_CONFIG.opencode.agents.report.model, "deepseek-v4-flash");
 });
@@ -120,9 +120,9 @@ test("default config exposes automation policy levels and safe gates", () => {
   assert.ok(DEFAULT_GLOBAL_CONFIG.automation.local_whitelist.stateful_local.actions.includes("reset_test_database"));
   assert.ok(DEFAULT_GLOBAL_CONFIG.automation.local_whitelist.external.actions.includes("remote_pr_write"));
   assert.equal(DEFAULT_GLOBAL_CONFIG.execution.bash.mode, "allow_local");
-  assert.equal(DEFAULT_GLOBAL_CONFIG.execution.bash.confirm_external, true);
-  assert.equal(DEFAULT_GLOBAL_CONFIG.execution.bash.confirm_destructive, true);
-  assert.equal(DEFAULT_GLOBAL_CONFIG.execution.bash.confirm_system_install, true);
+  assert.equal(DEFAULT_GLOBAL_CONFIG.execution.bash.confirm_external, false);
+  assert.equal(DEFAULT_GLOBAL_CONFIG.execution.bash.confirm_destructive, false);
+  assert.equal(DEFAULT_GLOBAL_CONFIG.execution.bash.confirm_system_install, false);
 });
 
 test("execution bash policy defaults to local auto-execution while preserving hard gates", () => {
@@ -134,9 +134,9 @@ test("execution bash policy defaults to local auto-execution while preserving ha
   });
 
   assert.equal(policy.mode, "allow_local");
-  assert.equal(policy.confirm_external, true);
-  assert.equal(policy.confirm_destructive, true);
-  assert.equal(policy.confirm_system_install, true);
+  assert.equal(policy.confirm_external, false);
+  assert.equal(policy.confirm_destructive, false);
+  assert.equal(policy.confirm_system_install, false);
   assert.throws(() => normalizeExecutionBashPolicy({ mode: "bypass" }), /Unsupported execution bash mode/);
 });
 

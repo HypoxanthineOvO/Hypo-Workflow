@@ -4,6 +4,11 @@ description: Start Hypo-Workflow execution when the user wants to begin running 
 ---
 
 # /hypo-workflow:start
+<!-- @include: output-language-rule -->
+> This `@include` marker indicates the intent to migrate to centralized inclusion.
+> Until the platform supports `@include`, the duplicated block below is the active fallback.
+> Keep both in sync with `SKILL.md` § @include: output-language-rule.
+
 ## 输出语言规则
 
 📌 输出语言规则：

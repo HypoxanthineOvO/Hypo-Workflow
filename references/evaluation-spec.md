@@ -24,6 +24,12 @@ Measures implementation quality independent of scope drift.
 - `4`: strong
 - `5`: excellent
 
+> **Deprecated scale direction (V1).** The V1 `code_quality` scale above
+> (`1 = unacceptable`, `5 = excellent`) is retained for historical reference
+> only. The canonical scale is the V4 direction: **`1 = excellent`,
+> `5 = poor`** (see §多维度评分体系). All new evaluation logic and
+> `adaptive_threshold` calculations must use the V4 direction.
+
 ## Check Set
 
 Apply only the checks listed in `evaluation.checks`.
@@ -250,3 +256,8 @@ Analysis reports should use `templates/analysis/report.md` or the language-speci
 - 阈值保持 `evaluation.max_diff_score`
 - 行为与 V3 的单维 `diff_score` 决策兼容
 - 其他维度可以记录在报告和 state 中，但不会改变原有的默认阻塞语义，除非调用方显式启用 V4 判定路径
+
+**STOP 规则兼容性：**
+
+- 当 `adaptive_threshold=false` 时，V4 多维度 STOP 条件（`overall > threshold + 1`、`architecture_drift >= 4`）同样被禁用；仅 V1 的 `diff_score > max_diff_score` STOP 规则生效。
+- 当 `adaptive_threshold=true` 时，所有 V4 STOP 条件均处于激活状态。

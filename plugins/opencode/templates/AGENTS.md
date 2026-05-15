@@ -10,6 +10,21 @@ This file is Hypo-Workflow managed. Edit the source Hypo-Workflow rules/config w
 - Use `question` for required user decisions.
 - Use `todowrite` for visible plan discipline, especially in `/hw-plan*` commands.
 
+## Workflow state persistence
+
+When executing inside a Hypo-Workflow Cycle, maintain pipeline state throughout the session:
+
+- At session start or after compaction, read `.pipeline/state.yaml` to restore the current milestone/step context.
+- After every meaningful code or config change that advances a step, update:
+  - `.pipeline/state.yaml` — current step, heartbeat timestamp
+  - `.pipeline/log.yaml` — step_complete or milestone_complete event
+  - `.pipeline/PROGRESS.md` — timeline entry
+- When receiving revision feedback mid-step, update step status to `in_progress` before reworking.
+- If blocked, write `.pipeline/continuation.yaml` with `status: active` and `safe_resume_command: /hw:resume`.
+- Never silently drop out of Workflow mode — always record state before responding to non-Workflow requests.
+
+If you are unsure whether you are in a Workflow Cycle, run `/hw:status` first.
+
 ## Protected files
 
 Treat `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/rules.yaml` as protected. Unexpected writes should be blocked or require explicit user confirmation.

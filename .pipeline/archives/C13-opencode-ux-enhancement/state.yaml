@@ -1,0 +1,54 @@
+# Hypo-Workflow Pipeline State — C13 OpenCode体验优化
+
+pipeline:
+  name: "OpenCode体验优化"
+  status: completed
+  prompts_total: 5
+  prompts_completed: 5
+  started: "2026-05-14T19:30:00+08:00"
+  finished: "2026-05-14T23:30:00+08:00"
+
+last_heartbeat: "2026-05-14T23:30:00+08:00"
+
+current:
+  phase: completed
+  prompt_index: 4
+  prompt_file: null
+  prompt_name: null
+  step: complete
+  step_index: 0
+
+milestones:
+  - id: M0
+    name: "面板刷新与交互基础"
+    status: done
+    prompt_file: .pipeline/prompts/00-panel-refresh-interaction-foundation.md
+  - id: M1
+    name: "折叠/展开与面板收起"
+    status: done
+    prompt_file: .pipeline/prompts/01-fold-expand-panel-collapse.md
+  - id: M2
+    name: "进度可视化与 Current 着色"
+    status: done
+    prompt_file: .pipeline/prompts/02-progress-visualization-current-coloring.md
+  - id: M3
+    name: "状态色编码与背景色块"
+    status: done
+    prompt_file: .pipeline/prompts/03-status-colors-background-blocks.md
+  - id: M4
+    name: "丰富色彩与 Metrics/Warnings 增强"
+    status: done
+    prompt_file: .pipeline/prompts/04-rich-colors-metrics-warnings.md
+
+history:
+  completed_prompts:
+    - prompt: "M0 - 面板刷新与交互基础"
+      status: pass
+    - prompt: "M1 - 折叠/展开与面板收起"
+      status: pass
+    - prompt: "M2 - 进度可视化与 Current 着色"
+      status: pass
+    - prompt: "M3 - 状态色编码与背景色块"
+      status: pass
+    - prompt: "M4 - 丰富色彩与 Metrics/Warnings 增强"
+      status: pass

@@ -29,11 +29,11 @@ Resolve every configurable value in this order:
 | execution mode | `execution.mode` | `execution.default_mode` | `self` |
 | subagent provider | `execution.subagent_tool` | `subagent.provider` | `auto` |
 | worker separation mode | `execution.worker_separation.mode` | `execution.worker_separation.mode` | `recommended` |
-| model pool plan role | `model_pool.roles.plan` | `model_pool.roles.plan` | `primary=gpt-5.5`, fallback `deepseek-v4-pro` |
+| model pool plan role | `model_pool.roles.plan` | `model_pool.roles.plan` | `primary=deepseek-v4-pro`, fallback `deepseek-v4-pro` |
 | model pool implement role | `model_pool.roles.implement` | `model_pool.roles.implement` | `primary=mimo-v2.5-pro`, fallback `deepseek-v4-pro`, `mimo-v2.5-pro` |
-| model pool review role | `model_pool.roles.review` | `model_pool.roles.review` | `primary=gpt-5.5`, fallback `deepseek-v4-pro` |
+| model pool review role | `model_pool.roles.review` | `model_pool.roles.review` | `primary=deepseek-v4-pro`, fallback `deepseek-v4-pro` |
 | model pool evaluate role | `model_pool.roles.evaluate` | `model_pool.roles.evaluate` | `primary=deepseek-v4-flash`, fallback `deepseek-v4-pro` |
-| model pool chat role | `model_pool.roles.chat` | `model_pool.roles.chat` | `primary=deepseek-v4-pro`, fallback `gpt-5.5` |
+| model pool chat role | `model_pool.roles.chat` | `model_pool.roles.chat` | `primary=deepseek-v4-pro`, fallback `deepseek-v4-pro` |
 | acceptance mode | `acceptance.mode` | `acceptance.mode` | `auto` |
 | acceptance user confirm | `acceptance.require_user_confirm` | `acceptance.require_user_confirm` | `false` |
 | acceptance timeout hours | `acceptance.timeout_hours` | `acceptance.timeout_hours` | `72` |
@@ -261,14 +261,14 @@ Workflow lifecycle policy is Cycle metadata. Project config may define `default_
 | analysis destructive/external boundary | `execution.analysis.boundaries.destructive_or_external_side_effects` | `execution.analysis.boundaries.destructive_or_external_side_effects` | `ask` |
 | OpenCode auto-continue | `opencode.auto_continue` | `opencode.auto_continue` | `true` |
 | OpenCode profile | `opencode.profile` | `opencode.profile` | `standard` |
-| OpenCode providers | `opencode.providers` | `opencode.providers` | placeholders for GPT 5.5, Opus 4.6, MiMo V2.5 Pro/Flash, DeepSeek V4 Pro/Flash |
+| OpenCode providers | `opencode.providers` | `opencode.providers` | placeholders for Opus 4.6, MiMo V2.5 Pro/Flash, DeepSeek V4 Pro/Flash |
 | OpenCode compaction target | `opencode.compaction.effective_context_target` | `opencode.compaction.effective_context_target` | `900000` |
-| OpenCode plan model | `opencode.agents.plan.model` | `opencode.agents.plan.model` | `gpt-5.5` |
+| OpenCode plan model | `opencode.agents.plan.model` | `opencode.agents.plan.model` | `deepseek-v4-pro` |
 | OpenCode compact model | `opencode.agents.compact.model` | `opencode.agents.compact.model` | `deepseek-v4-flash` |
 | OpenCode test model | `opencode.agents.test.model` | `opencode.agents.test.model` | `deepseek-v4-pro` |
 | OpenCode code-a model | `opencode.agents.code-a.model` | `opencode.agents.code-a.model` | `mimo-v2.5-pro` |
 | OpenCode code-b model | `opencode.agents.code-b.model` | `opencode.agents.code-b.model` | `deepseek-v4-pro` |
-| OpenCode debug model | `opencode.agents.debug.model` | `opencode.agents.debug.model` | `gpt-5.5` |
+| OpenCode debug model | `opencode.agents.debug.model` | `opencode.agents.debug.model` | `deepseek-v4-pro` |
 | OpenCode docs model | `opencode.agents.docs.model` | `opencode.agents.docs.model` | `deepseek-v4-pro` |
 | OpenCode report model | `opencode.agents.report.model` | `opencode.agents.report.model` | `deepseek-v4-flash` |
 | test profile enabled | `execution.test_profiles.enabled` | `execution.test_profiles.enabled` | `true` |
@@ -391,20 +391,20 @@ subagent:
 model_pool:
   roles:
     plan:
-      primary: gpt-5.5
+      primary: deepseek-v4-pro
       fallback: [deepseek-v4-pro]
     implement:
       primary: mimo-v2.5-pro
       fallback: [deepseek-v4-pro, mimo-v2.5-pro]
     review:
-      primary: gpt-5.5
+      primary: deepseek-v4-pro
       fallback: [deepseek-v4-pro]
     evaluate:
       primary: deepseek-v4-flash
       fallback: [deepseek-v4-pro]
     chat:
       primary: deepseek-v4-pro
-      fallback: [gpt-5.5]
+      fallback: [deepseek-v4-pro]
 acceptance:
   mode: auto
   require_user_confirm: false
@@ -506,10 +506,6 @@ opencode:
   auto_continue: true
   profile: standard
   providers:
-    openai:
-      models:
-        gpt-5.5:
-          name: GPT 5.5
     anthropic:
       models:
         claude-opus-4.6:
@@ -530,7 +526,7 @@ opencode:
     effective_context_target: 900000
   agents:
     plan:
-      model: gpt-5.5
+      model: deepseek-v4-pro
     compact:
       model: deepseek-v4-flash
     test:
@@ -540,7 +536,7 @@ opencode:
     code-b:
       model: deepseek-v4-pro
     debug:
-      model: gpt-5.5
+      model: deepseek-v4-pro
     docs:
       model: deepseek-v4-pro
     report:

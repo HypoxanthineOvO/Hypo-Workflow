@@ -11,22 +11,22 @@ source:
   author: user
   date: 2026-05-14
 content:
-  instruction: "OpenCode execution auto-approval must be represented through Hypo-Workflow `execution.bash.mode=allow_local`; generated `opencode.json` must stay schema-compatible and must not use `permission: bypass` or `permission.*: bypass`."
-  rationale: "OpenCode 1.14.30 rejects `bypass` as a permission value, which prevents project config, commands, plugins, and TUI panels from loading. Local bash auto-execution belongs in the Hypo policy/plugin layer while external, destructive, release, and system-install actions remain Ask-gated."
+  instruction: "OpenCode execution should use native schema-compatible YOLO permissions: generated `opencode.json` and OpenCode agent frontmatter should use `allow`, not `ask` or unsupported `bypass`."
+  rationale: "OpenCode supports `allow` as the schema-compatible all-clear permission. `bypass` is rejected by OpenCode, while `ask` creates interactive interruption. For this local workspace the requested OpenCode policy is no task interception."
   examples:
     good:
-      - "opencode.json keeps `*: ask`, `edit: ask`, `bash: ask`, and `question: allow`."
-      - ".opencode/hypo-workflow.json records `execution_bash.mode: allow_local`."
-      - "The OpenCode plugin auto-allows local test/build/lint commands and asks for git push, curl/wget, remote clone, publish, rm -rf, reset --hard, and system installs."
+      - "opencode.json keeps `*: allow`, `edit: allow`, `bash: allow`, and `question: allow`."
+      - ".opencode/hypo-workflow.json records `execution_bash.mode: allow_local` with confirm flags disabled."
+      - "The OpenCode plugin permission hook returns `allow` for bash, edit, protected files, external commands, and destructive commands."
     bad:
       - "writing `bypass` under `permission` in opencode.json"
-      - "using `--dangerously-skip-permissions` as a persisted project default"
-      - "auto-approving remote writes, destructive commands, release publish, or system dependency installation"
+      - "using `ask` for generated OpenCode bash or edit permissions"
+      - "returning `ask` or `deny` from the OpenCode permission hook"
 enforcement:
   check_kind: checklist
   evidence_required: true
   checklist:
     - "Run `opencode debug config` in an OpenCode project; it must parse successfully."
-    - "Inspect generated `opencode.json`; it must not contain `bypass`."
-    - "Verify `execution_bash.mode` is present in `.opencode/hypo-workflow.json` when OpenCode artifacts are regenerated."
-    - "Verify bash policy tests cover local allow plus external/destructive/system-install Ask gates."
+    - "Inspect generated `opencode.json`; it must contain `allow` permissions and must not contain `bypass`."
+    - "Verify `execution_bash.mode` is present in `.opencode/hypo-workflow.json` with confirm flags disabled when OpenCode artifacts are regenerated."
+    - "Verify bash policy tests cover local, external, destructive, and system-install commands as allowed."

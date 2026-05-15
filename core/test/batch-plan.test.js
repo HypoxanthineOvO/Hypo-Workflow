@@ -10,13 +10,13 @@ test("plan docs keep single-feature plan behavior and add --batch semantics", as
   const planReference = await readFile("plan/PLAN-SKILL.md", "utf8");
   const commandsSpec = await readFile("references/commands-spec.md", "utf8");
 
-  assert.match(planSkill, /Use this skill for the full P1-P4 planning flow\./);
-  assert.match(planSkill, /without `--batch`, preserve the existing single-feature P1-P4 flow/i);
+  assert.match(planSkill, /Use this skill for the full P1-P4 planning flow\.|将此 skill 用于完整的 P1-P4 规划流程/);
+  assert.match(planSkill, /without `--batch`, preserve the existing single-feature P1-P4 flow|没有 `--batch` 时，保留现有的单 Feature P1-P4 流程/i);
   assert.match(planSkill, /\/hw:plan --batch/);
   assert.match(planSkill, /Feature Queue/);
   assert.match(planSkill, /batch\.decompose_mode/);
   assert.match(discoverSkill, /Batch Discover/i);
-  assert.match(discoverSkill, /multiple Feature candidates/i);
+  assert.match(discoverSkill, /multiple Feature candidates|多个 Feature 候选项/i);
   assert.match(decomposeSkill, /upfront/i);
   assert.match(decomposeSkill, /just_in_time/i);
   assert.match(planReference, /Batch Plan Mode/);
@@ -198,8 +198,8 @@ test("vertical-slice docs require one-behavior TDD loops, prompt evidence, and s
     assert.match(promptTemplate, new RegExp(`^${escapeRegExp(heading)}$`, "m"));
   }
 
-  assert.match(compactSkill, /stable prompt\/design artifacts/i);
-  assert.match(compactSkill, /not.*design authority/i);
+  assert.match(compactSkill, /stable prompt\/design artifacts|稳定的 prompt\/设计产物/i);
+  assert.match(compactSkill, /not.*design authority|不是设计权威/i);
 });
 
 test("decompose assessment flags open-loop validation without observable closure", () => {

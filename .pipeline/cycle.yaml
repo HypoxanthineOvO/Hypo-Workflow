@@ -1,12 +1,11 @@
 cycle:
-  number: 12
-  name: "Workflow 深度计划讨论功能"
+  number: 14
+  name: "Prompt兼容性审查"
   type: feature
   status: active
-  started: "2026-05-12T21:01:33+08:00"
+  started: "2026-05-14T23:30:00+08:00"
   preset: tdd
-  workflow_kind: build
   context_sources: []
-  previous_cycle: 11
+  previous_cycle: 13
   summary: null
   lessons: null

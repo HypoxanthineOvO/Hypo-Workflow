@@ -1,0 +1,20 @@
+id: claude-hw-command-namespace
+extends: builtin
+severity: error
+category: project/error/workflow
+description: >
+  Claude Code integration must expose Hypo-Workflow commands through the hw
+  plugin namespace as /hw:* slash commands while keeping Claude native
+  /resume separate from /hw:resume.
+check:
+  - type: file_contains
+    paths: [".claude-plugin/plugin.json"]
+    pattern: '"namespace": "hw"'
+  - type: command_namespace_check
+    canonical_prefix: "/hw:"
+    platform_prefix: "/hw:"
+activation:
+  - platform: claude-code
+message:
+  zh: "Claude Code 必须通过 hw 插件命名空间暴露 /hw:* 命令，同时保持原生 /resume 与 /hw:resume 分离。"
+  en: "Claude Code must expose /hw:* commands through the hw plugin namespace and keep native /resume separate from /hw:resume."

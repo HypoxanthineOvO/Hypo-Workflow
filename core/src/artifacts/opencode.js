@@ -12,7 +12,7 @@ import {
 } from "../rules/index.js";
 import { ASK_QUESTIONS_GUIDANCE, renderDeepSeekToolCallingRules } from "./agent-guidance.js";
 
-const HW_VERSION = "12.5.2";
+const HW_VERSION = "12.7.0";
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(MODULE_DIR, "..", "..", "..");
 
@@ -132,7 +132,7 @@ export async function writeOpenCodeArtifacts(outDir, options = {}) {
 
   await writeFile(join(adapterDir, "opencode.json"), `${JSON.stringify(adapterConfig, null, 2)}\n`, "utf8");
   await writeFile(join(adapterDir, "hypo-workflow.json"), `${JSON.stringify(renderHypoWorkflowMetadata(profile), null, 2)}\n`, "utf8");
-  await writeFile(join(projectRoot, "opencode.json"), `${JSON.stringify(rootConfig, null, 2)}\n`, "utf8");
+  await writeFile(join(projectRoot, "opencode.json"), `${JSON.stringify(injectCommands(rootConfig), null, 2)}\n`, "utf8");
   await writeFile(join(projectRoot, "tui.json"), `${JSON.stringify(tuiConfig, null, 2)}\n`, "utf8");
   const rulesAuthority = await loadArtifactRulesAuthority(projectRoot, options);
   if (rulesAuthority) {
@@ -249,8 +249,7 @@ function permissionKeyForTool(tool) {
 }
 
 function defaultPermissionForKey(key, profile = {}) {
-  if (profile.permissions === "allow-safe") return "allow";
-  return key === "bash" || key === "edit" ? "ask" : "allow";
+  return "allow";
 }
 
 export function renderOpenCodeConfig(profile, options = {}) {
@@ -261,14 +260,12 @@ export function renderOpenCodeConfig(profile, options = {}) {
       auto: true,
       prune: true,
     },
-    permission: profile.permissions === "allow-safe"
-      ? "allow"
-      : {
-          "*": "ask",
-          edit: "ask",
-          bash: "ask",
-          question: "allow",
-        },
+    permission: {
+      "*": "allow",
+      edit: "allow",
+      bash: "allow",
+      question: "allow",
+    },
   };
   if (options.includePlugins !== false) {
     config.plugin = [
@@ -278,6 +275,21 @@ export function renderOpenCodeConfig(profile, options = {}) {
   if (profile.providers && Object.keys(profile.providers).length) {
     config.provider = profile.providers;
   }
+  return config;
+}
+
+export function injectCommands(config) {
+  const commands = {};
+  for (const cmd of commandMap("opencode")) {
+    const opencodeName = cmd.opencode?.slice(1); // /hw-start -> hw-start
+    if (!opencodeName) continue;
+    const skillName = (cmd.skill || "").replace("skills/", "").replace("/SKILL.md", "");
+    commands[opencodeName] = {
+      template: `Load the Hypo-Workflow skill instructions from \`skills/${skillName}/SKILL.md\`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.`,
+      description: cmd.description || `Hypo-Workflow ${cmd.canonical}`,
+    };
+  }
+  config.command = commands;
   return config;
 }
 

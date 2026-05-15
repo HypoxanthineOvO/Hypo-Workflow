@@ -1,0 +1,12 @@
+cycle:
+  number: 12
+  name: "Workflow 深度计划讨论功能"
+  type: feature
+  status: active
+  started: "2026-05-12T21:01:33+08:00"
+  preset: tdd
+  workflow_kind: build
+  context_sources: []
+  previous_cycle: 11
+  summary: null
+  lessons: null

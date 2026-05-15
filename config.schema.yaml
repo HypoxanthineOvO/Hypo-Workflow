@@ -1067,7 +1067,7 @@ $defs:
                 $ref: "#/$defs/opencode_agent_model"
             default:
               plan:
-                model: gpt-5.5
+                model: deepseek-v4-pro
               compact:
                 model: deepseek-v4-flash
               test:
@@ -1077,7 +1077,7 @@ $defs:
               code-b:
                 model: deepseek-v4-pro
               debug:
-                model: gpt-5.5
+                model: deepseek-v4-pro
               docs:
                 model: deepseek-v4-pro
               report:
@@ -1089,7 +1089,7 @@ $defs:
             effective_context_target: 900000
           agents:
             plan:
-              model: gpt-5.5
+              model: deepseek-v4-pro
             compact:
               model: deepseek-v4-flash
             test:
@@ -1099,7 +1099,7 @@ $defs:
             code-b:
               model: deepseek-v4-pro
             debug:
-              model: gpt-5.5
+              model: deepseek-v4-pro
             docs:
               model: deepseek-v4-pro
             report:
@@ -2282,7 +2282,7 @@ properties:
             $ref: "#/$defs/opencode_agent_model"
         default:
           plan:
-            model: gpt-5.5
+            model: deepseek-v4-pro
           compact:
             model: deepseek-v4-flash
           test:
@@ -2292,7 +2292,7 @@ properties:
           code-b:
             model: deepseek-v4-pro
           debug:
-            model: gpt-5.5
+            model: deepseek-v4-pro
           docs:
             model: deepseek-v4-pro
           report:

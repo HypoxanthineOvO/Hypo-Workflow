@@ -25,7 +25,7 @@ test("default global config exposes model pool, acceptance, sync, and knowledge 
     "evaluate",
     "chat",
   ]);
-  assert.equal(DEFAULT_GLOBAL_CONFIG.model_pool.roles.plan.primary, "gpt-5.5");
+  assert.equal(DEFAULT_GLOBAL_CONFIG.model_pool.roles.plan.primary, "deepseek-v4-pro");
   assert.deepEqual(DEFAULT_GLOBAL_CONFIG.model_pool.roles.implement.fallback, ["deepseek-v4-pro", "mimo-v2.5-pro"]);
   assert.equal(DEFAULT_GLOBAL_CONFIG.acceptance.mode, "auto");
   assert.equal(DEFAULT_GLOBAL_CONFIG.acceptance.require_user_confirm, false);

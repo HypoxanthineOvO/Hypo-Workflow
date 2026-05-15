@@ -1,0 +1,18 @@
+{
+  "execution": {
+    "preset": "analysis",
+    "steps": {"preset": "analysis"},
+    "analysis": {
+      "interaction_mode": "hybrid",
+      "allow_code_changes": false,
+      "require_confirmation_for_restart": true,
+      "require_confirmation_for_system_install": true
+    }
+  },
+  "boundaries": {
+    "network": "ask",
+    "remote_resources": "ask",
+    "destructive": "ask",
+    "external_side_effects": "ask"
+  }
+}

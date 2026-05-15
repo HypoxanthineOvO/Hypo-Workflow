@@ -25,35 +25,21 @@ export function collectOpenCodeToolPaths(value) {
 
 export function evaluateOpenCodeFileGuard(input = {}) {
   const paths = collectOpenCodeToolPaths(input.args || input.tool?.args || input);
-  if (!paths.length) return { behavior: "allow", severity: "info", paths: [] };
-
-  const decisions = paths.map((path) => evaluatePath(path, input));
-  if (decisions.some((decision) => decision.behavior === "deny")) {
-    return decisions.find((decision) => decision.behavior === "deny");
-  }
-  if (decisions.some((decision) => decision.severity === "warn")) {
-    return decisions.find((decision) => decision.severity === "warn");
-  }
-  return decisions[0] || { behavior: "allow", severity: "info", paths };
+  return {
+    behavior: "allow",
+    severity: "info",
+    paths,
+    message: "OpenCode YOLO permissions are enabled; file guard is informational only.",
+  };
 }
 
 export function decideOpenCodePermission(input = {}) {
   const bash = evaluateOpenCodeBashPolicy(input);
-  if (bash.applies && bash.status !== "allow") {
-    return { status: bash.status, reason: bash.reason, decision: bash };
-  }
-
-  const decision = evaluateOpenCodeFileGuard(input);
-  if (decision.behavior === "deny") {
-    return { status: "deny", reason: decision.message, decision };
-  }
-  if (decision.severity === "warn") {
-    return { status: "ask", reason: decision.message, decision };
-  }
-  if (bash.applies && bash.status === "allow") {
-    return { status: "allow", reason: bash.reason, decision: bash };
-  }
-  return { status: "allow", reason: decision.message, decision };
+  return {
+    status: "allow",
+    reason: bash.applies ? bash.reason : "OpenCode YOLO permissions are enabled.",
+    decision: bash.applies ? bash : evaluateOpenCodeFileGuard(input),
+  };
 }
 
 export function evaluateOpenCodeBashPolicy(input = {}) {
@@ -66,23 +52,11 @@ export function evaluateOpenCodeBashPolicy(input = {}) {
 
   const policy = normalizeBashPolicy(input.bash || input.execution?.bash || input.policy || {});
   if (!command) {
-    return { applies: true, status: "ask", category: "unknown", reason: "Bash command is unavailable; ask before execution." };
+    return { applies: true, status: "allow", category: "unknown", reason: "OpenCode YOLO bash permissions are enabled." };
   }
 
   const category = classifyOpenCodeBashCommand(command);
-  if (category === "destructive" && policy.confirm_destructive) {
-    return { applies: true, status: "ask", category, command, reason: "Destructive bash command requires confirmation." };
-  }
-  if (category === "system_install" && policy.confirm_system_install) {
-    return { applies: true, status: "ask", category, command, reason: "System dependency installation requires confirmation." };
-  }
-  if (category === "external" && policy.confirm_external) {
-    return { applies: true, status: "ask", category, command, reason: "External or remote side-effect bash command requires confirmation." };
-  }
-  if (policy.mode === "ask") {
-    return { applies: true, status: "ask", category, command, reason: "Bash execution mode is ask." };
-  }
-  return { applies: true, status: "allow", category, command, reason: `Local bash command allowed by execution.bash.mode=${policy.mode}.` };
+  return { applies: true, status: "allow", category, command, reason: `OpenCode YOLO bash permissions are enabled by execution.bash.mode=${policy.mode}.` };
 }
 
 export function classifyOpenCodeBashCommand(command = "") {
@@ -275,9 +249,9 @@ function normalizeBashPolicy(policy = {}) {
   const mode = String(policy.mode || "allow_local").trim().toLowerCase();
   return {
     mode: mode === "ask" ? "ask" : "allow_local",
-    confirm_external: policy.confirm_external !== false,
-    confirm_destructive: policy.confirm_destructive !== false,
-    confirm_system_install: policy.confirm_system_install !== false,
+    confirm_external: false,
+    confirm_destructive: false,
+    confirm_system_install: false,
   };
 }
 
