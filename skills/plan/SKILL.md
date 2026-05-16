@@ -86,6 +86,23 @@ Test Profiles 位于 preset 之上。保持 `preset` 用于步骤顺序，但通
 
 Feature DAG 概念仅属于长期运行、批量、多 Feature、AFK 或 HITL 协调。普通的单 Feature `/hw:plan` 必须保持简单，不应要求或显示 Feature DAG 字段。
 
+## P2 技术路线门禁
+
+P2 Decompose 是 Milestone 拆解和技术路线拆解的双重检查点。实现型 Milestone 不能只包含目标、验收标准、功能队列或待办列表；如果缺少技术方案和路线，P2 必须保持 `in_progress` 或 `revision`，不得标记为 `proposed`，也不得进入 P3 Generate。
+
+每个实现型 Milestone 必须包含以下字段：
+
+- `technical_solution`：架构选择、数据/接口/状态契约、关键实现策略
+- `technical_route`：有序实现路线，说明要触达的模块、边界和迁移/兼容处理
+- `research_required`：调研项状态、证据、阻塞问题或用户确认延后项
+- `risks_and_alternatives`：主要风险、被拒绝的替代方案和拒绝理由
+- `validation_path`：闭环验证命令或可执行场景、通过/失败信号和验证负责人
+- `audit_focus`：审计工作器需要重点检查的行为、证据和风险
+
+以下信号是硬性的 `research_required` 触发器：未知工具、外部服务、第三方库、平台能力、用户私有 schema 或专有数据契约。触发后必须在 P2 确认/P3 之前完成目标调研、向用户提出阻塞问题，或由用户明确接受延后；不能凭猜测把 P2 标记为 `proposed`。仍有未回答的阻塞问题时，P2 可以展示为待答复检查点，但不得被确认或进入 P3。
+
+如果用户质疑技术路线、指出欠调研或提出替代路线，P2 必须回到 `revision` 或 `in_progress`，记录被质疑点，执行有针对性的调研，然后重新展示包含修订结论的 P2 检查点。
+
 使用 `/hw:plan --insert <自然语言>` 编辑现有 Feature Queue。首先将自然语言请求转换为结构化队列操作，显示队列差异，然后在写入 `.pipeline/feature-queue.yaml` 之前等待显式确认。
 
 ## 前置条件
@@ -215,11 +232,16 @@ Codex 执行子工作器授权也是 P1 -> P2 门控的一部分。如果当前�
    - 当存在 `--batch` 时，在离开 Discover 之前收集多个 Feature 候选项、优先级、门控、依赖项、验收边界、类别和验证要求
 10. 运行 P2 Decompose：
     - 将工作拆分为具有验证点的可审查 Milestone
+    - 对每个实现型 Milestone 生成 `technical_solution`、`technical_route`、`research_required`、`risks_and_alternatives`、`validation_path` 和 `audit_focus`
+    - 如果拆分只有目标、验收标准或功能队列，保持 P2 为 `in_progress` 或 `revision`，不得标记为 `proposed`
+    - 当未知工具、外部服务、第三方库、平台能力或用户私有 schema 出现时，创建硬性 `research_required` 项；在 P2 确认/P3 前完成调研、询问用户或记录用户明确延后；未回答的阻塞问题不得穿越到 P3
+    - 如果用户挑战技术路线，记录挑战点，回到 `revision` 或 `in_progress`，完成针对性调研后重新展示 P2 检查点
     - 拒绝只有开环实现操作和没有可信闭环验证路径的 Milestone 拆分
     - 在交互模式下，在显示提议的拆分后停止，等待用户确认后再进行 P3
     - 当 `--batch` 且 `batch.decompose_mode=upfront` 时，分解所有 Feature；当 `just_in_time` 时，仅创建 Feature 脚手架
 11. 运行 P3 Generate：
     - 生成 `.pipeline/` 产物和架构基线
+    - 将 P2 的 `technical_solution`、`technical_route`、`research_required`、`risks_and_alternatives`、`validation_path` 和 `audit_focus` 原样保留到生成的提示中，不能压缩成普通目标摘要
     - 在生成的提示中保留闭环验证命令、真实测试方法、证据期望、验证者分离和审计伪测试拒绝规则
     - 在实现步骤之前在每个提示内生成 `Subworker Assignment Plan`，至少分配：
       - `test`：拥有 `write_tests` 和 `review_tests`；独立验证计划的真实测试方法、失败证据、最终测试运行和伪测试拒绝规则

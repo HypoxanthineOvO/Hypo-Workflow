@@ -61,4 +61,5 @@ This file is generated from structured Rules/Habits authority. Edit structured r
 
 ## Conflicts
 
-No structured rule conflicts.
+- **claude-hw-command-namespace** winner: project (.pipeline/rules/structured/project/claude-hw-command-namespace.yaml)
+  - overrides builtin

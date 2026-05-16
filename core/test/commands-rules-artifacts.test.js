@@ -6,15 +6,16 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { commandByCanonical, commandMap, loadRulesSummary, writeOpenCodeArtifacts } from "../src/index.js";
 
-test("commandMap contains 40 OpenCode mappings", () => {
+test("commandMap contains 41 OpenCode mappings", () => {
   const commands = commandMap("opencode");
-  assert.equal(commands.length, 40);
+  assert.equal(commands.length, 41);
   assert.equal(commandByCanonical("/hw:plan").opencode, "/hw-plan");
   assert.equal(commandByCanonical("/hw:plan:deep").opencode, "/hw-plan-deep");
   assert.equal(commandByCanonical("/hw:report").agent, "hw-report");
   assert.equal(commandByCanonical("/hw:compact").agent, "hw-compact");
   assert.equal(commandByCanonical("/hw:debug").agent, "hw-debug");
   assert.equal(commandByCanonical("/hw:chat").opencode, "/hw-chat");
+  assert.equal(commandByCanonical("/hw:analysis").opencode, "/hw-analysis");
   assert.equal(commandByCanonical("/hw:knowledge").opencode, "/hw-knowledge");
   assert.equal(commandByCanonical("/hw:accept").opencode, "/hw-accept");
   assert.equal(commandByCanonical("/hw:reject").opencode, "/hw-reject");

@@ -64,9 +64,9 @@ test("F001 gate OpenCode smoke validates generated runtime policy surfaces", asy
     protectedFileDirty: false,
   }), true);
 
-  assert.equal(decideOpenCodePermission({ args: { path: ".pipeline/state.yaml" } }).status, "deny");
+  assert.equal(decideOpenCodePermission({ args: { path: ".pipeline/state.yaml" } }).status, "allow");
   assert.equal(decideOpenCodePermission({ args: { path: ".pipeline/knowledge/records/C4-M05.yaml" } }).status, "allow");
-  assert.equal(decideOpenCodePermission({ args: { path: ".pipeline/config.yaml" } }).status, "ask");
+  assert.equal(decideOpenCodePermission({ args: { path: ".pipeline/config.yaml" } }).status, "allow");
 
   assert.match(runtime, /export function decideOpenCodePermission/);
   assert.match(runtime, /\.pipeline\/knowledge\//);

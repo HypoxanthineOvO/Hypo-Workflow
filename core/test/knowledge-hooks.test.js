@@ -70,9 +70,9 @@ test("knowledge hook docs define archive summary, compact generation, and rules"
   const knowledgeRule = await readFile("rules/builtin/knowledge-ledger-self-check.yaml", "utf8");
 
   assert.match(cycleSkill, /knowledge-summary\.md/);
-  assert.match(cycleSkill, /Do not archive, move, or delete `.pipeline\/knowledge\/`/);
+  assert.match(cycleSkill, /Do not archive, move, or delete `.pipeline\/knowledge\/`|不要归档、移动或删除 `.pipeline\/knowledge\/`/);
   assert.match(compactSkill, /\.pipeline\/knowledge\/knowledge\.compact\.md/);
-  assert.match(compactSkill, /raw knowledge records are not loaded by default/i);
+  assert.match(compactSkill, /raw knowledge records are not loaded by default|默认不加载完整的原始知识记录/i);
   assert.match(hooksReadme, /Knowledge Ledger/);
   assert.match(rulesSpec, /knowledge-ledger-self-check/);
   assert.match(sessionRule, /knowledge compact and category indexes/i);

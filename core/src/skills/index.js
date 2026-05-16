@@ -38,6 +38,19 @@ export async function checkSkillQuality(options = {}) {
       }
     }
 
+    for (const assetPath of extractInlineAssetPaths(content)) {
+      const skillDir = skillPath.split("/").slice(0, -1).join("/");
+      const localAssetPath = join(repoRoot, skillDir, assetPath);
+      const rootAssetPath = join(repoRoot, assetPath);
+      if (!existsSync(localAssetPath) && existsSync(rootAssetPath)) {
+        issues.push(issue(
+          "child-skill-shared-asset-path",
+          skillPath,
+          `Child Skill references shared root asset as child-local path: ${assetPath}. Use ../../${assetPath} from ${skillDir}/SKILL.md or an explicit shared root path.`,
+        ));
+      }
+    }
+
     if (internalSkills.includes(skillPath) && !/internal/i.test(content)) {
       issues.push(issue("internal-skill-not-marked", skillPath, "Internal Skill must be explicitly marked as internal."));
     }
@@ -101,6 +114,16 @@ function extractReferencePaths(content) {
     }
   }
   return paths;
+}
+
+function extractInlineAssetPaths(content) {
+  const paths = [];
+  const inlineCodePattern = /`([^`]+)`/g;
+  for (const match of content.matchAll(inlineCodePattern)) {
+    const value = match[1].trim();
+    if (/^assets\/[^*]+/.test(value)) paths.push(value);
+  }
+  return [...new Set(paths)];
 }
 
 function isReferencePathCheckable(referencePath) {

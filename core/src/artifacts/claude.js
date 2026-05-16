@@ -6,7 +6,7 @@ import { commandMap } from "../commands/index.js";
 import { buildModelPoolClaudeAgents, loadConfig } from "../config/index.js";
 import { ASK_QUESTIONS_GUIDANCE, renderDeepSeekToolCallingRules } from "./agent-guidance.js";
 
-const HW_VERSION = "12.7.0";
+const HW_VERSION = "12.8.0";
 
 export async function writeClaudeCodePluginArtifacts(outDir = ".", options = {}) {
   const pluginDir = join(outDir, ".claude-plugin");

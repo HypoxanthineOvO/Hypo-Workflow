@@ -1,31 +1,21 @@
-# C12 Plan Confirm Summary
+# C15 P4 Confirm Summary
 
-C12 将实现 Hypo-Workflow 的深度计划/讨论能力：在普通 `/hw:plan` 前提供长期 discussion package，通过第一性原理追问、只读调研、架构映射、模块 drilldown、readiness 检查和显式 convert，把模糊需求逐步收敛成可进入 Feature Queue 的计划上下文。
+状态：P3 Generate completed，等待 P4 确认。
 
-## Entry
+## 生成产物
 
-- Canonical: `/hw:plan:deep`
-- Alias: `/hw:plan --deep`
-- Core operations: `new`, `ask`, `research`, `map`, `drill`, `readiness`, `convert`
+| Milestone | Prompt |
+|---|---|
+| C15-M1 P2 Technical Route Gate | `.pipeline/prompts/00-p2-technical-route-gate.md` |
+| C15-M2 Detailed Completion Report Contract | `.pipeline/prompts/01-detailed-completion-report-contract.md` |
+| C15-M3 Interactive Analysis State And Command Entry | `.pipeline/prompts/02-interactive-analysis-state-command-entry.md` |
+| C15-M4 Shared Skill Asset Path Contract | `.pipeline/prompts/03-shared-skill-asset-path-contract.md` |
+| C15-M5 Integration Smoke And Release Readiness | `.pipeline/prompts/04-integration-smoke-release-readiness.md` |
 
-## Milestones
+## 执行契约
 
-1. M0 - Deep Plan 合同、命令入口与生命周期
-2. M1 - Discussion Package 数据模型与持久化
-3. M2 - First-Principles Ask Engine 与浅层计划拒绝
-4. M3 - Research 只读证据流
-5. M4 - Requirement Tracks、Architecture Map 与人读渲染
-6. M5 - Drill、Readiness Depth 与 Convert Gate
-7. M6 - Skills、Commands、Adapters 与状态面集成
-8. M7 - Feature Queue Handoff 与普通 Plan 集成
-9. M8 - 真实场景验收、回归与发布准备
-
-## Validation
-
-- `uv run -- node --test core/test/deep-plan*.test.js core/test/progressive-discover.test.js core/test/batch-plan.test.js core/test/commands-rules-artifacts.test.js`
-- `uv run python tests/run_regression.py`
-- `uv run -- bash scripts/validate-config.sh .pipeline/config.yaml`
-- `uv run -- node cli/bin/hypo-workflow sync --platform opencode --project /home/heyx/Hypo-Workflow --check-only`
-- `uv run -- git diff --check`
-- Manual: use deep planning to plan Hypo-Agent again and confirm Feature Queue order plus acceptance depth are clear before ordinary Plan.
-- Manual: research a referenced external project with explicit remote/network confirmation and verify downloaded source code evidence is inspected, not only README summaries.
+- Worker Separation：`recommended`
+- 执行子工作器授权：已授权 `/hw:start` 和 `/hw:resume`
+- 每个 prompt 都包含 `Subworker Assignment Plan`
+- P2 技术方案和技术路线已从 `.plan-state/decompose.yaml` 继承到 prompt
+- P3 后必须等待用户确认，确认后才可 `/hw:start`

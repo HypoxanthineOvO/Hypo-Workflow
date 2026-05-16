@@ -179,6 +179,12 @@ Decompose output rules:
   - test spec
   - expected artifacts
 - every implementation milestone must also include:
+  - `technical_solution`: architecture choice, state/data/interface contract, and key implementation strategy
+  - `technical_route`: ordered route across modules, boundaries, migrations or compatibility handling, and non-goals
+  - `research_required`: status, evidence, blocking questions, or user-approved deferrals
+  - `risks_and_alternatives`: major risks, alternatives considered, and why the selected route is preferred
+  - `validation_path`: closed-loop command or executable scenario, pass/fail signal, and validation owner
+  - `audit_focus`: specific behavior, evidence, and risk that audit must inspect
   - a closed-loop validation path with exact command or executable scenario
   - observable pass/fail evidence
   - independent validation ownership when non-trivial or delegated
@@ -194,8 +200,11 @@ Decompose output rules:
 - prefer narrower milestones when architecture review is likely to change downstream prompts
 - do not split solely by technical layer unless the milestone is explicitly analysis, docs, setup, or migration-only
 - reject open-loop milestone plans that only say "implement", "add tests", or "verify later" without a credible execution path
+- reject goal-only P2 checkpoints. A P2 checkpoint may not be marked `proposed` if it only contains goals, acceptance criteria, Feature Queue items, or test titles without the implementation milestone fields above.
+- treat unknown tools, external services, third-party libraries, platform capabilities, and user-private schemas as hard `research_required` triggers. P2 can be presented only after each trigger is resolved with evidence, converted into a user-facing blocking question, or explicitly deferred by the user; P2 cannot be confirmed and P3 cannot start while a blocking question remains unanswered.
+- if the user challenges a technical route, move P2 back to `revision` or `in_progress`, record the challenge, perform targeted research, and present a revised checkpoint before Generate.
 
-Persist milestone planning state in `.plan-state/decompose.yaml` when possible.
+Persist milestone planning state in `.plan-state/decompose.yaml` when possible, and persist the human technical route checkpoint in `.plan-state/technical-route.md`.
 
 Batch Decompose:
 
@@ -203,10 +212,12 @@ Batch Decompose:
 - just_in_time mode writes Feature scaffolds only
 - both modes generate a Markdown queue table and Mermaid graph
 - single-feature `/hw:plan` behavior is unchanged when `--batch` is absent
+- Feature DAG fields belong only to batch planning. Do not add Feature DAG requirements to ordinary single-feature P2 checkpoints.
 
 Interactive P2 checkpoint:
 
 - show the complete milestone split after Decompose
+- show the technical solution, technical route, research status, risks/alternatives, validation path, and audit focus for every implementation milestone
 - ask the user to confirm before entering Generate
 - do not write `.pipeline/` files, prompt files, or architecture files until P3
 
@@ -243,6 +254,8 @@ Preset selection rules:
 - choose `analysis` for root-cause analysis, metric investigation, or repo/system investigation where the primary deliverable is an evidence-backed conclusion
 - choose `custom` only when the user explicitly needs a non-standard sequence
 - for each milestone, write a concrete implementation plan with ordered steps, dependencies, verification points, test spec, and constraints before rendering the prompt file
+- preserve the P2 technical route contract in each generated implementation prompt: `technical_solution`, `technical_route`, `research_required`, `risks_and_alternatives`, `validation_path`, and `audit_focus`
+- stop and return to P2 revision if the approved milestone plan lacks any required P2 technical route field, has unresolved hard `research_required` items, or still has active blocking research questions
 - convert that implementation plan into the final prompt file format instead of freehand summary text
 - preserve the validation intent from the milestone plan in the generated prompt's `预期测试` and constraints sections
 - preserve closed-loop validation commands, real test method, scenario, pass/fail signal, evidence expectations, audit pseudo-test rejection rule, and implementation-versus-validation ownership in the generated prompt
@@ -322,6 +335,8 @@ Use these files when relevant:
 - `plan/assets/prompt-patch-queue-template.yaml`
 - `plan/templates/`
 - `.plan-state/discover.yaml`
+- `.plan-state/decompose.yaml`
+- `.plan-state/technical-route.md`
 - `references/plan-review-spec.md`
 
 `.plan-state/` is runtime planning state and should not be committed. Use it for resumable planning phases in the same spirit as `.pipeline/state.yaml`.

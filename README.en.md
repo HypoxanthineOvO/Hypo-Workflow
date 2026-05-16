@@ -6,7 +6,7 @@
 
 Plan -> Execute -> Review -> Report -> Resume
 
-[![Version](https://img.shields.io/badge/version-12.7.0-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-12.8.0-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/en/reference/platforms.md)
 
@@ -62,7 +62,7 @@ Third-party IDE adapters are repository instruction files. They teach the host I
 - Run pre-delivery checks for formatting, stale derived artifacts, README/docs freshness, secret markers, tests, and report evidence.
 - Automation is governed by `.pipeline/config.yaml`; release, destructive operations, external side effects, and PR/MR remote writes still follow explicit confirmation gates.
 
-Current version exposes **40 user-facing commands** and **1 internal watchdog** skill.
+Current version exposes **41 user-facing commands** and **1 internal watchdog** skill.
 
 ## Common Commands
 
@@ -72,6 +72,7 @@ Current version exposes **40 user-facing commands** and **1 internal watchdog** 
 | Plan a feature | `/hw:plan` |
 | Start or continue execution | `/hw:start` / `/hw:resume` |
 | Show status and recent events | `/hw:status` |
+| Continue analysis and root-cause investigation | `/hw:analysis` |
 | Explain code/config/changes with evidence | `/hw:explain "why this design"` |
 | Handle existing PR/MR | `/hw:pr inspect URL`, `/hw:pr review URL`, `/hw:pr fix URL` |
 | Create PR/MR | `/hw:pr create` / `/hw:pr create --from-worktree` / `/hw:pr create --plan` |
@@ -88,7 +89,7 @@ Current version exposes **40 user-facing commands** and **1 internal watchdog** 
 | [Platforms Reference](docs/en/reference/platforms.md) | Platform capability matrix |
 | [Generated Artifacts](docs/en/reference/generated-artifacts.md) | Generated adapter and docs sources |
 | [Configuration Reference](docs/en/reference/configuration.md) | Automation, gates, profiles, and worker separation |
-| [v12.7.0 Release Notes](docs/en/release/v12.7.0.md) | OpenCode bash auto-approval now uses valid schema plus plugin policy, with local distribution refreshed |
+| [v12.8.0 Release Notes](docs/en/release/v12.8.0.md) | Stronger P2 technical-route gates, detailed completion reporting, restored Analysis entrypoint, and release-regression repairs |
 
 ## License
 

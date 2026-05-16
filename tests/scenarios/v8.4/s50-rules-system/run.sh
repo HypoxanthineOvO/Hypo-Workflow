@@ -10,7 +10,7 @@ test -f skills/rules/SKILL.md
 test -f references/rules-spec.md
 test -x scripts/rules-summary.sh
 
-test "$(find rules/builtin -maxdepth 1 -type f -name '*.yaml' | wc -l | tr -d ' ')" = "16"
+test "$(find rules/builtin -maxdepth 1 -type f -name '*.yaml' | wc -l | tr -d ' ')" = "17"
 test "$(find rules/presets -maxdepth 1 -type f -name '*.yaml' | wc -l | tr -d ' ')" = "3"
 test -f rules/template/custom-rule-template.md
 
@@ -20,7 +20,7 @@ rg -q 'rules.extends' references/config-spec.md
 rg -q 'rules:' config.schema.yaml
 rg -q '\| `/hw:rules` \|' docs/reference/commands.md
 rg -q '/hw:rules' README.md
-rg -q '40 个用户指令' README.md
+rg -q '41 个用户指令' README.md
 rg -q '"version": "[0-9]+\.[0-9]+\.[0-9]+"' .claude-plugin/plugin.json
 
 summary="$(bash scripts/rules-summary.sh "$repo_root")"
@@ -30,7 +30,7 @@ printf '%s\n' "$summary" | rg -q 'knowledge-ledger-self-check[[:space:]]+hook[[:
 printf '%s\n' "$summary" | rg -q 'plan-tool-required[[:space:]]+workflow[[:space:]]+warn'
 printf '%s\n' "$summary" | rg -q 'session-start-context-load[[:space:]]+hook[[:space:]]+error[[:space:]]+on-session-start'
 printf '%s\n' "$summary" | rg -q 'claude-hw-command-namespace[[:space:]]+workflow[[:space:]]+error[[:space:]]+always,pre-commit,pre-release'
-printf '%s\n' "$summary" | rg -q 'Summary: 16/18 enabled'
+printf '%s\n' "$summary" | rg -q 'Summary: 17/20 enabled'
 printf '%s\n' "$summary" | rg -q 'prefer-chinese-output'
 printf '%s\n' "$summary" | rg -q 'report-language'
 

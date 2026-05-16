@@ -146,6 +146,7 @@ export async function buildOpenCodeStatusModel(projectRoot = ".", options = {}) 
   const feature = currentFeature({ state: state.value, queue: queue.value, current });
   const gate = gateFromQueue(queue.value, feature, state.value);
   const metricSummary = metricsSummary(metrics.value, feature, state.value);
+  const analysis = analysisSummaryFromState(state.value);
   const recentEvents = recentEventsFromLog(log.value);
   const cycleModel = cycleFromSources(cycle.value, queue.value, state.value);
   const dag = resolveFeatureDagBoard(queue.value || {});
@@ -182,6 +183,7 @@ export async function buildOpenCodeStatusModel(projectRoot = ".", options = {}) 
     },
     gate,
     metrics: metricSummary,
+    analysis,
     models,
     latest_score: latestScore || fallbackScore(state.value),
     recent_events: recentEvents,
@@ -211,6 +213,7 @@ function emptyModel({ sources, warnings, models }) {
     lease: { action: "none", reason: "missing_pipeline", repair_hint: null },
     derived: { ok: true, stale_count: 0, error_count: 0, artifacts: [] },
     metrics: { duration_ms: NA, token_count: NA, cost: NA },
+    analysis: null,
     models,
     latest_score: { diff_score: null, overall: null, code_quality: null },
     recent_events: [],
@@ -708,6 +711,7 @@ function renderSidebarModel(model) {
           `Gate: ${model.gate.status === "none" ? model.feature.gate || NA : model.gate.status}`,
         ],
       },
+      ...renderAnalysisSections(model),
       ...renderRecoverySections(model),
       {
         title: "Models",
@@ -776,7 +780,43 @@ function renderFooterModel(model) {
   if (model.lease?.action === "repair") parts.push("lease:repair");
   if (model.derived && model.derived.ok === false) parts.push(`derived:${model.derived.stale_count || model.derived.error_count}`);
   if (model.acceptance?.state && model.acceptance.state !== "none") parts.push(`acceptance:${model.acceptance.state}`);
+  if (model.analysis?.ledger_path) parts.push(`analysis:${model.analysis.milestone_id || "active"}`);
   return { text: parts.join(" | ") };
+}
+
+function analysisSummaryFromState(state = {}) {
+  const summary = state.prompt_state?.analysis_summary;
+  if (!summary || typeof summary !== "object") return null;
+  return {
+    milestone_id: summary.milestone_id || null,
+    question: summary.question || null,
+    ledger_path: summary.ledger_path || null,
+    conclusion: summary.conclusion || summary.outcome || null,
+    confidence: summary.confidence || null,
+    next_action: summary.next_action || null,
+    updated_at: summary.updated_at || null,
+    hypothesis_counts: summary.hypothesis_counts || null,
+    experiment_counts: summary.experiment_counts || null,
+  };
+}
+
+function renderAnalysisSections(model) {
+  const analysis = model.analysis;
+  if (!analysis) return [];
+  return [
+    {
+      title: "Analysis",
+      items: [
+        `Question: ${analysis.question || NA}`,
+        `Ledger: ${analysis.ledger_path || NA}`,
+        `Conclusion: ${analysis.conclusion || NA}`,
+        `Confidence: ${analysis.confidence || NA}`,
+        `Hypotheses: ${formatStatusCounts(analysis.hypothesis_counts)}`,
+        `Experiments: ${formatStatusCounts(analysis.experiment_counts)}`,
+        `Next: ${analysis.next_action || NA}`,
+      ],
+    },
+  ];
 }
 
 function derivedHealthFromSources(health, sources = []) {
@@ -1074,6 +1114,16 @@ function formatBoolean(value) {
   if (value === true) return "true";
   if (value === false) return "false";
   return NA;
+}
+
+function formatStatusCounts(counts) {
+  if (!counts || typeof counts !== "object") return NA;
+  const total = counts.total ?? NA;
+  const details = Object.entries(counts)
+    .filter(([key]) => key !== "total")
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(([key, value]) => `${key}:${value}`);
+  return [`total:${total}`, ...details].join(", ");
 }
 
 function normalizeStatusToken(value) {

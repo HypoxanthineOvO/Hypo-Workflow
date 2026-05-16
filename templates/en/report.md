@@ -1,5 +1,7 @@
 # Execution Report: {prompt_name}
 
+> Language: {output_language} | Timezone: {output_timezone}
+
 ## Summary
 - Prompt: {prompt_id} — {prompt_name}
 - Started: {started_at}
@@ -7,6 +9,16 @@
 - Duration: {duration}
 - Result: {result}
 - Diff Score: {diff_score}/5
+
+## Completion Narrative
+- Change Summary: {change_summary}
+- Technical Approach: {technical_approach}
+- Modified Files / Modules: {modified_files}
+- Test Design: {test_design}
+- Validation Results: {validation_results}
+- Expected Results: {expected_results}
+- Problems Encountered: {problems_encountered}
+- Risks / Follow-Up: {risks_follow_up}
 
 ## Steps
 | Step | Status | Duration | Notes |

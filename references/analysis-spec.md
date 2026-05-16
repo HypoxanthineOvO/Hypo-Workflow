@@ -10,7 +10,7 @@ It is not a Test Profile. Test Profiles continue to control validation evidence 
 
 One analysis Milestone normally represents one investigation question. The Milestone may contain multiple hypotheses and experiments. A disproved hypothesis is progress, not a Milestone failure.
 
-Analysis evidence is stored in an analysis ledger at `.pipeline/analysis/<milestone-id>-analysis-ledger.yaml`. The active `state.yaml` record should keep only a compact `prompt_state.analysis_summary` with counts, conclusion, confidence, and `ledger_path`.
+Analysis evidence is stored in an analysis ledger. The command-facing canonical path is `.pipeline/analysis/<cycle-or-milestone>/ledger.yaml`; existing `.pipeline/analysis/<milestone-id>-analysis-ledger.yaml` files remain valid legacy ledgers. The active `state.yaml` record should keep only a compact `prompt_state.analysis_summary` with counts, conclusion, confidence, and `ledger_path`.
 
 ## Step Chain
 
@@ -61,6 +61,12 @@ Same-Milestone fix and validation follows the interaction mode:
 - `manual`: report and proposal only
 - `hybrid`: propose the fix, then confirm before editing
 - `auto`: may patch and validate directly inside configured boundaries
+
+## User-Facing Analysis Lane
+
+`/hw:analysis` exposes Analysis as an interactive investigation lane with `enter`, `continue`, `end`, and `report` semantics. The lane should recover from `prompt_state.analysis_summary.ledger_path`, initialize the canonical ledger when entering a new question, and write continuation hints for unfinished investigations.
+
+Status, report, progress, and resume surfaces should show the question, ledger path, outcome/confidence, compact hypothesis and experiment counts, and next action. They should not dump the full hypotheses, experiments, observations, or validity discussion unless the user explicitly asks to inspect the ledger.
 
 ## Workflow Taxonomy
 

@@ -30,16 +30,43 @@ description: Split discovered work into milestones when the user wants Hypo-Work
    - 实现范围
    - 测试规格
    - 预期产物
-4. 每个实现 Milestone 必须定义闭环验证路径：
+4. 每个实现 Milestone 必须包含技术路线字段：
+   - `technical_solution`：架构选择、数据/接口/状态契约、关键实现策略
+   - `technical_route`：有序实现路线，说明触达模块、边界、兼容/迁移处理和非目标
+   - `research_required`：调研项状态、证据、阻塞问题或用户明确延后项
+   - `risks_and_alternatives`：主要风险、替代方案和取舍理由
+   - `validation_path`：闭环验证命令或可执行场景、通过/失败信号和验证负责人
+   - `audit_focus`：审计工作器需要重点检查的行为、证据和风险
+5. 每个实现 Milestone 必须定义闭环验证路径：
    - 精确的验证命令或可执行场景
    - 可观察的通过/失败证据
    - 当工作非平凡或已委托时，指定独立的验证负责人
-5. 对于实现工作，优先使用可运行的垂直切片：一个仅跨越运行和验证所需层的窄行为。
-6. 当数据库/API/UI/仅 schema 的 Milestone 不产生可运行行为或可信验证时，标记为水平拆分或开环拆分。
-7. 当架构可能在后续 prompt 中变动时，优先使用窄 Milestone。
-8. 保留 append 模式安全性：
+6. 对于实现工作，优先使用可运行的垂直切片：一个仅跨越运行和验证所需层的窄行为。
+7. 当数据库/API/UI/仅 schema 的 Milestone 不产生可运行行为或可信验证时，标记为水平拆分或开环拆分。
+8. 当架构可能在后续 prompt 中变动时，优先使用窄 Milestone。
+9. 保留 append 模式安全性：
    - 不要静默重新编号已执行的 prompt
    - 将新 prompt 追加到最高安全序号之后
+
+## 技术路线与调研门禁
+
+P2 不得以 goal-only checkpoint 进入 `proposed`。如果计划只列出目标、验收标准、功能队列、待办项或测试标题，而没有每个实现 Milestone 的技术方案、技术路线、调研状态、风险替代、验证路径和审计焦点，则 P2 必须保持 `in_progress` 或 `revision`。
+
+以下情况必须创建硬性的 `research_required` 项：
+
+- 未知工具或本地未确认的 CLI/API
+- 外部服务、远程资源或需要账号/权限的集成
+- 第三方库、框架、插件或版本相关能力
+- 平台能力、Agent 平台差异或运行时权限边界
+- 用户私有 schema、业务规则、专有数据格式或非公开接口
+
+每个 `research_required` 项必须在 P2 确认/P3 之前处于以下状态之一：
+
+- `resolved`：有本地代码、官方文档、用户说明或可运行探针作为证据
+- `blocking_question`：已转成用户可回答的问题；P2 可展示为待答复检查点，但不得被确认或进入 P3，直到用户回答或明确接受延后
+- `deferred_by_user`：用户明确接受延后，并说明延后到哪个 Milestone 或风险门控
+
+如果用户挑战技术路线、指出调研不足或要求比较替代方案，立即把 P2 状态视为 `revision` 或 `in_progress`，记录被挑战的字段和原因，执行目标调研，然后重新展示修订后的 P2 检查点。不要在挑战未处理时继续 P3。
 
 ## 交互行为
 
@@ -51,17 +78,31 @@ description: Split discovered work into milestones when the user wants Hypo-Work
   - 实现范围
   - 测试规格
   - 预期产物
+  - `technical_solution`
+  - `technical_route`
+  - `research_required` 状态和证据/阻塞/延后说明
+  - `risks_and_alternatives`
+  - `validation_path`
+  - `audit_focus`
   - 可运行垂直切片质量，包括涉及的层和真实验证证据
   - 闭环验证路径，包括通过/失败信号和验证负责人
   - 未解决的假设
 - 在进入 P3 Generate 前等待用户明确确认
 - 不要从 P2 直接生成 `.pipeline/` 文件、prompt 文件或架构文件
+- 将机器可读拆解保存在 `.plan-state/decompose.yaml`，将人工审查稿保存在 `.plan-state/technical-route.md`
 - 如果用户要求修改，调整拆分并重新展示检查点
 - 在 auto 模式下，除非被阻塞，否则直接最终确定 Milestone 拆分
 
 ## P2 检查点门禁
 
-交互式 P2 完成不等于允许写入文件。唯一有效的下一步是展示提议的拆解并要求用户确认。只有在用户明确批准 Milestone 拆分后才能开始 P3。
+交互式 P2 完成不等于允许写入文件。唯一有效的下一步是展示提议的拆解和技术路线并要求用户确认。只有在用户明确批准 Milestone 拆分、技术路线，并且硬性调研项已解决、已回答或已明确延后后，才能开始 P3。
+
+P2 可标记为 `proposed` 的最低条件：
+
+- 每个实现 Milestone 都有 `technical_solution`、`technical_route`、`research_required`、`risks_and_alternatives`、`validation_path` 和 `audit_focus`
+- 没有 unresolved 的硬性 `research_required` 项；如果存在 `blocking_question`，检查点必须显示为等待用户答复，不能进入 P3
+- 检查点不是仅由目标、验收标准、Feature Queue 或测试标题组成
+- 用户最近没有未处理的技术路线挑战
 
 ## 批量拆解
 

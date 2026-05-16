@@ -44,6 +44,7 @@ For the user-facing command map, see `SKILL.md`.
 - `/hw:audit`
 - `/hw:debug`
 - `/hw:chat`
+- `/hw:analysis`
 - `/hw:plan`
    - `/hw:plan:deep`
    - `/hw:plan:discover`
@@ -64,7 +65,7 @@ For the user-facing command map, see `SKILL.md`.
 3. parse remaining tokens as command arguments
 4. flags are order-independent
 5. if a command is unknown, return exactly:
-   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 6. if a known command receives an unsupported flag, stop and report the unsupported flag explicitly instead of guessing
 7. if a prompt selector is ambiguous, list the candidates and stop
 8. plan and review commands load `plan/PLAN-SKILL.md` before execution
@@ -83,7 +84,7 @@ User-visible command responses must not collapse into "done" plus a file path. U
 - explanation: why, with the most relevant evidence or changed content
 - next steps: what the user should do next
 
-Milestone, Cycle, report, status, explain, research, and link-analysis completions must additionally explain what changed, how it was validated, how the user can manually exercise it, and known risks or limits.
+Milestone, Cycle, Debug, Audit, Patch, report, status, explain, research, and link-analysis completions must additionally follow `references/completion-report-contract.md` when they synthesize a completion narrative. At minimum, they must explain what changed, the technical approach, modified files/modules, test design, validation results, expected result, encountered problems, and risks or follow-up.
 
 The command should prepare authoritative writes first, prevalidate invariants, commit authority with temp-file atomic replacement, then refresh derived views such as `.pipeline/log.yaml`, `.pipeline/PROGRESS.md`, metrics mirrors, compact views, `PROJECT-SUMMARY.md`, and OpenCode status inputs. If a derived refresh fails after authority commits, do not roll back authority; report the warning, write `.pipeline/derived-refresh.yaml`, and recommend `/hw:sync --light` or rerunning the lifecycle command after repair.
 
@@ -181,6 +182,7 @@ Behavior:
 - include the effective execution mode when config files are available
 - include active Cycle metadata, `last_heartbeat`, and watchdog state when present
 - include project-root `PROJECT-SUMMARY.md` top summary when present
+- when `prompt_state.analysis_summary` exists, include Analysis question, ledger path, outcome or conclusion if known, confidence, compact hypothesis/experiment counts, and next action; do not dump full hypotheses, experiments, or observations
 - do not mutate `state.yaml`, `log.md`, `log.yaml`, or reports
 
 ### `/hw:skip`
@@ -239,6 +241,7 @@ Behavior:
 - locate the most recent report using `history.completed_prompts[-1].report_file` when available
 - otherwise fall back to the newest report file in the reports directory
 - summarize the latest scores, warnings, and decision
+- for Analysis reports, prefer the ledger path from `prompt_state.analysis_summary.ledger_path`; summarize question, outcome, confidence, conclusion, next action, and compact counts only unless the user explicitly requests the full ledger
 
 ### `/hw:help`
 
@@ -251,7 +254,7 @@ Supported forms:
 Behavior:
 
 - read `SKILL.md` command tables as the source of truth
-- `/hw:help` lists all 40 user-facing commands grouped under Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility
+- `/hw:help` lists all 41 user-facing commands grouped under Setup, Pipeline, Plan, Analysis, Lifecycle, Docs, Review, Explain, and Utility
 - `/hw:help --quick` returns a compact cheat sheet
 - `/hw:help <cmd>` returns detailed usage, flags, and examples for the requested command
 
@@ -388,6 +391,7 @@ Behavior:
 
 - follow the five-step reasoning workflow in `references/debug-spec.md`
 - distinguish symptom-driven debugging from preventive audit scanning
+- when debugging becomes sustained root-cause investigation, initialize or continue `/hw:analysis` and keep durable evidence in the Analysis ledger
 - write the detailed report to `.pipeline/debug/` and append a debug log entry
 
 ### `/hw:chat`
@@ -406,6 +410,38 @@ Behavior:
 - `/hw:chat end` explicitly closes chat mode and writes a chat summary when required
 - if the session stays lightweight, keep at least chat entries plus modification traces
 - when scale grows beyond lightweight follow-up work, recommend upgrade to Patch instead of silently converting
+
+### `/hw:analysis`
+
+Supported forms:
+
+- `/hw:analysis`
+- `/hw:analysis enter "<question>"`
+- `/hw:analysis continue`
+- `/hw:analysis end`
+- `/hw:analysis report`
+
+OpenCode mapping:
+
+- `/hw:analysis` is invoked as `/hw-analysis`.
+- `/hw-analysis` is a native OpenCode slash-command mapping to canonical `/hw:analysis`, backed by `skills/analysis/SKILL.md`.
+
+Behavior:
+
+- load `skills/analysis/SKILL.md`
+- treat Analysis as an interactive investigation lane with enter/continue/end/report semantics
+- if an active `prompt_state.analysis_summary` exists and no operation is given, continue that lane
+- if no active summary exists and the user provided a question, enter a new lane
+- if no active summary or question exists, ask for the investigation question before creating durable state
+- use `.pipeline/analysis/<cycle-or-milestone>/ledger.yaml` as the source of truth for evidence
+- accept existing `.pipeline/analysis/<milestone-id>-analysis-ledger.yaml` ledgers as legacy-compatible evidence and preserve their path when state already points to them
+- keep `.pipeline/state.yaml` limited to `prompt_state.analysis_summary`; state must not store full hypotheses, experiments, or observations
+- write or refresh `.pipeline/continuation.yaml` with `safe_resume_command: /hw:analysis continue` when an Analysis lane cannot finish in the current turn
+- Analysis summaries should expose question, ledger path, outcome, confidence, next action, and compact hypothesis/experiment counts
+- Analysis status/report/progress surfaces must not dump the whole ledger unless the user asks to inspect it
+- boundary-controlled actions follow `execution.analysis.interaction_mode`: `manual` denies code changes, `hybrid` confirms before code changes, and `auto` allows code changes inside configured boundaries
+- service restarts, system dependency installation, network/remote resources, destructive actions, and external side effects still obey their explicit configured boundary
+- if an Analysis conclusion implies implementation, record a `followup_proposal` with `workflow_kind: build`, `source_analysis`, `recommended_change`, `validation_plan`, `evidence_refs`, and `mode_required`
 
 ### `/hw:plan`
 
@@ -426,6 +462,7 @@ Behavior:
 - honor `--context` as comma-separated P1 context sources, including `explore:E001` refs created by `/hw:explore upgrade plan E001`
 - single-feature /hw:plan behavior is unchanged when `--batch` is absent
 - ordinary `/hw:plan` keeps P1-P4 gates; Deep Plan context, `--deep`, or converted discussion output must not skip P1-P4
+- ordinary single-feature planning must remain simple. Feature DAG fields and queue dependency semantics are only for `--batch`; do not add DAG requirements to a normal P2 checkpoint.
 - with `--batch`, Discover covers multiple Features in one interview and generates a Feature Queue after confirmation
 - Progressive Discover starts by asking task category, desired effect, and verification method before deeper implementation detail
 - map task category to Test Profile expectations when applicable; webapp, agent-service, and research each require different validation evidence
@@ -500,6 +537,12 @@ Behavior:
 - load `plan/PLAN-SKILL.md`
 - split the project into milestones
 - include test specs and boundary coverage expectations per milestone
+- for every implementation milestone, require `technical_solution`, `technical_route`, `research_required`, `risks_and_alternatives`, `validation_path`, and `audit_focus`
+- do not mark P2 as `proposed` when the checkpoint only contains goals, acceptance criteria, Feature Queue items, test titles, or other goal-only planning text
+- treat unknown tools, external services, third-party libraries, platform capabilities, and user-private schemas as hard `research_required` triggers
+- before P2 confirmation/P3, each hard research trigger must be resolved with evidence, converted into a user-facing blocking question, or explicitly deferred by the user; active blocking questions keep P2 waiting and must not advance to P3
+- if the user challenges a technical route, return P2 to `revision` or `in_progress`, record the challenge, perform targeted research, and present a revised checkpoint before Generate
+- persist structured P2 state in `.plan-state/decompose.yaml` and the human technical route checkpoint in `.plan-state/technical-route.md` when planning state is available
 - in interactive mode, show the proposed milestone split and wait for confirmation before P3 Generate
 
 ### `/hw:plan:generate`
@@ -517,6 +560,8 @@ Behavior:
 - detect append mode when an existing `.pipeline/` workspace is present
 - choose `implement-only` for planning-heavy or document-heavy build plans unless the project clearly requires executable TDD
 - choose `analysis` for root-cause, metric, or repo/system investigations whose primary deliverable is a conclusion and evidence chain
+- preserve each milestone's P2 technical route fields in generated prompts: `technical_solution`, `technical_route`, `research_required`, `risks_and_alternatives`, `validation_path`, and `audit_focus`
+- stop and return to P2 revision instead of generating prompts if any implementation milestone lacks those fields, has unresolved hard `research_required` items, or still has active blocking research questions
 - on prompt-number conflicts, preserve executed prompts and append new prompt numbers after the highest existing number unless explicit resequencing is approved
 
 ### `/hw:plan:confirm`

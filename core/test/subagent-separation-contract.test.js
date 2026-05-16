@@ -78,8 +78,8 @@ test("execution skills carry the same Subagent separation contract", async () =>
   ];
   const combined = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
 
-  assert.match(combined, /P0 Configure.*Subagent authorization/is);
-  assert.match(combined, /implement.*test source.*fixtures.*snapshot.*assertion/is);
-  assert.match(combined, /degraded mode.*user confirmation/is);
-  assert.match(combined, /non-delegation rationale/i);
+  assert.match(combined, /P0 Configure.*(Subagent authorization|Subagent 授权)/is);
+  assert.match(combined, /implement.*test source.*fixtures.*snapshot.*assertion|implementation Subagent 不应读取测试源码、fixtures、snapshots 或 assertion 细节|implement.*不得.*测试.*fixture.*snapshot.*assertion/is);
+  assert.match(combined, /degraded mode.*user confirmation|降级模式.*用户明确确认/is);
+  assert.match(combined, /non-delegation rationale|非委托理由/i);
 });

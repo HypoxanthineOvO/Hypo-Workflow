@@ -6,6 +6,7 @@ export const CANONICAL_COMMANDS = Object.freeze([
   { canonical: "/hw:stop", opencode: "/hw-stop", agent: "hw-status", route: "pipeline", skill: "skills/stop/SKILL.md" },
   { canonical: "/hw:report", opencode: "/hw-report", agent: "hw-report", route: "read", skill: "skills/report/SKILL.md" },
   { canonical: "/hw:chat", opencode: "/hw-chat", agent: "hw-build", route: "lifecycle", skill: "skills/chat/SKILL.md" },
+  { canonical: "/hw:analysis", opencode: "/hw-analysis", agent: "hw-debug", route: "analysis", skill: "skills/analysis/SKILL.md" },
   { canonical: "/hw:plan", opencode: "/hw-plan", agent: "hw-plan", route: "plan", skill: "skills/plan/SKILL.md" },
   { canonical: "/hw:plan:deep", opencode: "/hw-plan-deep", agent: "hw-plan", route: "plan", skill: "skills/plan-deep/SKILL.md" },
   { canonical: "/hw:plan:discover", opencode: "/hw-plan-discover", agent: "hw-plan", route: "plan", skill: "skills/plan-discover/SKILL.md" },

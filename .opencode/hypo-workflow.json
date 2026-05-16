@@ -10,7 +10,7 @@
   },
   "agents": {
     "plan": {
-      "model": "gpt-5.5"
+      "model": "deepseek-v4-pro"
     },
     "compact": {
       "model": "deepseek-v4-flash"
@@ -25,7 +25,7 @@
       "model": "deepseek-v4-pro"
     },
     "debug": {
-      "model": "gpt-5.5"
+      "model": "deepseek-v4-pro"
     },
     "docs": {
       "model": "deepseek-v4-pro"
@@ -37,7 +37,7 @@
   "model_pool": {
     "roles": {
       "plan": {
-        "primary": "gpt-5.5",
+        "primary": "deepseek-v4-pro",
         "fallback": [
           "deepseek-v4-pro"
         ]
@@ -50,7 +50,7 @@
         ]
       },
       "review": {
-        "primary": "gpt-5.5",
+        "primary": "deepseek-v4-pro",
         "fallback": [
           "deepseek-v4-pro"
         ]
@@ -64,7 +64,7 @@
       "chat": {
         "primary": "deepseek-v4-pro",
         "fallback": [
-          "gpt-5.5"
+          "deepseek-v4-pro"
         ]
       }
     }
@@ -101,7 +101,7 @@
     "confirm_system_install": false
   },
   "fileGuard": "standard",
-  "version": "12.7.0",
+  "version": "12.8.0",
   "commandMap": [
     {
       "canonical": "/hw:start",
@@ -151,6 +151,13 @@
       "agent": "hw-build",
       "route": "lifecycle",
       "skill": "skills/chat/SKILL.md"
+    },
+    {
+      "canonical": "/hw:analysis",
+      "opencode": "/hw-analysis",
+      "agent": "hw-debug",
+      "route": "analysis",
+      "skill": "skills/analysis/SKILL.md"
     },
     {
       "canonical": "/hw:plan",

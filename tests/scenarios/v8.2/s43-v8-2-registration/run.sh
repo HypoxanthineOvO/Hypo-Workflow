@@ -16,7 +16,7 @@ rg -q '/hw:patch fix' README.md
 rg -q '/hw:compact' README.md
 rg -q '/hw:guide' README.md
 rg -q '/hw:rules' README.md
-rg -q '40 个用户指令' README.md
+rg -q '41 个用户指令' README.md
 rg -q '\[Commands Reference\]\(docs/reference/commands.md\)' README.md
 rg -q '"version": "[0-9]+\.[0-9]+\.[0-9]+"' .claude-plugin/plugin.json
 

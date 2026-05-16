@@ -1,5 +1,5 @@
 pipeline:
-  name: "C14 Prompt兼容性审查"
+  name: "C15 Workflow交互细节与Analysis模式调查"
   source: local
   output: local
   prompts_dir: .pipeline/prompts

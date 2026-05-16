@@ -31,6 +31,7 @@ export async function buildClaudeStatusSurface(projectRoot = ".", options = {}) 
     cycle: base.cycle,
     progress: base.progress,
     current: base.current,
+    analysis: base.analysis,
     lifecycle: base.lifecycle,
     progress_metadata: parsed.metadata,
     current_summary: parsed.current.summary || base.sidebar?.summary || "",
@@ -59,6 +60,9 @@ export function renderClaudeStatusMarkdown(surface = {}) {
     `- Automation: evaluation.auto_continue=${formatBoolean(surface.automation?.evaluation_auto_continue)}, batch.auto_chain=${formatBoolean(surface.automation?.batch_auto_chain)}`,
     `- Safety: ${surface.safety_profile || "standard"}`,
     `- Monitor: ${surface.monitor?.decision || "unknown"} (${surface.monitor?.reason || "n/a"})`,
+    ...(surface.analysis ? [
+      `- Analysis: ${surface.analysis.question || "active"} | ${surface.analysis.ledger_path || "ledger:n/a"} | ${surface.analysis.conclusion || "conclusion:n/a"} | confidence:${surface.analysis.confidence || "n/a"}`,
+    ] : []),
     "",
     `## Milestones`,
     `| # | Feature | Milestone | Status | Summary |`,
@@ -81,7 +85,8 @@ export function renderClaudeStatusSummary(surface = {}) {
     surface.current?.step || surface.pipeline?.status || "unknown",
     `${surface.progress?.completed ?? 0}/${surface.progress?.total ?? 0}`,
     `next:${surface.lifecycle?.next_action || "none"}`,
-  ].join(" | ");
+    surface.analysis?.ledger_path ? `analysis:${surface.analysis.milestone_id || "active"}` : null,
+  ].filter(Boolean).join(" | ");
 }
 
 export function renderClaudeStatusMonitorManifest(options = {}) {

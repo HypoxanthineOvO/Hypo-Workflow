@@ -4,13 +4,19 @@ Use this reference for analysis Milestones that need a durable, reviewable evide
 
 ## Location
 
-Canonical ledger path:
+Canonical ledger path for the user-facing Analysis lane:
+
+```text
+.pipeline/analysis/<cycle-or-milestone>/ledger.yaml
+```
+
+Legacy compatible ledger path:
 
 ```text
 .pipeline/analysis/<milestone-id>-analysis-ledger.yaml
 ```
 
-One analysis Milestone should normally write one ledger. The ledger is the evidence store; `.pipeline/state.yaml` remains the execution pointer and recovery summary.
+One analysis Cycle, Milestone, or focused investigation question should normally write one ledger. The ledger is the evidence store; `.pipeline/state.yaml` remains the execution pointer and recovery summary. If state already points to a legacy ledger, continue using that path. If no path exists, initialize the canonical directory form.
 
 ## Required Fields
 
@@ -78,7 +84,7 @@ prompt_state:
   analysis_summary:
     milestone_id: M06
     question: ""
-    ledger_path: .pipeline/analysis/M06-analysis-ledger.yaml
+    ledger_path: .pipeline/analysis/M06/ledger.yaml
     hypothesis_counts:
       total: 0
       confirmed: 0
@@ -156,7 +162,7 @@ When the conclusion implies implementation work, use:
 ```yaml
 followup_proposal:
   workflow_kind: build
-  source_analysis: .pipeline/analysis/M08-analysis-ledger.yaml
+  source_analysis: .pipeline/analysis/M08/ledger.yaml
   title: ""
   problem: ""
   recommended_change: ""

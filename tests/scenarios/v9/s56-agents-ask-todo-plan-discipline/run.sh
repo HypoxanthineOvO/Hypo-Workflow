@@ -41,6 +41,6 @@ grep -Fq 'plan-tool-required: off' rules/presets/minimal.yaml
 
 grep -Fq 'Plan 工具纪律' SKILL.md
 grep -Fq 'plan-tool-required' skills/plan/SKILL.md
-grep -Fq 'P1/P2/P3/P4 checkpoint' skills/plan/SKILL.md
+grep -Eq 'P1/P2/P3/P4 checkpoint|P1/P2/P3/P4 检查点' skills/plan/SKILL.md
 
 echo "s56 passed"

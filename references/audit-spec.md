@@ -76,4 +76,16 @@ Use this reference for `/hw:audit`, the preventive code auditing workflow.
 
 ## Architecture Delta
 - [delta against architecture baseline, if any]
+
+## Completion Narrative
+- Change Summary: [audit outcome and finding counts]
+- Technical Approach: [scan method, dimensions, and grading]
+- Modified Files / Modules: [reviewed files/modules and report path]
+- Test Design: [checks, commands, or sampling basis]
+- Validation Results: [findings and command results]
+- Expected Result: [expected state after remediation]
+- Problems Encountered: [constraints or none]
+- Risks / Follow-Up: [remaining risks and follow-up actions]
 ```
+
+Audit completion narratives must follow `references/completion-report-contract.md`.

@@ -157,7 +157,7 @@ export async function loadStructuredRulesAuthority(projectRoot = ".", repoRoot =
     join(repoRoot, "rules", "packs"),
   );
   const builtin = builtinRules.map((rule) => normalizeStructuredRule({
-    id: rule.name,
+    id: rule.name || rule.id,
     scope: "builtin",
     label: rule.label || "workflow",
     severity: rule.default_severity || "warn",

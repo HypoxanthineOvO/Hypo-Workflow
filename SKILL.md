@@ -1,7 +1,7 @@
 ---
 name: hypo-workflow
 version: 12.5.1
-description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:plan`, `/hw:plan:deep`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
+description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:analysis`, `/hw:plan`, `/hw:plan:deep`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
 ---
 
 # Hypo-Workflow v12.5.1
@@ -30,6 +30,8 @@ This SKILL.md serves as the **index and routing summary** for Hypo-Workflow. For
 | `/hw:stop` | Gracefully stop and save state |
 | `/hw:report` | Show compact report summaries, latest scores, or `--view <M>` full report |
 | `/hw:chat` | Enter lightweight append conversation mode |
+| `/hw:analysis` | Enter, continue, end, or report an interactive Analysis investigation lane |
+| `/hw-analysis` | OpenCode native alias for `/hw:analysis` |
 | `/hw:plan` | Enter Plan Mode through `plan/PLAN-SKILL.md` |
 | `/hw:plan:deep` | Maintain Deep Plan discussion packages before ordinary Plan conversion |
 | `/hw:plan:discover` | Run the Discover phase of Plan Mode |
@@ -182,6 +184,8 @@ Use these bundled files when relevant:
 - [`references/check-spec.md`](./references/check-spec.md)
 - [`references/audit-spec.md`](./references/audit-spec.md)
 - [`references/debug-spec.md`](./references/debug-spec.md)
+- [`references/analysis-spec.md`](./references/analysis-spec.md)
+- [`references/analysis-ledger-spec.md`](./references/analysis-ledger-spec.md)
 - [`references/init-spec.md`](./references/init-spec.md)
 - [`references/log-spec.md`](./references/log-spec.md)
 - [`references/plan-review-spec.md`](./references/plan-review-spec.md)
@@ -208,6 +212,7 @@ Use these bundled files when relevant:
 - [`skills/rules/SKILL.md`](./skills/rules/SKILL.md)
 - [`skills/pr/SKILL.md`](./skills/pr/SKILL.md)
 - [`skills/explain/SKILL.md`](./skills/explain/SKILL.md)
+- [`skills/analysis/SKILL.md`](./skills/analysis/SKILL.md)
 
 ## 支持的指令
 
@@ -229,6 +234,8 @@ Handle these commands directly:
   Load compact report summaries when available. With `--view <M>`, load the specified Milestone report in full. Otherwise summarize the latest scores, warnings, and decision.
 - `/hw:chat`
   Load [`skills/chat/SKILL.md`](./skills/chat/SKILL.md). Enter lightweight append conversation mode, reload `state.yaml + cycle.yaml + PROGRESS.md + recent report`, and write chat entries instead of Milestone reports.
+- `/hw:analysis`
+  Load [`skills/analysis/SKILL.md`](./skills/analysis/SKILL.md). Enter, continue, end, or report an interactive Analysis lane. Use `.pipeline/analysis/<cycle-or-milestone>/ledger.yaml` as the durable evidence source of truth, accept legacy `.pipeline/analysis/<milestone-id>-analysis-ledger.yaml`, and keep `.pipeline/state.yaml` limited to `prompt_state.analysis_summary`.
 - `/hw:help`
   Show grouped command help. Use `--quick` for a compact cheat sheet or `/hw:help <cmd>` for detailed usage, arguments, and examples sourced from this file.
 - `/hw:reset`
@@ -278,7 +285,7 @@ Handle these commands directly:
 
 If a command starts with `/hw:` and is not listed above, return:
 
-`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 
 Slash commands are exact and take precedence over fuzzy natural-language matching. Detailed parsing and option semantics live in [`references/commands-spec.md`](./references/commands-spec.md).
 
@@ -513,6 +520,8 @@ Resolve the active step sequence from config:
   `write_tests -> review_tests -> run_tests_red -> implement -> run_tests_green -> review_code`
 - `implement-only`
   `implement -> run_tests -> review_code`
+- `analysis`
+  `define_question -> gather_context -> hypothesize -> experiment -> interpret -> conclude`
 - `custom`
   Use `execution.steps.sequence` exactly as configured.
 

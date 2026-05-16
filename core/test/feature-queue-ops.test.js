@@ -244,10 +244,10 @@ test("M07 docs describe insert confirmation, auto-chain gates, JIT, and metrics 
   assert.match(featureSpec, /confirmation_required/);
   assert.match(featureSpec, /structured queue operation/i);
   assert.match(planSkill, /\/hw:plan --insert/);
-  assert.match(startSkill, /auto-chain/i);
+  assert.match(startSkill, /auto[-_ ]?chain|自动链/i);
   assert.match(startSkill, /gate: confirm/);
   assert.match(resumeSkill, /just_in_time/);
-  assert.match(resumeSkill, /token\/cost/i);
+  assert.match(resumeSkill, /token\/cost|令牌\/成本/i);
 });
 
 function sampleQueue(overrides = {}) {

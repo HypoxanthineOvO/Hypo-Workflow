@@ -29,7 +29,8 @@ test("renderOpenCodeStatusTuiPlugin registers sidebar and footer slots without m
   assert.match(source, /latestSubtaskModel/);
   assert.match(source, /providerID.*modelID/s);
   assert.match(source, /toast/);
-  assert.match(source, /<text>\{renderSidebarText\(model\(\)\)\}<\/text>/);
+  assert.match(source, /Hypo-Workflow/);
+  assert.match(source, /ProgressBar/);
   assert.match(source, /<text>\{renderFooterText\(model\(\), false\)\}<\/text>/);
   assert.doesNotMatch(source, /jsx-dev-runtime/);
   assert.doesNotMatch(source, /writeFile|state\.yaml.*=/);
@@ -140,7 +141,7 @@ test("generated OpenCode plugins are importable and expose OpenCode module entry
   );
   await writeFile(
     join(dir, ".opencode", "node_modules", "solid-js", "index.js"),
-    "export function createSignal(value) { return [() => value, (next) => { value = next; }]; }\n",
+    "export function createSignal(value) { return [() => value, (next) => { value = next; }]; }\nexport function For(props) { return Array.from(props.each || []).map(props.children); }\n",
     "utf8",
   );
 

@@ -15,6 +15,8 @@ description: Investigate a concrete failure when the user wants symptom-driven r
 
 当用户需要症状驱动的根因分析而非预防性审计扫描时，使用此技能进行五步调试工作流。
 
+如果调试已经从一次性诊断变成持续 root-cause investigation（需要多轮假设、实验、解释、结论或跨回合恢复），自动切换或建议进入 Analysis lane：加载 `skills/analysis/SKILL.md`，使用 `/hw:analysis enter "<question>"` 或 `/hw:analysis continue` 语义，并把完整证据写入 Analysis ledger。Debug 报告可保留症状入口，但 durable source of truth 应变为 `.pipeline/analysis/<cycle-or-milestone>/ledger.yaml` 或已有 legacy ledger。
+
 当项目 `execution.worker_separation.mode` 启用时：
 
 - 当 `execution.worker_separation.mode=off` 时，在可行的情况下将实现帮助与测试复现分开
@@ -43,17 +45,29 @@ description: Investigate a concrete failure when the user wants symptom-driven r
    - 最近的 Git 变更
 3. 解析 `output.language` 和 `output.timezone`。
 4. 生成 3-5 个排序假设。
-5. 按顺序验证它们。
-6. 使用 `output.language` 生成根因报告和可选的修复建议。
+5. 按顺序验证它们；如果验证需要持续多轮调查、多个实验记录或跨回合恢复，进入 Analysis state 并维护 ledger。
+6. 使用 `output.language` 生成根因报告和可选的修复建议，并按 `references/completion-report-contract.md` 写出完成说明：
+   - 改动摘要：症状、根因结论或已应用修复
+   - 技术思路：假设排序、验证路径和关键判断
+   - 修改文件/模块：检查或修改的文件、模块、报告路径；无修改时写 `无`
+   - 测试设计：复现方式、验证命令、责任 worker 或无需新增测试的原因
+   - 验证结果：每个假设的确认/排除证据和命令结果
+   - 预期结果：修复或建议落地后应出现的行为
+   - 遇到的问题：阻塞、降级、无法复现、工具不可用或 `无`
+   - 风险/后续：剩余不确定性、需独立验证或后续修复
 7. 在 `--auto-fix` 编辑或独立验证前，确认所需的 Worker 授权或停止并给出阻塞原因。
 8. 使用 `--auto-fix` 时，仅在验证通过后才声称成功。
 9. 在离开调试轮次前，关闭/释放调试打开的任何 Worker 或记录 `close_failed` 及 Worker ID 和原因；未解决的 Worker 生命周期无法满足调试验证证据。
 10. 在持久写入前应用共享的密钥安全证据脱敏助手；不要存储原始 API 密钥、令牌、Authorization 头、Cookie、密码或私钥。
 11. 将报告写入 `.pipeline/debug/`，时间戳使用 `output.timezone`，并追加调试生命周期条目。
 12. 当使用状态跟踪时，设置 `current.phase=lifecycle_debug`。
+13. 当进入 Analysis lane 时，状态只保留 `prompt_state.analysis_summary`，包含 question、ledger path、outcome/conclusion、confidence、next action 和计数；不要把完整 hypotheses 或 experiments 写入 state。
 
 ## 参考文件
 
 - `references/debug-spec.md`
+- `references/analysis-spec.md`
+- `references/analysis-ledger-spec.md`
+- `references/completion-report-contract.md`
 - `references/log-spec.md`
 - `SKILL.md`

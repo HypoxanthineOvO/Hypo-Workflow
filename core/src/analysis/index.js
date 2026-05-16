@@ -94,7 +94,17 @@ export function renderAnalysisBoundaryGuidance(input = {}) {
 
 export function analysisLedgerPath(milestoneId) {
   const id = String(milestoneId || "analysis").trim() || "analysis";
+  return `.pipeline/analysis/${id}/ledger.yaml`;
+}
+
+export function legacyAnalysisLedgerPath(milestoneId) {
+  const id = String(milestoneId || "analysis").trim() || "analysis";
   return `.pipeline/analysis/${id}-analysis-ledger.yaml`;
+}
+
+export function resolveAnalysisLedgerPath(input = {}, options = {}) {
+  const milestoneId = options.milestoneId || options.milestone_id || input.milestone_id || "analysis";
+  return options.ledgerPath || options.ledger_path || input.ledger_path || analysisLedgerPath(milestoneId);
 }
 
 export function validateAnalysisLedger(ledger = {}) {
@@ -132,7 +142,7 @@ export function buildAnalysisStateSummary(ledger = {}, options = {}) {
   return {
     milestone_id: milestoneId,
     question: ledger.question || null,
-    ledger_path: options.ledgerPath || options.ledger_path || analysisLedgerPath(milestoneId),
+    ledger_path: resolveAnalysisLedgerPath(ledger, options),
     hypothesis_counts: countStatuses(ledger.hypotheses, HYPOTHESIS_STATUSES),
     experiment_counts: countStatuses(ledger.experiments, EXPERIMENT_STATUSES),
     conclusion: ledger.conclusion || null,
@@ -217,7 +227,7 @@ export function evaluateAnalysisEvidence(ledger = {}, options = {}) {
 
 export function buildAnalysisReportContract(ledger = {}, options = {}) {
   const milestoneId = options.milestoneId || options.milestone_id || ledger.milestone_id || "analysis";
-  const ledgerPath = options.ledgerPath || options.ledger_path || analysisLedgerPath(milestoneId);
+  const ledgerPath = resolveAnalysisLedgerPath(ledger, { ...options, milestoneId });
   return {
     preset: "analysis",
     report_type: "analysis",
@@ -253,7 +263,8 @@ export function renderAnalysisPromptPlan(feature = {}) {
     "- conclude",
     "",
     "Evidence:",
-    "- maintain `.pipeline/analysis/<milestone-id>-analysis-ledger.yaml`",
+    "- maintain `.pipeline/analysis/<cycle-or-milestone>/ledger.yaml`",
+    "- preserve `.pipeline/analysis/<milestone-id>-analysis-ledger.yaml` only when resuming legacy state that already points there",
     "- keep `state.yaml` limited to `prompt_state.analysis_summary`",
   ].join("\n");
 }

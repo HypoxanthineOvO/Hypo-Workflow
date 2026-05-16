@@ -176,6 +176,8 @@ Patch 修复是轻量级的，但仍然是生产工作。Patch 修复必须保�
 7. **Commit** — 每个 Patch 创建一个独立 commit，格式为 `git commit -m "fix(P001): <Patch title>"`。对于批量修复，不要合并 Patch commit。
 8. **Close or Gate** — 如果独立的 `test` 验证和 `audit` 审查通过，且所有必需的 worker 任务已成功完成并关闭/释放生命周期状态，将 Patch 文件更新为 `closed`，刷新 `.pipeline/PROGRESS.md` 看板表格，并向 `.pipeline/log.yaml` 追加生命周期事件。如果任何 worker 任务为 `failed` 或 `blocked`，或缺少独立验证或生命周期关闭，设置 `pending_acceptance` 或保持 `open`，记录缺失的 Worker Separation 证据，并在声称完成前停止。
 
+Patch 完成或进入 `pending_acceptance` 的最终回应和 Patch 记录必须按 `references/completion-report-contract.md` 覆盖：改动摘要、技术思路、修改文件/模块、测试设计、验证结果、预期结果、遇到的问题、风险/后续。Patch 修复仍然不得生成 Milestone `report.md`；详细完成负载应写入 Patch 文件、`.pipeline/log.yaml` 链接字段或最终回应，`PROGRESS.md` 仅保留紧凑看板行。
+
 ### 已关闭 Patch 更新
 
 当步骤 8 关闭 Patch 时，在保留现有备注的同时更新或追加 Patch 文件中的以下字段：
@@ -188,6 +190,15 @@ Patch 修复是轻量级的，但仍然是生产工作。Patch 修复必须保�
 - worker_separation: implement=<worker-id>, test=<worker-id>, audit=<worker-id>
 - worker_lifecycle: test=requested/started/completed/closed, implement=requested/started/completed/closed, audit=requested/started/completed/closed
 - commit: `a1b2c3d`
+- completion:
+  - 改动摘要: 修复登录页 CSS 错位
+  - 技术思路: 最小化调整样式选择器并保留现有布局结构
+  - 修改文件/模块: src/login.css
+  - 测试设计: 运行现有 UI 回归并由 test worker 复核
+  - 验证结果: 39/39 通过
+  - 预期结果: 登录页在目标视口不再错位
+  - 遇到的问题: 无
+  - 风险/后续: 无
 ```
 
 使用 `output.language` 和 `output.timezone` 生成散文和时间格式。如果现有 Patch 语言已清晰，保留原有语言。
@@ -220,7 +231,7 @@ Patch 修复是轻量级的，但仍然是生产工作。Patch 修复必须保�
 - `summary: <one-line change summary>`
 - `tests: <test command and result>`
 
-Patch 修复绝不能写入 `.pipeline/state.yaml`，也绝不能生成 `report.md`。
+Patch fix must never write `.pipeline/state.yaml`. Patch 修复绝不能写入 `.pipeline/state.yaml`，也绝不能生成 `report.md`。
 
 ### 批量修复
 
@@ -296,6 +307,7 @@ Patch 在 Cycle 关闭时不会被归档。它们保留在 `.pipeline/patches/` 
 
 ## 参考文件
 
+- `references/completion-report-contract.md` — Patch 完成汇报必需字段
 - `skills/cycle/SKILL.md` — 活跃 Cycle 检测
 - `skills/plan-discover/SKILL.md` — Patch 上下文注入
 - `references/config-spec.md` — 输出语言和时区默认值

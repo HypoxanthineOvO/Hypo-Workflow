@@ -13,20 +13,20 @@ description: Show the full Hypo-Workflow command map when the user needs a quick
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-使用此技能来解释 40 个面向用户的 Hypo-Workflow 命令和内部 watchdog 技能。
+使用此技能来解释 41 个面向用户的 Hypo-Workflow 命令和内部 watchdog 技能。There are 41 user-facing Hypo-Workflow commands.
 
 ## 指令分组
 
 - Setup:
   - `setup`
 - Pipeline:
-  - `start`, `resume`, `status`, `skip`, `stop`, `report`, `chat`
+  - `start`, `resume`, `status`, `skip`, `stop`, `report`, `chat`, `analysis`
 - Plan:
   - `/hw:plan`, `/hw:plan:deep`, `/hw:plan:discover`, `/hw:plan:decompose`, `/hw:plan:generate`, `/hw:plan:confirm`, `/hw:plan:extend`, `/hw:plan:review`
 - Lifecycle:
   - `init`, `cycle`, `accept`, `reject`, `patch`, `patch fix`, `release`
 - Analysis/Review:
-  - `check`, `audit`, `debug`
+  - `analysis`, `check`, `audit`, `debug`
 - Utility:
   - `sync`, `docs`, `compact`, `knowledge`, `guide`, `showcase`, `rules`, `help`, `reset`, `log`, `setup`, `explore`
 - Internal:
@@ -34,7 +34,7 @@ description: Show the full Hypo-Workflow command map when the user needs a quick
 
 ## 执行流程
 
-1. 默认情况下，按类别分组列出所有 40 个面向用户的命令。
+1. 默认情况下，按类别分组列出所有 41 个面向用户的命令。
 2. 对于特定命令，解释：
    - 何时使用它
    - 所需的输入或标志

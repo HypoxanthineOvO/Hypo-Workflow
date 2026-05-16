@@ -6,7 +6,7 @@
 
 规划 -> 执行 -> 审查 -> 报告 -> 恢复
 
-[![Version](https://img.shields.io/badge/version-12.7.0-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-12.8.0-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/reference/platforms.md)
 
@@ -65,7 +65,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 - 完成前做交付前检查：格式、派生产物、README/文档新鲜度、secret marker、测试证据和报告证据。
 - 自动化等级由 `.pipeline/config.yaml` 的 `automation.level` 决定；发布、破坏性操作和外部副作用仍按配置确认点执行。
 
-当前版本提供 **40 个用户指令**，另有 **1 个内部 watchdog** skill。
+当前版本提供 **41 个用户指令**，另有 **1 个内部 watchdog** skill。
 
 ## 常用命令
 
@@ -77,6 +77,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | 开始或继续执行 | `/hw:start` / `/hw:resume` |
 | 查看状态和最近事件 | `/hw:status` |
 | 查看报告 | `/hw:report` |
+| 持续分析和根因调查 | `/hw:analysis` |
 | 带证据解释代码/配置/改动 | `/hw:explain "为什么这样设计"` |
 | 小修复不进完整 Milestone | `/hw:patch` / `/hw:patch fix P001` |
 | 处理已有 PR/MR | `/hw:pr inspect URL`、`/hw:pr review URL`、`/hw:pr fix URL` |
@@ -93,10 +94,10 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 
 | 类别 | 命令 |
 |---|---|
-| Pipeline | `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat` |
+| Pipeline | `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:analysis` |
 | Plan | `/hw:plan`, `/hw:plan:discover`, `/hw:plan:decompose`, `/hw:plan:generate`, `/hw:plan:confirm`, `/hw:plan:extend`, `/hw:plan:review` |
 | Lifecycle | `/hw:init`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:patch`, `/hw:patch fix`, `/hw:release` |
-| Analysis/Review | `/hw:check`, `/hw:audit`, `/hw:debug`, `/hw:pr`, `/hw:pr create`, `/hw:explain` |
+| Analysis/Review | `/hw:analysis`, `/hw:check`, `/hw:audit`, `/hw:debug`, `/hw:pr`, `/hw:pr create`, `/hw:explain` |
 | Utility | `/hw:sync`, `/hw:docs`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:help`, `/hw:reset`, `/hw:log`, `/hw:setup`, `/hw:explore` |
 
 完整映射见 [Commands Reference](docs/reference/commands.md) 和 [OpenCode Command Map](references/opencode-command-map.md)。
@@ -107,11 +108,11 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 |---|---|
 | [User Guide](docs/user-guide.md) | 常见流程、恢复、Feature Queue |
 | [Developer Guide](docs/developer.md) | 核心 helper、权限边界、派生产物和测试约定 |
-| [Commands Reference](docs/reference/commands.md) | 40 个标准命令和 OpenCode 映射 |
+| [Commands Reference](docs/reference/commands.md) | 41 个标准命令和 OpenCode 映射 |
 | [Platforms Reference](docs/reference/platforms.md) | 六个平台能力表 |
 | [Generated Artifacts](docs/reference/generated-artifacts.md) | OpenCode、第三方适配、压缩视图和文档引用的生成来源 |
 | [OpenCode Guide](docs/platforms/opencode.md) | OpenCode 指令、智能体角色、模型矩阵和边界 |
-| [v12.7.0 发布说明](docs/release/v12.7.0.md) | OpenCode bash 自动批准策略改为合法 schema + plugin policy，并同步本地分发 |
+| [v12.8.0 发布说明](docs/release/v12.8.0.md) | 强化 P2 技术路线门控、完成汇报契约、Analysis 入口恢复和发布前回归修复 |
 | [Cursor Guide](docs/platforms/cursor.md) | Cursor 仓库规则 |
 | [GitHub Copilot Guide](docs/platforms/copilot.md) | GitHub Copilot 仓库指令 |
 | [Trae Guide](docs/platforms/trae.md) | Trae 项目规则 |

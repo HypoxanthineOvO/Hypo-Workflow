@@ -32,7 +32,15 @@ description: Run a preventive code audit when the user wants graded findings acr
 4. 如果 audit 将作为验收证据，请在扫描前确认独立 audit worker 已授权且与实现分离。
 5. 扫描六个审计维度。
 6. 将发现分级为 `Critical`、`Warning` 或 `Info`。
-7. 将报告写入 `.pipeline/audits/audit-NNN.md`，使用 `output.language`。
+7. 将报告写入 `.pipeline/audits/audit-NNN.md`，使用 `output.language`，并按 `references/completion-report-contract.md` 写出完成说明：
+   - 改动摘要：审计范围、结论和发现计数
+   - 技术思路：审计维度、扫描方法和分级策略
+   - 修改文件/模块：被审阅的文件、模块、报告路径；审计未改代码时仍列出 reviewed scope
+   - 测试设计：检查依据、命令、抽样策略或无需新增测试的原因
+   - 验证结果：Critical/Warning/Info 计数、关键证据和命令结果
+   - 预期结果：按建议修复后的目标状态
+   - 遇到的问题：权限、范围、工具、worker separation 降级或 `无`
+   - 风险/后续：残余风险、需复核项、后续 Patch/Milestone 建议
 8. 使用 `output.timezone` 渲染报告时间戳。
 9. 在持久写入前应用共享的密钥安全证据脱敏助手；不要存储原始 API 密钥、令牌、Authorization 头、cookie、密码或私钥。
 10. 追加生命周期日志条目。
@@ -40,6 +48,7 @@ description: Run a preventive code audit when the user wants graded findings acr
 
 ## References
 
+- `references/completion-report-contract.md`
 - `references/audit-spec.md`
 - `references/log-spec.md`
 - `SKILL.md`

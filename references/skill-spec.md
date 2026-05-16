@@ -17,6 +17,7 @@ The repository currently has 40 local Skill files under `skills/*/SKILL.md`:
 | Path | Role |
 |---|---|
 | `skills/accept/SKILL.md` | User-facing Cycle acceptance command |
+| `skills/analysis/SKILL.md` | User-facing interactive Analysis investigation command |
 | `skills/audit/SKILL.md` | User-facing audit command |
 | `skills/chat/SKILL.md` | User-facing lightweight append conversation command |
 | `skills/check/SKILL.md` | User-facing health-check command |
@@ -59,7 +60,8 @@ The repository currently has 40 local Skill files under `skills/*/SKILL.md`:
 Additional inventory notes:
 
 - Root `SKILL.md` is the aggregate Hypo-Workflow router and system reference. It is not counted as a child Skill in the 40 local Skill files.
-- The OpenCode command map exposes 40 user-facing commands and 38 user-facing Skill paths because `/hw:patch` and `/hw:patch fix` share `skills/patch/SKILL.md`, and `/hw:pr` plus `/hw:pr create` share `skills/pr/SKILL.md`.
+- The OpenCode command map exposes 41 user-facing commands and 39 user-facing Skill paths because `/hw:patch` and `/hw:patch fix` share `skills/patch/SKILL.md`, and `/hw:pr` plus `/hw:pr create` share `skills/pr/SKILL.md`.
+- `/hw:analysis` is a first-class user-facing command backed by `skills/analysis/SKILL.md`; it owns enter/continue/end/report semantics for interactive investigation lanes and keeps full evidence in an Analysis ledger.
 - `/hw:plan:deep` is a first-class user-facing command backed by `skills/plan-deep/SKILL.md`; it owns Deep Plan operations for durable discussion packages before ordinary Plan conversion.
 - `skills/watchdog/SKILL.md` is internal and cron-only. It is intentionally not part of the user-facing command map.
 - The installed Codex copy under `$CODEX_HOME/skills/hypo-workflow` should mirror the same root plus child Skill layout after sync or installation.
@@ -84,6 +86,8 @@ Rules:
 - `SKILL.md` keeps only activation-critical instructions, safety rules, step sequence, output rules, and direct reference links.
 - Put long command semantics in `references/`, deterministic helpers in `scripts/`, and reusable payloads in `assets/` or `templates/`.
 - Reference paths from `SKILL.md` should be relative to the Skill root when they are bundled with a Skill, or repository-root paths when they intentionally point to shared Hypo-Workflow references.
+- Child-local `assets/`, `references/`, and `scripts/` paths may use paths relative to the child Skill directory, such as `assets/example.yaml` for `skills/<command>/assets/example.yaml`.
+- Root shared assets must be written as explicit shared/root paths or as correct relative paths from the child Skill directory, such as `../../assets/state-init.yaml` from `skills/cycle/SKILL.md`. Do not copy root assets into child Skill directories to satisfy path resolution.
 - Alias commands may share one Skill only when they truly share behavior; document the alias in both `references/commands-spec.md` and the platform command map.
 - Internal Skills must be marked explicitly as internal, hidden, or cron-only in their description/body and must not appear as normal user commands.
 
@@ -153,6 +157,7 @@ Canonical user-facing command map:
 | `/hw:stop` | `/hw-stop` | `hw-status` | `skills/stop/SKILL.md` |
 | `/hw:report` | `/hw-report` | `hw-report` | `skills/report/SKILL.md` |
 | `/hw:chat` | `/hw-chat` | `hw-build` | `skills/chat/SKILL.md` |
+| `/hw:analysis` | `/hw-analysis` | `hw-debug` | `skills/analysis/SKILL.md` |
 | `/hw:plan` | `/hw-plan` | `hw-plan` | `skills/plan/SKILL.md` |
 | `/hw:plan:deep` | `/hw-plan-deep` | `hw-plan` | `skills/plan-deep/SKILL.md` |
 | `/hw:plan:discover` | `/hw-plan-discover` | `hw-plan` | `skills/plan-discover/SKILL.md` |
@@ -213,7 +218,7 @@ Current status after M04:
 - `skills/showcase/SKILL.md` now uses the canonical `## Output Language Rules` heading.
 - Stale `/hw:review` V7 compatibility wording has been replaced in root `SKILL.md`, `references/plan-review-spec.md`, and `references/commands-spec.md`. The current canonical command is `/hw:plan:review`; `/hw:review` is only a legacy compatibility alias.
 - `skill-quality` exists as a built-in rule/checking surface for frontmatter, output-language heading, reference paths, command-map traceability, and internal Skill exceptions.
-- `skills/watchdog/SKILL.md` is a valid internal exception: it is cron-only, should not be user-invocable, and should not be counted among the 38 user-facing Skill paths.
+- `skills/watchdog/SKILL.md` is a valid internal exception: it is cron-only, should not be user-invocable, and should not be counted among the 39 user-facing Skill paths.
 - Some long command semantics remain in Skill bodies instead of shared references. This should be improved incrementally without changing trigger behavior.
 - C2 explicitly allows cleanup, formatting, and documentation improvements, but no merge or delete of existing Skills.
 

@@ -146,6 +146,47 @@ test("OpenCode status model shows concise DAG board only when dependencies exist
   assert.equal(ordinary.sidebar.sections.some((section) => section.title === "Feature DAG"), false);
 });
 
+test("OpenCode status model surfaces compact analysis summary without ledger expansion", async () => {
+  const root = await fixtureRoot();
+  await writePipeline(root, {
+    "state.yaml": `
+pipeline:
+  name: Analysis Demo
+  status: running
+  prompts_total: 3
+  prompts_completed: 1
+current:
+  prompt_name: "M06 / F001 — Analysis Investigation"
+  step: experiment
+prompt_state:
+  analysis_summary:
+    milestone_id: M06
+    question: "Why did latency drift?"
+    ledger_path: .pipeline/analysis/M06/ledger.yaml
+    hypothesis_counts:
+      total: 2
+      confirmed: 1
+      pending: 1
+    experiment_counts:
+      total: 3
+      completed: 2
+      blocked: 1
+    conclusion: "Scheduler contention is the leading cause."
+    confidence: medium
+    next_action: "run focused scheduler trace"
+`,
+  });
+
+  const model = await buildOpenCodeStatusModel(root);
+  const section = model.sidebar.sections.find((item) => item.title === "Analysis");
+
+  assert.equal(model.analysis.ledger_path, ".pipeline/analysis/M06/ledger.yaml");
+  assert.match(model.footer.text, /analysis:M06/);
+  assert.match(section.items.join("\n"), /Why did latency drift/);
+  assert.match(section.items.join("\n"), /total:2/);
+  assert.doesNotMatch(section.items.join("\n"), /H1|command:|observations:/i);
+});
+
 test("OpenCode status model handles failed state and malformed optional files", async () => {
   const root = await fixtureRoot();
   await writePipeline(root, {

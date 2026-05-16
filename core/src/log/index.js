@@ -26,6 +26,7 @@ export const LIFECYCLE_LOG_FAMILIES = Object.freeze([
 export const LIFECYCLE_LOG_STATUSES = Object.freeze([
   "active",
   "completed",
+  "completed_with_transport_error",
   "warning",
   "blocked",
   "failed",

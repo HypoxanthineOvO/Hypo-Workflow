@@ -59,7 +59,7 @@ test("deep plan skill defines operation vocabulary and lifecycle states", async 
   }
 
   assert.match(skill, /\.pipeline\/deep-plans\/DP[0-9]+/);
-  assert.match(skill, /machine[- ]readable/i);
+  assert.match(skill, /machine[- ]readable|机器可读/i);
   assert.match(skill, /Mermaid|Markdown/);
   assert.match(commandsSpec, /\/hw:plan:deep/);
   assert.match(commandsSpec, /--deep/);
@@ -86,10 +86,10 @@ test("ordinary /hw:plan keeps P1-P4 gates and --deep routes before ordinary deco
   const planCommand = await readFile("commands/plan.md", "utf8");
   const commandsSpec = await readFile("references/commands-spec.md", "utf8");
 
-  assert.match(planSkill, /full P1-P4 planning flow/i);
-  assert.match(planSkill, /ordinary.*\/hw:plan|\/hw:plan.*ordinary/is);
+  assert.match(planSkill, /full P1-P4 planning flow|完整的 P1-P4 规划流程/i);
+  assert.match(planSkill, /ordinary.*\/hw:plan|\/hw:plan.*ordinary|普通的.*\/hw:plan|\/hw:plan.*普通/is);
   assert.match(planSkill, /--deep/);
-  assert.match(planSkill, /must not.*skip.*P1-P4|P1-P4.*must not.*skip/is);
+  assert.match(planSkill, /must not.*skip.*P1-P4|P1-P4.*must not.*skip|不得跳过 P1-P4|P1-P4.*不得.*跳过/is);
 
   assert.match(planCommand, /--deep/);
   assert.match(planCommand, /route.*\/hw:plan:deep|\/hw:plan:deep.*route/is);

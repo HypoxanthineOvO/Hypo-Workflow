@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import subprocess
@@ -119,6 +120,17 @@ def run(cmd: str, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         env=env,
     )
+
+
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run Hypo-Workflow regression scenarios.")
+    parser.add_argument(
+        "--scenario",
+        action="append",
+        default=[],
+        help="Run only the named scenario. May be provided multiple times.",
+    )
+    return parser.parse_args(argv)
 
 
 def read(path: Path) -> str:
@@ -295,11 +307,28 @@ def scenario_specific(scene: Path, result: ScenarioResult) -> None:
 
 
 def main() -> int:
+    args = parse_args(sys.argv[1:])
     RESULTS_ROOT.mkdir(parents=True, exist_ok=True)
-    scenario_dirs = sorted(
+    all_scenario_dirs = sorted(
         [p for p in SCENARIOS_ROOT.glob("v*/s*") if p.is_dir() and p.name in TARGET_SCENARIOS],
         key=lambda p: p.name,
     )
+    scenario_by_name = {p.name: p for p in all_scenario_dirs}
+    if args.scenario:
+        unknown = [name for name in args.scenario if name not in scenario_by_name]
+        if unknown:
+            print(
+                "Unknown scenario(s): " + ", ".join(unknown) + "\n"
+                "Known scenarios: " + ", ".join(sorted(scenario_by_name)),
+                file=sys.stderr,
+            )
+            return 2
+        scenario_dirs = [scenario_by_name[name] for name in args.scenario]
+        result_suffix = f"selected-{len(scenario_dirs)}"
+    else:
+        scenario_dirs = all_scenario_dirs
+        result_suffix = f"all-{len(scenario_dirs)}"
+
     results: list[ScenarioResult] = []
     for scene in scenario_dirs:
         started = time.time()
@@ -327,7 +356,7 @@ def main() -> int:
         ]
     }
     stamp = time.strftime("%Y%m%dT%H%M%S")
-    (RESULTS_ROOT / f"{stamp}-s01-s30.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    (RESULTS_ROOT / f"{stamp}-{result_suffix}.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     failed = [r for r in results if not r.ok]
     print(f"\nSummary: {len(results)-len(failed)}/{len(results)} passed")
     return 1 if failed else 0

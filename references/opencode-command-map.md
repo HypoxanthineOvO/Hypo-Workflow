@@ -15,6 +15,7 @@ OpenCode uses dash-style native slash commands. Each command remains traceable t
 | `/hw:stop` | `/hw-stop` | `hw-status` | `skills/stop/SKILL.md` |
 | `/hw:report` | `/hw-report` | `hw-report` | `skills/report/SKILL.md` |
 | `/hw:chat` | `/hw-chat` | `hw-build` | `skills/chat/SKILL.md` |
+| `/hw:analysis` | `/hw-analysis` | `hw-debug` | `skills/analysis/SKILL.md` |
 | `/hw:plan` | `/hw-plan` | `hw-plan` | `skills/plan/SKILL.md` |
 | `/hw:plan:deep` | `/hw-plan-deep` | `hw-plan` | `skills/plan-deep/SKILL.md` |
 | `/hw:plan:discover` | `/hw-plan-discover` | `hw-plan` | `skills/plan-discover/SKILL.md` |
@@ -53,6 +54,7 @@ Agent policy:
 
 - OpenCode exposes `/hw:patch accept PNNN` and `/hw:patch reject PNNN "feedback"` as argument subcommands of `/hw-patch`; they are not first-class `/hw-patch-accept` or `/hw-patch-reject` commands.
 - `/hw-plan*`, `/hw:init`, and `/hw:guide` use `hw-plan` to maximize Ask/question and todowrite discipline.
+- `/hw:analysis` uses `hw-debug` because it is an investigation-first lane with hypothesis tracking, experiments, Ask/question gates, and optional build follow-up proposals.
 - Execution and mutation-heavy commands use `hw-build`.
 - Compact, debug, and report commands use `hw-compact`, `hw-debug`, and `hw-report` so the OpenCode model matrix can tune those roles independently.
 - Audit/review commands use `hw-review`.

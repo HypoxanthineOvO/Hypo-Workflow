@@ -1,5 +1,495 @@
 entries:
   -
+    id: M3-AUDIT-START-C15-20260516T012604+0800
+    type: worker_start
+    ref: C15/M3/audit
+    status: active
+    timestamp: "2026-05-16T01:26:04+08:00"
+    summary: "Started C15-M3 audit worker Hilbert for Analysis command-entry, state boundary, OpenCode mapping, and compatibility review."
+    report: .pipeline/reviews/C15/M3/audit.md
+    trigger: auto
+    related_milestone: C15-M3
+    worker:
+      role: audit
+      id: "019e2cad-768f-7e02-8d3f-f3c4a0a2d185"
+      nickname: Hilbert
+      lifecycle: requested/started
+  -
+    id: M3-VALIDATION-C15-20260516T012604+0800
+    type: step_complete
+    ref: C15/M3/run_tests_green
+    status: completed
+    timestamp: "2026-05-16T01:26:04+08:00"
+    summary: "C15-M3 validation passed after restoring /hw:analysis command exposure, OpenCode mapping, status/report/debug guidance, and stale command-count tests."
+    trigger: auto
+    related_milestone: C15-M3
+    tests:
+      - "uv run -- node --test core/test/analysis-command-entry.test.js: 5/5 passing"
+      - "uv run -- node --test analysis/chat/sync/skill/deep-plan/command/claude/knowledge suite: 56/56 passing"
+      - "git diff --check targeted M3 files: passing"
+  -
+    id: M3-IMPLEMENT-WORKER-COMPLETE-C15-20260516T012604+0800
+    type: worker_complete
+    ref: C15/M3/implement
+    status: completed_with_transport_error
+    timestamp: "2026-05-16T01:26:04+08:00"
+    summary: "C15-M3 implement worker Sagan wrote implementation evidence and Analysis exposure changes, but final subagent status reported an upstream 502; main integration validated and completed the work."
+    report: .pipeline/reviews/C15/M3/implementation-evidence.md
+    trigger: auto
+    related_milestone: C15-M3
+    worker:
+      role: implement
+      id: "019e2c7e-b365-7832-b651-0f1d26bec340"
+      nickname: Sagan
+      lifecycle: completed_with_transport_error
+  -
+    id: M3-TEST-WORKER-COMPLETE-C15-20260516T004104+0800
+    type: worker_complete
+    ref: C15/M3/test
+    status: completed
+    timestamp: "2026-05-16T00:41:04+08:00"
+    summary: "C15-M3 test worker Plato completed Analysis command-entry tests; RED proves command/skill/status/report/debug/OpenCode exposure is missing while existing Analysis runtime tests remain green."
+    report: .pipeline/reviews/C15/M3/test-evidence.md
+    trigger: auto
+    related_milestone: C15-M3
+    tests:
+      - "uv run -- node --test core/test/analysis-command-entry.test.js: expected RED, 5 failures before implementation"
+      - "existing analysis/chat/sync/skill regression combination: 34/34 passing"
+    worker:
+      role: test
+      id: "019e2c7e-49b9-72b3-aebc-b2a2f514dd75"
+      nickname: Plato
+      lifecycle: completed
+  -
+    id: M3-WORKERS-START-C15-20260516T003618+0800
+    type: worker_start
+    ref: C15/M3
+    status: active
+    timestamp: "2026-05-16T00:36:18+08:00"
+    summary: "Requested and started C15-M3 test worker Plato and implement worker Sagan with disjoint write scopes for Analysis command entry and state exposure."
+    report: .pipeline/reviews/C15/M3/
+    trigger: auto
+    related_milestone: C15-M3
+    workers:
+      test:
+        id: "019e2c7e-49b9-72b3-aebc-b2a2f514dd75"
+        nickname: Plato
+        lifecycle: requested/started
+        scope: "core/test/analysis-command-entry.test.js and .pipeline/reviews/C15/M3/test-evidence.md"
+      implement:
+        id: "019e2c7e-b365-7832-b651-0f1d26bec340"
+        nickname: Sagan
+        lifecycle: requested/started
+        scope: "Analysis skill, command maps/specs, OpenCode metadata, status/report/debug guidance, implementation evidence"
+  -
+    id: M3-START-C15-20260516T003152+0800
+    type: milestone_start
+    ref: C15/M3
+    status: active
+    timestamp: "2026-05-16T00:31:52+08:00"
+    summary: "Started C15-M3 Interactive Analysis State And Command Entry after C15-M2 completion."
+    report: .pipeline/prompts/02-interactive-analysis-state-command-entry.md
+    trigger: auto
+    related_milestone: C15-M3
+  -
+    id: M2-COMPLETE-C15-20260516T003152+0800
+    type: milestone_complete
+    ref: C15/M2
+    status: completed
+    timestamp: "2026-05-16T00:31:52+08:00"
+    summary: "Completed C15-M2 Detailed Completion Report Contract with shared completion fields across Milestone, Cycle, Debug, Audit, Patch; audit found no blockers."
+    report: .pipeline/reports/01-detailed-completion-report-contract.report.md
+    trigger: auto
+    related_milestone: C15-M2
+    tests:
+      - "uv run -- node --test core/test/completion-report-contract.test.js core/test/response-contract.test.js core/test/log-evidence.test.js core/test/progress-table.test.js: 13/13 passing"
+      - "bash tests/scenarios/v6/s24-audit-report/run.sh: passing"
+      - "bash tests/scenarios/v6/s25-debug-flow/run.sh: passing"
+      - "bash tests/scenarios/v8.2/s38-patch-fix-flow/run.sh: passing"
+      - "audit: no blockers"
+  -
+    id: M2-AUDIT-COMPLETE-C15-20260516T003152+0800
+    type: worker_complete
+    ref: C15/M2/audit
+    status: completed
+    timestamp: "2026-05-16T00:31:52+08:00"
+    summary: "C15-M2 audit worker Locke confirmed completion contract coverage and no blockers; main agent resolved the remaining template placeholder warning."
+    report: .pipeline/reviews/C15/M2/audit.md
+    trigger: auto
+    related_milestone: C15-M2
+    worker:
+      role: audit
+      id: "019e2c75-d9d0-7953-bad7-f32c04a95385"
+      nickname: Locke
+      lifecycle: completed
+  -
+    id: M2-AUDIT-START-C15-20260516T002535+0800
+    type: worker_start
+    ref: C15/M2/audit
+    status: active
+    timestamp: "2026-05-16T00:25:35+08:00"
+    summary: "Started C15-M2 audit worker Locke for completion contract coverage, compatibility, and evidence review."
+    report: .pipeline/reviews/C15/M2/audit.md
+    trigger: auto
+    related_milestone: C15-M2
+    worker:
+      role: audit
+      id: "019e2c75-d9d0-7953-bad7-f32c04a95385"
+      nickname: Locke
+      lifecycle: requested/started
+  -
+    id: M2-VALIDATION-C15-20260516T002535+0800
+    type: step_complete
+    ref: C15/M2/run_tests_green
+    status: completed
+    timestamp: "2026-05-16T00:25:35+08:00"
+    summary: "C15-M2 validation passed after runtime response compatibility and template field-name fixes."
+    trigger: auto
+    related_milestone: C15-M2
+    tests:
+      - "uv run -- node --test core/test/completion-report-contract.test.js core/test/response-contract.test.js core/test/log-evidence.test.js core/test/progress-table.test.js: 13/13 passing"
+      - "bash tests/scenarios/v6/s24-audit-report/run.sh: passing"
+      - "bash tests/scenarios/v6/s25-debug-flow/run.sh: passing"
+      - "bash tests/scenarios/v8.2/s38-patch-fix-flow/run.sh: passing"
+      - "git diff --check targeted M2 files: passing"
+  -
+    id: M2-IMPLEMENT-WORKER-COMPLETE-C15-20260516T002535+0800
+    type: worker_complete
+    ref: C15/M2/implement
+    status: completed
+    timestamp: "2026-05-16T00:25:35+08:00"
+    summary: "C15-M2 implement worker Kierkegaard completed shared completion contract and template/skill/spec updates; main integration added runtime response wiring and legacy compatibility fixes."
+    report: .pipeline/reviews/C15/M2/implementation-evidence.md
+    trigger: auto
+    related_milestone: C15-M2
+    worker:
+      role: implement
+      id: "019e2c68-f9ca-73d0-a31c-276810c841e1"
+      nickname: Kierkegaard
+      lifecycle: completed
+  -
+    id: M2-TEST-WORKER-COMPLETE-C15-20260516T001630+0800
+    type: worker_complete
+    ref: C15/M2/test
+    status: completed
+    timestamp: "2026-05-16T00:16:30+08:00"
+    summary: "C15-M2 test worker Kuhn completed completion-report contract tests; RED result proves current templates/skills lack the required detailed completion fields."
+    report: .pipeline/reviews/C15/M2/test-evidence.md
+    trigger: auto
+    related_milestone: C15-M2
+    tests:
+      - "uv run -- node --test core/test/completion-report-contract.test.js: expected RED, 0/3 passing before implementation"
+      - "uv run -- node --test core/test/response-contract.test.js core/test/log-evidence.test.js core/test/progress-table.test.js: 10/10 passing"
+    worker:
+      role: test
+      id: "019e2c68-4a92-7892-9823-0699616765e8"
+      nickname: Kuhn
+      lifecycle: completed
+  -
+    id: M2-WORKERS-START-C15-20260516T001233+0800
+    type: worker_start
+    ref: C15/M2
+    status: active
+    timestamp: "2026-05-16T00:12:33+08:00"
+    summary: "Requested and started C15-M2 test worker Kuhn and implement worker Kierkegaard with disjoint write scopes."
+    report: .pipeline/reviews/C15/M2/
+    trigger: auto
+    related_milestone: C15-M2
+    workers:
+      test:
+        id: "019e2c68-4a92-7892-9823-0699616765e8"
+        nickname: Kuhn
+        lifecycle: requested/started
+        scope: "core/test/completion-report-contract.test.js and .pipeline/reviews/C15/M2/test-evidence.md"
+      implement:
+        id: "019e2c68-f9ca-73d0-a31c-276810c841e1"
+        nickname: Kierkegaard
+        lifecycle: requested/started
+        scope: "completion contract references/templates/skills/specs and .pipeline/reviews/C15/M2/implementation-evidence.md"
+  -
+    id: M2-START-C15-20260516T000952+0800
+    type: milestone_start
+    ref: C15/M2
+    status: active
+    timestamp: "2026-05-16T00:09:52+08:00"
+    summary: "Started C15-M2 Detailed Completion Report Contract after C15-M1 completion."
+    report: .pipeline/prompts/01-detailed-completion-report-contract.md
+    trigger: auto
+    related_milestone: C15-M2
+  -
+    id: M1-COMPLETE-C15-20260516T000952+0800
+    type: milestone_complete
+    ref: C15/M1
+    status: completed
+    timestamp: "2026-05-16T00:09:52+08:00"
+    summary: "Completed C15-M1 P2 Technical Route Gate with detailed report; audit recheck found no blockers and 27/27 focused planning tests passed."
+    report: .pipeline/reports/00-p2-technical-route-gate.report.md
+    trigger: auto
+    related_milestone: C15-M1
+    tests:
+      - "uv run -- node --test core/test/p2-technical-route-contract.test.js core/test/progressive-discover.test.js core/test/batch-plan.test.js core/test/deep-plan-handoff.test.js: 27/27 passing"
+      - "audit recheck: no blockers"
+  -
+    id: M1-AUDIT-RECHECK-COMPLETE-C15-20260516T000952+0800
+    type: worker_complete
+    ref: C15/M1/audit-recheck
+    status: completed
+    timestamp: "2026-05-16T00:09:52+08:00"
+    summary: "C15-M1 audit recheck worker Hume confirmed the original runtime-file test blocker is resolved; no blockers remain."
+    report: .pipeline/reviews/C15/M1/audit-recheck.md
+    trigger: auto
+    related_milestone: C15-M1
+    worker:
+      role: audit
+      id: "019e2c63-e65b-7943-be75-e36a584bdfee"
+      nickname: Hume
+      lifecycle: completed
+  -
+    id: M1-AUDIT-RECHECK-START-C15-20260516T000700+0800
+    type: worker_start
+    ref: C15/M1/audit-recheck
+    status: active
+    timestamp: "2026-05-16T00:07:00+08:00"
+    summary: "Started C15-M1 audit recheck worker Hume after fixture-based test rework and local revalidation."
+    report: .pipeline/reviews/C15/M1/audit-recheck.md
+    trigger: auto
+    related_milestone: C15-M1
+    worker:
+      role: audit
+      id: "019e2c63-e65b-7943-be75-e36a584bdfee"
+      nickname: Hume
+      lifecycle: requested/started
+  -
+    id: M1-REVALIDATION-C15-20260516T000548+0800
+    type: step_complete
+    ref: C15/M1/run_tests_green
+    status: completed
+    timestamp: "2026-05-16T00:05:48+08:00"
+    summary: "C15-M1 revalidation passed after test fixture rework; original audit blocker is ready for independent recheck."
+    trigger: auto
+    related_milestone: C15-M1
+    tests:
+      - "uv run -- node --test core/test/p2-technical-route-contract.test.js core/test/progressive-discover.test.js core/test/batch-plan.test.js core/test/deep-plan-handoff.test.js: 27/27 passing"
+      - "rg '.plan-state|.pipeline/prompts|prompt.file' core/test/p2-technical-route-contract.test.js core/test/fixtures/p2-technical-route: no matches"
+      - "git diff --check targeted M1 files: passing"
+      - "YAML parse check for .pipeline/state.yaml, .pipeline/log.yaml, and .pipeline/.lock: passing"
+  -
+    id: M1-TEST-REWORK-COMPLETE-C15-20260516T000311+0800
+    type: worker_complete
+    ref: C15/M1/test-rework
+    status: completed
+    timestamp: "2026-05-16T00:03:11+08:00"
+    summary: "C15-M1 test rework worker Curie removed ignored runtime file dependencies by switching P2 contract tests to tracked fixtures."
+    report: .pipeline/reviews/C15/M1/test-rework-evidence.md
+    trigger: auto
+    related_milestone: C15-M1
+    worker:
+      role: test
+      id: "019e2c5c-10e8-7ad0-8815-9a682389bada"
+      nickname: Curie
+      lifecycle: completed
+  -
+    id: M1-TEST-REWORK-START-C15-20260515T235724+0800
+    type: worker_start
+    ref: C15/M1/test-rework
+    status: active
+    timestamp: "2026-05-15T23:57:24+08:00"
+    summary: "Started C15-M1 test rework worker Curie to remove ignored runtime file dependency from P2 technical route tests."
+    report: .pipeline/reviews/C15/M1/test-rework-evidence.md
+    trigger: auto
+    related_milestone: C15-M1
+    worker:
+      role: test
+      id: "019e2c5c-10e8-7ad0-8815-9a682389bada"
+      nickname: Curie
+      lifecycle: requested/started
+  -
+    id: M1-AUDIT-BLOCK-C15-20260515T235724+0800
+    type: step_complete
+    ref: C15/M1/review_code
+    status: blocked
+    timestamp: "2026-05-15T23:57:24+08:00"
+    summary: "C15-M1 audit blocked completion because the new test depended on ignored runtime .plan-state/.pipeline prompt files; M1 returned to test rework."
+    report: .pipeline/reviews/C15/M1/audit.md
+    trigger: auto
+    related_milestone: C15-M1
+    worker:
+      role: audit
+      id: "019e2c58-7941-7d40-b35b-b2e70c70eefb"
+      nickname: McClintock
+      lifecycle: completed
+  -
+    id: M1-AUDIT-START-C15-20260515T235449+0800
+    type: worker_start
+    ref: C15/M1/audit
+    status: active
+    timestamp: "2026-05-15T23:54:49+08:00"
+    summary: "Started C15-M1 audit worker McClintock for read-only final diff, evidence, and worker-separation review."
+    report: .pipeline/reviews/C15/M1/audit.md
+    trigger: auto
+    related_milestone: C15-M1
+    worker:
+      role: audit
+      id: "019e2c58-7941-7d40-b35b-b2e70c70eefb"
+      nickname: McClintock
+      lifecycle: requested/started
+  -
+    id: M1-VALIDATION-C15-20260515T235449+0800
+    type: step_complete
+    ref: C15/M1/run_tests_green
+    status: completed
+    timestamp: "2026-05-15T23:54:49+08:00"
+    summary: "C15-M1 combined validation passed: 27/27 focused planning tests, route-field content check, and git diff whitespace check."
+    trigger: auto
+    related_milestone: C15-M1
+    tests:
+      - "uv run -- node --test core/test/p2-technical-route-contract.test.js core/test/progressive-discover.test.js core/test/batch-plan.test.js core/test/deep-plan-handoff.test.js: 27/27 passing"
+      - "rg route field content check: passing"
+      - "git diff --check targeted files: passing"
+  -
+    id: M1-IMPLEMENT-WORKER-COMPLETE-C15-20260515T235123+0800
+    type: worker_complete
+    ref: C15/M1/implement
+    status: completed
+    timestamp: "2026-05-15T23:51:23+08:00"
+    summary: "C15-M1 implement worker Beauvoir completed P2 technical route gate guidance changes and implementation evidence."
+    report: .pipeline/reviews/C15/M1/implementation-evidence.md
+    trigger: auto
+    related_milestone: C15-M1
+    worker:
+      role: implement
+      id: "019e2c4b-0eff-7583-9ece-1cccad97a618"
+      nickname: Beauvoir
+      lifecycle: completed
+  -
+    id: M1-TEST-WORKER-COMPLETE-C15-20260515T234723+0800
+    type: worker_complete
+    ref: C15/M1/test
+    status: completed
+    timestamp: "2026-05-15T23:47:23+08:00"
+    summary: "C15-M1 test worker Bacon completed focused P2 technical route contract tests; 6/6 focused and 21/21 related planning tests passed."
+    report: .pipeline/reviews/C15/M1/test-evidence.md
+    trigger: auto
+    related_milestone: C15-M1
+    worker:
+      role: test
+      id: "019e2c4a-b17b-7342-80b2-159670939448"
+      nickname: Bacon
+      lifecycle: completed
+  -
+    id: M1-WORKERS-START-C15-20260515T233741+0800
+    type: worker_start
+    ref: C15/M1
+    status: active
+    timestamp: "2026-05-15T23:37:41+08:00"
+    summary: "Requested and started C15-M1 test worker Bacon and implement worker Beauvoir with disjoint write scopes."
+    report: .pipeline/reviews/C15/M1/
+    trigger: auto
+    related_milestone: C15-M1
+    workers:
+      test:
+        id: "019e2c4a-b17b-7342-80b2-159670939448"
+        nickname: Bacon
+        lifecycle: requested/started
+        scope: "core/test/* and .pipeline/reviews/C15/M1/test-evidence.md"
+      implement:
+        id: "019e2c4b-0eff-7583-9ece-1cccad97a618"
+        nickname: Beauvoir
+        lifecycle: requested/started
+        scope: "skills/plan*.md, plan/PLAN-SKILL.md, references/commands-spec.md, implementation evidence"
+  -
+    id: M1-START-C15-20260515T233741+0800
+    type: milestone_start
+    ref: C15/M1
+    status: active
+    timestamp: "2026-05-15T23:37:41+08:00"
+    summary: "Started C15-M1 P2 Technical Route Gate after P4 confirmation; execution uses authorized Subagent worker separation."
+    report: .pipeline/prompts/00-p2-technical-route-gate.md
+    trigger: manual
+    related_milestone: C15-M1
+  -
+    id: P3-GENERATE-C15-20260515T233207+0800
+    type: plan_generate
+    ref: C15/P3
+    status: completed
+    timestamp: "2026-05-15T23:32:07+08:00"
+    summary: "Generated five C15 prompts with technical route inheritance and Subworker Assignment Plans; moved to P4 confirm."
+    report: .pipeline/confirm-summary.md
+    trigger: manual
+  -
+    id: P2-DECOMPOSE-C15-20260515T205058+0800
+    type: plan_decompose
+    ref: C15/P2
+    status: proposed
+    timestamp: "2026-05-15T20:50:58+08:00"
+    summary: "Completed C15 P2 checkpoint with five proposed milestones, technical solution/route artifacts, and no blocking research questions."
+    report: .plan-state/technical-route.md
+    trigger: manual
+  -
+    id: P1-DISCOVER-R5-C15-20260515T204644+0800
+    type: plan_discover
+    ref: C15/P1/R5
+    status: active
+    timestamp: "2026-05-15T20:46:44+08:00"
+    summary: "Recorded C15 P1 round 5: Analysis ledger/summary artifacts, preferred /hw:analysis entry, and required-fields plus narrative completion reports."
+    trigger: manual
+  -
+    id: P1-DISCOVER-R4-C15-20260515T204143+0800
+    type: plan_discover
+    ref: C15/P1/R4
+    status: active
+    timestamp: "2026-05-15T20:41:43+08:00"
+    summary: "Recorded C15 P1 round 4: P2 technical route artifacts, hard research gate, and automatic plus command-based Analysis entry preference."
+    trigger: manual
+  -
+    id: P1-DISCOVER-R3-C15-20260515T203645+0800
+    type: plan_discover
+    ref: C15/P1/R3
+    status: active
+    timestamp: "2026-05-15T20:36:45+08:00"
+    summary: "Recorded C15 P1 round 3 from Workflow conversation sample: P2 must include auditable technical route and route-research revision behavior before confirmation."
+    trigger: manual
+  -
+    id: P1-DISCOVER-R2-C15-20260515T202635+0800
+    type: plan_discover
+    ref: C15/P1/R2
+    status: active
+    timestamp: "2026-05-15T20:26:35+08:00"
+    summary: "Recorded C15 P1 round 2: detailed completion report surfaces and interactive Analysis-state goal; awaiting Workflow conversation sample for P2 expectations."
+    trigger: manual
+  -
+    id: P0-CONFIGURE-C15-20260515T202236+0800
+    type: plan_configure
+    ref: C15/P0
+    status: completed
+    timestamp: "2026-05-15T20:22:36+08:00"
+    summary: "Completed P0 Configure for C15 by reusing C12 settings with explicit execution subworker authorization and recommended worker separation."
+    trigger: manual
+  -
+    id: PLAN-START-C15-20260515T201647+0800
+    type: plan_start
+    ref: C15/P0-P1
+    status: active
+    timestamp: "2026-05-15T20:16:47+08:00"
+    summary: "Started P0 Configure and P1 Discover for C15; included cycle state-init template path issue in scope."
+    trigger: manual
+  -
+    id: CYCLE-NEW-C15-20260515T201418+0800
+    type: cycle_new
+    ref: C15
+    status: active
+    timestamp: "2026-05-15T20:14:18+08:00"
+    summary: "Created new Cycle C15 Workflow交互细节与Analysis模式调查 (type: feature, preset: tdd)."
+    trigger: manual
+  -
+    id: CYCLE-CLOSE-C14-20260515T180000+0800
+    type: cycle_close
+    ref: C14
+    status: completed
+    timestamp: "2026-05-15T18:00:00+08:00"
+    summary: "Closed C14 Prompt兼容性审查 (14/14 milestones completed). Archived to .pipeline/archives/C14-prompt-compatibility-audit/. Released as v12.7.0."
+    trigger: manual
+  -
     id: CYCLE-NEW-C14-20260514T233000+0800
     type: cycle_new
     ref: C14
@@ -5751,3 +6241,210 @@ entries:
     summary: Completed C12 Workflow 深度计划讨论功能 with Deep Plan lifecycle, handoff, and research-code source inspection contracts.
     report: .pipeline/reports/C12-final.report.md
     trigger: auto
+  -
+    id: M3-AUDIT-BLOCK-C15-20260516T013000+0800
+    type: audit_block
+    ref: C15/M3/review_code
+    status: blocked
+    timestamp: "2026-05-16T01:30:00+08:00"
+    summary: "First C15-M3 audit found Analysis ledger default still used legacy path and command docs/scenarios still treated the surface as 40 commands."
+    report: .pipeline/reviews/C15/M3/audit.md
+    trigger: auto
+    related_milestone: C15-M3
+  -
+    id: M3-AUDIT-REPAIR-C15-20260516T015210+0800
+    type: step_complete
+    ref: C15/M3/review_code_repair
+    status: completed
+    timestamp: "2026-05-16T01:52:10+08:00"
+    summary: "Repaired Analysis canonical ledger default, compact status surfaces, stale 40-command docs, and scenario assertions; second read-only audit passed."
+    report: .pipeline/reports/02-interactive-analysis-state-command-entry.report.md
+    trigger: auto
+    related_milestone: C15-M3
+    tests:
+      - "uv run -- node --test <M3 focused regression + docs/readme>: 105/105 passing"
+      - "bash tests/scenarios/v9/s51-opencode-capability-matrix/run.sh: passing"
+      - "bash tests/scenarios/v9/s55-opencode-command-map/run.sh: passing"
+      - "bash tests/scenarios/v6/s19-help-list/run.sh && bash tests/scenarios/v8.2/s43-v8-2-registration/run.sh && bash tests/scenarios/v8.4/s50-rules-system/run.sh && bash tests/scenarios/v9/s59-v9-regression-bundle/run.sh: passing"
+      - "git diff --check -- <M3 target files>: passing"
+  -
+    id: M3-COMPLETE-C15-20260516T015920+0800
+    type: milestone_complete
+    ref: C15/M3
+    status: completed
+    timestamp: "2026-05-16T01:59:20+08:00"
+    summary: "Completed interactive Analysis state and command entry with /hw:analysis, canonical ledger path, compact status/report surfaces, and 41-command documentation/smoke alignment."
+    report: .pipeline/reports/02-interactive-analysis-state-command-entry.report.md
+    trigger: auto
+    related_milestone: C15-M3
+  -
+    id: M4-START-C15-20260516T015920+0800
+    type: milestone_start
+    ref: C15/M4
+    status: active
+    timestamp: "2026-05-16T01:59:20+08:00"
+    summary: "Started shared skill asset path contract milestone for the cycle assets/state-init.yaml child-skill path issue."
+    report: .pipeline/prompts/03-shared-skill-asset-path-contract.md
+    trigger: auto
+    related_milestone: C15-M4
+  -
+    id: M4-WRITE-TESTS-C15-20260516T122347+0800
+    type: step_complete
+    ref: C15/M4/write_tests
+    status: completed
+    timestamp: "2026-05-16T12:23:47+08:00"
+    summary: "Added RED/GREEN skill quality coverage for child-skill shared root asset references, legal child-local paths, and explicit shared-root paths."
+    report: .pipeline/reviews/C15/M4/test-evidence.md
+    trigger: auto
+    related_milestone: C15-M4
+    tests:
+      - "node --test core/test/skill-quality.test.js: RED 5/6 passing before implementation, then GREEN 6/6 passing"
+      - "uv run -- node --test core/test/skill-quality.test.js core/test/skill-spec.test.js: 9/9 passing"
+  -
+    id: M4-IMPLEMENT-C15-20260516T122347+0800
+    type: step_complete
+    ref: C15/M4/implement
+    status: completed
+    timestamp: "2026-05-16T12:23:47+08:00"
+    summary: "Repaired cycle/start shared state-init asset references in source and installed bundle, documented the path contract, and added inline asset path scanning to skill quality checks."
+    report: .pipeline/reviews/C15/M4/implementation-evidence.md
+    trigger: auto
+    related_milestone: C15-M4
+  -
+    id: M4-AUDIT-C15-20260516T122347+0800
+    type: step_complete
+    ref: C15/M4/review_code
+    status: completed
+    timestamp: "2026-05-16T12:23:47+08:00"
+    summary: "Independent read-only audit passed the shared asset path contract; full core test warning recorded as M5 readiness risk."
+    report: .pipeline/reports/03-shared-skill-asset-path-contract.report.md
+    trigger: auto
+    related_milestone: C15-M4
+    tests:
+      - "node --test core/test/skill-quality.test.js: 6/6 passing"
+      - "node --test core/test/skill-spec.test.js: 3/3 passing"
+      - "npm --prefix core test: 501/514 passing, 13 unrelated contract failures recorded as warning"
+  -
+    id: M4-COMPLETE-C15-20260516T122347+0800
+    type: milestone_complete
+    ref: C15/M4
+    status: completed
+    timestamp: "2026-05-16T12:23:47+08:00"
+    summary: "Completed shared skill asset path contract; source and installed cycle/start skills now reference ../../assets/state-init.yaml and no child-copy masking exists."
+    report: .pipeline/reports/03-shared-skill-asset-path-contract.report.md
+    trigger: auto
+    related_milestone: C15-M4
+    tests:
+      - "uv run -- node --test core/test/skill-quality.test.js core/test/skill-spec.test.js: 9/9 passing"
+      - "state-init source/installed layout smoke: passing"
+      - "git diff --check -- <M4 target files>: passing"
+  -
+    id: M5-START-C15-20260516T122347+0800
+    type: milestone_start
+    ref: C15/M5
+    status: active
+    timestamp: "2026-05-16T12:23:47+08:00"
+    summary: "Started integration smoke and release readiness milestone for P2 route gate, completion report contract, Analysis state, shared asset path, and generated adapter surfaces."
+    report: .pipeline/prompts/04-integration-smoke-release-readiness.md
+    trigger: auto
+    related_milestone: C15-M5
+  -
+    id: M5-WRITE-TESTS-C15-20260516T123327+0800
+    type: step_complete
+    ref: C15/M5/write_tests
+    status: completed
+    timestamp: "2026-05-16T12:33:27+08:00"
+    summary: "Ran final C15 integration smoke matrix; targeted Node tests passed, focused behavior smoke passed, and initial regression filter warning was reproduced."
+    report: .pipeline/reviews/C15/M5/test-evidence.md
+    trigger: auto
+    related_milestone: C15-M5
+    tests:
+      - "uv run -- node --test core/test/analysis*.test.js core/test/chat*.test.js core/test/response-contract.test.js core/test/skill*.test.js core/test/sync-standardization.test.js core/test/progressive-discover.test.js: 58/58 passing"
+      - "focused P2/Analysis/state-init/OpenCode smoke: 21/21 passing"
+  -
+    id: M5-IMPLEMENT-C15-20260516T123327+0800
+    type: step_complete
+    ref: C15/M5/implement
+    status: completed
+    timestamp: "2026-05-16T12:33:27+08:00"
+    summary: "Repaired installed /hw:analysis freshness and added --scenario filtering to tests/run_regression.py so focused release smoke runs only requested scenarios."
+    report: .pipeline/reviews/C15/M5/implementation-evidence.md
+    trigger: auto
+    related_milestone: C15-M5
+    tests:
+      - "uv run python tests/run_regression.py --scenario s24-audit-report --scenario s25-debug-flow --scenario s38-patch-fix-flow --scenario s62-analysis-preset-runtime: 4/4 passing"
+      - "installed command map: 41 commands with /hw:analysis"
+      - "git diff --check: passing"
+  -
+    id: M5-AUDIT-REPAIR-C15-20260516T123327+0800
+    type: step_complete
+    ref: C15/M5/review_code_repair
+    status: completed
+    timestamp: "2026-05-16T12:33:27+08:00"
+    summary: "Repaired audit finding by changing full regression result suffix from stale s01-s30 to dynamic all-<count> while preserving selected-<count> for filtered runs."
+    report: .pipeline/reviews/C15/M5/implementation-evidence.md
+    trigger: auto
+    related_milestone: C15-M5
+  -
+    id: M5-AUDIT-RECHECK-C15-20260516T124046+0800
+    type: step_complete
+    ref: C15/M5/review_code
+    status: completed
+    timestamp: "2026-05-16T12:40:46+08:00"
+    summary: "Independent read-only audit recheck passed after regression suffix repair; no remaining M5 release blockers."
+    report: .pipeline/reports/04-integration-smoke-release-readiness.report.md
+    trigger: auto
+    related_milestone: C15-M5
+    tests:
+      - "uv run python tests/run_regression.py --scenario s24-audit-report --scenario s25-debug-flow --scenario s38-patch-fix-flow --scenario s62-analysis-preset-runtime: 4/4 passing"
+      - "uv run python tests/run_regression.py --scenario does-not-exist: exit 2 as expected"
+      - "git diff --check -- tests/run_regression.py .pipeline/reviews/C15/M5/implementation-evidence.md .pipeline/log.yaml: passing"
+  -
+    id: M5-COMPLETE-C15-20260516T124046+0800
+    type: milestone_complete
+    ref: C15/M5
+    status: completed
+    timestamp: "2026-05-16T12:40:46+08:00"
+    summary: "Completed integration smoke and release readiness for C15."
+    report: .pipeline/reports/04-integration-smoke-release-readiness.report.md
+    trigger: auto
+    related_milestone: C15-M5
+  -
+    id: CYCLE-COMPLETE-C15-20260516T124046+0800
+    type: cycle_complete
+    ref: C15
+    status: completed
+    timestamp: "2026-05-16T12:40:46+08:00"
+    summary: "Completed C15 Workflow interaction detail improvements and Analysis mode restoration."
+    report: .pipeline/reports/C15-final.report.md
+    trigger: auto
+  -
+    id: DEBUG-REGRESSION-RELEASE-READINESS-20260516T130024+0800
+    type: debug_complete
+    ref: release-readiness/regression
+    status: completed
+    timestamp: "2026-05-16T13:00:24+08:00"
+    summary: "Repaired release-readiness regression failures by updating stale bilingual/current-contract tests and adding completed_with_transport_error to lifecycle log status validation; full regression is green."
+    report: .pipeline/debug/20260516T130024-regression-release-readiness.md
+    trigger: manual
+    tests:
+      - "uv run -- node --test focused contract suite: 56/56 passing"
+      - "focused scenario smoke s32/s33/s34/s35/s37/s42/s44/s45/s46/s47/s56/s60: passing"
+      - "uv run python tests/run_regression.py: 68/68 passing"
+      - "git diff --check: passing"
+  -
+    id: RELEASE-v12.8.0-20260516T130934+0800
+    type: release
+    ref: v12.8.0
+    status: completed
+    timestamp: "2026-05-16T13:09:34+08:00"
+    summary: "Prepared v12.8.0 release: synced version sources, README/CHANGELOG/release notes, OpenCode artifacts, docs checks, and full regression; user confirmed the release gate for subsequent commit/tag/push/publish steps."
+    report: .pipeline/release/v12.8.0.md
+    trigger: manual
+    tests:
+      - "node cli/bin/hypo-workflow sync --platform opencode --project . --repair: derived=fresh"
+      - "node cli/bin/hypo-workflow sync --platform opencode --project . --check-only: derived=fresh"
+      - "checkDocs('.') and checkNarrativeDocsForRelease('.'): ok"
+      - "checkDocsLanguage('.'): ok, 17 files checked"
+      - "uv run -- node --test docs/readme/opencode/sync focused suite: 34/34 passing"
+      - "uv run python tests/run_regression.py: 68/68 passing"

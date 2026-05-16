@@ -34,7 +34,7 @@ description: Start Hypo-Workflow execution when the user wants to begin running 
    - `execution.mode` 回退到全局 `execution.default_mode`，然后 `self`
    - `execution.subagent_tool` 回退到全局 `subagent.provider`，然后 `auto`
    - `dashboard.*` 和 `plan.*` 在相关时使用相同的优先级
-4. 如果存在，读取 `.pipeline/state.yaml`；否则从 `assets/state-init.yaml` 初始化状态。
+4. 如果存在，读取 `.pipeline/state.yaml`；否则从共享根资产 `../../assets/state-init.yaml` 初始化状态。
 5. 如果存在，读取 `.pipeline/continuation.yaml`。如果其 `status: active`，在回退到通用 `current.*` 状态之前，优先选择其 `next_action`、`reason` 和 `safe_resume_command`。
 6. 如果存在，读取 `.pipeline/cycle.yaml`，并从 `cycle.workflow_kind` 和 `cycle.lifecycle_policy` 派生 Cycle 行为。
 7. 当没有明确兼容的预设存在时，从工作流类型默认步骤预设：`build -> tdd`、`analysis -> analysis`、`showcase -> implement-only`。

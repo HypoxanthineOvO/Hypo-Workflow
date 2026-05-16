@@ -226,11 +226,11 @@ test("workflow commit helper contract is documented for lifecycle commands", asy
   assert.match(stateContract, /workflow commit helper/);
   assert.match(stateContract, /derived-refresh.yaml/);
   assert.match(commandsSpec, /Lifecycle-mutating commands must use the workflow commit helper/);
-  assert.match(acceptSkill, /workflow commit helper/);
-  assert.match(rejectSkill, /workflow commit helper/);
-  assert.match(startSkill, /workflow commit helper/);
-  assert.match(resumeSkill, /workflow commit helper/);
-  assert.match(planGenerateSkill, /workflow commit helper/);
+  assert.match(acceptSkill, /workflow commit helper|工作流提交助手/);
+  assert.match(rejectSkill, /workflow commit helper|工作流提交助手/);
+  assert.match(startSkill, /workflow commit helper|工作流提交助手/);
+  assert.match(resumeSkill, /workflow commit helper|工作流提交助手/);
+  assert.match(planGenerateSkill, /workflow commit helper|工作流提交助手/);
 });
 
 async function fixtureRoot(prefix) {

@@ -165,7 +165,7 @@ prompt_state:
   analysis_summary:
     milestone_id: M06
     question: "Why did the metric change?"
-    ledger_path: .pipeline/analysis/M06-analysis-ledger.yaml
+    ledger_path: .pipeline/analysis/M06/ledger.yaml
     hypothesis_counts:
       total: 2
       confirmed: 1
@@ -188,7 +188,8 @@ Boundary rules:
 - `state.yaml` must not store full hypotheses.
 - `state.yaml` must not store full experiments.
 - `state.yaml` must not store full observations.
-- Full evidence belongs in `.pipeline/analysis/<milestone-id>-analysis-ledger.yaml`.
+- Full evidence belongs in `.pipeline/analysis/<cycle-or-milestone>/ledger.yaml`.
+- Existing `.pipeline/analysis/<milestone-id>-analysis-ledger.yaml` files are legacy-compatible evidence. Preserve that path when `prompt_state.analysis_summary.ledger_path` already points to it; new Analysis lanes should use the canonical directory path.
 - Hypothesis backtracking should update the ledger and summary counts; it must not require rolling back `current.step`.
 
 ## Read / Write Timing

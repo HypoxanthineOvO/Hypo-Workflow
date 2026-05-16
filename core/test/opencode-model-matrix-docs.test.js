@@ -21,7 +21,7 @@ test("OpenCode guide documents model matrix defaults and boundaries", async () =
     assert.ok(readme.includes(`\`${agent}\``), `README missing ${agent}`);
   }
   assert.match(readme, /opencode:\n\s+compaction:\n\s+effective_context_target: 900000/);
-  assert.match(readme, /plan:\n\s+model: gpt-5\.5/);
+  assert.match(readme, /plan:\n\s+model: deepseek-v4-pro/);
   assert.match(readme, /compact:\n\s+model: deepseek-v4-flash/);
   assert.match(readme, /发布默认/);
   assert.match(readme, /OpenCode.*负责实际模型调用/);

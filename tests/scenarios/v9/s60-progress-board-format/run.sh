@@ -24,7 +24,7 @@ grep -Fq '## Deferred 项' "$progress"
 
 grep -Fq 'board-style summary' "$spec"
 grep -Fq 'Do not append standalone one-line entries' "$spec"
-grep -Fq 'refresh `.pipeline/PROGRESS.md` board tables' "$patch_skill"
-grep -Fq 'Do not append standalone one-line progress entries' "$patch_skill"
+grep -Eq 'refresh `.pipeline/PROGRESS.md` board tables|刷新 `.pipeline/PROGRESS.md`' "$patch_skill"
+grep -Eq 'Do not append standalone one-line progress entries|不要向 `PROGRESS.md` 底部追加独立的单行进度条目' "$patch_skill"
 
 echo "s60 passed"

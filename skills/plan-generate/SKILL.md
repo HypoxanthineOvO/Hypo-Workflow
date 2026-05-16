@@ -18,20 +18,29 @@ description: Generate Hypo-Workflow artifacts from the approved milestone plan w
 ## 前置条件
 
 - Milestone 已定义得足够好以产生 `.pipeline/` 产物
+- P2 已被用户确认，且每个实现 Milestone 都包含 `technical_solution`、`technical_route`、`research_required`、`risks_and_alternatives`、`validation_path` 和 `audit_focus`
+- 所有硬性 `research_required` 项已解决，或已有用户明确接受的延后记录；仍处于 `blocking_question` 的调研项必须返回 P2 等待用户答复，不得进入 P3
 
 ## 执行流程
 
 1. 读取 `~/.hypo-workflow/config.yaml`（如果存在）。
-2. 生成 `.pipeline/config.yaml`，包含项目特定值和仅应覆盖全局默认值的覆盖项，包括 `output.*`、`plan.interactive.*` 和 `watchdog.*`（仅当项目需要显式覆盖时）。
-3. 生成 `.pipeline/prompts/*.md`。
-4. 生成架构基线文件。
-5. 当创建 Cycle 时生成或更新 `.pipeline/cycle.yaml` 元数据：
+2. 读取已确认的 `.plan-state/decompose.yaml` 和 `.plan-state/technical-route.md`（如果存在），以 P2 技术路线字段作为生成提示的权威输入。
+3. 生成 `.pipeline/config.yaml`，包含项目特定值和仅应覆盖全局默认值的覆盖项，包括 `output.*`、`plan.interactive.*` 和 `watchdog.*`（仅当项目需要显式覆盖时）。
+4. 生成 `.pipeline/prompts/*.md`。
+5. 生成架构基线文件。
+6. 当创建 Cycle 时生成或更新 `.pipeline/cycle.yaml` 元数据：
    - `workflow_kind: build | analysis | showcase`
    - 当工作流为 analysis 时的 `analysis_kind`
    - `lifecycle_policy.reject.default_action`，默认为 `needs_revision`
    - `lifecycle_policy.accept.next`，当存在计划的后续时使用 `follow_up_plan`
    - 计划后续节点的 `continuations[]`
-6. 在写入每个提示之前，创建一个详细的实现计划，包含：
+7. 在写入每个提示之前，创建一个详细的实现计划，包含：
+   - P2 的 `technical_solution`
+   - P2 的 `technical_route`
+   - P2 的 `research_required` 状态、证据、阻塞问题或用户延后记录
+   - P2 的 `risks_and_alternatives`
+   - P2 的 `validation_path`
+   - P2 的 `audit_focus`
    - 有序步骤
    - 依赖项
    - 验证点
@@ -40,9 +49,19 @@ description: Generate Hypo-Workflow artifacts from the approved milestone plan w
    - 闭环验证命令或场景
    - 可观测证据和独立验证所有者（如适用）
    - 一个 `Subworker Assignment Plan`，在实现开始前预先分配 Worker Separation 角色
-7. 将该实现计划转换为最终提示文件。
-8. 检测附加模式并保留已执行的编号。
-9. 对于任何触及受保护生命周期状态的项目周期写入，使用工作流提交助手，以便权威事实在派生刷新之前原子提交。
+8. 将该实现计划转换为最终提示文件。
+9. 检测附加模式并保留已执行的编号。
+10. 对于任何触及受保护生命周期状态的项目周期写入，使用工作流提交助手，以便权威事实在派生刷新之前原子提交。
+
+P3 Generate 必须保留 P2 技术路线字段，不能把它们折叠成目标摘要或普通验收清单。生成的每个实现提示必须让 worker 能看到：
+
+- 采用的技术方案和被拒绝的替代方案
+- 具体技术路线、触达模块、边界和非目标
+- `research_required` 项的结论、证据、阻塞问题或用户延后范围
+- 风险和审计重点
+- 闭环验证路径、真实测试方法和伪测试拒绝规则
+
+如果 P2 产物只有目标、验收标准、Feature Queue 或测试标题，缺少任一必填技术路线字段，或仍有 active blocking research question，停止 Generate 并返回 P2 revision。不要在 P3 中自行补全未确认的技术方案。
 
 当 Cycle 或 Feature 具有 `workflow_kind: analysis` 时，生成的提示应包括分析步骤链，生成的配置/周期元数据应使用 `analysis` preset：
 

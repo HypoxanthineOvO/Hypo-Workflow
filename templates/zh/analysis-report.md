@@ -1,8 +1,21 @@
 # 分析报告
 
+> 语言：{{output_language}} | 时区：{{output_timezone}}
+
 ## 问题
 
 {{question}}
+
+## 完成说明
+
+- 改动摘要：{{change_summary}}
+- 技术思路：{{technical_approach}}
+- 修改文件/模块：{{modified_files_or_modules}}
+- 测试设计：{{test_design}}
+- 验证结果：{{validation_results}}
+- 预期结果：{{expected_results}}
+- 遇到的问题：{{encountered_issues}}
+- 风险/后续：{{risks_and_followups}}
 
 ## 环境快照
 

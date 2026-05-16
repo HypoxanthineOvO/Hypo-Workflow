@@ -134,11 +134,11 @@ test("guide and Discover contracts document router, adaptive Grill-Me, and artif
   const knowledgeSpec = await readFile("references/knowledge-spec.md", "utf8");
   const commandsSpec = await readFile("references/commands-spec.md", "utf8");
 
-  assert.match(guideSkill, /intent router/i);
-  assert.match(guideSkill, /one next path/i);
-  assert.match(guideSkill, /deep Grill-Me/i);
-  assert.match(guideSkill, /Plan long-running or multi-Feature work/);
-  assert.match(guideSkill, /do not force deep Grill-Me/i);
+  assert.match(guideSkill, /intent router|意图路由器/i);
+  assert.match(guideSkill, /one next path|一个.*下一步路径/i);
+  assert.match(guideSkill, /deep Grill-Me|深度 Grill-Me/i);
+  assert.match(guideSkill, /Plan long-running or multi-Feature work|长期运行或多 Feature 工作/);
+  assert.match(guideSkill, /do not force deep Grill-Me|不要.*强制深度 Grill-Me/i);
   assert.match(guideSkill, /\/hw:docs/);
   assert.match(discoverSkill, /Adaptive Grill-Me|自适应追问/i);
   assert.match(discoverSkill, /\.pipeline\/design-concepts\.yaml/);

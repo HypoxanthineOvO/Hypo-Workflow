@@ -1,8 +1,9 @@
 ok: true
-checked_at: "2026-05-15T06:51:22.231Z"
+checked_at: "2026-05-16T05:07:00.510Z"
 stale_count: 0
 error_count: 0
 refreshed:
+  - .pipeline/PROGRESS.compact.md
   - .pipeline/state.compact.yaml
   - .pipeline/log.compact.yaml
   - .pipeline/metrics.compact.yaml
@@ -10,10 +11,6 @@ refreshed:
   - .pipeline/patches.compact.md
   - PROJECT-SUMMARY.md
 skipped:
-  -
-    id: progress_compact
-    path: .pipeline/PROGRESS.compact.md
-    reason: source_missing
   -
     id: opencode_metadata
     path: .opencode/hypo-workflow.json

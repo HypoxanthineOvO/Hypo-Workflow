@@ -1,5 +1,33 @@
 # Changelog
 
+## v12.8.0 - 2026-05-16
+
+### Features
+
+- 强化 P2 Decompose：除 Milestone 拆分外，必须展示可审核的技术方案、技术路线、调研依据、风险和不确定性。
+- 新增完成汇报契约，覆盖 Milestone、Cycle、Debug、Audit 和 Patch，要求说明改动内容、技术思路、修改范围、测试设计、验证结果、预期结果、遇到的问题和风险/后续。
+- 恢复并一等化 `/hw:analysis`，补齐 skill、命令映射、OpenCode/Claude/Codex 状态展示、ledger 路径和 compact summary。
+- 明确 shared skill asset path contract，修复子技能误引用 `assets/state-init.yaml` 时在子目录查找失败的问题。
+
+### Fixes
+
+- 发布前回归从 55/68 修复到 68/68，主要更新中文化和当前契约后的 scenario/Core 测试断言。
+- lifecycle log validator 新增 `completed_with_transport_error` 合法状态，匹配真实 worker transport-error 完成记录。
+- OpenCode TUI panel 测试适配 rich plugin surface，并补齐测试 fake `solid-js` 的 `For` export。
+
+### Docs
+
+- README / README.en 更新到 v12.8.0 发布说明入口。
+- 新增中英文 v12.8.0 release notes。
+- 同步版本源、OpenCode/Claude/Codex package metadata、默认配置版本和 generator `HW_VERSION`。
+
+### Tests
+
+- `uv run python tests/run_regression.py`: 68/68 passing.
+- Focused contract suite: 56/56 passing.
+- Focused scenario smoke s32/s33/s34/s35/s37/s42/s44/s45/s46/s47/s56/s60 passing.
+- `git diff --check`: passing.
+
 ## v12.7.0 - 2026-05-15
 
 ### Features

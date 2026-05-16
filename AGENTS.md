@@ -52,3 +52,5 @@ Structured Rules/Habits are authority; Markdown habits and platform instructions
 - progress-timezone (builtin/warn/style): Keep PROGRESS timestamps aligned with output.timezone.
 - report-language (builtin/warn/style): Keep reports and generated summaries aligned with output.language.
 - session-start-context-load (builtin/error/hook): Preserve SessionStart context loading as a rule-level gate.
+
+Conflicts are resolved by `cycle > project > global > builtin`; review reports should list overridden sources.

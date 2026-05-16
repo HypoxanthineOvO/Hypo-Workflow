@@ -22,6 +22,7 @@ Deep Plan 是一个持久化的 pre-plan 讨论生命周期。适用于需求、
 
 - Deep Plan 不是 `/hw:guide`；`/hw:guide` 仍然是引导和路由入口，而 Deep Plan 是一个显式的 discussion package 生命周期。
 - Deep Plan 不是 `/hw:explore`；`/hw:explore` 仍然是有界的假设验证和代码库探索，而 Deep Plan 捕获需求、架构推理、决策和 readiness。
+- Deep Plan is not `/hw:explore`; `/hw:explore` remains bounded codebase exploration while Deep Plan owns durable discussion packages.
 - Deep Plan 不得直接执行 implementation milestones。
 - Deep Plan 不得绕过普通 `/hw:plan` 的 P1-P4 gates。Conversion 创建 Plan 输入；普通 Plan 仍然控制 decomposition、generation 和 confirmation。
 

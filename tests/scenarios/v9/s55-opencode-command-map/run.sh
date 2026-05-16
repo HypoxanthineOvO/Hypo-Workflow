@@ -16,8 +16,8 @@ tmp_home="$(mktemp -d)"
 HOME="$tmp_home" node cli/bin/hypo-workflow init-project --platform opencode --project "$tmp_project" >"$init_log"
 
 count="$(find "$tmp_project/.opencode/commands" -maxdepth 1 -type f -name 'hw-*.md' | wc -l | tr -d ' ')"
-test "$count" = "40" || {
-  echo "expected 40 command files, found $count" >&2
+test "$count" = "41" || {
+  echo "expected 41 command files, found $count" >&2
   exit 1
 }
 
@@ -30,6 +30,7 @@ grep -Fq 'agent: hw-build' "$tmp_project/.opencode/commands/hw-resume.md"
 grep -Fq 'agent: hw-build' "$tmp_project/.opencode/commands/hw-patch-fix.md"
 grep -Fq 'agent: hw-build' "$tmp_project/.opencode/commands/hw-release.md"
 grep -Fq 'agent: hw-build' "$tmp_project/.opencode/commands/hw-chat.md"
+grep -Fq 'agent: hw-debug' "$tmp_project/.opencode/commands/hw-analysis.md"
 grep -Fq 'agent: hw-build' "$tmp_project/.opencode/commands/hw-accept.md"
 grep -Fq 'agent: hw-build' "$tmp_project/.opencode/commands/hw-reject.md"
 grep -Fq 'agent: hw-build' "$tmp_project/.opencode/commands/hw-sync.md"
@@ -47,6 +48,7 @@ for pair in \
   "hw-plan-discover.md:/hw:plan:discover" \
   "hw-patch-fix.md:/hw:patch fix" \
   "hw-chat.md:/hw:chat" \
+  "hw-analysis.md:/hw:analysis" \
   "hw-accept.md:/hw:accept" \
   "hw-reject.md:/hw:reject" \
   "hw-explore.md:/hw:explore" \
@@ -72,6 +74,7 @@ test -f references/opencode-command-map.md
 grep -Fq '| `/hw:plan` | `/hw-plan` | `hw-plan` |' references/opencode-command-map.md
 grep -Fq '| `/hw:plan:deep` | `/hw-plan-deep` | `hw-plan` |' references/opencode-command-map.md
 grep -Fq '| `/hw:patch fix` | `/hw-patch-fix` | `hw-build` |' references/opencode-command-map.md
+grep -Fq '| `/hw:analysis` | `/hw-analysis` | `hw-debug` |' references/opencode-command-map.md
 grep -Fq '| `/hw:accept` | `/hw-accept` | `hw-build` |' references/opencode-command-map.md
 grep -Fq '| `/hw:reject` | `/hw-reject` | `hw-build` |' references/opencode-command-map.md
 grep -Fq '| `/hw:explore` | `/hw-explore` | `hw-explore` |' references/opencode-command-map.md

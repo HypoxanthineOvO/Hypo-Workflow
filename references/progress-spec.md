@@ -8,6 +8,7 @@ Use this reference for the human-readable progress summary file at `.pipeline/PR
 
 - `log.yaml` is machine-readable and structured
 - `PROGRESS.md` is narrative and quick to scan
+- Detailed completion narratives follow `references/completion-report-contract.md` and belong in reports, logs, Patch records, or final responses, not in long `PROGRESS.md` sections.
 
 ## File Location
 
@@ -94,7 +95,7 @@ When recording a new event:
 1. Update the top metadata line (`最后更新`, status, completed/total count).
 2. Update the affected row in `Milestone 进度` or `Patch 轨道`.
 3. Insert a compact row at the top of `时间线`.
-4. Keep older timeline rows brief; detailed event payloads belong in `.pipeline/log.yaml`.
+4. Keep older timeline rows brief; detailed event payloads belong in `.pipeline/log.yaml` and the workflow report named by the log entry.
 
 Cycle acceptance rows use compact lifecycle status labels:
 
@@ -142,6 +143,6 @@ Compact time format:
 
 It is a summary surface, not a replacement for state or lifecycle logs.
 
-For analysis Milestones, `PROGRESS.md` should mention the current question, outcome/confidence when known, and the ledger path if it helps recovery. Full hypotheses, experiments, observations, and validity discussion belong in the analysis ledger and report, not the progress board.
+For analysis Milestones or `/hw:analysis` lanes, `PROGRESS.md` should mention the current question, ledger path, outcome/confidence when known, and next action. Full hypotheses, experiments, observations, and validity discussion belong in the analysis ledger and report, not the progress board.
 
 For Agent Review gates, `PROGRESS.md` should show compact review status only: stage, verdict, retry round when relevant, and the `.pipeline/reviews/<feature>/<milestone>/<stage>/` path. Full issues, transcripts, coverage matrices, and repair proposals belong in review artifacts, not the progress board.

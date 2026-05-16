@@ -63,6 +63,7 @@ See also [`external-docs-index.md`](./external-docs-index.md) for the cross-plat
 | `/hw:stop` | `/hw-stop` | `hw-status` | Native slash command, HW-specific state mutation. |
 | `/hw:report` | `/hw-report` | `hw-report` | Native slash command, HW-specific report contract. |
 | `/hw:chat` | `/hw-chat` | `hw-build` | Native slash command, lightweight append conversation lane. |
+| `/hw:analysis` | `/hw-analysis` | `hw-debug` | Native slash command, interactive Analysis investigation lane with compact state summary and external ledger evidence. |
 | `/hw:plan` | `/hw-plan` | `hw-plan` | Native slash command, OpenCode question/todowrite required. |
 | `/hw:plan:deep` | `/hw-plan-deep` | `hw-plan` | Native slash command, durable Deep Plan discussion package before ordinary Plan. |
 | `/hw:plan:discover` | `/hw-plan-discover` | `hw-plan` | Native slash command, Ask-gated discovery. |

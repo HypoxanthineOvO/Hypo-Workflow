@@ -57,7 +57,7 @@ test("analysis outcomes and build follow-up proposals are stable", () => {
   assert.equal(determineAnalysisOutcome({ experiments: [{ status: "blocked" }] }), "blocked");
 
   const proposal = buildAnalysisFollowupProposal({
-    source_analysis: ".pipeline/analysis/M08-analysis-ledger.yaml",
+    source_analysis: ".pipeline/analysis/M08/ledger.yaml",
     title: "Patch cache normalization",
     problem: "Cache hit rate differs by provider.",
     recommended_change: "Normalize cache key provider parameters.",
@@ -106,13 +106,13 @@ test("analysis report contract carries ledger evidence and telemetry unavailable
 
   assert.equal(contract.preset, "analysis");
   assert.equal(contract.report_type, "analysis");
-  assert.equal(contract.ledger_path, ".pipeline/analysis/M06-analysis-ledger.yaml");
+  assert.equal(contract.ledger_path, ".pipeline/analysis/M06/ledger.yaml");
   assert.equal(contract.metrics.duration_ms, 150000);
   assert.equal(contract.metrics.token_count, "telemetry_unavailable");
   assert.equal(contract.metrics.cost, "telemetry_unavailable");
   assert.equal(contract.evaluation.diff_score, 1);
   assert.equal(contract.evaluation.failed_checks.length, 0);
-  assert.ok(contract.evidence_refs.includes(".pipeline/analysis/M06-analysis-ledger.yaml"));
+  assert.ok(contract.evidence_refs.includes(".pipeline/analysis/M06/ledger.yaml"));
   assert.equal(contract.report_file, ".pipeline/reports/M06-analysis.report.md");
 });
 
@@ -141,6 +141,7 @@ test("analysis templates and planning guidance are discoverable without pollutin
   assert.match(plan, /workflow_kind: analysis/);
   assert.match(plan, /define_question/);
   assert.match(plan, /conclude/);
+  assert.match(plan, /\.pipeline\/analysis\/<cycle-or-milestone>\/ledger\.yaml/);
 });
 
 test("batch plan keeps analysis fields and C3 queue policy has no confirm gates", async () => {

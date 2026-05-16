@@ -83,7 +83,7 @@ cycle:
 7. 解析 `--context`；将支持的值存储在 `cycle.context_sources` 中。
 8. 创建 `.pipeline/cycle.yaml`。
 9. 重置 Cycle 本地运行时：
-   - 从 `assets/state-init.yaml` 重置 `.pipeline/state.yaml`
+   - 从共享根资产 `../../assets/state-init.yaml` 重置 `.pipeline/state.yaml`
    - 删除 `.pipeline/prompts/` 下的文件
    - 删除 `.pipeline/reports/` 下的文件
    - 如果 `.pipeline/PROGRESS.md` 属于前一个 Cycle，则删除它
@@ -119,7 +119,8 @@ Cycle 0 Legacy 根据定义已经关闭。如果用户要求关闭 Cycle 0，停
 5. 运行归档流程。
 6. 更新项目根目录的 `PROJECT-SUMMARY.md`。
 7. 如果 `compact.auto=true`，在归档后再次重新生成紧凑视图，以便持久文件和已关闭的 Patch 有新的摘要。
-8. 使 `.pipeline/` 仅包含持久文件和任何新生成的摘要。
+8. 生成归档摘要和最终用户回应时，必须按 `references/completion-report-contract.md` 覆盖改动摘要、技术思路、修改文件/模块、测试设计、验证结果、预期结果、遇到的问题、风险/后续。
+9. 使 `.pipeline/` 仅包含持久文件和任何新生成的摘要。
 
 ## 归档流程
 
@@ -201,6 +202,7 @@ acceptance:
 - 延后事项计数和名称
 - 对于放弃的 Cycle，包括 `lessons`
 - 当 `.pipeline/archives/C{N}-{slug}/knowledge-summary.md` 存在时的知识摘要路径
+- 完成说明：改动摘要、技术思路、修改文件/模块、测试设计、验证结果、预期结果、遇到的问题、风险/后续
 
 使用 `output.language` 编写摘要；默认语言为英语。
 
@@ -257,6 +259,7 @@ C0 [Legacy] Legacy (pre-Workflow) — closed — <total_commits> commits / <tota
 ## 参考文件
 
 - `references/commands-spec.md` — 命令解析和未知命令行为
+- `references/completion-report-contract.md` — Cycle 完成汇报必需字段
 - `references/state-contract.md` — Milestone 状态字段
 - `references/progress-spec.md` — PROGRESS 关系
 - `references/config-spec.md` — 输出语言和时区默认值

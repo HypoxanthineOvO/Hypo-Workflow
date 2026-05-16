@@ -46,6 +46,10 @@
       "template": "Load the Hypo-Workflow skill instructions from `skills/chat/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
       "description": "Hypo-Workflow /hw:chat"
     },
+    "hw-analysis": {
+      "template": "Load the Hypo-Workflow skill instructions from `skills/analysis/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
+      "description": "Hypo-Workflow /hw:analysis"
+    },
     "hw-plan": {
       "template": "Load the Hypo-Workflow skill instructions from `skills/plan/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
       "description": "Hypo-Workflow /hw:plan"

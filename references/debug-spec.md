@@ -6,6 +6,7 @@ Use this reference for `/hw:debug`, the symptom-driven debugging workflow.
 
 - `audit` is a preventive broad scan
 - `debug` is a symptom-driven root-cause investigation after a failure or abnormal behavior appears
+- when a debug session becomes a sustained investigation with recoverable hypotheses, experiments, interpretation, and conclusion, it should enter the Analysis lane instead of keeping all evidence inside a debug report
 
 ## Five-Step Method
 
@@ -33,6 +34,7 @@ Use this reference for `/hw:debug`, the symptom-driven debugging workflow.
 - validate hypotheses in order through code reading, tests, or targeted instrumentation
 - mark each as confirmed, rejected, or needing more information
 - if all are rejected, widen the scope and generate a fresh round
+- if validation requires multiple experiment records, cross-turn continuation, or a traceable conclusion ledger, initialize or continue `/hw:analysis` state and record evidence in the Analysis ledger
 
 ### Step 5: Report Root Cause
 
@@ -68,6 +70,16 @@ Use this reference for `/hw:debug`, the symptom-driven debugging workflow.
 ## Fix Suggestion
 [concrete code change]
 
+## Completion Narrative
+- Change Summary: [symptom, root cause, or applied fix]
+- Technical Approach: [hypothesis ranking and validation strategy]
+- Modified Files / Modules: [reviewed or changed files/modules]
+- Test Design: [reproduction and validation plan]
+- Validation Results: [confirmed/rejected evidence and command results]
+- Expected Result: [expected behavior after fix]
+- Problems Encountered: [constraints or none]
+- Risks / Follow-Up: [remaining uncertainty or follow-up]
+
 ## Architecture Impact
 [whether architecture should be updated]
 ```
@@ -77,3 +89,6 @@ Use this reference for `/hw:debug`, the symptom-driven debugging workflow.
 - `/hw:debug --auto-fix` must run validation after applying a fix
 - if validation fails, keep the diagnosis but do not claim the fix is complete
 - always write a report to `.pipeline/debug/` and a `type: debug` entry to `.pipeline/log.yaml`
+- debug completion narratives must follow `references/completion-report-contract.md`
+- Analysis handoff uses `.pipeline/analysis/<cycle-or-milestone>/ledger.yaml` as the source of truth, with legacy `.pipeline/analysis/<milestone-id>-analysis-ledger.yaml` accepted when state already points there
+- status/report/progress surfaces for the handoff should show question, ledger path, outcome/confidence, next action, and compact counts, not full hypotheses or observations

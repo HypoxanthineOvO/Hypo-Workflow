@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import {
   analysisLedgerPath,
   buildAnalysisStateSummary,
+  legacyAnalysisLedgerPath,
   parseYaml,
   validateAnalysisLedger,
 } from "../src/index.js";
@@ -30,9 +31,10 @@ test("analysis state summary stays small and points to the external ledger", asy
     updatedAt: "2026-05-02T13:00:00+08:00",
   });
 
-  assert.equal(analysisLedgerPath("M06"), ".pipeline/analysis/M06-analysis-ledger.yaml");
+  assert.equal(analysisLedgerPath("M06"), ".pipeline/analysis/M06/ledger.yaml");
+  assert.equal(legacyAnalysisLedgerPath("M06"), ".pipeline/analysis/M06-analysis-ledger.yaml");
   assert.equal(summary.milestone_id, "M06");
-  assert.equal(summary.ledger_path, ".pipeline/analysis/M06-analysis-ledger.yaml");
+  assert.equal(summary.ledger_path, ".pipeline/analysis/M06/ledger.yaml");
   assert.equal(summary.question, ledger.question);
   assert.deepEqual(summary.hypothesis_counts, {
     total: 2,
@@ -53,6 +55,17 @@ test("analysis state summary stays small and points to the external ledger", asy
   assert.equal(Object.hasOwn(summary, "hypotheses"), false);
   assert.equal(Object.hasOwn(summary, "experiments"), false);
   assert.equal(Object.hasOwn(summary, "observations"), false);
+});
+
+test("analysis state summary preserves an explicitly referenced legacy ledger", async () => {
+  const raw = await readFile("core/test/fixtures/analysis/M06-analysis-ledger.yaml", "utf8");
+  const ledger = parseYaml(raw);
+  const summary = buildAnalysisStateSummary(ledger, {
+    milestoneId: "M06",
+    ledgerPath: legacyAnalysisLedgerPath("M06"),
+  });
+
+  assert.equal(summary.ledger_path, ".pipeline/analysis/M06-analysis-ledger.yaml");
 });
 
 test("analysis docs define state summary and ledger fields without expanding state.yaml", async () => {
@@ -94,6 +107,7 @@ test("analysis docs define state summary and ledger fields without expanding sta
   }
 
   assert.match(analysisSpec, /analysis ledger/i);
+  assert.match(analysisSpec, /\.pipeline\/analysis\/<cycle-or-milestone>\/ledger\.yaml/);
   assert.match(analysisSpec, /\.pipeline\/analysis\/<milestone-id>-analysis-ledger\.yaml/);
 });
 

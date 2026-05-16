@@ -227,8 +227,8 @@ test("workflow lifecycle contracts are documented for skills and references", as
   assert.match(configSpec, /Cycle-scoped workflow kind/);
   assert.match(progressSpec, /needs_revision/);
   assert.match(progressSpec, /follow_up_planning/);
-  assert.match(statusSkill, /canonical phase/);
-  assert.match(statusSkill, /next action/);
+  assert.match(statusSkill, /canonical phase|规范阶段/);
+  assert.match(statusSkill, /next action|下一步操作/);
   assert.match(acceptSkill, /follow_up_planning/);
   assert.match(rejectSkill, /needs_revision/);
 });

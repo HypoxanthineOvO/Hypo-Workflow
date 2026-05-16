@@ -24,6 +24,7 @@ test("Claude status surface renders compact PROGRESS sections and automation bas
   assert.equal(surface.automation.evaluation_auto_continue, true);
   assert.equal(surface.automation.batch_auto_chain, true);
   assert.equal(surface.safety_profile, "developer");
+  assert.equal(surface.analysis.ledger_path, ".pipeline/analysis/M06/ledger.yaml");
   assert.equal(surface.recent_events.length, 2);
   assert.equal(surface.monitor.supported, true);
   assert.equal(surface.monitor.decision, "fallback-required");
@@ -38,6 +39,8 @@ test("Claude status markdown uses the compact shared status model", async () => 
   assert.match(rendered, /M06/);
   assert.match(rendered, /continue_execution/);
   assert.match(rendered, /evaluation\.auto_continue=true/);
+  assert.match(rendered, /Analysis: Why did the status surface drift/);
+  assert.match(rendered, /\.pipeline\/analysis\/M06\/ledger\.yaml/);
   assert.match(rendered, /developer/);
   assert.match(rendered, /M05 completed/);
   assert.doesNotMatch(rendered, /sk-/);
@@ -101,6 +104,18 @@ async function fixtureRoot() {
       { id: "M05", feature_id: "F001", status: "done" },
       { id: "M06", feature_id: "F001", status: "in_progress" },
     ],
+    prompt_state: {
+      analysis_summary: {
+        milestone_id: "M06",
+        question: "Why did the status surface drift?",
+        ledger_path: ".pipeline/analysis/M06/ledger.yaml",
+        hypothesis_counts: { total: 2, confirmed: 1, pending: 1 },
+        experiment_counts: { total: 2, completed: 1, pending: 1 },
+        conclusion: "Compact status should expose the ledger pointer.",
+        confidence: "medium",
+        next_action: "inspect generated markdown",
+      },
+    },
   });
   await writeConfig(join(root, ".pipeline", "log.yaml"), {
     events: [

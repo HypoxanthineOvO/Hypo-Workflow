@@ -41,6 +41,8 @@ Field rules:
 - `trigger`: one of `plan_review`, `audit`, `debug`, `user`, `regression`, `auto`
 - `related_milestone`: nearest owning milestone such as `M4`; optional for pure release work
 
+Detailed completion narratives linked from `report` must follow `references/completion-report-contract.md`. Keep `summary` one line; do not inline the full completion payload into `log.yaml`.
+
 ## Write Triggers
 
 Write a new entry when:
@@ -75,6 +77,7 @@ All durable and user-facing evidence surfaces share one conservative redaction c
 - debug reports
 - audit reports
 - milestone reports
+- Patch records and completion narratives
 - `log.yaml`
 - status/dashboard Recent
 - Knowledge Ledger records, indexes, and compact views
@@ -139,6 +142,16 @@ When displaying entries, use `output.language` and convert timestamps to `output
 ## Verification
 - [tests / checks / evidence]
 
+## Completion Narrative
+- Change Summary: [what changed]
+- Technical Approach: [how the fix was made]
+- Modified Files / Modules: [files/modules]
+- Test Design: [planned validation]
+- Validation Results: [actual checks]
+- Expected Result: [expected behavior]
+- Problems Encountered: [issues or none]
+- Risks / Follow-Up: [risks or none]
+
 ## Architecture Impact
 - [none / what changed in architecture]
 ```
@@ -163,6 +176,16 @@ When displaying entries, use `output.language` and convert timestamps to `output
 
 ## Recommended Actions
 - [next steps]
+
+## Completion Narrative
+- Change Summary: [audit result]
+- Technical Approach: [scan method]
+- Modified Files / Modules: [reviewed files/modules]
+- Test Design: [validation basis]
+- Validation Results: [findings/checks]
+- Expected Result: [expected remediation behavior]
+- Problems Encountered: [constraints or none]
+- Risks / Follow-Up: [remaining risks]
 ```
 
 ## Debug Report Template
@@ -190,6 +213,16 @@ When displaying entries, use `output.language` and convert timestamps to `output
 
 ## Fix Recommendation
 - [diff or concrete code suggestion]
+
+## Completion Narrative
+- Change Summary: [root cause or applied fix]
+- Technical Approach: [hypothesis strategy]
+- Modified Files / Modules: [reviewed or changed files]
+- Test Design: [reproduction/validation plan]
+- Validation Results: [confirmed/rejected evidence]
+- Expected Result: [expected behavior after fix]
+- Problems Encountered: [constraints or none]
+- Risks / Follow-Up: [remaining risks]
 
 ## Architecture Impact
 - [none / required update]
