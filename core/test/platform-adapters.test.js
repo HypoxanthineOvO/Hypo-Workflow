@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
@@ -134,7 +134,9 @@ test("cursor sync writes repository rule, flat skills, and slash commands", asyn
   const cursorSetupSkill = await readFile(join(root, ".cursor", "skills", "hw-setup.md"), "utf8");
   assert.doesNotMatch(cursorSetupSkill, /gpt-5\.4|claude-sonnet-4-20250514|deepseek-v4|mimo-v2\.5/);
   assert.doesNotMatch(cursorSetupSkill, /subagent\.codex\.model|subagent\.claude\.model|agent\.model/);
+  assert.doesNotMatch(cursorSetupSkill, /`references\/config-spec\.md`/);
   assert.match(cursorSetupSkill, /Cursor chooses the active model in the UI\/session/);
+  await assertCursorSkillReferencesResolvable(root);
   assert.equal(result.third_party_adapter.skill_bundles[0].entry, ".cursor/skills/hypo-workflow.md");
   assert.ok(result.third_party_adapter.skill_bundles[0].files.includes(".cursor/skills/hw-start.md"));
   assert.ok(result.third_party_adapter.skill_bundles[0].command_files.includes(".cursor/commands/hw-start.md"));
@@ -193,7 +195,7 @@ async function fixtureRoot() {
 
 async function exists(file) {
   try {
-    await readFile(file, "utf8");
+    await access(file);
     return true;
   } catch (error) {
     if (error.code === "ENOENT") return false;
@@ -214,6 +216,77 @@ async function readTreeText(root) {
         await collect(path);
       } else if (entry.isFile()) {
         chunks.push(await readFile(path, "utf8"));
+      }
+    }
+  }
+}
+
+async function assertCursorSkillReferencesResolvable(root) {
+  const skillFiles = await listMarkdownFiles(join(root, ".cursor", "skills"));
+  for (const skillFile of skillFiles) {
+    const content = await readFile(skillFile, "utf8");
+    const references = extractBacktickReferences(content);
+    for (const reference of references) {
+      if (await cursorReferenceExists(root, reference)) continue;
+      assert.match(
+        content,
+        /external\/non-local/i,
+        `${reference} in ${skillFile} is missing and not marked external/non-local`,
+      );
+      assert.match(
+        content,
+        /fallback/i,
+        `${reference} in ${skillFile} is missing and has no fallback behavior`,
+      );
+    }
+  }
+}
+
+async function cursorReferenceExists(root, reference) {
+  if (reference.startsWith(".cursor/")) {
+    return exists(join(root, reference));
+  }
+  if (/^(adapters|assets|references|scripts)\//.test(reference)) {
+    return exists(join(root, ".cursor", "hypo-workflow", reference));
+  }
+  return false;
+}
+
+function extractBacktickReferences(content) {
+  const references = new Set();
+  for (const match of content.matchAll(/`([^`\s]+)`/g)) {
+    const value = match[1];
+    if (value.startsWith("/")) continue;
+    if (value.startsWith("~")) continue;
+    if (value.includes("*")) continue;
+    if (value.startsWith(".pipeline/")) continue;
+    if (!looksLikePathReference(value)) continue;
+    references.add(value);
+  }
+  return [...references];
+}
+
+function looksLikePathReference(value) {
+  return (
+    value === "SKILL.md"
+    || value.startsWith(".cursor/")
+    || /^(adapters|assets|core|docs|references|rules|scripts|templates)\//.test(value)
+  );
+}
+
+async function listMarkdownFiles(root) {
+  const files = [];
+  await collect(root);
+  return files;
+
+  async function collect(directory) {
+    const entries = await readdir(directory, { withFileTypes: true });
+    for (const entry of entries) {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) {
+        await collect(path);
+      } else if (entry.isFile() && entry.name.endsWith(".md")) {
+        files.push(path);
       }
     }
   }

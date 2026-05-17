@@ -19,6 +19,12 @@ Embedded authority source: `skills/skip/SKILL.md`
 5. Do not treat Hypo-Workflow as a runner; Cursor Agent performs the actual work and records evidence in project files when the active command owns those writes.
 6. Cursor chooses the active model in the UI/session; treat provider-specific model defaults as non-Cursor examples and do not write or recommend them unless explicitly requested.
 
+## Cursor Reference Resolution
+
+- Local Cursor references live under `.cursor/skills/` and `.cursor/hypo-workflow/`.
+- Source-repository paths mentioned by the embedded authority but absent from `.cursor/hypo-workflow/` are external/non-local for Cursor targets.
+- Fallback: use the embedded command authority in this file first, then mirrored `.cursor/hypo-workflow/` resources; ask the user for source-repository context only if the missing external reference is required.
+
 ## Command Skill Authority
 
 ---
