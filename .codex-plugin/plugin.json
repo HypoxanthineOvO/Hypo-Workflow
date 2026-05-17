@@ -1,6 +1,6 @@
 {
   "name": "hypo-workflow",
-  "version": "12.8.0",
+  "version": "12.8.1",
   "description": "Serialized prompt workflow with setup, planning, execution, analysis evidence ledgers, cycles, patches, compact context, guide, showcase, rules, OpenCode native adapter scaffold, global config TUI, docs governance, lifecycle recovery, auditing, debugging, release automation, watchdog, and WebUI support.",
   "author": {
     "name": "Hypoxanthine",

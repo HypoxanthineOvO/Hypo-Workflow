@@ -6,7 +6,7 @@
 
 规划 -> 执行 -> 审查 -> 报告 -> 恢复
 
-[![Version](https://img.shields.io/badge/version-12.8.0-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-12.8.1-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/reference/platforms.md)
 
@@ -112,7 +112,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | [Platforms Reference](docs/reference/platforms.md) | 六个平台能力表 |
 | [Generated Artifacts](docs/reference/generated-artifacts.md) | OpenCode、第三方适配、压缩视图和文档引用的生成来源 |
 | [OpenCode Guide](docs/platforms/opencode.md) | OpenCode 指令、智能体角色、模型矩阵和边界 |
-| [v12.8.0 发布说明](docs/release/v12.8.0.md) | 强化 P2 技术路线门控、完成汇报契约、Analysis 入口恢复和发布前回归修复 |
+| [v12.8.1 发布说明](docs/release/v12.8.1.md) | Cursor flat Skills/commands 同步、`/hw-setup` 自包含修复和 PR #8 合入 |
 | [Cursor Guide](docs/platforms/cursor.md) | Cursor 仓库规则 |
 | [GitHub Copilot Guide](docs/platforms/copilot.md) | GitHub Copilot 仓库指令 |
 | [Trae Guide](docs/platforms/trae.md) | Trae 项目规则 |

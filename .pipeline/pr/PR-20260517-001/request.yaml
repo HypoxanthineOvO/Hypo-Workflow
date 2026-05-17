@@ -1,0 +1,42 @@
+id: PR-20260517-001
+kind: github_pr
+status: merged
+created_at: "2026-05-17 21:03:42 CST"
+updated_at: "2026-05-17 21:24:54 CST"
+source:
+  provider: github
+  repository: HypoxanthineOvO/Hypo-Workflow
+  number: 8
+  url: https://github.com/HypoxanthineOvO/Hypo-Workflow/pull/8
+  title: "Optimize Cursor adapter sync"
+  author:
+    login: Baojch
+    name: Jiacheng Bao
+  state: MERGED
+  draft: false
+  mergeable: MERGEABLE
+  review_decision: APPROVED
+  merged:
+    at: "2026-05-17T13:23:59Z"
+    merge_commit: 930b5620c4d9d0f4ccd862f434a9497e664c285e
+  base: main
+  head:
+    owner: Baojch
+    repository: Hypo-Workflow
+    ref: chore/cursor-sync-bundle-20260517
+  commits:
+    - oid: ac074bff932d4996c1ce81af99062ca2ffdf0677
+      headline: "feat: optimize Cursor adapter sync"
+      authored_at: "2026-05-17T12:36:15Z"
+    - oid: 27c53895155a062a330502bdc29859d741fc9191
+      headline: "fix: make Cursor setup references self-contained"
+      authored_at: "2026-05-17T13:14:34Z"
+scope:
+  changed_files: 153
+  additions: 13984
+  deletions: 51
+policy:
+  remote_write_authorized: true
+  local_archive_allowed: true
+  protected_payload_touched: false
+  notes: "User explicitly authorized approve feedback and merge. No labels or reviewer assignment changes were performed."

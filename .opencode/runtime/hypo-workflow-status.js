@@ -7,6 +7,7 @@ const RECENT_FAMILIES = new Set([
   "feature",
   "milestone",
   "patch",
+  "pr",
   "acceptance",
   "sync",
   "recovery",
@@ -54,6 +55,7 @@ function logFamily(type) {
   if (normalized.startsWith("step")) return "step";
   if (normalized.startsWith("worker")) return "step";
   if (normalized.startsWith("patch")) return "patch";
+  if (normalized.startsWith("pr")) return "pr";
   if (normalized.startsWith("acceptance") || normalized.startsWith("cycle_accept") || normalized.startsWith("cycle_reject")) return "acceptance";
   if (normalized.startsWith("sync")) return "sync";
   if (normalized.startsWith("recovery") || normalized.includes("lease") || normalized.includes("takeover")) return "recovery";

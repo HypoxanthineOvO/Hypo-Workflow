@@ -1,5 +1,35 @@
 # Changelog
 
+## v12.8.1 - 2026-05-17
+
+### Features
+
+- 合入 PR #8，Cursor adapter 现在同步每个 `/hw-*` 入口的平铺 Skill 文件和 command 文件。
+- 新增 `.cursor/hypo-workflow/` compact shared resource bundle，镜像 Cursor 执行所需的 references、assets、adapters 和 scripts。
+- Cursor adapter 文档、平台能力矩阵和 generated artifacts reference 更新为新的 flat Skills/commands 结构。
+
+### Fixes
+
+- 修复 Cursor `/hw-setup` 生成内容指向未镜像 `references/config-spec.md` 的问题；当前 setup Skill 自包含，并声明 external/non-local fallback 行为。
+- 新增 generated Cursor Skill reference 回归检查，防止生成 Skill 引用目标项目中不存在且无 fallback 的本地路径。
+- lifecycle log validator 和 `references/log-spec.md` 新增 `pr` family 及 PR review/merge 状态，修复 PR #8 归档事件导致完整回归失败的问题。
+
+### Docs
+
+- README / README.en 更新到 v12.8.1 发布说明入口。
+- 新增中英文 v12.8.1 release notes。
+- 同步版本源、OpenCode/Claude/Codex package metadata、默认配置版本和 generator `HW_VERSION`。
+
+### Tests
+
+- `node --test core/test/platform-adapters.test.js core/test/profile-platform.test.js`: 13/13 passing.
+- Docs/readme/skill/sync focused smoke: 42/42 passing.
+- `node --test core/test/*.test.js`: 516/516 passing.
+- `uv run python tests/run_regression.py`: 68/68 passing.
+- `checkDocs('.')`, `checkDocsLanguage('.')`, `checkNarrativeDocsForRelease('.')`, and `checkReadmeFreshness('README.md')`: passing.
+- `node cli/bin/hypo-workflow sync --platform opencode --project . --check-only`: derived=fresh.
+- `git diff --check`: passing.
+
 ## v12.8.0 - 2026-05-16
 
 ### Features

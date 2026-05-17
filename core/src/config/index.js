@@ -5,7 +5,7 @@ import { DEFAULT_ANALYSIS_INTERACTION } from "../analysis/index.js";
 import { DEFAULT_KNOWLEDGE_CONFIG } from "../knowledge/index.js";
 
 export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
-  version: "12.8.0",
+  version: "12.8.1",
   agent: {
     platform: "codex",
     model: "default",

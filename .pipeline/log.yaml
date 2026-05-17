@@ -6448,3 +6448,69 @@ entries:
       - "checkDocsLanguage('.'): ok, 17 files checked"
       - "uv run -- node --test docs/readme/opencode/sync focused suite: 34/34 passing"
       - "uv run python tests/run_regression.py: 68/68 passing"
+  -
+    id: PR-REVIEW-PR-20260517-001-20260517T210342+0800
+    type: pr
+    ref: PR-20260517-001
+    status: review_ready
+    timestamp: "2026-05-17T21:03:42+08:00"
+    summary: "Inspected GitHub PR #8 from Baojch for Cursor adapter sync; archived metadata, diff summary, local test evidence, and one medium review finding about Cursor /hw-setup referencing an unmirrored config spec."
+    report: .pipeline/pr/PR-20260517-001/review-notes.md
+    trigger: manual
+    tests:
+      - "node --test core/test/platform-adapters.test.js core/test/profile-platform.test.js: 13/13 passing"
+      - "node --test docs/readme/skill/sync focused smoke: 29/29 passing"
+      - "node --test core/test/*.test.js: 516/516 passing"
+  -
+    id: PR-REMOTE-REVIEW-PR-20260517-001-20260517T210804+0800
+    type: pr
+    ref: PR-20260517-001
+    status: remote_review_submitted
+    timestamp: "2026-05-17T21:08:04+08:00"
+    summary: "Submitted GitHub request-changes review on PR #8 with the Cursor /hw-setup missing config-spec reference finding and local test evidence."
+    report: .pipeline/pr/PR-20260517-001/review-notes.md
+    trigger: manual
+  -
+    id: PR-REREVIEW-PR-20260517-001-20260517T211842+0800
+    type: pr
+    ref: PR-20260517-001
+    status: rereview_passed
+    timestamp: "2026-05-17T21:18:42+08:00"
+    summary: "Re-reviewed GitHub PR #8 after fix commit 27c5389; previous Cursor /hw-setup missing config-spec reference finding is resolved, local tests and diff check passed, and the PR is approvable pending explicit remote approval authorization."
+    report: .pipeline/pr/PR-20260517-001/review-notes.md
+    trigger: manual
+    tests:
+      - "node --test core/test/platform-adapters.test.js core/test/profile-platform.test.js: 13/13 passing"
+      - "node --test docs/readme/skill/sync focused smoke: 29/29 passing"
+      - "node --test core/test/*.test.js: 516/516 passing"
+      - "git diff --check main...github/pr/8: passing"
+  -
+    id: PR-MERGE-PR-20260517-001-20260517T212454+0800
+    type: pr
+    ref: PR-20260517-001
+    status: merged
+    timestamp: "2026-05-17T21:24:54+08:00"
+    summary: "Submitted approve review and merged GitHub PR #8 with merge commit 930b562; local main fast-forwarded and docs governance checks passed."
+    report: .pipeline/pr/PR-20260517-001/summary.md
+    trigger: manual
+    tests:
+      - "checkDocs('.') and checkDocsLanguage('.') on merged local main: passing"
+      - "node cli/bin/hypo-workflow sync --project . --check-only on detached PR worktree: exit 0 with non-blocking .pipeline compact/runtime stale warnings"
+  -
+    id: RELEASE-v12.8.1-20260517T214121+0800
+    type: release
+    ref: v12.8.1
+    status: completed
+    timestamp: "2026-05-17T21:41:21+08:00"
+    summary: "Prepared v12.8.1 release after merging PR #8: synced version sources, README/CHANGELOG/release notes, OpenCode artifacts, docs registry, and repaired PR lifecycle log schema before full regression."
+    report: .pipeline/release/v12.8.1.md
+    trigger: manual
+    tests:
+      - "node --test core/test/log-evidence.test.js: 5/5 passing"
+      - "node --test core/test/docs-governance.test.js core/test/log-evidence.test.js: 13/13 passing"
+      - "node --test core/test/docs-governance.test.js core/test/readme-update.test.js core/test/skill-spec.test.js core/test/sync-standardization.test.js core/test/commands-rules-artifacts.test.js core/test/platform-adapters.test.js core/test/profile-platform.test.js: 42/42 passing"
+      - "node --test core/test/*.test.js: 516/516 passing"
+      - "uv run python tests/run_regression.py: 68/68 passing"
+      - "checkDocs/checkDocsLanguage/checkNarrativeDocsForRelease/checkReadmeFreshness: passing"
+      - "node cli/bin/hypo-workflow sync --platform opencode --project . --check-only: derived=fresh"
+      - "git diff --check: passing"

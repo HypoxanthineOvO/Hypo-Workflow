@@ -1,0 +1,70 @@
+status: merged
+recommendation: merged
+remote_actions_taken:
+  - submitted_github_review:
+      provider: github
+      repository: HypoxanthineOvO/Hypo-Workflow
+      pr: 8
+      action: request_changes
+      timestamp: "2026-05-17 21:08:04 CST"
+  - submitted_github_review:
+      provider: github
+      repository: HypoxanthineOvO/Hypo-Workflow
+      pr: 8
+      action: approve
+      timestamp: "2026-05-17 21:21:32 CST"
+  - merged_github_pr:
+      provider: github
+      repository: HypoxanthineOvO/Hypo-Workflow
+      pr: 8
+      method: merge
+      merge_commit: 930b5620c4d9d0f4ccd862f434a9497e664c285e
+      merged_at: "2026-05-17T13:23:59Z"
+local_actions_taken:
+  - fetched_pr_branch: github/pr/8
+  - created_review_worktree: /tmp/hw-pr8-review
+  - archived_inspect_evidence: .pipeline/pr/PR-20260517-001
+blocking_findings:
+  - id: cursor-setup-missing-config-reference
+    severity: medium
+    status: resolved
+    summary: "Generated Cursor /hw-setup references references/config-spec.md, but Cursor bundle excludes that file."
+    resolved_by: 27c53895155a062a330502bdc29859d741fc9191
+tests:
+  pr_declared:
+    command: "node --test core/test/platform-adapters.test.js core/test/profile-platform.test.js"
+    result: pass
+  smoke:
+    command: "node --test core/test/docs-governance.test.js core/test/readme-update.test.js core/test/skill-spec.test.js core/test/sync-standardization.test.js core/test/commands-rules-artifacts.test.js"
+    result: pass
+  full_node:
+    command: "node --test core/test/*.test.js"
+    result: pass
+    tests: 516
+  rereview:
+    finding_check: "Verified generated Cursor /hw-setup no longer references backticked references/config-spec.md and now has external/non-local fallback behavior."
+    pr_declared:
+      command: "node --test core/test/platform-adapters.test.js core/test/profile-platform.test.js"
+      result: pass
+      tests: 13
+    smoke:
+      command: "node --test core/test/docs-governance.test.js core/test/readme-update.test.js core/test/skill-spec.test.js core/test/sync-standardization.test.js core/test/commands-rules-artifacts.test.js"
+      result: pass
+      tests: 29
+    full_node:
+      command: "node --test core/test/*.test.js"
+      result: pass
+      tests: 516
+    diff_check:
+      command: "git diff --check main...github/pr/8"
+      result: pass
+  docs_sync_merge_gate:
+    docs_api:
+      command: "checkDocs('.') and checkDocsLanguage('.') on merged local main"
+      result: pass
+    sync_check_only:
+      command: "node cli/bin/hypo-workflow sync --project . --check-only on detached PR worktree"
+      result: "exit 0, stale warnings only"
+      note: ".pipeline compact/runtime stale warnings are local workflow artifacts and not PR payload."
+next_allowed_actions:
+  - "Optional: push/sync merged main to other remotes if explicitly requested."

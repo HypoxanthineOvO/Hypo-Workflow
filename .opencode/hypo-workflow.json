@@ -101,7 +101,7 @@
     "confirm_system_install": false
   },
   "fileGuard": "standard",
-  "version": "12.8.0",
+  "version": "12.8.1",
   "commandMap": [
     {
       "canonical": "/hw:start",

@@ -30,8 +30,8 @@ test("docs map defines ownership, generated references, and narrative policy", (
   const userGuide = map.documents.find((doc) => doc.path === "docs/user-guide.md");
   const englishUserGuide = map.documents.find((doc) => doc.path === "docs/en/user-guide.md");
   const configuration = map.documents.find((doc) => doc.path === "docs/reference/configuration.md");
-  const releaseNote = map.documents.find((doc) => doc.path === "docs/release/v12.8.0.md");
-  const englishReleaseNote = map.documents.find((doc) => doc.path === "docs/en/release/v12.8.0.md");
+  const releaseNote = map.documents.find((doc) => doc.path === "docs/release/v12.8.1.md");
+  const englishReleaseNote = map.documents.find((doc) => doc.path === "docs/en/release/v12.8.1.md");
 
   assert.equal(readme.role, "concise_user_entrypoint");
   assert.equal(readme.narrative_update_policy, "explicit_repair");
@@ -162,13 +162,13 @@ test("human-facing docs and key references stay Chinese-body", async () => {
   assert.ok(result.checked.some((item) => item.path === "references/commands-spec.md"));
 });
 
-test("v12.8.0 release coverage is Chinese-first and linked from entrypoints", async () => {
-  const chineseRelease = await readFile("docs/release/v12.8.0.md", "utf8");
-  const englishRelease = await readFile("docs/en/release/v12.8.0.md", "utf8");
+test("v12.8.1 release coverage is Chinese-first and linked from entrypoints", async () => {
+  const chineseRelease = await readFile("docs/release/v12.8.1.md", "utf8");
+  const englishRelease = await readFile("docs/en/release/v12.8.1.md", "utf8");
   const readme = await readFile("README.md", "utf8");
   const englishReadme = await readFile("README.en.md", "utf8");
 
-  for (const item of ["P2", "/hw:analysis", "completed_with_transport_error", "68/68", "state-init.yaml"]) {
+  for (const item of ["Cursor", "/hw-setup", "references/config-spec.md", "PR #8", "516/516"]) {
     assert.match(chineseRelease, new RegExp(escapeRegExp(item)), `Chinese release note missing ${item}`);
     assert.match(englishRelease, new RegExp(escapeRegExp(item)), `mirror release note missing ${item}`);
   }
