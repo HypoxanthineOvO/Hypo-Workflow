@@ -19,6 +19,14 @@ alwaysApply: true
 - 常用入口：`/hw:init` 初始化或重扫，`/hw:plan` 规划，`/hw:start` 开始执行，`/hw:resume` 继续，`/hw:status` 查看状态。
 - 如果平台不支持原生 slash commands，把用户的 `/hw:*` 意图映射到同名 Hypo-Workflow skill / README 语义。
 
+## Cursor Skills And Commands
+
+- `hypo-workflow sync --platform cursor --project .` 同步本规则文件，并为每个 `/hw-*` 入口写入一个平铺 Skill 文件：`.cursor/skills/hw-*.md`。
+- 同步 `.cursor/commands/hw-*.md` 作为 Cursor 对话里的 slash command 入口；精简共享参考资源镜像在 `.cursor/hypo-workflow/`，命令 authority 直接嵌入平铺 Skill。
+- 当用户输入 `/hw-start`、`/hw-plan`、`/hw-resume` 等命令时，加载同名 `.cursor/skills/hw-*.md`，并映射到 canonical `/hw:*` 语义。
+- Cursor 的模型选择由当前 Cursor UI/session 决定；adapter 不写入或推荐具体模型/provider 默认值，除非用户明确要求配置外部后端。
+- 如果这些平铺 Skill 或 command 文件缺失或 stale，提示用户运行 `hypo-workflow sync --platform cursor --project .` 后再继续。
+
 ## Protected Files And Preflight
 
 - Treat protected files `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/rules.yaml` as lifecycle authority files.
@@ -41,10 +49,14 @@ alwaysApply: true
 
 Structured Rules/Habits are authority; Markdown habits and platform instructions are derived views.
 
+- claude-hw-command-namespace (project/error/workflow): Claude Code integration must expose Hypo-Workflow commands through the `hw` plugin namespace as `/hw:*` slash commands while keeping Claude native `/resume` separate from Hypo `/hw:resume`.
 - conflict-check (builtin/warn/guard): Detect incompatible local agent plugins or hook systems at session start.
+- opencode-bash-auto-policy (project/error/guard): OpenCode execution should use native schema-compatible YOLO permissions: generated `opencode.json` and OpenCode agent frontmatter should use `allow`, not `ask` or unsupported `bypass`.
 - plan-tool-required (builtin/warn/workflow): Complex planning and execution work must maintain a visible plan/todo state.
 - prefer-chinese-output (project/warn/style): 面向用户的说明、README 更新、PROGRESS 摘要和交互提示优先使用中文。命令名、配置键、文件名和专有英文术语保持英文。
 - progress-timezone (builtin/warn/style): Keep PROGRESS timestamps aligned with output.timezone.
 - report-language (builtin/warn/style): Keep reports and generated summaries aligned with output.language.
 - session-start-context-load (builtin/error/hook): Preserve SessionStart context loading as a rule-level gate.
+
+Conflicts are resolved by `cycle > project > global > builtin`; review reports should list overridden sources.
 <!-- HYPO-WORKFLOW:MANAGED:END -->

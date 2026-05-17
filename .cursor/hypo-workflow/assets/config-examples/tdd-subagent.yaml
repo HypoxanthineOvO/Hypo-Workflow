@@ -1,0 +1,22 @@
+pipeline:
+  name: "My Project"
+  source: local
+  output: local
+  prompts_dir: .pipeline/prompts
+  reports_dir: .pipeline/reports
+
+execution:
+  mode: subagent
+  subagent_tool: auto
+  steps:
+    preset: tdd
+
+step_overrides:
+  review_tests:
+    reviewer: subagent
+  review_code:
+    reviewer: subagent
+
+evaluation:
+  auto_continue: false
+  max_diff_score: 3

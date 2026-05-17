@@ -416,11 +416,11 @@ function renderEnglishReadme() {
     "| Codex | Codex Skill / repo skill source | [Codex Guide](docs/en/platforms/codex.md) |",
     "| Claude Code | `hw` plugin plus Claude hooks/agents | [Claude Code Guide](docs/en/platforms/claude-code.md) |",
     "| OpenCode | Native commands, agents, plugins, TUI/status | [OpenCode Guide](docs/en/platforms/opencode.md) |",
-    "| Cursor | Repository rule file | [Cursor Guide](docs/en/platforms/cursor.md) |",
+    "| Cursor | Repository rule plus per-command Skills/commands | [Cursor Guide](docs/en/platforms/cursor.md) |",
     "| GitHub Copilot | Repository custom instructions | [GitHub Copilot Guide](docs/en/platforms/copilot.md) |",
     "| Trae | Project rule file | [Trae Guide](docs/en/platforms/trae.md) |",
     "",
-    "Third-party IDE adapters are repository instruction files. They teach the host IDE Agent to read Hypo-Workflow docs and `.pipeline/`, but they do not claim native hooks, automatic installs, or lifecycle enforcement.",
+    "Third-party IDE adapters provide repository instruction surfaces; Cursor also receives one flat Skill file and one command file per `/hw-*` entry. They teach the host IDE Agent to read Hypo-Workflow docs and `.pipeline/`, but they do not claim native hooks, automatic installs, or lifecycle enforcement.",
     "",
     "## Operating Principles",
     "",
@@ -439,6 +439,7 @@ function renderEnglishReadme() {
     "| Plan a feature | `/hw:plan` |",
     "| Start or continue execution | `/hw:start` / `/hw:resume` |",
     "| Show status and recent events | `/hw:status` |",
+    "| Continue analysis and root-cause investigation | `/hw:analysis` |",
     "| Explain code/config/changes with evidence | `/hw:explain \"why this design\"` |",
     "| Handle existing PR/MR | `/hw:pr inspect URL`, `/hw:pr review URL`, `/hw:pr fix URL` |",
     "| Create PR/MR | `/hw:pr create` / `/hw:pr create --from-worktree` / `/hw:pr create --plan` |",
@@ -478,7 +479,7 @@ function renderUserGuide() {
     "| Codex | 将仓库安装或 symlink 为 Codex Skill source。 | `docs/platforms/codex.md` |",
     "| Claude Code | 安装 `hw` plugin 或用 `--plugin-dir` 调试；项目内用 `hypo-workflow sync --platform claude-code --project .` 同步 hooks/agents。 | `docs/platforms/claude-code.md` |",
     "| OpenCode | 用 `hypo-workflow init-project --platform opencode --project .` 生成 native commands、agents、plugins 和 status artifacts。 | `docs/platforms/opencode.md` |",
-    "| Cursor | 生成 `.cursor/rules/hypo-workflow.mdc`。 | `docs/platforms/cursor.md` |",
+    "| Cursor | 生成 `.cursor/rules/hypo-workflow.mdc`、`.cursor/skills/hw-*.md` 和 `.cursor/commands/hw-*.md`。 | `docs/platforms/cursor.md` |",
     "| GitHub Copilot | 生成 `.github/copilot-instructions.md`。 | `docs/platforms/copilot.md` |",
     "| Trae | 生成 `.trae/rules/project_rules.md`。 | `docs/platforms/trae.md` |",
     "",
@@ -558,7 +559,7 @@ function renderEnglishUserGuide() {
     "| Codex | Install or symlink the repository as a Codex Skill source. | `docs/en/platforms/codex.md` |",
     "| Claude Code | Install the `hw` plugin or debug with `--plugin-dir`; sync hooks/agents with `hypo-workflow sync --platform claude-code --project .`. | `docs/en/platforms/claude-code.md` |",
     "| OpenCode | Run `hypo-workflow init-project --platform opencode --project .` for native commands, agents, plugins, and status artifacts. | `docs/en/platforms/opencode.md` |",
-    "| Cursor | Generate `.cursor/rules/hypo-workflow.mdc`. | `docs/en/platforms/cursor.md` |",
+    "| Cursor | Generate `.cursor/rules/hypo-workflow.mdc`, `.cursor/skills/hw-*.md`, and `.cursor/commands/hw-*.md`. | `docs/en/platforms/cursor.md` |",
     "| GitHub Copilot | Generate `.github/copilot-instructions.md`. | `docs/en/platforms/copilot.md` |",
     "| Trae | Generate `.trae/rules/project_rules.md`. | `docs/en/platforms/trae.md` |",
     "",
@@ -645,6 +646,7 @@ function renderPlatformGuide(platform) {
     `- Subagents: ${capability.subagents || "host-dependent"}.`,
     `- Events/hooks: ${capability.events || "host-dependent"}.`,
     `- Rules/instructions: ${capability.rules || "host-dependent"}.`,
+    capability.skills ? `- Skills: ${capability.skills}.` : null,
     `- Recovery: ${capability.recovery || "pipeline-files"}.`,
   ];
 
@@ -657,9 +659,13 @@ function renderPlatformGuide(platform) {
       "",
       "## 仓库指令文件",
       "",
-      `Adapter target: \`${capability.adapter_target || capability.rules}\`.`,
+      platform === "cursor"
+        ? `Adapter targets: \`${capability.adapter_target || capability.rules}\`, \`${capability.skills}\`, \`${capability.commands_dir}\`, and \`${capability.resource_bundle}\`.`
+        : `Adapter target: \`${capability.adapter_target || capability.rules}\`.`,
       "",
-      "这些 adapters 是仓库级 instruction files。它们告诉宿主 IDE Agent 阅读 `HypoxanthineOvO/Hypo-Workflow` 并遵循 README 快速入口；它们不提供 native Hook 或 lifecycle enforcement。",
+      platform === "cursor"
+        ? "Cursor adapter 同步仓库级 rule file、每命令一个平铺 Skill 文件和每命令一个 slash command 文件。`/hw-start` 等入口加载同名 `.cursor/skills/hw-*.md` 并映射到 canonical `/hw:*`；这些文件不提供 native Hook 或 lifecycle enforcement。"
+        : "这些 adapters 是仓库级 instruction files。它们告诉宿主 IDE Agent 阅读 `HypoxanthineOvO/Hypo-Workflow` 并遵循 README 快速入口；它们不提供 native Hook 或 lifecycle enforcement。",
       "",
       "继续保护 protected files，在完成前执行 preflight checks；当宿主支持 delegated work 时，尽量把 implementation 与 testing/review 分离。",
     );
@@ -737,7 +743,7 @@ function renderPlatformGuide(platform) {
     );
   }
 
-  return base.join("\n") + "\n";
+  return base.filter((line) => line !== null).join("\n") + "\n";
 }
 
 function platformInstallLines(platform) {
@@ -805,13 +811,13 @@ function platformInstallLines(platform) {
   }
   if (platform === "cursor") {
     return [
-      "生成 Cursor rule file：",
+      "生成 Cursor rule file、平铺 Skills 和 slash commands：",
       "",
       "```bash",
       "hypo-workflow sync --platform cursor --project .",
       "```",
       "",
-      "Target: `.cursor/rules/hypo-workflow.mdc`.",
+      "Targets: `.cursor/rules/hypo-workflow.mdc`, `.cursor/skills/hw-*.md`, `.cursor/commands/hw-*.md`, and a compact `.cursor/hypo-workflow/` reference bundle.",
     ];
   }
   if (platform === "copilot") {
@@ -873,6 +879,17 @@ function platformFeatureLines(platform) {
       "- Status 可显示 OpenCode active subagent/model，但这些 subtask 字段必须标记为 runtime-only，不能作为 `/hw:accept` worker evidence。",
     ];
   }
+  if (platform === "cursor") {
+    return [
+      ...common,
+      "- 生成 repository-level rule file，让 Cursor Agent 遵循 Hypo-Workflow contract。",
+      "- 为每个 `/hw-*` 入口同步一个平铺 Skill 文件：`.cursor/skills/hw-*.md`。",
+      "- 同步 `.cursor/commands/hw-*.md`，让 Cursor 对话中可以发现 `/hw-start`、`/hw-plan`、`/hw-resume` 等指令。",
+      "- 命令 authority 直接嵌入 `.cursor/skills/hw-*.md`；`.cursor/hypo-workflow/` 只镜像 compact shared references/assets/scripts/adapters。",
+      "- 模型选择由当前 Cursor UI/session 决定；adapter 不写入或推荐具体模型/provider 默认值，除非用户明确要求配置外部后端。",
+      "- 携带 protected-file、preflight、rules 和 implementation/test separation 指导。",
+    ];
+  }
   return [
     ...common,
     "- 提供 repository-level instructions，让宿主 IDE Agent 可以遵循 Hypo-Workflow contract。",
@@ -927,6 +944,7 @@ function renderEnglishPlatformGuide(platform) {
     `- Subagents: ${capability.subagents || "host-dependent"}.`,
     `- Events/hooks: ${capability.events || "host-dependent"}.`,
     `- Rules/instructions: ${capability.rules || "host-dependent"}.`,
+    capability.skills ? `- Skills: ${capability.skills}.` : null,
     `- Recovery: ${capability.recovery || "pipeline-files"}.`,
     "",
     "## Install / Sync",
@@ -975,7 +993,7 @@ function renderEnglishPlatformGuide(platform) {
     );
   }
 
-  return base.join("\n") + "\n";
+  return base.filter((line) => line !== null).join("\n") + "\n";
 }
 
 function englishPlatformInstallLines(platform) {
@@ -1033,13 +1051,13 @@ function englishPlatformInstallLines(platform) {
   }
   if (platform === "cursor") {
     return [
-      "Generate the Cursor rule file:",
+      "Generate the Cursor rule file, flat Skills, and slash commands:",
       "",
       "```bash",
       "hypo-workflow sync --platform cursor --project .",
       "```",
       "",
-      "Target: `.cursor/rules/hypo-workflow.mdc`.",
+      "Targets: `.cursor/rules/hypo-workflow.mdc`, `.cursor/skills/hw-*.md`, `.cursor/commands/hw-*.md`, and a compact `.cursor/hypo-workflow/` reference bundle.",
     ];
   }
   if (platform === "copilot") {
@@ -1097,6 +1115,17 @@ function englishPlatformFeatureLines(platform) {
       "- Use native `question` for required decisions and `todowrite` for visible plan discipline.",
       "- Map `/hw-pr-create` to canonical `/hw:pr create` for guided GitHub PR / GitLab MR creation.",
       "- Status may display OpenCode active subagent/model data, but those subtask fields are runtime-only and must not satisfy `/hw:accept` worker evidence.",
+    ];
+  }
+  if (platform === "cursor") {
+    return [
+      ...common,
+      "- Generate the repository-level rule file so Cursor Agent follows the Hypo-Workflow contract.",
+      "- Sync one flat Skill file per `/hw-*` entry: `.cursor/skills/hw-*.md`.",
+      "- Sync `.cursor/commands/hw-*.md` so Cursor chat can discover `/hw-start`, `/hw-plan`, `/hw-resume`, and the other command entries.",
+      "- Embed command authority directly in `.cursor/skills/hw-*.md`; mirror only compact shared references/assets/scripts/adapters under `.cursor/hypo-workflow/`.",
+      "- Model selection belongs to the active Cursor UI/session; the adapter does not write or recommend concrete model/provider defaults unless the user explicitly asks to configure an external backend.",
+      "- Carry protected-file, preflight, rules, and implementation/test separation guidance.",
     ];
   }
   return [
@@ -1166,7 +1195,7 @@ function renderPlatformsReference() {
   return [
     "# 平台参考",
     "",
-    "本页汇总各平台的 command、Ask、Plan 和事件能力。第三方 IDE adapter 只提供仓库指令，不代表 native hook 或自动执行能力。平台能力表用于避免夸大自动化边界，也方便用户判断当前宿主 Agent 能支持哪些 Hypo-Workflow 行为。",
+    "本页汇总各平台的 command、Ask、Plan 和事件能力。第三方 IDE adapter 提供仓库指令面；Cursor 还同步每命令一个平铺 Skill 和 command 文件，但仍不代表 native hook 或自动执行能力。平台能力表用于避免夸大自动化边界，也方便用户判断当前宿主 Agent 能支持哪些 Hypo-Workflow 行为。",
     "",
     "| Platform | Commands | Ask | Plan | Events |",
     "|---|---|---|---|---|",
@@ -1187,6 +1216,9 @@ function renderGeneratedArtifactsReference() {
     "| `.opencode/commands/hw-*.md` | command registry | `/hw:sync` |",
     "| `.opencode/agents/hw-*.md` | OpenCode artifact helper | `/hw:sync` |",
     "| `.cursor/rules/hypo-workflow.mdc` | third-party adapter helper | `/hw:sync --platform cursor` |",
+    "| `.cursor/skills/hw-*.md` | Cursor per-command Skill sync | `/hw:sync --platform cursor` |",
+    "| `.cursor/commands/hw-*.md` | Cursor slash command sync | `/hw:sync --platform cursor` |",
+    "| `.cursor/hypo-workflow/` | Cursor compact shared reference resources | `/hw:sync --platform cursor` |",
     "| `.github/copilot-instructions.md` | third-party adapter helper | `/hw:sync --platform copilot` |",
     "| `.trae/rules/project_rules.md` | third-party adapter helper | `/hw:sync --platform trae` |",
     "| `.pipeline/*.compact.*` | `.pipeline/` authority files | `/hw:sync --repair` |",
@@ -1223,7 +1255,7 @@ function renderEnglishPlatformsReference() {
     "",
     "[中文](../../../reference/platforms.md) | English",
     "",
-    "This page summarizes command, Ask, Plan, and event capabilities across supported platforms. Third-party IDE adapters provide repository instructions; they do not imply native hooks or automatic execution.",
+    "This page summarizes command, Ask, Plan, and event capabilities across supported platforms. Third-party IDE adapters provide repository instruction surfaces; Cursor also syncs one flat Skill and command file per `/hw-*` entry, but none of them imply native hooks or automatic execution.",
     "",
     "| Platform | Commands | Ask | Plan | Events |",
     "|---|---|---|---|---|",
@@ -1246,6 +1278,9 @@ function renderEnglishGeneratedArtifactsReference() {
     "| `.opencode/commands/hw-*.md` | command registry | `/hw:sync` |",
     "| `.opencode/agents/hw-*.md` | OpenCode artifact helper | `/hw:sync` |",
     "| `.cursor/rules/hypo-workflow.mdc` | third-party adapter helper | `/hw:sync --platform cursor` |",
+    "| `.cursor/skills/hw-*.md` | Cursor per-command Skill sync | `/hw:sync --platform cursor` |",
+    "| `.cursor/commands/hw-*.md` | Cursor slash command sync | `/hw:sync --platform cursor` |",
+    "| `.cursor/hypo-workflow/` | Cursor compact shared reference resources | `/hw:sync --platform cursor` |",
     "| `.github/copilot-instructions.md` | third-party adapter helper | `/hw:sync --platform copilot` |",
     "| `.trae/rules/project_rules.md` | third-party adapter helper | `/hw:sync --platform trae` |",
     "| `.pipeline/*.compact.*` | `.pipeline/` authority files | `/hw:sync --repair` |",

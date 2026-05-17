@@ -77,6 +77,9 @@ test("capabilityFor exposes OpenCode native primitives", () => {
 
 test("capabilityFor exposes third-party IDE adapter targets", () => {
   assert.equal(capabilityFor("cursor").rules, ".cursor/rules/hypo-workflow.mdc");
+  assert.equal(capabilityFor("cursor").skills, ".cursor/skills/hw-*.md");
+  assert.equal(capabilityFor("cursor").commands_dir, ".cursor/commands/hw-*.md");
+  assert.equal(capabilityFor("cursor").model_routing, "cursor-ui-session");
   assert.equal(capabilityFor("copilot").rules, ".github/copilot-instructions.md");
   assert.equal(capabilityFor("trae").rules, ".trae/rules/project_rules.md");
 });

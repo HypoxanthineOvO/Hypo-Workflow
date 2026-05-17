@@ -49,11 +49,11 @@ Check status and continue:
 | Codex | Codex Skill / repo skill source | [Codex Guide](docs/en/platforms/codex.md) |
 | Claude Code | `hw` plugin plus Claude hooks/agents | [Claude Code Guide](docs/en/platforms/claude-code.md) |
 | OpenCode | Native commands, agents, plugins, TUI/status | [OpenCode Guide](docs/en/platforms/opencode.md) |
-| Cursor | Repository rule file | [Cursor Guide](docs/en/platforms/cursor.md) |
+| Cursor | Repository rule plus per-command Skills/commands | [Cursor Guide](docs/en/platforms/cursor.md) |
 | GitHub Copilot | Repository custom instructions | [GitHub Copilot Guide](docs/en/platforms/copilot.md) |
 | Trae | Project rule file | [Trae Guide](docs/en/platforms/trae.md) |
 
-Third-party IDE adapters are repository instruction files. They teach the host IDE Agent to read Hypo-Workflow docs and `.pipeline/`, but they do not claim native hooks, automatic installs, or lifecycle enforcement.
+Third-party IDE adapters provide repository instruction surfaces; Cursor also receives one flat Skill file and one command file per `/hw-*` entry. They teach the host IDE Agent to read Hypo-Workflow docs and `.pipeline/`, but they do not claim native hooks, automatic installs, or lifecycle enforcement.
 
 ## Operating Principles
 

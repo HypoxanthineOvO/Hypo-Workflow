@@ -37,7 +37,7 @@ export const PLATFORM_CAPABILITIES = Object.freeze({
     rules: "AGENTS.md-instructions",
   },
   cursor: {
-    commands: "repository-instructions",
+    commands: "repository-instructions+skills",
     ask: "chat",
     plan: "host-dependent",
     subagents: "host-dependent",
@@ -45,7 +45,11 @@ export const PLATFORM_CAPABILITIES = Object.freeze({
     permissions: "host-dependent",
     recovery: "pipeline-files",
     handoff_boundaries: "preserve-host-permissions",
+    model_routing: "cursor-ui-session",
     rules: ".cursor/rules/hypo-workflow.mdc",
+    skills: ".cursor/skills/hw-*.md",
+    commands_dir: ".cursor/commands/hw-*.md",
+    resource_bundle: ".cursor/hypo-workflow",
     adapter_target: ".cursor/rules/hypo-workflow.mdc",
   },
   copilot: {

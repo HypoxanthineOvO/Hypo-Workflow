@@ -2,10 +2,7 @@ id: claude-hw-command-namespace
 extends: builtin
 severity: error
 category: project/error/workflow
-description: >
-  Claude Code integration must expose Hypo-Workflow commands through the hw
-  plugin namespace as /hw:* slash commands while keeping Claude native
-  /resume separate from /hw:resume.
+description: Claude Code integration must expose Hypo-Workflow commands through the hw plugin namespace as /hw:* slash commands while keeping Claude native /resume separate from /hw:resume.
 check:
   - type: file_contains
     paths: [".claude-plugin/plugin.json"]
