@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
@@ -18,10 +18,17 @@ test("third-party adapter artifacts teach conservative repository installation",
     ".github/copilot-instructions.md",
     ".trae/rules/project_rules.md",
   ]);
+  assert.deepEqual(result.skill_bundles.map((bundle) => bundle.path), [
+    ".cursor/skills",
+  ]);
 
   const cursor = await readFile(join(root, ".cursor", "rules", "hypo-workflow.mdc"), "utf8");
   const copilot = await readFile(join(root, ".github", "copilot-instructions.md"), "utf8");
   const trae = await readFile(join(root, ".trae", "rules", "project_rules.md"), "utf8");
+  const cursorRootSkill = await readFile(join(root, ".cursor", "skills", "hypo-workflow.md"), "utf8");
+  const cursorStartSkill = await readFile(join(root, ".cursor", "skills", "hw-start.md"), "utf8");
+  const cursorStartCommand = await readFile(join(root, ".cursor", "commands", "hw-start.md"), "utf8");
+  const cursorCommandsSpec = await readFile(join(root, ".cursor", "hypo-workflow", "references", "commands-spec.md"), "utf8");
 
   for (const content of [cursor, copilot, trae]) {
     assert.match(content, /HypoxanthineOvO\/Hypo-Workflow/);
@@ -40,6 +47,32 @@ test("third-party adapter artifacts teach conservative repository installation",
     assert.doesNotMatch(content, /deepseek|mimo|claude model/i);
   }
   assert.match(cursor, /^---\ndescription:/);
+  assert.match(cursor, /Cursor Skills And Commands/);
+  assert.match(cursor, /\.cursor\/skills\/hw-\*\.md/);
+  assert.match(cursorRootSkill, /name: hypo-workflow/);
+  assert.match(cursorRootSkill, /\.cursor\/skills\/hw-start\.md/);
+  assert.match(cursorRootSkill, /Cursor UI\/session/);
+  assert.match(cursorStartSkill, /\/hw:start/);
+  assert.match(cursorStartSkill, /Embedded authority source: `skills\/start\/SKILL\.md`/);
+  assert.match(cursorStartSkill, /\.cursor\/skills\/hypo-workflow\.md/);
+  assert.match(cursorStartSkill, /Cursor chooses the active model in the UI\/session/);
+  assert.match(cursorStartCommand, /\.cursor\/skills\/hw-start\.md/);
+  assert.match(cursorCommandsSpec, /\/hw:start/);
+  assert.ok(result.skill_bundles[0].source_paths.includes("references/commands-spec.md"));
+  assert.ok(result.skill_bundles[0].source_paths.includes("references/skill-spec.md"));
+  assert.ok(!result.skill_bundles[0].source_paths.includes("config.schema.yaml"));
+  assert.ok(!result.skill_bundles[0].source_paths.includes("references/config-spec.md"));
+  assert.equal(await exists(join(root, ".cursor", "hypo-workflow", "skills", "start", "SKILL.md")), false);
+  assert.equal(await exists(join(root, ".cursor", "hypo-workflow", "templates", "report.md")), false);
+  assert.equal(await exists(join(root, ".cursor", "hypo-workflow", "rules", "presets", "recommended.yaml")), false);
+  assert.equal(await exists(join(root, ".cursor", "hypo-workflow", "config.schema.yaml")), false);
+  assert.equal(await exists(join(root, ".cursor", "hypo-workflow", "references", "config-spec.md")), false);
+  assert.equal(await exists(join(root, ".cursor", "hypo-workflow", "references", "opencode-spec.md")), false);
+  assert.equal(await exists(join(root, ".cursor", "hypo-workflow", "references", "platform-claude.md")), false);
+  assert.equal(await exists(join(root, ".cursor", "hypo-workflow", "scripts", "claude-smoke-fixture.mjs")), false);
+  const cursorFiles = await readTreeText(join(root, ".cursor"));
+  assert.doesNotMatch(cursorFiles, /gpt-5\.4|claude-sonnet-4-20250514|deepseek-v4|mimo-v2\.5/);
+  assert.doesNotMatch(cursorFiles, /agent\.model|subagent\.codex\.model|subagent\.claude\.model/);
 });
 
 test("third-party adapters preserve user-owned content around managed blocks", async () => {
@@ -79,7 +112,69 @@ test("sync platform selection writes the requested third-party adapter only", as
   assert.ok(result.operations.includes("trae_adapter"));
   assert.equal(await exists(join(root, ".trae", "rules", "project_rules.md")), true);
   assert.equal(await exists(join(root, ".cursor", "rules", "hypo-workflow.mdc")), false);
+  assert.equal(await exists(join(root, ".cursor", "skills", "hw-start.md")), false);
+  assert.equal(await exists(join(root, ".cursor", "commands", "hw-start.md")), false);
   assert.equal(await exists(join(root, ".github", "copilot-instructions.md")), false);
+});
+
+test("cursor sync writes repository rule, flat skills, and slash commands", async () => {
+  const root = await fixtureRoot();
+  const result = await runProjectSync(root, { mode: "standard", platform: "cursor" });
+
+  assert.ok(result.operations.includes("cursor_adapter"));
+  assert.equal(await exists(join(root, ".cursor", "rules", "hypo-workflow.mdc")), true);
+  assert.equal(await exists(join(root, ".cursor", "skills", "hypo-workflow.md")), true);
+  assert.equal(await exists(join(root, ".cursor", "skills", "hw-start.md")), true);
+  assert.equal(await exists(join(root, ".cursor", "skills", "hw-plan.md")), true);
+  assert.equal(await exists(join(root, ".cursor", "commands", "hw-start.md")), true);
+  assert.equal(await exists(join(root, ".cursor", "commands", "hw-plan.md")), true);
+  assert.equal(await exists(join(root, ".cursor", "hypo-workflow", "SKILL.md")), false);
+  assert.equal(await exists(join(root, ".cursor", "hypo-workflow", "references", "commands-spec.md")), true);
+  assert.equal(await exists(join(root, ".cursor", "hypo-workflow", "skills", "start", "SKILL.md")), false);
+  const cursorSetupSkill = await readFile(join(root, ".cursor", "skills", "hw-setup.md"), "utf8");
+  assert.doesNotMatch(cursorSetupSkill, /gpt-5\.4|claude-sonnet-4-20250514|deepseek-v4|mimo-v2\.5/);
+  assert.doesNotMatch(cursorSetupSkill, /subagent\.codex\.model|subagent\.claude\.model|agent\.model/);
+  assert.match(cursorSetupSkill, /Cursor chooses the active model in the UI\/session/);
+  assert.equal(result.third_party_adapter.skill_bundles[0].entry, ".cursor/skills/hypo-workflow.md");
+  assert.ok(result.third_party_adapter.skill_bundles[0].files.includes(".cursor/skills/hw-start.md"));
+  assert.ok(result.third_party_adapter.skill_bundles[0].command_files.includes(".cursor/commands/hw-start.md"));
+});
+
+test("cursor sync rebuilds managed resources and prunes stale command files", async () => {
+  const root = await fixtureRoot();
+  await mkdir(join(root, ".cursor", "hypo-workflow", "templates"), { recursive: true });
+  await writeFile(
+    join(root, ".cursor", "hypo-workflow", ".hypo-workflow-managed.json"),
+    `${JSON.stringify({ managed_by: "hypo-workflow", source_paths: ["templates"] })}\n`,
+    "utf8",
+  );
+  await writeFile(join(root, ".cursor", "hypo-workflow", "templates", "stale.md"), "stale\n", "utf8");
+  await mkdir(join(root, ".cursor", "skills"), { recursive: true });
+  await writeFile(
+    join(root, ".cursor", "skills", "hw-old.md"),
+    [
+      "---",
+      "name: hw-old",
+      'description: "Hypo-Workflow Cursor skill for /hw-old"',
+      "---",
+      "",
+    ].join("\n"),
+    "utf8",
+  );
+  await mkdir(join(root, ".cursor", "commands"), { recursive: true });
+  await writeFile(
+    join(root, ".cursor", "commands", "hw-old.md"),
+    "Load Cursor Skill `.cursor/skills/hw-old.md`, then execute canonical command `/hw:old` with any user-provided arguments.\n",
+    "utf8",
+  );
+
+  await runProjectSync(root, { mode: "standard", platform: "cursor" });
+
+  assert.equal(await exists(join(root, ".cursor", "hypo-workflow", "templates", "stale.md")), false);
+  assert.equal(await exists(join(root, ".cursor", "skills", "hw-old.md")), false);
+  assert.equal(await exists(join(root, ".cursor", "commands", "hw-old.md")), false);
+  assert.equal(await exists(join(root, ".cursor", "commands", "hw-pr.md")), true);
+  assert.equal(await exists(join(root, ".cursor", "commands", "hw-pr-create.md")), true);
 });
 
 async function fixtureRoot() {
@@ -103,5 +198,23 @@ async function exists(file) {
   } catch (error) {
     if (error.code === "ENOENT") return false;
     throw error;
+  }
+}
+
+async function readTreeText(root) {
+  const chunks = [];
+  await collect(root);
+  return chunks.join("\n");
+
+  async function collect(directory) {
+    const entries = await readdir(directory, { withFileTypes: true });
+    for (const entry of entries) {
+      const path = join(directory, entry.name);
+      if (entry.isDirectory()) {
+        await collect(path);
+      } else if (entry.isFile()) {
+        chunks.push(await readFile(path, "utf8"));
+      }
+    }
   }
 }

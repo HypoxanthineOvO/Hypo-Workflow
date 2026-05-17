@@ -1,6 +1,60 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
+import { commandMap } from "../commands/index.js";
 import { loadStructuredRulesAuthority, renderStructuredRulesInstructionBlock } from "../rules/index.js";
+
+export const CURSOR_SKILLS_DIR = ".cursor/skills";
+export const CURSOR_COMMANDS_DIR = ".cursor/commands";
+export const CURSOR_RESOURCE_BUNDLE_PATH = ".cursor/hypo-workflow";
+export const LEGACY_CURSOR_SKILL_BUNDLE_PATH = ".cursor/skills/hypo-workflow";
+
+export const CURSOR_RESOURCE_BUNDLE_SOURCES = Object.freeze([
+  "references/audit-spec.md",
+  "references/analysis-ledger-spec.md",
+  "references/analysis-spec.md",
+  "references/chat-spec.md",
+  "references/check-spec.md",
+  "references/claude-codex-plugin-spec.md",
+  "references/commands-spec.md",
+  "references/completion-report-contract.md",
+  "references/debug-spec.md",
+  "references/domain-pack-spec.md",
+  "references/evaluation-spec.md",
+  "references/explain-spec.md",
+  "references/feature-queue-spec.md",
+  "references/init-spec.md",
+  "references/knowledge-spec.md",
+  "references/log-spec.md",
+  "references/metrics-spec.md",
+  "references/opencode-command-map.md",
+  "references/opencode-parity.md",
+  "references/platform-capabilities.md",
+  "references/platform-codex.md",
+  "references/plan-review-spec.md",
+  "references/pr-spec.md",
+  "references/progress-spec.md",
+  "references/progressive-discover-spec.md",
+  "references/release-spec.md",
+  "references/review-artifacts-spec.md",
+  "references/rules-spec.md",
+  "references/skill-spec.md",
+  "references/state-contract.md",
+  "references/subagent-spec.md",
+  "references/tdd-spec.md",
+  "references/test-profile-spec.md",
+  "references/v9-architecture.md",
+  "adapters",
+  "assets",
+  "scripts/diff-stats.sh",
+  "scripts/log-append.sh",
+  "scripts/notion_api.py",
+  "scripts/rules-summary.sh",
+  "scripts/state-summary.sh",
+  "scripts/validate-config.sh",
+  "scripts/watchdog.sh",
+]);
+
+export const CURSOR_SKILL_BUNDLE_SOURCES = CURSOR_RESOURCE_BUNDLE_SOURCES;
 
 export const THIRD_PARTY_ADAPTERS = Object.freeze({
   cursor: {
@@ -37,6 +91,7 @@ export const THIRD_PARTY_MANAGED_END = "<!-- HYPO-WORKFLOW:MANAGED:END -->";
 export async function writeThirdPartyAdapterArtifacts(projectRoot = ".", options = {}) {
   const adapters = selectThirdPartyAdapters(options.platform || "all");
   const files = [];
+  const skillBundles = [];
   const rulesBlock = await renderAdapterRulesBlock(projectRoot, options);
   for (const adapter of adapters) {
     const file = join(projectRoot, adapter.path);
@@ -50,8 +105,267 @@ export async function writeThirdPartyAdapterArtifacts(projectRoot = ".", options
       path: adapter.path,
       changed: existing !== next,
     });
+    if (adapter.platform === "cursor") {
+      skillBundles.push(await writeCursorSkillBundle(projectRoot, options));
+    }
   }
-  return { files };
+  const result = { files };
+  if (skillBundles.length) result.skill_bundles = skillBundles;
+  return result;
+}
+
+export async function writeCursorSkillBundle(projectRoot = ".", options = {}) {
+  const repoRoot = options.repoRoot || resolve(new URL("../../..", import.meta.url).pathname);
+  const bundleRoot = join(projectRoot, CURSOR_RESOURCE_BUNDLE_PATH);
+  const copied = [];
+  const missing = [];
+
+  await removeLegacyCursorSkillBundle(projectRoot);
+  await resetManagedCursorResourceBundle(projectRoot);
+  await mkdir(bundleRoot, { recursive: true });
+  for (const sourcePath of CURSOR_RESOURCE_BUNDLE_SOURCES) {
+    const source = join(repoRoot, sourcePath);
+    if (!await existsPath(source)) {
+      missing.push(sourcePath);
+      continue;
+    }
+    const target = join(bundleRoot, sourcePath);
+    await mkdir(dirname(target), { recursive: true });
+    await cp(source, target, {
+      recursive: true,
+      force: true,
+      errorOnExist: false,
+    });
+    copied.push(sourcePath);
+  }
+  if (missing.length) {
+    throw new Error(`Cannot sync Cursor Skill bundle; missing source paths: ${missing.join(", ")}`);
+  }
+
+  await writeFile(
+    join(bundleRoot, ".hypo-workflow-managed.json"),
+    `${JSON.stringify({
+      managed_by: "hypo-workflow",
+      entry: `${CURSOR_SKILLS_DIR}/hypo-workflow.md`,
+      strategy: "compact-shared-resources",
+      source_paths: copied,
+    }, null, 2)}\n`,
+    "utf8",
+  );
+
+  const skillFiles = await writeCursorSkillFiles(projectRoot, repoRoot);
+  const commandFiles = await writeCursorCommandFiles(projectRoot);
+
+  return {
+    platform: "cursor",
+    path: CURSOR_SKILLS_DIR,
+    entry: `${CURSOR_SKILLS_DIR}/hypo-workflow.md`,
+    resource_bundle: CURSOR_RESOURCE_BUNDLE_PATH,
+    command_dir: CURSOR_COMMANDS_DIR,
+    files: skillFiles,
+    command_files: commandFiles,
+    source_paths: copied,
+  };
+}
+
+async function writeCursorSkillFiles(projectRoot, repoRoot) {
+  const skillsDir = join(projectRoot, CURSOR_SKILLS_DIR);
+  const written = [];
+  await mkdir(skillsDir, { recursive: true });
+  await removeGeneratedCursorSkillFiles(skillsDir);
+
+  const rootSkillFile = join(skillsDir, "hypo-workflow.md");
+  await writeFile(rootSkillFile, renderCursorRootSkill(), "utf8");
+  written.push(`${CURSOR_SKILLS_DIR}/hypo-workflow.md`);
+
+  for (const command of commandMap("opencode")) {
+    const fileName = `${command.opencode.slice(1)}.md`;
+    const sourceSkillContent = await readFile(join(repoRoot, command.skill), "utf8");
+    const skillContent = adaptSkillContentForCursor(command, sourceSkillContent);
+    await writeFile(
+      join(skillsDir, fileName),
+      renderCursorCommandSkill(command, skillContent),
+      "utf8",
+    );
+    written.push(`${CURSOR_SKILLS_DIR}/${fileName}`);
+  }
+  return written;
+}
+
+function adaptSkillContentForCursor(command, skillContent) {
+  if (command.canonical !== "/hw:setup") return skillContent;
+  return renderCursorSetupAuthority();
+}
+
+function renderCursorSetupAuthority() {
+  return [
+    "---",
+    "name: setup",
+    "description: Configure Cursor-safe Hypo-Workflow defaults without taking over model selection.",
+    "---",
+    "",
+    "# /hypo-workflow:setup",
+    "## Cursor Setup Boundary",
+    "",
+    "Use this Cursor-specific setup authority when `/hw-setup` or `/hw:setup` runs inside Cursor.",
+    "",
+    "- Cursor chooses the active model in the UI/session.",
+    "- Do not ask for, recommend, or write concrete model/provider defaults.",
+    "- Do not write model routing fields unless the user explicitly asks to configure an external non-Cursor backend.",
+    "- Keep project-local `.pipeline/config.yaml` writes owned by `/hw:init` or `/hw:plan-generate`, not setup.",
+    "",
+    "## Allowed Setup Scope",
+    "",
+    "1. Read `~/.hypo-workflow/config.yaml` when present.",
+    "2. Summarize non-model defaults such as execution mode, plan mode, output language, output timezone, watchdog, compact, showcase, and rules.",
+    "3. Ask whether the user wants to edit those non-model defaults.",
+    "4. If writing global config, preserve any existing model/provider fields exactly as-is unless the user explicitly requested an external backend change.",
+    "5. Remind the user that project config can override global defaults.",
+    "",
+    "## Reference Files",
+    "",
+    "- `references/config-spec.md` in the source repository for non-Cursor configuration semantics.",
+    "- `.cursor/skills/hypo-workflow.md` for Cursor routing and runtime boundaries.",
+    "",
+  ].join("\n");
+}
+
+async function writeCursorCommandFiles(projectRoot) {
+  const commandsDir = join(projectRoot, CURSOR_COMMANDS_DIR);
+  const written = [];
+  await mkdir(commandsDir, { recursive: true });
+  await removeGeneratedCursorCommandFiles(commandsDir);
+  for (const command of commandMap("opencode")) {
+    const fileName = `${command.opencode.slice(1)}.md`;
+    await writeFile(join(commandsDir, fileName), renderCursorCommandFile(command), "utf8");
+    written.push(`${CURSOR_COMMANDS_DIR}/${fileName}`);
+  }
+  return written;
+}
+
+function renderCursorRootSkill() {
+  const rows = commandMap("opencode").map((command) => (
+    `| \`${command.opencode}\` | \`${command.canonical}\` | \`${CURSOR_SKILLS_DIR}/${command.opencode.slice(1)}.md\` |`
+  ));
+  return [
+    "---",
+    "name: hypo-workflow",
+    'description: "Hypo-Workflow Cursor router. Use when the user invokes any /hw-* or /hw:* workflow command."',
+    "---",
+    "",
+    "# Hypo-Workflow Cursor Router",
+    "",
+    "This file is generated by `hypo-workflow sync --platform cursor --project .`.",
+    "",
+    "## Runtime Contract",
+    "",
+    "- Hypo-Workflow is not a runner. Cursor Agent performs implementation, tests, and review.",
+    "- `.pipeline/` remains the source of truth for state, Cycle, Patch, rules, PROGRESS, prompts, reports, and logs.",
+    "- Protected files `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/rules.yaml` require lifecycle command ownership before writes.",
+    "- Command authority is embedded in flat files under `.cursor/skills/hw-*.md`; compact shared references are mirrored under `.cursor/hypo-workflow/`.",
+    "- Model selection belongs to the active Cursor UI/session. Do not prescribe, request, or write model/provider defaults unless the user explicitly asks to configure an external backend.",
+    "",
+    "## Command Skills",
+    "",
+    "| Cursor command | Canonical command | Skill file |",
+    "|---|---|---|",
+    ...rows,
+    "",
+  ].join("\n");
+}
+
+function renderCursorCommandSkill(command, skillContent) {
+  const name = command.opencode.slice(1);
+  return [
+    "---",
+    `name: ${name}`,
+    `description: "Hypo-Workflow Cursor skill for ${command.opencode}; use when the user invokes ${command.opencode} or canonical ${command.canonical}."`,
+    "---",
+    "",
+    `# ${command.opencode}`,
+    "",
+    `Canonical command: \`${command.canonical}\``,
+    `Cursor command: \`${command.opencode}\``,
+    `Route: \`${command.route}\``,
+    `Embedded authority source: \`${command.skill}\``,
+    "",
+    "## Cursor Execution",
+    "",
+    "1. Treat this file as the command-specific Cursor Skill for the requested `/hw-*` command.",
+    "2. Read `.cursor/skills/hypo-workflow.md` when global routing, output-language, or shared runtime rules are needed.",
+    `3. Execute the canonical \`${command.canonical}\` semantics using the embedded command authority below and any user-provided arguments.`,
+    "4. Before writes, inspect `.pipeline/config.yaml`, `.pipeline/cycle.yaml`, `.pipeline/state.yaml`, and `.pipeline/rules.yaml` when present.",
+    "5. Do not treat Hypo-Workflow as a runner; Cursor Agent performs the actual work and records evidence in project files when the active command owns those writes.",
+    "6. Cursor chooses the active model in the UI/session; treat provider-specific model defaults as non-Cursor examples and do not write or recommend them unless explicitly requested.",
+    "",
+    "## Command Skill Authority",
+    "",
+    skillContent.trimEnd(),
+    "",
+  ].join("\n");
+}
+
+function renderCursorCommandFile(command) {
+  return [
+    `# ${command.opencode}`,
+    "",
+    `Load Cursor Skill \`${CURSOR_SKILLS_DIR}/${command.opencode.slice(1)}.md\`, then execute canonical command \`${command.canonical}\` with any user-provided arguments.`,
+    "",
+    "Arguments: `$ARGUMENTS`",
+    "",
+  ].join("\n");
+}
+
+async function removeLegacyCursorSkillBundle(projectRoot) {
+  const legacyRoot = join(projectRoot, LEGACY_CURSOR_SKILL_BUNDLE_PATH);
+  const marker = await readOptionalText(join(legacyRoot, ".hypo-workflow-managed.json"));
+  if (!marker || !/"managed_by"\s*:\s*"hypo-workflow"/.test(marker)) return;
+  await rm(legacyRoot, { recursive: true, force: true });
+}
+
+async function resetManagedCursorResourceBundle(projectRoot) {
+  const bundleRoot = join(projectRoot, CURSOR_RESOURCE_BUNDLE_PATH);
+  const marker = await readOptionalText(join(bundleRoot, ".hypo-workflow-managed.json"));
+  if (marker && /"managed_by"\s*:\s*"hypo-workflow"/.test(marker)) {
+    await rm(bundleRoot, { recursive: true, force: true });
+    return;
+  }
+  if (!marker && await existsPath(bundleRoot)) {
+    throw new Error(`Refusing to replace user-owned Cursor resource bundle at ${CURSOR_RESOURCE_BUNDLE_PATH}`);
+  }
+}
+
+async function removeGeneratedCursorSkillFiles(skillsDir) {
+  await removeGeneratedMarkdownFiles(skillsDir, (name, content) => (
+    name === "hypo-workflow.md"
+      ? /Hypo-Workflow Cursor Router/.test(content)
+      : /^hw-.*\.md$/.test(name) && /Hypo-Workflow Cursor skill for/.test(content)
+  ));
+}
+
+async function removeGeneratedCursorCommandFiles(commandsDir) {
+  await removeGeneratedMarkdownFiles(commandsDir, (name, content) => (
+    /^hw-.*\.md$/.test(name)
+    && /Load Cursor Skill `\.cursor\/skills\/hw-.*\.md`, then execute canonical command/.test(content)
+  ));
+}
+
+async function removeGeneratedMarkdownFiles(directory, shouldRemove) {
+  let entries;
+  try {
+    entries = await readdir(directory, { withFileTypes: true });
+  } catch (error) {
+    if (error.code === "ENOENT") return;
+    throw error;
+  }
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.endsWith(".md")) continue;
+    const file = join(directory, entry.name);
+    const content = await readOptionalText(file);
+    if (shouldRemove(entry.name, content)) {
+      await rm(file, { force: true });
+    }
+  }
 }
 
 export function renderThirdPartyAdapter(adapterOrPlatform, options = {}) {
@@ -72,6 +386,14 @@ export function renderThirdPartyAdapter(adapterOrPlatform, options = {}) {
     "- `.pipeline/` 是 state、Cycle、Patch、rules、PROGRESS、prompts、reports、logs 的 source of truth。",
     "- 常用入口：`/hw:init` 初始化或重扫，`/hw:plan` 规划，`/hw:start` 开始执行，`/hw:resume` 继续，`/hw:status` 查看状态。",
     "- 如果平台不支持原生 slash commands，把用户的 `/hw:*` 意图映射到同名 Hypo-Workflow skill / README 语义。",
+    adapter.platform === "cursor" ? "" : null,
+    adapter.platform === "cursor" ? "## Cursor Skills And Commands" : null,
+    adapter.platform === "cursor" ? "" : null,
+    adapter.platform === "cursor" ? "- `hypo-workflow sync --platform cursor --project .` 同步本规则文件，并为每个 `/hw-*` 入口写入一个平铺 Skill 文件：`.cursor/skills/hw-*.md`。" : null,
+    adapter.platform === "cursor" ? "- 同步 `.cursor/commands/hw-*.md` 作为 Cursor 对话里的 slash command 入口；精简共享参考资源镜像在 `.cursor/hypo-workflow/`，命令 authority 直接嵌入平铺 Skill。" : null,
+    adapter.platform === "cursor" ? "- 当用户输入 `/hw-start`、`/hw-plan`、`/hw-resume` 等命令时，加载同名 `.cursor/skills/hw-*.md`，并映射到 canonical `/hw:*` 语义。" : null,
+    adapter.platform === "cursor" ? "- Cursor 的模型选择由当前 Cursor UI/session 决定；adapter 不写入或推荐具体模型/provider 默认值，除非用户明确要求配置外部后端。" : null,
+    adapter.platform === "cursor" ? "- 如果这些平铺 Skill 或 command 文件缺失或 stale，提示用户运行 `hypo-workflow sync --platform cursor --project .` 后再继续。" : null,
     "",
     "## Protected Files And Preflight",
     "",
@@ -134,6 +456,15 @@ async function readOptionalText(file) {
   } catch (error) {
     if (error.code === "ENOENT") return "";
     throw error;
+  }
+}
+
+async function existsPath(file) {
+  try {
+    await access(file);
+    return true;
+  } catch {
+    return false;
   }
 }
 

@@ -11,7 +11,7 @@ Hypo-Workflow 围绕 `.pipeline/` 的状态、提示、报告、日志和恢复�
 | Codex | 将仓库安装或 symlink 为 Codex Skill source。 | `docs/platforms/codex.md` |
 | Claude Code | 安装 `hw` plugin 或用 `--plugin-dir` 调试；项目内用 `hypo-workflow sync --platform claude-code --project .` 同步 hooks/agents。 | `docs/platforms/claude-code.md` |
 | OpenCode | 用 `hypo-workflow init-project --platform opencode --project .` 生成 native commands、agents、plugins 和 status artifacts。 | `docs/platforms/opencode.md` |
-| Cursor | 生成 `.cursor/rules/hypo-workflow.mdc`。 | `docs/platforms/cursor.md` |
+| Cursor | 生成 `.cursor/rules/hypo-workflow.mdc`、`.cursor/skills/hw-*.md` 和 `.cursor/commands/hw-*.md`。 | `docs/platforms/cursor.md` |
 | GitHub Copilot | 生成 `.github/copilot-instructions.md`。 | `docs/platforms/copilot.md` |
 | Trae | 生成 `.trae/rules/project_rules.md`。 | `docs/platforms/trae.md` |
 

@@ -13,7 +13,7 @@ Start from the platform guide for your host Agent. The README stays as a compact
 | Codex | Install or symlink the repository as a Codex Skill source. | `docs/en/platforms/codex.md` |
 | Claude Code | Install the `hw` plugin or debug with `--plugin-dir`; sync hooks/agents with `hypo-workflow sync --platform claude-code --project .`. | `docs/en/platforms/claude-code.md` |
 | OpenCode | Run `hypo-workflow init-project --platform opencode --project .` for native commands, agents, plugins, and status artifacts. | `docs/en/platforms/opencode.md` |
-| Cursor | Generate `.cursor/rules/hypo-workflow.mdc`. | `docs/en/platforms/cursor.md` |
+| Cursor | Generate `.cursor/rules/hypo-workflow.mdc`, `.cursor/skills/hw-*.md`, and `.cursor/commands/hw-*.md`. | `docs/en/platforms/cursor.md` |
 | GitHub Copilot | Generate `.github/copilot-instructions.md`. | `docs/en/platforms/copilot.md` |
 | Trae | Generate `.trae/rules/project_rules.md`. | `docs/en/platforms/trae.md` |
 

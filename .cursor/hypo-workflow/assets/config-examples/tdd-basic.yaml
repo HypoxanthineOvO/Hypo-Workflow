@@ -1,0 +1,15 @@
+pipeline:
+  name: "My Project"
+  source: local
+  output: local
+  prompts_dir: .pipeline/prompts
+  reports_dir: .pipeline/reports
+
+execution:
+  mode: self
+  steps:
+    preset: tdd
+
+evaluation:
+  auto_continue: false
+  max_diff_score: 3

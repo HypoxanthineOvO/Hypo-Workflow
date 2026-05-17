@@ -52,11 +52,11 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | Codex | Codex Skill / repo skill source | [Codex Guide](docs/platforms/codex.md) |
 | Claude Code | `hw` plugin + Claude hooks/agents | [Claude Code Guide](docs/platforms/claude-code.md) |
 | OpenCode | 原生 commands、agents、plugins、TUI/status | [OpenCode Guide](docs/platforms/opencode.md) |
-| Cursor | 仓库规则文件 | [Cursor Guide](docs/platforms/cursor.md) |
+| Cursor | 仓库规则 + 每命令 Skill/Command 文件 | [Cursor Guide](docs/platforms/cursor.md) |
 | GitHub Copilot | 仓库 custom instructions | [GitHub Copilot Guide](docs/platforms/copilot.md) |
 | Trae | 项目规则文件 | [Trae Guide](docs/platforms/trae.md) |
 
-第三方 IDE 的规则文件是仓库指令：它们帮助智能体学会读取 Hypo-Workflow 的 README、命令语义和 `.pipeline/` 文件协议，但不声明平台会自动安装、自动执行钩子或强制生命周期。
+第三方 IDE 的规则文件是仓库指令：它们帮助智能体学会读取 Hypo-Workflow 的 README、命令语义和 `.pipeline/` 文件协议；Cursor 还会为每个 `/hw-*` 入口同步一个平铺 Skill 文件和 command 文件。它们都不声明平台会自动安装、自动执行钩子或强制生命周期。
 
 ## 工作原则
 
