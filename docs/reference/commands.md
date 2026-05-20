@@ -1,6 +1,6 @@
 # 命令参考
 
-本页由 `core/src/commands/index.js` 生成。当前用户命令数量：41。命令名、平台映射和 Skill 路径保留英文/代码格式。阅读时以 Canonical 列为用户入口，以 OpenCode 列为平台映射；新增或删除命令必须先修改 command registry，再刷新本页。
+本页由 `core/src/commands/index.js` 生成。当前用户命令数量：50。命令名、平台映射和 Skill 路径保留英文/代码格式。阅读时以 Canonical 列为用户入口，以 OpenCode 列为平台映射；新增或删除命令必须先修改 command registry，再刷新本页。
 
 | Canonical | OpenCode | Agent | Skill |
 |---|---|---|---|
@@ -25,6 +25,15 @@
 | `/hw:reject` | `/hw-reject` | `hw-build` | `skills/reject/SKILL.md` |
 | `/hw:explore` | `/hw-explore` | `hw-explore` | `skills/explore/SKILL.md` |
 | `/hw:sync` | `/hw-sync` | `hw-build` | `skills/sync/SKILL.md` |
+| `/hw:maintain` | `/hw-maintain` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain status` | `/hw-maintain-status` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain scan` | `/hw-maintain-scan` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain plan` | `/hw-maintain-plan` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain queue` | `/hw-maintain-queue` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain run` | `/hw-maintain-run` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain apply` | `/hw-maintain-apply` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain verify` | `/hw-maintain-verify` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain log` | `/hw-maintain-log` | `hw-build` | `skills/maintain/SKILL.md` |
 | `/hw:docs` | `/hw-docs` | `hw-docs` | `skills/docs/SKILL.md` |
 | `/hw:patch` | `/hw-patch` | `hw-build` | `skills/patch/SKILL.md` |
 | `/hw:patch fix` | `/hw-patch-fix` | `hw-build` | `skills/patch/SKILL.md` |

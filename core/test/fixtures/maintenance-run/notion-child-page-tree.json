@@ -1,0 +1,35 @@
+{
+  "id": "mr-20260519-notion-child-tree",
+  "kind": "maintenance_run",
+  "title": "Notion child-page relation cleanup",
+  "run_type": "partitioned",
+  "object_ref": "notion:project-root",
+  "status": "planned",
+  "review_mode": "batch",
+  "scope": {
+    "root": "notion:project-root",
+    "partition_strategy": "child_page_tree"
+  },
+  "discovery_input": {
+    "adapter": "notion_child_page_tree",
+    "children": [
+      {
+        "ref": "notion:page/alpha",
+        "title": "Alpha project",
+        "children": [
+          {
+            "ref": "notion:page/alpha/tasks",
+            "title": "Alpha tasks"
+          }
+        ]
+      },
+      {
+        "ref": "notion:page/beta",
+        "title": "Beta project",
+        "children": []
+      }
+    ]
+  },
+  "created_at": "2026-05-19T13:05:00+08:00",
+  "updated_at": "2026-05-19T13:05:00+08:00"
+}

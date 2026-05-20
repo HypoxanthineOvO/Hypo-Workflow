@@ -18,7 +18,7 @@ Core helpers live under `core/src/` and are shared by the CLI, skills, OpenCode 
 | Directory | Purpose | Write Boundary |
 |---|---|---|
 | `.pipeline/` | Source of truth: state, cycle, config, rules, prompts, reports, logs, knowledge, audits, patches, PR archives | Lifecycle commands or workflow commit helper |
-| `skills/` | 40 local Skill files; each Skill directory contains `SKILL.md`, optional `references/`, `scripts/`, and `assets/` | Skill command execution and sync adapters |
+| `skills/` | 41 local Skill files; each Skill directory contains `SKILL.md`, optional `references/`, `scripts/`, and `assets/` | Skill command execution and sync adapters |
 | `references/` | Normative specs: skill-spec, commands-spec, check-spec, release-spec, audit-spec, debug-spec, etc. | Command semantics definitions and Skill authoring guides |
 | `core/src/` | JS implementation: config, commands, artifacts, lifecycle, preflight, compact, knowledge, domains modules | Shared by CLI, Skills, tests, and platform adapters |
 | `.pipeline/prompts/` | Cycle-generated execution prompt files | `/hw:plan:generate` and `/hw:plan:extend` |

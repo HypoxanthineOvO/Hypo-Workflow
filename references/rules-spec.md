@@ -192,6 +192,14 @@ Rules with the same `id` are merged by scope precedence. The effective summary m
 - conflict entries for review reports;
 - active rules that could not be checked automatically.
 
+The effective rules matrix uses this precedence order:
+
+```text
+cycle > project > global > builtin
+```
+
+Projection output must retain `source_path`, `source`, and `evidence_refs` for the winner and every override. This lets review reports explain both the active rule and the lower-precedence records it superseded.
+
 Project structured records live under `.pipeline/rules/structured/project/*.yaml`; Cycle-local records live under `.pipeline/rules/structured/cycle/*.yaml`. User-level global records may live under `~/.hypo-workflow/rules/structured/*.yaml`, but they are loaded only when that directory is explicitly configured as an external source.
 
 Markdown custom rules remain supported and are normalized into the structured summary with `source.format=markdown`, but they are natural-language compatibility records rather than the preferred authority for newly remembered rules.

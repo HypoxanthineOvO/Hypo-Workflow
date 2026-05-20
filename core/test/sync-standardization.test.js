@@ -18,7 +18,7 @@ test("sync command map, skill, and OpenCode artifact are exposed", async () => {
   const root = await fixtureRoot();
   const result = await runProjectSync(root, { mode: "standard" });
 
-  assert.equal(commandMap("opencode").length, 41);
+  assert.equal(commandMap("opencode").length, 50);
   assert.equal(commandByCanonical("/hw:sync").opencode, "/hw-sync");
   assert.equal(commandByCanonical("/hw:sync").agent, "hw-build");
   assert.match(await readFile("skills/sync/SKILL.md", "utf8"), /--light/);
@@ -134,6 +134,18 @@ test("SessionStart light sync detects drift without writes and TUI exposes expli
   });
   assert.equal(hookOutput.status, 0, hookOutput.stderr);
   assert.match(JSON.parse(hookOutput.stdout).additionalContext, /Sync Light Check/);
+
+  const globalKnowledgeRoot = join(root, ".hw-home", "knowledge", "projections", "projects");
+  await mkdir(globalKnowledgeRoot, { recursive: true });
+  await writeFile(join(globalKnowledgeRoot, "hw-sync-standard.compact.md"), "# Global Knowledge Projection\n\n- global context\n", "utf8");
+  await writeFile(join(globalKnowledgeRoot, "hw-sync-standard.yaml"), "schema_version: 1\nentries: []\n", "utf8");
+  const globalHookOutput = spawnSync("bash", ["-lc", `printf '{"cwd":"${root}"}' | HYPO_WORKFLOW_HOME="${join(root, ".hw-home")}" HYPO_WORKFLOW_PROJECT_ID=hw-sync-standard bash hooks/session-start.sh resume`], {
+    cwd: ".",
+    encoding: "utf8",
+  });
+  assert.equal(globalHookOutput.status, 0, globalHookOutput.stderr);
+  assert.match(JSON.parse(globalHookOutput.stdout).additionalContext, /Global Knowledge compact/);
+  assert.match(JSON.parse(globalHookOutput.stdout).additionalContext, /Loaded global knowledge projection compact\/index only/);
 
   const home = join(await mkdtemp(join(tmpdir(), "hw-sync-tui-home-")), "home");
   const registryFile = join(home, ".hypo-workflow", "projects.yaml");

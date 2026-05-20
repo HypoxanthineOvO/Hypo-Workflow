@@ -18,7 +18,7 @@ test("Deep Plan is first-class in canonical command maps for OpenCode and Claude
     const commands = commandMap(platform);
     const deepPlanCommands = commands.filter((command) => command.canonical === DEEP_PLAN_CANONICAL);
 
-    assert.equal(commands.length, 41, `${platform} command count should include Deep Plan and Analysis`);
+    assert.equal(commands.length, 50, `${platform} command count should include Deep Plan, Analysis, and Maintain`);
     assert.equal(deepPlanCommands.length, 1, `${platform} should expose Deep Plan exactly once`);
     assert.deepEqual(deepPlanCommands[0], {
       canonical: DEEP_PLAN_CANONICAL,
@@ -53,7 +53,7 @@ test("Claude Code generated commands include Deep Plan as a namespaced slash com
   const dir = await mkdtemp(join(tmpdir(), "hw-deep-plan-claude-"));
   const result = await writeClaudeCodePluginArtifacts(dir);
 
-  assert.equal(result.command_count, 41);
+  assert.equal(result.command_count, 50);
   assert.equal(result.written_commands.filter((file) => file === "commands/plan/deep.md").length, 1);
 
   const command = await readFile(join(dir, "commands", "plan", "deep.md"), "utf8");
@@ -69,9 +69,9 @@ test("Help, docs, and references present Deep Plan as integrated operations with
   const deepPlanSkill = await readFile("skills/plan-deep/SKILL.md", "utf8");
   const generatedCommand = await readFile("commands/plan/deep.md", "utf8");
 
-  assert.match(help, /41 user-facing Hypo-Workflow commands/i);
+  assert.match(help, /50 user-facing Hypo-Workflow commands/i);
   assert.match(help, /\/hw:plan:deep/);
-  assert.match(skillSpec, /41 user-facing commands/i);
+  assert.match(skillSpec, /50 user-facing commands/i);
   assert.doesNotMatch(skillSpec, /plan:deep[\s\S]{0,120}(deferred|outside the legacy OpenCode `commandMap\(\)` count)/i);
   assert.doesNotMatch(skillSpec, /deferred to M6/i);
 

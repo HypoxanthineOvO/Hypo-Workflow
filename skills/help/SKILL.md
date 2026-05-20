@@ -13,7 +13,7 @@ description: Show the full Hypo-Workflow command map when the user needs a quick
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-使用此技能来解释 41 个面向用户的 Hypo-Workflow 命令和内部 watchdog 技能。There are 41 user-facing Hypo-Workflow commands.
+使用此技能来解释 50 个面向用户的 Hypo-Workflow 命令和内部 watchdog 技能。There are 50 user-facing Hypo-Workflow commands.
 
 ## 指令分组
 
@@ -25,6 +25,8 @@ description: Show the full Hypo-Workflow command map when the user needs a quick
   - `/hw:plan`, `/hw:plan:deep`, `/hw:plan:discover`, `/hw:plan:decompose`, `/hw:plan:generate`, `/hw:plan:confirm`, `/hw:plan:extend`, `/hw:plan:review`
 - Lifecycle:
   - `init`, `cycle`, `accept`, `reject`, `patch`, `patch fix`, `release`
+- Maintenance:
+  - `/hw:maintain`, `/hw:maintain status`, `/hw:maintain scan`, `/hw:maintain plan`, `/hw:maintain queue`, `/hw:maintain run`, `/hw:maintain apply`, `/hw:maintain verify`, `/hw:maintain log`
 - Analysis/Review:
   - `analysis`, `check`, `audit`, `debug`
 - Utility:
@@ -34,7 +36,7 @@ description: Show the full Hypo-Workflow command map when the user needs a quick
 
 ## 执行流程
 
-1. 默认情况下，按类别分组列出所有 41 个面向用户的命令。
+1. 默认情况下，按类别分组列出所有 50 个面向用户的命令。
 2. 对于特定命令，解释：
    - 何时使用它
    - 所需的输入或标志
@@ -45,8 +47,9 @@ description: Show the full Hypo-Workflow command map when the user needs a quick
    - Claude Code 和其他非 Codex 平台在配置时可以使用它们自己的原生委派表面
    - 混合模式只能在当前平台支持的边界内通过 `step_overrides` 委派单个步骤
 5. 提及 Codex 仍然使用根 `SKILL.md` 和 `/hw:*` 兼容性路径。
-6. 在正常帮助输出中包含 `/hw:cycle`、`/hw:patch`、`/hw:patch fix`、`/hw:compact`、`/hw:guide`、`/hw:showcase`、`/hw:rules` 和 `/hw:plan:extend`。
-7. 仅在用户询问 watchdog 或自动恢复内部机制时提及 `/hw:watchdog`。
+6. 在正常帮助输出中包含 `/hw:cycle`、`/hw:patch`、`/hw:patch fix`、`/hw:compact`、`/hw:guide`、`/hw:showcase`、`/hw:rules`、`/hw:plan:extend` 和 `/hw:maintain status|scan|plan|queue|run|apply|verify|log`。
+7. 说明 `/hw:maintain` 不是 `/hw:sync`，不是 runner；维护 queue/ledger authority 位于 `~/.hypo-workflow/maintenance/`。
+8. 仅在用户询问 watchdog 或自动恢复内部机制时提及 `/hw:watchdog`。
 
 ## 参考文件
 

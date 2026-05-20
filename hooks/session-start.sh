@@ -134,6 +134,55 @@ append_knowledge_context() {
   fi
 }
 
+slugify_project_id() {
+  local value="$1"
+  value="$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')"
+  printf '%s' "${value:-project}"
+}
+
+project_id_from_config() {
+  local config_file="$pipeline_dir/config.yaml"
+  [[ -f "$config_file" ]] || return 0
+  awk '
+    /^project:/ { in_project=1; next }
+    in_project && /^[^[:space:]]/ { in_project=0 }
+    in_project && match($0, /^[[:space:]]*id:[[:space:]]*"?([^"]+)"?/, m) {
+      print m[1]
+      exit
+    }
+  ' "$config_file"
+}
+
+resolve_project_id() {
+  if [[ -n "${HYPO_WORKFLOW_PROJECT_ID:-}" ]]; then
+    slugify_project_id "$HYPO_WORKFLOW_PROJECT_ID"
+    return 0
+  fi
+  local configured
+  configured="$(project_id_from_config || true)"
+  if [[ -n "$configured" ]]; then
+    slugify_project_id "$configured"
+    return 0
+  fi
+  slugify_project_id "$(basename "$cwd")"
+}
+
+append_global_knowledge_context() {
+  local project_id global_home projection_dir compact_file index_file
+  project_id="$(resolve_project_id)"
+  global_home="${HYPO_WORKFLOW_HOME:-$HOME/.hypo-workflow}"
+  projection_dir="$global_home/knowledge/projections/projects"
+  compact_file="$projection_dir/$project_id.compact.md"
+  index_file="$projection_dir/$project_id.yaml"
+
+  append_context_file "Global Knowledge compact" "$compact_file"
+  append_context_file "Global Knowledge projection index" "$index_file"
+
+  if [[ -f "$compact_file" || -f "$index_file" ]]; then
+    context_load_log+=$'\n'"Loaded global knowledge projection compact/index only for project ${project_id}"
+  fi
+}
+
 append_sync_light_check() {
   local messages=()
   if git -C "$cwd" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -169,21 +218,6 @@ extract_state_chat_active() {
     }
   ' "$file"
 }
-
-# Inject Workflow state summary if in a Cycle
-if [ -f "$pipeline_dir/state.yaml" ] && [ -f "$pipeline_dir/cycle.yaml" ]; then
-  CYCLE=$(grep "name:" "$pipeline_dir/cycle.yaml" | head -1 | cut -d'"' -f2)
-  STATUS=$(grep "status:" "$pipeline_dir/state.yaml" | head -1 | awk '{print $2}')
-  MILESTONE=$(grep "prompt_name:" "$pipeline_dir/state.yaml" | head -1 | cut -d'"' -f2)
-  STEP=$(grep "step:" "$pipeline_dir/state.yaml" | head -1 | awk '{print $2}')
-  echo "--- Hypo-Workflow Active ---"
-  echo "Cycle: $CYCLE"
-  echo "Status: $STATUS"
-  echo "Current: $MILESTONE"
-  echo "Step: $STEP"
-  echo "Run /hw:status for details"
-  echo "--- End Workflow State ---"
-fi
 
 summary="$("$scripts_dir/state-summary.sh" "$pipeline_dir" 2>/dev/null || true)"
 if [[ -z "$summary" || "$summary" == "No active pipeline" ]]; then
@@ -255,6 +289,7 @@ append_compact_or_full "state" "$pipeline_dir/state.compact.yaml" "$pipeline_dir
 append_compact_or_full "log" "$pipeline_dir/log.compact.yaml" "$pipeline_dir/log.yaml"
 append_context_file "patches compact" "$pipeline_dir/patches.compact.md"
 append_knowledge_context
+append_global_knowledge_context
 append_open_patches
 append_rules_context
 append_sync_light_check

@@ -1,5 +1,34 @@
 # Changelog
 
+## v13.0.0-alpha.1 - 2026-05-20
+
+### Features
+
+- 新增 C16 根目录项目管理模式：Global Workspace authority、Artifact Catalog、Storage Sync Template、Maintenance Queue/Ledger/Run、Global Consolidation、Global Knowledge/Rules/Secret Reference projection 和最终 Notion apply gate。
+- 新增 `/hw:maintain` 命令族，覆盖 `status`、`scan`、`plan`、`queue`、`run`、`apply`、`verify` 和 `log`，将长期维护对象从 Cycle/Patch 中拆出。
+- 新增每日 04:00 全局沉淀本地入口 `hypo-workflow maintain-scheduler --dry-run` 与 `scripts/maintenance-scheduler.sh`，生成 safe-local evidence 和 maintenance ledger event。
+- 新增项目级 Global Knowledge projection，SessionStart 只读加载 compact/index projection 文件，不加载 raw global records 或 raw candidates。
+
+### Fixes
+
+- 修订 C16 Notion 同步策略：从“创建额外同步子页”改为 legacy reconciliation，整理现有 Hypo-Workflow 主页及既有子页面，并保留备份、dry-run、显式授权和读回验证证据。
+- 强化 Notion apply gate：要求 dry-run hash、reviewed apply plan、精确确认短语、显式 target binding、re-read verification 和 sanitized ledger/evidence。
+- 修复 SessionStart hook stdout 契约，确保只输出可解析 JSON，并将 Global Knowledge compact 作为 additional context 注入。
+
+### Docs
+
+- README / README.en 更新到 v13.0.0-alpha.1 预发布说明入口。
+- 新增中英文 v13.0.0-alpha.1 release notes。
+- 同步版本源、OpenCode/Claude/Codex package metadata、默认配置版本和 generator `HW_VERSION`。
+
+### Tests
+
+- `cd core && npm test`: 588/588 passing。
+- `node --test core/test/knowledge-ledger.test.js core/test/global-knowledge-index.test.js core/test/sync-standardization.test.js`: 16/16 passing，来自 Global Knowledge projection 修订记录。
+- SessionStart hook JSON parse: passing。
+- `git diff --check`: passing。
+- Python Notion pytest 路径仍收集 0 个测试，记录为覆盖空洞。
+
 ## v12.8.1 - 2026-05-17
 
 ### Features

@@ -1,5 +1,5 @@
 pipeline:
-  name: "C15 Workflow交互细节与Analysis模式调查"
+  name: "C16 根目录项目管理模式"
   source: local
   output: local
   prompts_dir: .pipeline/prompts

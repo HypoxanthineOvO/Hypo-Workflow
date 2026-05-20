@@ -2,6 +2,12 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import { redactSecrets } from "../evidence/index.js";
+export {
+  buildGlobalKnowledgeProjection,
+  buildInfrastructureFactProjection,
+  buildNotionProjectableGlobalSummary,
+  sanitizeProjection,
+} from "./projections.js";
 
 export const KNOWLEDGE_RECORD_TYPES = Object.freeze([
   "milestone",
@@ -29,6 +35,13 @@ export const DEFAULT_KNOWLEDGE_CONFIG = Object.freeze({
     compact: true,
     indexes: [...KNOWLEDGE_INDEX_CATEGORIES],
     records: false,
+    global_projection: {
+      enabled: true,
+      root: "~/.hypo-workflow/knowledge/projections/projects",
+      compact: true,
+      index: true,
+      records: false,
+    },
   },
   compaction: {
     auto: true,
@@ -194,6 +207,7 @@ export function buildKnowledgeLoadPlan(config = DEFAULT_KNOWLEDGE_CONFIG) {
   const merged = mergeObjects(DEFAULT_KNOWLEDGE_CONFIG, config || {});
   const root = merged.root || ".pipeline/knowledge";
   const loading = merged.loading || {};
+  const globalProjection = normalizeGlobalProjectionLoadConfig(loading.global_projection);
   const indexes = loading.indexes === true
     ? [...KNOWLEDGE_INDEX_CATEGORIES]
     : Array.isArray(loading.indexes)
@@ -206,7 +220,97 @@ export function buildKnowledgeLoadPlan(config = DEFAULT_KNOWLEDGE_CONFIG) {
     compact: loading.compact === false ? null : merged.compaction?.compact_file || `${root}/knowledge.compact.md`,
     indexes: indexes.map((category) => `${root}/index/${category}.yaml`),
     records: loading.records ? [`${root}/records/*.yaml`] : [],
+    global_projection: {
+      enabled: globalProjection.enabled,
+      compact: globalProjection.enabled && globalProjection.compact ? `${globalProjection.root}/{project_id}.compact.md` : null,
+      index: globalProjection.enabled && globalProjection.index ? `${globalProjection.root}/{project_id}.yaml` : null,
+      records: [],
+    },
   };
+}
+
+export function buildProjectGlobalKnowledgeProjection(input = {}) {
+  const projectId = safeString(input.project_id || input.project?.id || input.object_id || "project");
+  const project = findProjectRecord(projectId, input.project || input.project_registry || input.projects);
+  const entries = filterProjectEntries(projectId, input.global_knowledge_projection?.entries || input.entries);
+  const infrastructure = filterProjectEntries(projectId, input.infrastructure_projection?.facts || input.infrastructure_facts || input.facts);
+  const secretRefs = filterProjectEntries(projectId, input.secret_capability_projection?.secret_refs || input.secret_refs)
+    .map((ref) => compactObject({
+      id: ref.id,
+      provider: ref.provider,
+      allowed_for: normalizeRefs(ref.allowed_for),
+      health: ref.health ? compactObject({
+        status: ref.health.status || "unknown",
+        checked_at: ref.health.checked_at ?? null,
+      }) : undefined,
+      store_ref: {
+        store_ref: ref.secret_ref?.store_ref || ref.store_ref || `local_secret:${ref.id || ref.provider || "unknown"}`,
+        metadata_only: true,
+      },
+    }));
+
+  return redactKnowledgeSecrets(compactObject({
+    schema_version: "1",
+    projection: "project_global_knowledge",
+    project_id: projectId,
+    generated_at: input.generated_at || null,
+    raw_global_records_copied: false,
+    raw_project_records_copied: false,
+    facts: compactObject({
+      display_name: project.display_name || project.name,
+      canonical_path: project.path || project.canonical_path,
+      status: project.status,
+      platform: project.platform,
+      profile: project.profile,
+    }),
+    relationships: normalizeRelationshipList(project.relationships || project.relations || project.links),
+    entries: entries.map((entry) => projectProjectionEntry(entry)),
+    infrastructure: infrastructure.map((fact) => projectProjectionEntry(fact)),
+    secret_refs: secretRefs,
+  }));
+}
+
+export function renderProjectGlobalProjectionCompact(projection = {}) {
+  const lines = [
+    "# Global Knowledge Projection",
+    "",
+    `Project: ${projection.project_id || "unknown"}`,
+    `Generated: ${projection.generated_at || "unknown"}`,
+    "",
+    "This is a project-scoped read-only projection. Raw global records and raw secrets are not loaded.",
+  ];
+
+  const facts = projection.facts || {};
+  lines.push("", "## Project Facts");
+  const factLines = [
+    facts.display_name ? `- Name: ${facts.display_name}` : null,
+    facts.canonical_path ? `- Canonical path: ${facts.canonical_path}` : null,
+    facts.status ? `- Status: ${facts.status}` : null,
+    facts.platform ? `- Platform: ${facts.platform}` : null,
+  ].filter(Boolean);
+  lines.push(...(factLines.length ? factLines : ["- n/a"]));
+
+  lines.push("", "## Relationships");
+  const relationships = Array.isArray(projection.relationships) ? projection.relationships : [];
+  lines.push(...(relationships.length
+    ? relationships.map((item) => `- ${[item.kind, item.target, item.reason].filter(Boolean).join(": ")}`)
+    : ["- n/a"]));
+
+  lines.push("", "## Global Entries");
+  const entries = Array.isArray(projection.entries) ? projection.entries : [];
+  lines.push(...(entries.length ? entries.map(renderProjectionLine) : ["- n/a"]));
+
+  lines.push("", "## Infrastructure");
+  const infrastructure = Array.isArray(projection.infrastructure) ? projection.infrastructure : [];
+  lines.push(...(infrastructure.length ? infrastructure.map(renderProjectionLine) : ["- n/a"]));
+
+  lines.push("", "## Secret Refs");
+  const secretRefs = Array.isArray(projection.secret_refs) ? projection.secret_refs : [];
+  lines.push(...(secretRefs.length
+    ? secretRefs.map((ref) => `- ${ref.id || ref.provider}: ${ref.provider || "unknown"} (${ref.store_ref?.store_ref || "metadata-only"})`)
+    : ["- n/a"]));
+
+  return `${lines.join("\n")}\n`;
 }
 
 export async function appendKnowledgeRecord(projectRoot, record, options = {}) {
@@ -375,6 +479,112 @@ function slugify(value) {
 
 function knowledgeRoot(projectRoot, options = {}) {
   return join(projectRoot, options.root || DEFAULT_KNOWLEDGE_CONFIG.root);
+}
+
+function normalizeGlobalProjectionLoadConfig(config = {}) {
+  const value = config === false ? { enabled: false } : isPlainObject(config) ? config : {};
+  return {
+    enabled: value.enabled !== false,
+    root: value.root || "~/.hypo-workflow/knowledge/projections/projects",
+    compact: value.compact !== false,
+    index: value.index !== false,
+    records: false,
+  };
+}
+
+function findProjectRecord(projectId, input) {
+  if (Array.isArray(input)) {
+    return input.find((item) => safeString(item.id || item.project_id) === projectId) || {};
+  }
+  if (isPlainObject(input)) {
+    if (safeString(input.id || input.project_id) === projectId) return input;
+    const projects = input.projects || input.items || input.entries;
+    if (Array.isArray(projects)) return findProjectRecord(projectId, projects);
+    return input[projectId] || {};
+  }
+  return {};
+}
+
+function filterProjectEntries(projectId, entries = []) {
+  return (Array.isArray(entries) ? entries : [])
+    .filter((entry) => isAcceptedProjectionEntry(entry))
+    .filter((entry) => isProjectRelevant(projectId, entry))
+    .map((entry) => redactKnowledgeSecrets(entry));
+}
+
+function isAcceptedProjectionEntry(entry = {}) {
+  const status = safeString(entry.status || "accepted").toLowerCase();
+  return !["pending", "pending_review", "rejected", "raw", "superseded"].includes(status);
+}
+
+function isProjectRelevant(projectId, entry = {}) {
+  const refs = [
+    ...normalizeRefs(entry.project_ids),
+    ...normalizeRefs(entry.projects),
+    ...normalizeRefs(entry.object_refs),
+    ...normalizeRefs(entry.applies_to),
+  ];
+  if (!refs.length) return true;
+  return refs.some((ref) => ref === projectId || ref === `project:${projectId}`);
+}
+
+function projectProjectionEntry(entry = {}) {
+  return compactObject({
+    id: entry.id,
+    type: entry.type || entry.category || entry.kind,
+    title: entry.title,
+    summary: entry.summary,
+    sensitivity: entry.sensitivity,
+    freshness: entry.freshness,
+    status: entry.status,
+    authority: entry.authority,
+    source_ref: entry.source_ref || entry.path,
+    evidence_refs: normalizeRefs(entry.evidence_refs || entry.source_record_refs),
+    tags: normalizeRefs(entry.tags),
+  });
+}
+
+function normalizeRelationshipList(value) {
+  return (Array.isArray(value) ? value : [])
+    .map((item) => {
+      if (typeof item === "string") return { target: item };
+      if (!isPlainObject(item)) return null;
+      return compactObject({
+        kind: item.kind || item.type || item.relation,
+        target: item.target || item.to || item.project_id || item.id,
+        reason: item.reason || item.summary,
+      });
+    })
+    .filter(Boolean);
+}
+
+function renderProjectionLine(entry = {}) {
+  const label = entry.title || entry.id || entry.type || "entry";
+  const summary = entry.summary ? `: ${entry.summary}` : "";
+  return `- ${label}${summary}`;
+}
+
+function compactObject(object = {}) {
+  const result = {};
+  for (const [key, value] of Object.entries(object || {})) {
+    if (value === undefined) continue;
+    if (value === null) {
+      result[key] = value;
+      continue;
+    }
+    if (Array.isArray(value) && value.length === 0) continue;
+    if (isPlainObject(value) && Object.keys(value).length === 0) continue;
+    result[key] = value;
+  }
+  return result;
+}
+
+function normalizeRefs(value) {
+  return Array.isArray(value) ? value.map((item) => safeString(item)).filter(Boolean) : [];
+}
+
+function safeString(value) {
+  return String(value || "").trim();
 }
 
 function buildCategoryIndex(category, records, options = {}) {

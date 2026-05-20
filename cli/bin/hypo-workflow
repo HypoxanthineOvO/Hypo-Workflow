@@ -12,6 +12,7 @@ import {
   normalizeProfile,
   registerProject,
   renderGlobalTuiSnapshot,
+  runMaintenanceScheduler,
   runProjectSync,
   stringifyYaml,
   writeConfig,
@@ -44,6 +45,8 @@ try {
     await install(args.slice(1));
   } else if (command === "init-project") {
     await initProject(args.slice(1));
+  } else if (command === "maintain-scheduler") {
+    await maintainScheduler(args.slice(1));
   } else {
     throw new Error(`Unknown command: ${command}`);
   }
@@ -216,6 +219,32 @@ async function initProject(flags) {
   process.stdout.write(`Initialized project adapters in ${project}\n`);
 }
 
+async function maintainScheduler(flags) {
+  const home = resolve(valueAfter(flags, "--home") || homedir());
+  const project = resolve(valueAfter(flags, "--project") || ".");
+  const fixtureRoot = valueAfter(flags, "--fixture-root");
+  const now = valueAfter(flags, "--now");
+  const schedule = valueAfter(flags, "--schedule") || "04:00 Asia/Shanghai";
+  const result = await runMaintenanceScheduler({
+    home_dir: home,
+    fixture_root: fixtureRoot ? resolve(fixtureRoot) : undefined,
+    schedule,
+    mode: "dry-run",
+    language: "zh-CN",
+  }, {
+    now,
+  });
+  if (!result.ok) {
+    process.stderr.write(`Maintain scheduler blocked: ${result.errors.join("; ")}\n`);
+    process.exit(1);
+  }
+  process.stdout.write(`Maintain scheduler: ${result.run.run_type} ${result.scheduler.schedule.expression} status=${result.scheduler.status}\n`);
+  process.stdout.write(`Evidence: ${result.evidence_paths.outputs}\n`);
+  process.stdout.write(`Ledger: ${result.ledger_path}\n`);
+  process.stdout.write(`remote_writes_enabled=${result.scheduler.remote_writes_enabled} apply_required=${result.scheduler.apply_required}\n`);
+  process.stdout.write(`Cron install example: crontab -e -> 0 4 * * * ${join(project, "scripts", "maintenance-scheduler.sh")} ${project}\n`);
+}
+
 async function readOrDefaultConfig() {
   if (await exists(globalConfigPath())) return loadConfig(globalConfigPath());
   return { ...DEFAULT_GLOBAL_CONFIG, profiles: profileIndex() };
@@ -270,6 +299,7 @@ function help() {
   process.stdout.write("  profile list|use <name>|edit <name> [--platform <name>] [--model <name>]\n");
   process.stdout.write("  install opencode|codex|claude\n");
   process.stdout.write("  init-project --platform opencode --project <dir> [--automation manual|balanced|full]\n");
+  process.stdout.write("  maintain-scheduler [--dry-run] [--home <dir>] [--project <dir>] [--schedule '04:00 Asia/Shanghai']\n");
   process.stdout.write("\nPipeline execution remains inside OpenCode, Codex, or Claude Code agents.\n");
 }
 

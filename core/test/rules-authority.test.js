@@ -4,6 +4,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { mkdtemp } from "node:fs/promises";
+import * as core from "../src/index.js";
 import {
   loadStructuredRulesAuthority,
   normalizeStructuredRule,
@@ -226,4 +227,84 @@ test("loadStructuredRulesAuthority does not load global habits unless configured
 
   const configuredAuthority = await loadStructuredRulesAuthority(dir, ".", { globalRulesDir: globalDir });
   assert.equal(configuredAuthority.global.some((rule) => rule.id === "global-only"), true);
+});
+
+test("effective rules matrix records precedence and override evidence for each source", () => {
+  const buildEffectiveRulesMatrix = core.buildEffectiveRulesMatrix;
+  assert.equal(typeof buildEffectiveRulesMatrix, "function", "buildEffectiveRulesMatrix must be exported");
+
+  const matrix = buildEffectiveRulesMatrix({
+    project_id: "hypo-workflow",
+    builtin: [
+      normalizeStructuredRule({
+        id: "prefer-chinese-output",
+        scope: "builtin",
+        severity: "warn",
+        label: "style",
+        source_path: "rules/builtin/prefer-chinese-output.yaml",
+        source: { format: "builtin", pack: "recommended" },
+        content: { instruction: "Use configured output language." },
+      }),
+    ],
+    global: [
+      normalizeStructuredRule({
+        id: "prefer-chinese-output",
+        scope: "global",
+        severity: "error",
+        label: "style",
+        source_path: "~/.hypo-workflow/rules/structured/prefer-chinese-output.yaml",
+        source: { format: "structured", author: "global" },
+        content: { instruction: "User-facing documentation should be Chinese." },
+      }),
+    ],
+    project: [
+      normalizeStructuredRule({
+        id: "prefer-chinese-output",
+        scope: "project",
+        severity: "warn",
+        label: "style",
+        source_path: ".pipeline/rules.yaml",
+        source: { format: "project-config", project: "hypo-workflow" },
+        content: { instruction: "Project output should be Chinese except identifiers." },
+      }),
+    ],
+    cycle: [
+      normalizeStructuredRule({
+        id: "prefer-chinese-output",
+        scope: "cycle",
+        severity: "error",
+        label: "style",
+        source_path: ".pipeline/cycle.yaml",
+        source: { format: "cycle", cycle: "C16" },
+        content: { instruction: "C16 reports and summaries must be Chinese." },
+      }),
+    ],
+  });
+
+  assert.equal(matrix.precedence, "cycle > project > global > builtin");
+  assert.ok(Array.isArray(matrix.rules), "matrix.rules must be an array");
+
+  const rule = matrix.rules.find((item) => item.id === "prefer-chinese-output");
+  assert.equal(rule.effective.scope, "cycle");
+  assert.equal(rule.effective.source_path, ".pipeline/cycle.yaml");
+  assert.deepEqual(rule.overrides.map((item) => item.scope), ["project", "global", "builtin"]);
+  for (const override of rule.overrides) {
+    assert.ok(override.source_path, `override ${override.scope} must include source_path`);
+    assert.ok(override.evidence_refs?.length, `override ${override.scope} must include evidence_refs`);
+    assert.ok(override.source, `override ${override.scope} must include source metadata`);
+  }
+  assert.deepEqual(
+    matrix.conflicts.map((conflict) => ({
+      rule_id: conflict.rule_id,
+      winner_scope: conflict.winner.scope,
+      overridden_scopes: conflict.overridden.map((item) => item.scope),
+    })),
+    [
+      {
+        rule_id: "prefer-chinese-output",
+        winner_scope: "cycle",
+        overridden_scopes: ["project", "global", "builtin"],
+      },
+    ],
+  );
 });

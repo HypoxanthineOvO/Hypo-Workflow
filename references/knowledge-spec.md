@@ -116,6 +116,55 @@ SessionStart loads the compact summary and category indexes only:
 
 Raw `.pipeline/knowledge/records/*.yaml` files are loaded only for explicit `/hw:knowledge view` or narrow search results.
 
+## Global Project Projections
+
+Global Knowledge is stored outside individual projects under `~/.hypo-workflow/knowledge/`. Projects must not load the raw global records by default. Instead, each project receives a read-only projection generated from accepted global records, accepted consolidation candidates, project registry facts, infrastructure facts, and metadata-only secret references.
+
+Canonical projection layout:
+
+```text
+~/.hypo-workflow/knowledge/
+  records/
+  index/
+  candidates/
+  projections/projects/<project-id>.yaml
+  projections/projects/<project-id>.compact.md
+```
+
+`projections/projects/<project-id>.yaml` is a generated project-scoped index. `<project-id>.compact.md` is the SessionStart surface. Both files are derived and may be deleted or regenerated.
+
+Project SessionStart loading order:
+
+1. current user instruction and active Cycle state
+2. project-local `.pipeline/knowledge/knowledge.compact.md`
+3. project-local `.pipeline/knowledge/index/*.yaml`
+4. global project projection compact/index
+
+Raw global `records/` and `candidates/` are never loaded during SessionStart. They may be opened only by explicit `/hw:knowledge global view <id>` or a narrow `/hw:knowledge global search ...` result.
+
+Projection rules:
+
+- include only `accepted`, `approved`, or authoritative entries;
+- exclude `pending_review`, `rejected`, `superseded`, and `raw` entries;
+- include project facts, project relationships, relevant infrastructure facts, relevant pitfalls/decisions/templates, and metadata-only secret refs;
+- never include raw secret values, raw session messages, raw page blocks, raw Knowledge records, or raw maintenance evidence payloads;
+- store only pointers in `state.yaml`, never projection bodies or raw records.
+
+## Global Projection
+
+Global Knowledge projections are derived, safe-to-share summaries. They may aggregate only:
+
+- project compact summaries;
+- project Knowledge index entries;
+- global authored records;
+- accepted consolidation candidates.
+
+They must not bulk-copy project-local `raw_records`, raw record `details`, `messages`, or `blocks`. Pending or rejected consolidation candidates stay out of the authoritative projection.
+
+Infrastructure fact projections preserve metadata needed for review, including `id`, `sensitivity`, `freshness`, `authority`, and `evidence_refs`. Raw detail payloads and secret-bearing fields are omitted before projection.
+
+Notion-projectable summaries are a further restricted view: accepted safe summaries plus metadata-only secret references. Raw Knowledge records, raw blocks/messages, and raw secret stores are never projected.
+
 ## Helper API
 
 The deterministic helper API lives in `core/src/knowledge/index.js` and is exported from `core/src/index.js`.
@@ -127,6 +176,8 @@ Core helpers support:
 - `rebuildKnowledgeIndexes` for regenerating all six category indexes
 - `renderKnowledgeCompact` for writing `.pipeline/knowledge/knowledge.compact.md`
 - `rebuildKnowledgeLedger` for index plus compact regeneration
+- `buildGlobalKnowledgeProjection`, `buildInfrastructureFactProjection`, and `buildNotionProjectableGlobalSummary` for derived projection surfaces that strip raw records and secret-bearing fields
+- `buildProjectGlobalKnowledgeProjection` and `renderProjectGlobalProjectionCompact` for project-scoped read-only global Knowledge projections
 
 These helpers are reusable by CLI commands, hooks, `/hw:knowledge`, and OpenCode plugin code. They must stay deterministic and dependency-light.
 
@@ -143,5 +194,9 @@ When a Cycle is archived, copy the compact knowledge summary or write a short ar
 - `compact`: regenerate or display `knowledge.compact.md`
 - `index`: regenerate or inspect category indexes
 - `search`: filter by category, tag, source, or text
+- `global sync`: regenerate the current project's global projection from accepted global sources
+- `global status`: show whether the current project has a global projection and which files SessionStart will load
+- `global search`: search global indexes/projections without loading raw records by default
+- `global view`: show a specific global record only when explicitly requested, with redaction
 
 M01 defines this contract. M02 implements deterministic helper APIs and index/compact generation. Hook capture and OpenCode SessionStart integration are implemented in later milestones.

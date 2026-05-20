@@ -2,7 +2,7 @@
 
 [中文](../../../reference/commands.md) | English
 
-This page is generated from `core/src/commands/index.js`. Current user-facing command count: 41. Use the Canonical column as the user entrypoint and the OpenCode column as the platform mapping.
+This page is generated from `core/src/commands/index.js`. Current user-facing command count: 50. Use the Canonical column as the user entrypoint and the OpenCode column as the platform mapping.
 
 | Canonical | OpenCode | Agent | Skill |
 |---|---|---|---|
@@ -27,6 +27,15 @@ This page is generated from `core/src/commands/index.js`. Current user-facing co
 | `/hw:reject` | `/hw-reject` | `hw-build` | `skills/reject/SKILL.md` |
 | `/hw:explore` | `/hw-explore` | `hw-explore` | `skills/explore/SKILL.md` |
 | `/hw:sync` | `/hw-sync` | `hw-build` | `skills/sync/SKILL.md` |
+| `/hw:maintain` | `/hw-maintain` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain status` | `/hw-maintain-status` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain scan` | `/hw-maintain-scan` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain plan` | `/hw-maintain-plan` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain queue` | `/hw-maintain-queue` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain run` | `/hw-maintain-run` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain apply` | `/hw-maintain-apply` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain verify` | `/hw-maintain-verify` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain log` | `/hw-maintain-log` | `hw-build` | `skills/maintain/SKILL.md` |
 | `/hw:docs` | `/hw-docs` | `hw-docs` | `skills/docs/SKILL.md` |
 | `/hw:patch` | `/hw-patch` | `hw-build` | `skills/patch/SKILL.md` |
 | `/hw:patch fix` | `/hw-patch-fix` | `hw-build` | `skills/patch/SKILL.md` |

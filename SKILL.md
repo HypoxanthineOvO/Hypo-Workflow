@@ -1,7 +1,7 @@
 ---
 name: hypo-workflow
 version: 12.5.1
-description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:analysis`, `/hw:plan`, `/hw:plan:deep`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
+description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:analysis`, `/hw:plan`, `/hw:plan:deep`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:maintain`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
 ---
 
 # Hypo-Workflow v12.5.1
@@ -45,6 +45,15 @@ This SKILL.md serves as the **index and routing summary** for Hypo-Workflow. For
 | `/hw:reject` | Reject pending Cycle work with structured feedback and reopen the Cycle |
 | `/hw:explore` | Start an isolated exploration worktree and record exploration metadata |
 | `/hw:sync` | Synchronize project adapters and lightweight derived context without executing pipeline milestones |
+| `/hw:maintain` | Manage maintenance queue, ledger, evidence, backups, and gated maintenance operations |
+| `/hw:maintain status` | Show maintenance queue and ledger status |
+| `/hw:maintain scan` | Create scan evidence for maintenance candidates |
+| `/hw:maintain plan` | Plan maintenance operations as queue items |
+| `/hw:maintain queue` | Inspect or update the maintenance queue |
+| `/hw:maintain run` | Run approved maintenance operations |
+| `/hw:maintain apply` | Apply confirmed maintenance writes |
+| `/hw:maintain verify` | Verify maintenance apply results |
+| `/hw:maintain log` | Read the sanitized maintenance ledger |
 | `/hw:docs` | Generate, check, repair, and sync documentation |
 | `/hw:patch` | Create, list, close, and `fix` persistent lightweight Patches |
 | `/hw:patch fix` | Execute the lightweight six-step Patch repair lane |
@@ -213,6 +222,7 @@ Use these bundled files when relevant:
 - [`skills/pr/SKILL.md`](./skills/pr/SKILL.md)
 - [`skills/explain/SKILL.md`](./skills/explain/SKILL.md)
 - [`skills/analysis/SKILL.md`](./skills/analysis/SKILL.md)
+- [`skills/maintain/SKILL.md`](./skills/maintain/SKILL.md)
 
 ## 支持的指令
 
@@ -262,6 +272,8 @@ Handle these commands directly:
   Load [`skills/cycle/SKILL.md`](./skills/cycle/SKILL.md). Manage explicit Cycles, archives, deferred items, and project summaries. Old projects without `.pipeline/cycle.yaml` remain compatible as implicit `C1`.
 - `/hw:sync`
   Load [`skills/sync/SKILL.md`](./skills/sync/SKILL.md). Run light, standard, or deep project sync without executing pipeline milestones. SessionStart may only run light external-change detection.
+- `/hw:maintain`, `/hw:maintain status`, `/hw:maintain scan`, `/hw:maintain plan`, `/hw:maintain queue`, `/hw:maintain run`, `/hw:maintain apply`, `/hw:maintain verify`, `/hw:maintain log`
+  Load [`skills/maintain/SKILL.md`](./skills/maintain/SKILL.md). Manage maintenance operations under `~/.hypo-workflow/maintenance/` queue/ledger/evidence authority. This is not `/hw:sync` and is not a runner.
 - `/hw:patch`
   Load [`skills/patch/SKILL.md`](./skills/patch/SKILL.md). Manage persistent lightweight patches under `.pipeline/patches/`. Support `/hw:patch fix P001 [P...]` for the lightweight six-step fix lane.
 - `/hw:pr`
@@ -285,7 +297,7 @@ Handle these commands directly:
 
 If a command starts with `/hw:` and is not listed above, return:
 
-`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:maintain, /hw:maintain status, /hw:maintain scan, /hw:maintain plan, /hw:maintain queue, /hw:maintain run, /hw:maintain apply, /hw:maintain verify, /hw:maintain log, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 
 Slash commands are exact and take precedence over fuzzy natural-language matching. Detailed parsing and option semantics live in [`references/commands-spec.md`](./references/commands-spec.md).
 

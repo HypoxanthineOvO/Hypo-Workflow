@@ -1,0 +1,58 @@
+status: active
+updated_at: "2026-05-20T14:45:00+08:00"
+safe_resume_command: /hw:resume
+next_action: resume_revision
+reason: "C16 acceptance was rejected because the Notion sync must reconcile the existing Hypo-Workflow page and existing child pages instead of only creating a new sync child page; cleanup and readability polish are now complete after backups."
+context:
+  cycle: C16
+  current_milestone: C16-M9
+  current_step: revise
+  prompt_file: .pipeline/prompts/08-final-gated-notion-apply-verification.md
+  report_file: .pipeline/reports/08-final-gated-notion-apply-verification.report.md
+  active_workers: []
+  completed_workers:
+    - role: test
+      id: "019e40f1-b633-78b2-8735-03dc1dc2b406"
+      nickname: Tesla
+      lifecycle: closed
+      evidence: .pipeline/reviews/C16/M9/test-evidence.md
+    - role: audit
+      id: "019e40fa-f5f3-77a2-9d9a-5094b069dbfe"
+      nickname: Mendel
+      lifecycle: closed
+      evidence: .pipeline/reviews/C16/M9/audit.md
+  last_completed_milestone: C16-M9
+  acceptance:
+    state: rejected
+    feedback_ref: .pipeline/acceptance/cycle-C16-rejection-20260520T130827+0800.yaml
+  last_validation:
+    - "node --test core/test/global-consolidation.test.js core/test/session-source-discovery.test.js core/test/maintenance-backfill.test.js core/test/maintenance-command-map.test.js core/test/skill-spec.test.js: 16/16 passing"
+    - "scripts/maintenance-scheduler.sh /home/heyx/Hypo-Workflow --home /tmp/hw-maintain-smoke --fixture-root /home/heyx/Hypo-Workflow/core/test/fixtures/global-consolidation --now 2026-05-20T04:00:00+08:00 --dry-run: created global_consolidation evidence and ledger event; remote_writes_enabled=false"
+    - "node --test core/test/notion-apply-gate.test.js core/test/maintenance-ledger.test.js core/test/root-management-dry-run.test.js: 18/18 passing"
+    - "node --test core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 8/8 passing"
+    - "cd core && npm test: 587/587 passing"
+    - "python3 -m pytest tests/test_notion_integration.py tests/test_notion_output_adapter.py tests/test_notion_mixed_mode.py: collected 0 tests, exit code 5"
+    - "git diff --check: passing"
+    - "Notion read-back: created child page 365819d0-6774-811a-b4d0-e50c27a743d6 under Hypo-Workflow page with 63 children"
+    - "Hypo-Claw QQ live-roundtrip: 4/4 sanitized scheme segments returned status=sent and externalContacted=true"
+    - "Maintain specification: queue YAML parsed, ledger YAML parsed, required queue item fields present"
+    - "Notion remote read: current Hypo-Workflow page has 88 top-level blocks including the C16 sync child page"
+    - "Maintain scan/manifest/draft: 88 Notion top blocks, 35 child pages, 70 local files, 193 manifest rows"
+    - "Safe structure apply payload dry-run: 15 candidate operations, 0 destructive operations, no Notion write"
+    - "Safe structure apply: updated 2 summary blocks, appended 66 structure/index blocks, read-back top_level_count=154, deleted_or_archived_blocks=0"
+    - "Domain rebuild: created 8 domain child pages with content, read-back top_level_count=162, deleted_or_archived_blocks=0"
+    - "Legacy page copy: copied 35/35 legacy child pages into domain pages, all copies verified non-empty, original pages archived/deleted=0"
+    - "Recursive backup before cleanup: 8982 blocks, 103 pages, max_depth=5, errors=0"
+    - "Cleanup archive: planned=152, archived=152, errors=0; root now 2 summary blocks + 8 domain pages"
+    - "Readability pass: icons updated for 44 pages; root remains 10 blocks; 8 domain pages and 35 copies verified; source-id noise=0"
+    - "Title/Overview polish: Overview quote blocks after verify=0; renamed 35 pages; '归位 —' prefix after verify=0"
+  carried_risks:
+    - "A live Notion write was executed only for the user-authorized Workflow self-sync child page; other project Notion applies still require user-selected dry-run bundle, operation subset, and target pages."
+    - "Revision must account for the already-created Notion child page 365819d0-6774-811a-b4d0-e50c27a743d6 as existing content in the merge/reorganization plan."
+    - "No further Notion writes should be performed until the revised legacy reconciliation plan is reviewed and explicitly authorized."
+    - "The current Maintain output is a specification only; it does not yet include the full source_id-level manifest required for safe apply."
+    - "Daily 04:00 scheduler currently creates safe-local dry-run evidence and ledger events only; installing the cron line is a user/system operation."
+    - "Real ledger append persistence was not in the final audit recheck scope; helper returns sanitized ledger event/evidence refs."
+    - "The boolean true confirmation path relies on command-layer code setting it only after explicit user confirmation."
+  next_user_options:
+    - "/hw:resume to review polished Notion Project Home and decide whether C16 can return to acceptance"

@@ -1,0 +1,14 @@
+schema_version: "1"
+cycle_id: C16
+cycle_number: 16
+status: rejected
+rejected_at: "2026-05-20T13:08:27+08:00"
+source: user_acceptance_feedback
+feedback:
+  raw: "我不希望你是创建子页面啊，我希望你是把现有的和子页面一起拳补整理好。"
+  summary: "User rejected the acceptance result because the Notion sync created an additional child page instead of reconciling and fully organizing the existing Hypo-Workflow page together with its existing child pages."
+  required_revision:
+    - "Revise the Notion synchronization approach to reconcile the existing Hypo-Workflow page and its existing child pages, not merely create a new child sync page."
+    - "Produce a safe legacy reconciliation plan for the current Notion page tree, including existing content, existing child pages, local Workflow artifacts, and conflict handling."
+    - "Do not perform further Notion writes until the revised merge/reorganization plan is reviewed and explicitly authorized."
+  external_side_effect_note: "A prior user-authorized Workflow self-sync child page was created at Notion page id 365819d0-6774-811a-b4d0-e50c27a743d6; the revision must account for it as an existing page to reconcile rather than silently ignore or delete."

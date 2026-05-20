@@ -29,6 +29,15 @@ OpenCode uses dash-style native slash commands. Each command remains traceable t
 | `/hw:reject` | `/hw-reject` | `hw-build` | `skills/reject/SKILL.md` |
 | `/hw:explore` | `/hw-explore` | `hw-explore` | `skills/explore/SKILL.md` |
 | `/hw:sync` | `/hw-sync` | `hw-build` | `skills/sync/SKILL.md` |
+| `/hw:maintain` | `/hw-maintain` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain status` | `/hw-maintain-status` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain scan` | `/hw-maintain-scan` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain plan` | `/hw-maintain-plan` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain queue` | `/hw-maintain-queue` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain run` | `/hw-maintain-run` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain apply` | `/hw-maintain-apply` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain verify` | `/hw-maintain-verify` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain log` | `/hw-maintain-log` | `hw-build` | `skills/maintain/SKILL.md` |
 | `/hw:docs` | `/hw-docs` | `hw-docs` | `skills/docs/SKILL.md` |
 | `/hw:patch` | `/hw-patch` | `hw-build` | `skills/patch/SKILL.md` |
 | `/hw:patch fix` | `/hw-patch-fix` | `hw-build` | `skills/patch/SKILL.md` |
@@ -61,4 +70,5 @@ Agent policy:
 - `/hw:pr` uses `hw-review` because PR/MR inspection and review are evidence-first and remote writes are manual-gated.
 - `/hw:pr create` uses `hw-build` because the guided flow prepares local commits/branches and only performs remote provider writes after explicit confirmation.
 - `/hw:explain` uses `hw-review` because answers must be grounded in local evidence and unknowns.
+- `/hw:maintain` and its subcommands use `hw-build` but remain separate from `/hw:sync`; they manage `~/.hypo-workflow/maintenance/` queue/ledger/evidence authority and are not runners.
 - Status/help/log/rules/check commands use `hw-status`.

@@ -458,6 +458,12 @@ knowledge:
       - config-notes
       - secret-refs
     records: false
+    global_projection:
+      enabled: true
+      root: ~/.hypo-workflow/knowledge/projections/projects
+      compact: true
+      index: true
+      records: false
   compaction:
     auto: true
     max_records_per_category: 50

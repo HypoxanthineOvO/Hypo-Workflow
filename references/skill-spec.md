@@ -12,7 +12,7 @@ This document is the canonical contract for Hypo-Workflow Skill assets. It recor
 
 ## Inventory
 
-The repository currently has 40 local Skill files under `skills/*/SKILL.md`:
+The repository currently has 41 local Skill files under `skills/*/SKILL.md`:
 
 | Path | Role |
 |---|---|
@@ -32,6 +32,7 @@ The repository currently has 40 local Skill files under `skills/*/SKILL.md`:
 | `skills/init/SKILL.md` | User-facing project initialization command |
 | `skills/knowledge/SKILL.md` | User-facing Knowledge Ledger command |
 | `skills/log/SKILL.md` | User-facing lifecycle log command |
+| `skills/maintain/SKILL.md` | User-facing maintenance queue, ledger, evidence, and backup command shared by `/hw:maintain` and its subcommands |
 | `skills/patch/SKILL.md` | User-facing Patch command shared by `/hw:patch` and `/hw:patch fix` |
 | `skills/pr/SKILL.md` | User-facing PR/MR Change Request command |
 | `skills/plan-confirm/SKILL.md` | User-facing planning command |
@@ -59,10 +60,11 @@ The repository currently has 40 local Skill files under `skills/*/SKILL.md`:
 
 Additional inventory notes:
 
-- Root `SKILL.md` is the aggregate Hypo-Workflow router and system reference. It is not counted as a child Skill in the 40 local Skill files.
-- The OpenCode command map exposes 41 user-facing commands and 39 user-facing Skill paths because `/hw:patch` and `/hw:patch fix` share `skills/patch/SKILL.md`, and `/hw:pr` plus `/hw:pr create` share `skills/pr/SKILL.md`.
+- Root `SKILL.md` is the aggregate Hypo-Workflow router and system reference. It is not counted as a child Skill in the 41 local Skill files.
+- The OpenCode command map exposes 50 user-facing commands and 40 user-facing Skill paths. `/hw:patch` and `/hw:patch fix` share `skills/patch/SKILL.md`, `/hw:pr` plus `/hw:pr create` share `skills/pr/SKILL.md`, and `/hw:maintain` plus its eight subcommands share `skills/maintain/SKILL.md`.
 - `/hw:analysis` is a first-class user-facing command backed by `skills/analysis/SKILL.md`; it owns enter/continue/end/report semantics for interactive investigation lanes and keeps full evidence in an Analysis ledger.
 - `/hw:plan:deep` is a first-class user-facing command backed by `skills/plan-deep/SKILL.md`; it owns Deep Plan operations for durable discussion packages before ordinary Plan conversion.
+- `/hw:maintain` is a first-class user-facing command backed by `skills/maintain/SKILL.md`; it owns maintenance queue, ledger, evidence, backup, side-effect gate, and zh-CN rendering semantics under `~/.hypo-workflow/maintenance/`. It is not `/hw:sync` and is not a runner.
 - `skills/watchdog/SKILL.md` is internal and cron-only. It is intentionally not part of the user-facing command map.
 - The installed Codex copy under `$CODEX_HOME/skills/hypo-workflow` should mirror the same root plus child Skill layout after sync or installation.
 
@@ -170,10 +172,20 @@ Canonical user-facing command map:
 | `/hw:cycle` | `/hw-cycle` | `hw-status` | `skills/cycle/SKILL.md` |
 | `/hw:explore` | `/hw-explore` | `hw-explore` | `skills/explore/SKILL.md` |
 | `/hw:sync` | `/hw-sync` | `hw-build` | `skills/sync/SKILL.md` |
+| `/hw:maintain` | `/hw-maintain` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain status` | `/hw-maintain-status` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain scan` | `/hw-maintain-scan` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain plan` | `/hw-maintain-plan` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain queue` | `/hw-maintain-queue` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain run` | `/hw-maintain-run` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain apply` | `/hw-maintain-apply` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain verify` | `/hw-maintain-verify` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain log` | `/hw-maintain-log` | `hw-build` | `skills/maintain/SKILL.md` |
 | `/hw:docs` | `/hw-docs` | `hw-docs` | `skills/docs/SKILL.md` |
 | `/hw:patch` | `/hw-patch` | `hw-build` | `skills/patch/SKILL.md` |
 | `/hw:patch fix` | `/hw-patch-fix` | `hw-build` | `skills/patch/SKILL.md` |
 | `/hw:pr` | `/hw-pr` | `hw-review` | `skills/pr/SKILL.md` |
+| `/hw:pr create` | `/hw-pr-create` | `hw-build` | `skills/pr/SKILL.md` |
 | `/hw:explain` | `/hw-explain` | `hw-review` | `skills/explain/SKILL.md` |
 | `/hw:compact` | `/hw-compact` | `hw-compact` | `skills/compact/SKILL.md` |
 | `/hw:knowledge` | `/hw-knowledge` | `hw-compact` | `skills/knowledge/SKILL.md` |
@@ -219,7 +231,7 @@ Current status after M04:
 - `skills/showcase/SKILL.md` now uses the canonical `## Output Language Rules` heading.
 - Stale `/hw:review` V7 compatibility wording has been replaced in root `SKILL.md`, `references/plan-review-spec.md`, and `references/commands-spec.md`. The current canonical command is `/hw:plan:review`; `/hw:review` is only a legacy compatibility alias.
 - `skill-quality` exists as a built-in rule/checking surface for frontmatter, output-language heading, reference paths, command-map traceability, and internal Skill exceptions.
-- `skills/watchdog/SKILL.md` is a valid internal exception: it is cron-only, should not be user-invocable, and should not be counted among the 39 user-facing Skill paths.
+- `skills/watchdog/SKILL.md` is a valid internal exception: it is cron-only, should not be user-invocable, and should not be counted among the 40 user-facing Skill paths.
 - Some long command semantics remain in Skill bodies instead of shared references. This should be improved incrementally without changing trigger behavior.
 - C2 explicitly allows cleanup, formatting, and documentation improvements, but no merge or delete of existing Skills.
 

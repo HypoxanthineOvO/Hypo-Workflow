@@ -6,6 +6,7 @@ import { join } from "node:path";
 import {
   DEFAULT_GLOBAL_CONFIG,
   appendKnowledgeRecord,
+  buildProjectGlobalKnowledgeProjection,
   buildKnowledgeLoadPlan,
   commandByCanonical,
   commandMap,
@@ -16,6 +17,7 @@ import {
   rebuildKnowledgeLedger,
   redactKnowledgeSecrets,
   renderKnowledgeCompact,
+  renderProjectGlobalProjectionCompact,
   validateKnowledgeRecord,
 } from "../src/index.js";
 
@@ -82,6 +84,9 @@ test("knowledge config defaults load compact plus category indexes only at Sessi
 
   const plan = buildKnowledgeLoadPlan(DEFAULT_GLOBAL_CONFIG.knowledge);
   assert.equal(plan.compact, ".pipeline/knowledge/knowledge.compact.md");
+  assert.equal(plan.global_projection.compact, "~/.hypo-workflow/knowledge/projections/projects/{project_id}.compact.md");
+  assert.equal(plan.global_projection.index, "~/.hypo-workflow/knowledge/projections/projects/{project_id}.yaml");
+  assert.deepEqual(plan.global_projection.records, []);
   assert.deepEqual(plan.indexes, [
     ".pipeline/knowledge/index/dependencies.yaml",
     ".pipeline/knowledge/index/references.yaml",
@@ -91,6 +96,97 @@ test("knowledge config defaults load compact plus category indexes only at Sessi
     ".pipeline/knowledge/index/secret-refs.yaml",
   ]);
   assert.deepEqual(plan.records, []);
+});
+
+test("project global projection keeps only project-relevant accepted global knowledge", () => {
+  const projection = buildProjectGlobalKnowledgeProjection({
+    project_id: "hypo-workflow",
+    generated_at: "2026-05-20T16:30:00+08:00",
+    global_knowledge_projection: {
+      projection: "global_knowledge",
+      entries: [
+        {
+          id: "global.notion-sync-pitfall",
+          status: "accepted",
+          type: "pitfall",
+          title: "Notion sync layout pitfall",
+          summary: "Do not treat block conversion as information architecture cleanup.",
+          tags: ["notion", "sync"],
+          project_ids: ["hypo-workflow"],
+          evidence_refs: ["~/.hypo-workflow/maintenance/ledger.yaml#notion-sync"],
+        },
+        {
+          id: "global.other-project-only",
+          status: "accepted",
+          title: "Other project fact",
+          summary: "OTHER_PROJECT_SHOULD_NOT_PROJECT",
+          project_ids: ["hypo-writer"],
+        },
+        {
+          id: "global.pending",
+          status: "pending_review",
+          title: "Pending fact",
+          summary: "PENDING_SHOULD_NOT_PROJECT",
+          project_ids: ["hypo-workflow"],
+        },
+      ],
+    },
+    infrastructure_projection: {
+      projection: "infrastructure_facts",
+      facts: [
+        {
+          id: "infra.hypo-workflow-local",
+          title: "Hypo-Workflow local workspace",
+          summary: "Canonical path is available as a project fact.",
+          project_ids: ["hypo-workflow"],
+          authorization: "Bearer raw-token",
+          evidence_refs: ["~/.hypo-workflow/workspace.yaml#projects.hypo-workflow"],
+        },
+      ],
+    },
+    project_registry: [
+      {
+        id: "hypo-workflow",
+        display_name: "Hypo-Workflow",
+        path: "/home/heyx/Hypo-Workflow",
+        status: "active",
+        raw_secret: "sk-raw-project-secret",
+        relationships: [{ kind: "related", target: "hypo-claw" }],
+      },
+    ],
+    secret_capability_projection: {
+      secret_refs: [
+        {
+          id: "notion-main",
+          provider: "notion",
+          project_ids: ["hypo-workflow"],
+          allowed_for: ["project_home_sync"],
+          secret_ref: { store_ref: "local_secret:notion-main" },
+          token: "raw-notion-token",
+        },
+      ],
+    },
+    raw_knowledge_records: [{ id: "raw", details: "RAW_RECORD_SHOULD_NOT_PROJECT" }],
+  });
+
+  assert.equal(projection.projection, "project_global_knowledge");
+  assert.equal(projection.project_id, "hypo-workflow");
+  assert.equal(projection.raw_global_records_copied, false);
+  assert.equal(projection.facts.canonical_path, "/home/heyx/Hypo-Workflow");
+  assert.deepEqual(projection.relationships, [{ kind: "related", target: "hypo-claw" }]);
+  assert.ok(projection.entries.some((entry) => entry.id === "global.notion-sync-pitfall"));
+  assert.ok(projection.infrastructure.some((fact) => fact.id === "infra.hypo-workflow-local"));
+  assert.ok(projection.secret_refs.some((ref) => ref.id === "notion-main"));
+
+  const serialized = JSON.stringify(projection);
+  assert.doesNotMatch(serialized, /OTHER_PROJECT_SHOULD_NOT_PROJECT|PENDING_SHOULD_NOT_PROJECT|RAW_RECORD_SHOULD_NOT_PROJECT/);
+  assert.doesNotMatch(serialized, /raw-token|raw-notion-token|sk-raw-project-secret|authorization|token|raw_secret/i);
+
+  const compact = renderProjectGlobalProjectionCompact(projection);
+  assert.match(compact, /# Global Knowledge Projection/);
+  assert.match(compact, /Project: hypo-workflow/);
+  assert.match(compact, /Notion sync layout pitfall/);
+  assert.doesNotMatch(compact, /RAW_RECORD|raw-notion-token/);
 });
 
 test("knowledge specs and skill document command semantics and state boundary", async () => {
@@ -139,7 +235,7 @@ test("knowledge command is exposed through the canonical OpenCode command map", 
   const commands = commandMap("opencode");
   const knowledge = commandByCanonical("/hw:knowledge");
 
-  assert.equal(commands.length, 41);
+  assert.equal(commands.length, 50);
   assert.equal(knowledge.opencode, "/hw-knowledge");
   assert.equal(knowledge.agent, "hw-compact");
   assert.equal(knowledge.route, "tool");

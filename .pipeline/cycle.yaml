@@ -1,10 +1,9 @@
 cycle:
-  number: 15
-  name: "Workflow交互细节与Analysis模式调查"
+  number: 16
+  name: "根目录项目管理模式"
   type: feature
-  status: completed
-  started: "2026-05-15T20:14:18+08:00"
-  completed: "2026-05-16T12:40:46+08:00"
+  status: active
+  started: "2026-05-18T15:24:00+08:00"
   preset: tdd
   workflow_kind: build
   lifecycle_policy:
@@ -14,6 +13,10 @@ cycle:
       next: complete
   continuations: []
   context_sources: []
-  previous_cycle: 14
-  summary: "Completed Workflow interaction improvements: P2 technical route gate, detailed completion reports, /hw:analysis recovery, shared state-init asset path repair, and integration smoke/readiness fixes."
-  lessons: "P2 must expose technical route for review; installed Codex skill bundles need explicit freshness checks; focused regression flags must be implemented rather than assumed."
+  previous_cycle: 15
+  summary: "C16 reopened after user rejection: Notion sync must reconcile the existing Hypo-Workflow page and its child pages instead of creating an additional child sync page only."
+  lessons: null
+  acceptance:
+    state: rejected
+    rejected_at: "2026-05-20T13:08:27+08:00"
+    feedback_ref: .pipeline/acceptance/cycle-C16-rejection-20260520T130827+0800.yaml

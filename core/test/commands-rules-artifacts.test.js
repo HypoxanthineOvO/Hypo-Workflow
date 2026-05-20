@@ -6,9 +6,20 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { commandByCanonical, commandMap, loadRulesSummary, writeOpenCodeArtifacts } from "../src/index.js";
 
-test("commandMap contains 41 OpenCode mappings", () => {
+const MAINTAIN_SUBCOMMANDS = Object.freeze([
+  "status",
+  "scan",
+  "plan",
+  "queue",
+  "run",
+  "apply",
+  "verify",
+  "log",
+]);
+
+test("commandMap contains 50 OpenCode mappings including /hw:maintain", () => {
   const commands = commandMap("opencode");
-  assert.equal(commands.length, 41);
+  assert.equal(commands.length, 50);
   assert.equal(commandByCanonical("/hw:plan").opencode, "/hw-plan");
   assert.equal(commandByCanonical("/hw:plan:deep").opencode, "/hw-plan-deep");
   assert.equal(commandByCanonical("/hw:report").agent, "hw-report");
@@ -27,6 +38,19 @@ test("commandMap contains 41 OpenCode mappings", () => {
   assert.equal(commandByCanonical("/hw:pr create").opencode, "/hw-pr-create");
   assert.equal(commandByCanonical("/hw:pr create").agent, "hw-build");
   assert.equal(commandByCanonical("/hw:explain").opencode, "/hw-explain");
+
+  const maintain = commandByCanonical("/hw:maintain");
+  assert.equal(maintain.opencode, "/hw-maintain");
+  assert.equal(maintain.agent, "hw-build");
+  assert.equal(maintain.route, "maintenance");
+  assert.equal(maintain.skill, "skills/maintain/SKILL.md");
+  for (const subcommand of MAINTAIN_SUBCOMMANDS) {
+    const command = commandByCanonical(`/hw:maintain ${subcommand}`);
+    assert.equal(command.opencode, `/hw-maintain-${subcommand}`);
+    assert.equal(command.agent, "hw-build");
+    assert.equal(command.route, "maintenance");
+    assert.equal(command.skill, "skills/maintain/SKILL.md");
+  }
 });
 
 test("loadRulesSummary reads builtin rules", async () => {

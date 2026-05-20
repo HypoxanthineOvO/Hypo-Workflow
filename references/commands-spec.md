@@ -12,7 +12,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 - Claude Code exposes canonical commands through plugin-root `commands/` files under a plugin whose namespace is `hw`; those slash-command files must load the existing Hypo-Workflow skill files instead of duplicating a second implementation
 - Claude Code `/hw:*` entries are plugin slash-command mappings backed by the existing `skills/*/SKILL.md` authority
 - Claude Code native `/resume` remains owned by Claude Code; Hypo-Workflow must never register or document bare `/resume` as an alias for `/hw:resume`
-- V12 canonical namespace contains user-facing commands across Setup, Pipeline, Plan, Lifecycle, Docs, Review, Explain, and Utility groups, plus an internal cron-only watchdog skill
+- V12 canonical namespace contains 50 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Maintenance, Docs, Review, Explain, and Utility groups, plus an internal cron-only watchdog skill
 - slash commands are exact and namespace-scoped
 - slash commands take precedence over fuzzy natural-language matching
 - natural-language commands remain valid for backward compatibility
@@ -58,6 +58,15 @@ For the user-facing command map, see `SKILL.md`.
    - `/hw:reject`
    - `/hw:explore`
    - `/hw:sync`
+   - `/hw:maintain`
+   - `/hw:maintain status`
+   - `/hw:maintain scan`
+   - `/hw:maintain plan`
+   - `/hw:maintain queue`
+   - `/hw:maintain run`
+   - `/hw:maintain apply`
+   - `/hw:maintain verify`
+   - `/hw:maintain log`
    - `/hw:docs`
    - `/hw:patch`
    - `/hw:pr`
@@ -65,7 +74,7 @@ For the user-facing command map, see `SKILL.md`.
 3. parse remaining tokens as command arguments
 4. flags are order-independent
 5. if a command is unknown, return exactly:
-   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:maintain, /hw:maintain status, /hw:maintain scan, /hw:maintain plan, /hw:maintain queue, /hw:maintain run, /hw:maintain apply, /hw:maintain verify, /hw:maintain log, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 6. if a known command receives an unsupported flag, stop and report the unsupported flag explicitly instead of guessing
 7. if a prompt selector is ambiguous, list the candidates and stop
 8. plan and review commands load `plan/PLAN-SKILL.md` before execution
@@ -254,9 +263,44 @@ Supported forms:
 Behavior:
 
 - read `SKILL.md` command tables as the source of truth
-- `/hw:help` lists all 41 user-facing commands grouped under Setup, Pipeline, Plan, Analysis, Lifecycle, Docs, Review, Explain, and Utility
+- `/hw:help` lists all 50 user-facing commands grouped under Setup, Pipeline, Plan, Analysis, Lifecycle, Maintenance, Docs, Review, Explain, and Utility
 - `/hw:help --quick` returns a compact cheat sheet
 - `/hw:help <cmd>` returns detailed usage, flags, and examples for the requested command
+
+### `/hw:maintain`
+
+Supported forms:
+
+- `/hw:maintain`
+- `/hw:maintain status`
+- `/hw:maintain scan`
+- `/hw:maintain plan`
+- `/hw:maintain queue`
+- `/hw:maintain run`
+- `/hw:maintain apply`
+- `/hw:maintain verify`
+- `/hw:maintain log`
+
+Behavior:
+
+- load `skills/maintain/SKILL.md`
+- manage maintenance operations under `~/.hypo-workflow/maintenance/`
+- use `queue.yaml` for maintenance operation queue authority
+- use `ledger.yaml` as sanitized append-only maintenance event authority
+- write evidence under `maintenance/evidence/` and backups under `maintenance/backups/`
+- require `kind: maintenance_operation`; do not accept Feature, Cycle, or Patch shaped queue items
+- support `kind: maintenance_run` as a higher-level maintenance orchestration object; do not accept Cycle, Patch, Feature, `milestones`, or `acceptance_criteria` shaped runs
+- maintenance run states are `planned`, `discovering_items`, `in_progress`, `waiting_review`, `waiting_confirmation`, `applying`, `verifying`, `completed`, `paused`, and `failed`
+- `/hw:maintain plan` may create generic orchestration runs from `planned_items`; planners must not hard-code a single daily-report template
+- `/hw:maintain run` may discover partitioned run subitems from local docs folder and Notion child-page tree inputs, then emit queue items with `review_group` based on `review_mode` (`per_item` or `batch`)
+- run transitions support `start`, `pause`, `resume`, `review`, `approve`, `verify`, and `complete`, preserving resumable cursor, resume token, and evidence refs
+- enforce side-effect gates before local authority writes, document writes, remote writes, destructive remote writes, and external actions
+- require backup metadata for `local_document_write_with_backup` and destructive remote writes
+- external notifications are `external_action` and require explicit confirmation before apply
+- run apply must ignore user-controlled `ledgerFile` input; ledger authority remains `root/maintenance/ledger.yaml`
+- recurring completed runs may produce `maintenance_template_candidate` records, but learned candidates default to `authority: non_authoritative`, `status: pending_review`, and `authoritative: false`; only explicit user-confirmed review may approve or promote them
+- preserve `/hw:sync` separation: `/hw:sync` synchronizes adapters and derived project context, while `/hw:maintain` manages long-lived maintenance queue/ledger/evidence state
+- `/hw:maintain` is not a runner and must not execute pipeline milestones
 
 ### `/hw:reset`
 
@@ -772,13 +816,19 @@ Supported forms:
 - `/hw:knowledge compact`
 - `/hw:knowledge index`
 - `/hw:knowledge search [--category <name>] [--tag <tag>] [--source <source>] [text]`
+- `/hw:knowledge global sync`
+- `/hw:knowledge global status`
+- `/hw:knowledge global search [text]`
+- `/hw:knowledge global view <id>`
 
 Behavior:
 
 - load `skills/knowledge/SKILL.md`
 - read `references/knowledge-spec.md`
 - inspect `.pipeline/knowledge/knowledge.compact.md` and `.pipeline/knowledge/index/*.yaml` by default
+- inspect `~/.hypo-workflow/knowledge/projections/projects/<project-id>.compact.md` and `<project-id>.yaml` when present
 - only load `.pipeline/knowledge/records/*.yaml` for `view` or narrow `search` results
+- only load raw global `~/.hypo-workflow/knowledge/records/*.yaml` for explicit `global view` or narrow `global search` results
 - redact `api_key`, `token`, `secret`, `password`, `authorization`, `access_token`, `refresh_token`, `client_secret`, and similar fields before display
 - never write raw secret values into `.pipeline/`
 - keep `.pipeline/state.yaml` compact and do not store full knowledge records there

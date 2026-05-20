@@ -12,7 +12,7 @@ import {
 
 const metadata = {
   name: "hypo-workflow",
-  version: "12.8.1",
+  version: "13.0.0-alpha.1",
   commandMap: [
   {
     "canonical": "/hw:start",
@@ -160,6 +160,69 @@ const metadata = {
     "agent": "hw-build",
     "route": "tool",
     "skill": "skills/sync/SKILL.md"
+  },
+  {
+    "canonical": "/hw:maintain",
+    "opencode": "/hw-maintain",
+    "agent": "hw-build",
+    "route": "maintenance",
+    "skill": "skills/maintain/SKILL.md"
+  },
+  {
+    "canonical": "/hw:maintain status",
+    "opencode": "/hw-maintain-status",
+    "agent": "hw-build",
+    "route": "maintenance",
+    "skill": "skills/maintain/SKILL.md"
+  },
+  {
+    "canonical": "/hw:maintain scan",
+    "opencode": "/hw-maintain-scan",
+    "agent": "hw-build",
+    "route": "maintenance",
+    "skill": "skills/maintain/SKILL.md"
+  },
+  {
+    "canonical": "/hw:maintain plan",
+    "opencode": "/hw-maintain-plan",
+    "agent": "hw-build",
+    "route": "maintenance",
+    "skill": "skills/maintain/SKILL.md"
+  },
+  {
+    "canonical": "/hw:maintain queue",
+    "opencode": "/hw-maintain-queue",
+    "agent": "hw-build",
+    "route": "maintenance",
+    "skill": "skills/maintain/SKILL.md"
+  },
+  {
+    "canonical": "/hw:maintain run",
+    "opencode": "/hw-maintain-run",
+    "agent": "hw-build",
+    "route": "maintenance",
+    "skill": "skills/maintain/SKILL.md"
+  },
+  {
+    "canonical": "/hw:maintain apply",
+    "opencode": "/hw-maintain-apply",
+    "agent": "hw-build",
+    "route": "maintenance",
+    "skill": "skills/maintain/SKILL.md"
+  },
+  {
+    "canonical": "/hw:maintain verify",
+    "opencode": "/hw-maintain-verify",
+    "agent": "hw-build",
+    "route": "maintenance",
+    "skill": "skills/maintain/SKILL.md"
+  },
+  {
+    "canonical": "/hw:maintain log",
+    "opencode": "/hw-maintain-log",
+    "agent": "hw-build",
+    "route": "maintenance",
+    "skill": "skills/maintain/SKILL.md"
   },
   {
     "canonical": "/hw:docs",

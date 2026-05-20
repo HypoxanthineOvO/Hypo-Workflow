@@ -1,42 +1,65 @@
-# C14 Architecture — Prompt/Workflow 兼容性审查
+# C16 Architecture — Root Workspace Maintenance Mode
 
 ## 工作类型
 
-C14 是审查型 Cycle。默认只读审查，不直接修复代码逻辑。所有发现进入报告、结构化 findings、修复队列和检查清单。
+C16 是 feature Cycle，目标是把“根目录项目管理模式”实现为 Global Workspace Maintenance 系统。该系统独立于普通 Cycle/Patch，但会读取并维护多个项目、文档、服务、技能、Notion 页面、Knowledge、Rules 和 Secret refs 的长期状态。
 
-## 审查域
+## 核心组件
 
-1. Workflow 语义与状态机
-2. 跨平台适配器兼容性（OpenCode / Claude Code / Codex）
-3. Prompt / Skill / Rules 冗余与冲突
-4. 测试健壮性与硬编码
-5. 文档、用户引导与贡献者体验
-6. 潜在扩展空间
+1. Global Workspace Authority
+   - `~/.hypo-workflow/workspace.yaml` 是全局对象、关系、sync target refs、policy refs 和 secret refs 的 authority。
+   - `~/.hypo-workflow/projects.yaml` 只作为 Global TUI/project switcher derived view。
 
-## 严重度
+2. Artifact Catalog
+   - 只读扫描项目、legacy 项目、pre-Workflow 项目、skill/service、publication 和 infrastructure artifacts。
+   - 输出 authority、freshness、parseability、sensitivity、projection 和 evidence refs。
 
-- P0: 阻塞或高概率破坏工作流的兼容性问题
-- P1: 高风险 drift、状态不一致、平台不一致
-- P2: 中风险硬编码、覆盖缺口、冗余冲突
-- P3: 改进项、文档缺口、重构候选
-- P4: 观察项或待验证假设
+3. Storage Sync Template
+   - 后端中立的 projection contract。
+   - Notion 是第一版 adapter，先支持 Project Home merge dry-run，最后阶段才 gated apply。
 
-## 输出产物
+4. Maintenance Substrate
+   - `/hw:maintain status|scan|plan|queue|run|apply|verify|log`
+   - `~/.hypo-workflow/maintenance/queue.yaml`
+   - `~/.hypo-workflow/maintenance/ledger.yaml`
+   - `cache/`、`evidence/`、`backups/`
 
-- `.pipeline/reports/C14-M0-baseline-index.md`
-- `.pipeline/reports/C14-M1-workflow-state-audit.md`
-- `.pipeline/reports/C14-M2-platform-compatibility-audit.md`
-- `.pipeline/reports/C14-M3-prompt-rules-audit.md`
-- `.pipeline/reports/C14-M4-test-hardcode-audit.md`
-- `.pipeline/reports/C14-M5-docs-onboarding-audit.md`
-- `.pipeline/reports/C14-compatibility-audit.md`
-- `.pipeline/reports/C14-findings.yaml`
-- `.pipeline/reports/C14-fix-queue.md`
-- `.pipeline/reports/C14-compatibility-checklist.md`
+5. Maintenance Run Engine
+   - 支持 orchestration run、partitioned run、system-initiated run、scheduled consolidation run、historical backfill run。
+   - 支持 pause/resume、per-item/batch/risk-tiered review、local backup、notification 和 template candidate learning。
+
+6. Global Consolidation
+   - 每日 04:00 读取 Codex/OpenCode/Claude sessions 和 Notion。
+   - 首次从 2026-03-01 起分片回填。
+   - 输出中文沉淀结果，并可进入 Notion projection dry-run。
+
+7. Global Projections
+   - Global Knowledge、infrastructure facts、effective rules matrix、secret refs/capability projections。
+   - 不复制 raw project records，不输出 raw secrets。
+
+## 外部副作用边界
+
+- C16-M1 到 C16-M8 不允许真实 Notion 写入。
+- C16-M9 只能消费已审核 dry-run bundle，并要求显式用户确认、target page ids、hash 匹配和 re-read verification。
+- 本地文档自动更新必须先写集中备份；git repo 目标还要提供 diff/patch evidence。
+- 发布渠道和 destructive remote writes 必须额外显式确认。
+- Raw secrets 只属于本地 Secret Store，不进入 workspace、Knowledge、Notion、报告、日志或 diff。
+
+## Milestone 顺序
+
+1. Workspace Authority Schema And Object Registry
+2. Artifact Catalog Scanner
+3. Storage Sync Template And Notion Merge Dry-Run
+4. Maintenance Command Surface Queue Ledger And Evidence Store
+5. Maintenance Run Engine And Template Learning
+6. Scheduled Global Consolidation And Chat Backfill
+7. Global Knowledge Rules And Secret Reference Projections
+8. End To End Dry-Run Review Pack
+9. Final Gated Notion Apply And Verification
 
 ## 验收规则
 
-- 正式 finding 必须有路径/行号或命令证据。
-- P0/P1 必须有影响范围与建议修复方向。
-- 无证据项进入 Pending hypotheses，不作为正式 finding。
-- 测试命令采用“发现后执行关键验证”；未执行必须记录原因。
+- 每个实现 Milestone 必须保留 P2 技术路线字段。
+- 每个 prompt 必须包含 Subworker Assignment Plan。
+- 测试必须是真实命令或可执行场景，不能用伪测试替代。
+- 审计必须检查 side-effect gates、redaction、worker separation 和状态/证据一致性。

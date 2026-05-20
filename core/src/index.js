@@ -45,3 +45,8 @@ export * from "./continuation/index.js";
 export * from "./preflight/index.js";
 export * from "./compact/index.js";
 export * from "./response/index.js";
+export * from "./workspace/index.js";
+export * from "./artifact-catalog/index.js";
+export * from "./storage-sync/index.js";
+export * from "./maintenance/index.js";
+export * from "./secrets/index.js";

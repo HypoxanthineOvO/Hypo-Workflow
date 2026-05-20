@@ -102,6 +102,42 @@
       "template": "Load the Hypo-Workflow skill instructions from `skills/sync/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
       "description": "Hypo-Workflow /hw:sync"
     },
+    "hw-maintain": {
+      "template": "Load the Hypo-Workflow skill instructions from `skills/maintain/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
+      "description": "Hypo-Workflow /hw:maintain"
+    },
+    "hw-maintain-status": {
+      "template": "Load the Hypo-Workflow skill instructions from `skills/maintain/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
+      "description": "Hypo-Workflow /hw:maintain status"
+    },
+    "hw-maintain-scan": {
+      "template": "Load the Hypo-Workflow skill instructions from `skills/maintain/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
+      "description": "Hypo-Workflow /hw:maintain scan"
+    },
+    "hw-maintain-plan": {
+      "template": "Load the Hypo-Workflow skill instructions from `skills/maintain/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
+      "description": "Hypo-Workflow /hw:maintain plan"
+    },
+    "hw-maintain-queue": {
+      "template": "Load the Hypo-Workflow skill instructions from `skills/maintain/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
+      "description": "Hypo-Workflow /hw:maintain queue"
+    },
+    "hw-maintain-run": {
+      "template": "Load the Hypo-Workflow skill instructions from `skills/maintain/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
+      "description": "Hypo-Workflow /hw:maintain run"
+    },
+    "hw-maintain-apply": {
+      "template": "Load the Hypo-Workflow skill instructions from `skills/maintain/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
+      "description": "Hypo-Workflow /hw:maintain apply"
+    },
+    "hw-maintain-verify": {
+      "template": "Load the Hypo-Workflow skill instructions from `skills/maintain/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
+      "description": "Hypo-Workflow /hw:maintain verify"
+    },
+    "hw-maintain-log": {
+      "template": "Load the Hypo-Workflow skill instructions from `skills/maintain/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
+      "description": "Hypo-Workflow /hw:maintain log"
+    },
     "hw-docs": {
       "template": "Load the Hypo-Workflow skill instructions from `skills/docs/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
       "description": "Hypo-Workflow /hw:docs"

@@ -12,7 +12,7 @@ import {
 } from "../rules/index.js";
 import { ASK_QUESTIONS_GUIDANCE, renderDeepSeekToolCallingRules } from "./agent-guidance.js";
 
-const HW_VERSION = "12.8.1";
+const HW_VERSION = "13.0.0-alpha.1";
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(MODULE_DIR, "..", "..", "..");
 

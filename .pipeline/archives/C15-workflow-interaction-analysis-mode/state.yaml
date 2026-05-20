@@ -1,0 +1,84 @@
+pipeline:
+  name: "C15 Workflow交互细节与Analysis模式调查"
+  status: completed
+  prompts_total: 5
+  prompts_completed: 5
+  started: "2026-05-15T23:37:41+08:00"
+  finished: "2026-05-16T12:40:46+08:00"
+last_heartbeat: "2026-05-16T13:09:34+08:00"
+current:
+  phase: completed
+  prompt_index: 4
+  prompt_file: .pipeline/prompts/04-integration-smoke-release-readiness.md
+  prompt_name: C15-M5 Integration Smoke And Release Readiness
+  step: completed
+  step_index: 4
+milestones:
+  - id: C15-M1
+    name: P2 Technical Route Gate
+    status: completed
+    prompt_file: .pipeline/prompts/00-p2-technical-route-gate.md
+    started_at: "2026-05-15T23:37:41+08:00"
+    completed_at: "2026-05-16T00:09:52+08:00"
+    report_file: .pipeline/reports/00-p2-technical-route-gate.report.md
+    revision_reason: "Audit blocked test because it depended on ignored runtime .plan-state/.pipeline prompt files."
+  - id: C15-M2
+    name: Detailed Completion Report Contract
+    status: completed
+    prompt_file: .pipeline/prompts/01-detailed-completion-report-contract.md
+    started_at: "2026-05-16T00:09:52+08:00"
+    completed_at: "2026-05-16T00:31:52+08:00"
+    report_file: .pipeline/reports/01-detailed-completion-report-contract.report.md
+  - id: C15-M3
+    name: Interactive Analysis State And Command Entry
+    status: completed
+    prompt_file: .pipeline/prompts/02-interactive-analysis-state-command-entry.md
+    started_at: "2026-05-16T00:31:52+08:00"
+    completed_at: "2026-05-16T01:59:20+08:00"
+    report_file: .pipeline/reports/02-interactive-analysis-state-command-entry.report.md
+  - id: C15-M4
+    name: Shared Skill Asset Path Contract
+    status: completed
+    prompt_file: .pipeline/prompts/03-shared-skill-asset-path-contract.md
+    started_at: "2026-05-16T01:59:20+08:00"
+    completed_at: "2026-05-16T12:23:47+08:00"
+    report_file: .pipeline/reports/03-shared-skill-asset-path-contract.report.md
+  - id: C15-M5
+    name: Integration Smoke And Release Readiness
+    status: completed
+    prompt_file: .pipeline/prompts/04-integration-smoke-release-readiness.md
+    started_at: "2026-05-16T12:23:47+08:00"
+    completed_at: "2026-05-16T12:40:46+08:00"
+    report_file: .pipeline/reports/04-integration-smoke-release-readiness.report.md
+history:
+  completed_prompts:
+    - id: C15-M1
+      prompt_index: 0
+      prompt_file: .pipeline/prompts/00-p2-technical-route-gate.md
+      report_file: .pipeline/reports/00-p2-technical-route-gate.report.md
+      completed_at: "2026-05-16T00:09:52+08:00"
+      result: completed
+    - id: C15-M2
+      prompt_index: 1
+      prompt_file: .pipeline/prompts/01-detailed-completion-report-contract.md
+      report_file: .pipeline/reports/01-detailed-completion-report-contract.report.md
+      completed_at: "2026-05-16T00:31:52+08:00"
+      result: completed
+    - id: C15-M3
+      prompt_index: 2
+      prompt_file: .pipeline/prompts/02-interactive-analysis-state-command-entry.md
+      report_file: .pipeline/reports/02-interactive-analysis-state-command-entry.report.md
+      completed_at: "2026-05-16T01:59:20+08:00"
+      result: completed
+    - id: C15-M4
+      prompt_index: 3
+      prompt_file: .pipeline/prompts/03-shared-skill-asset-path-contract.md
+      report_file: .pipeline/reports/03-shared-skill-asset-path-contract.report.md
+      completed_at: "2026-05-16T12:23:47+08:00"
+      result: completed
+    - id: C15-M5
+      prompt_index: 4
+      prompt_file: .pipeline/prompts/04-integration-smoke-release-readiness.md
+      report_file: .pipeline/reports/04-integration-smoke-release-readiness.report.md
+      completed_at: "2026-05-16T12:40:46+08:00"
+      result: completed

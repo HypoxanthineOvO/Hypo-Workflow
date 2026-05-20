@@ -151,6 +151,52 @@ export function resolveEffectiveStructuredRules(authority = {}) {
   return { rules, conflicts };
 }
 
+export function buildEffectiveRulesMatrix(authority = {}) {
+  const allRules = [
+    ...normalizeRuleCollection(authority.builtin, "builtin"),
+    ...normalizeRuleCollection(authority.global, "global"),
+    ...normalizeRuleCollection(authority.project, "project"),
+    ...normalizeRuleCollection(authority.cycle, "cycle"),
+    ...normalizeRuleCollection(authority.rules, "project"),
+  ].map((rule) => withProjectionEvidence(rule));
+
+  const byId = new Map();
+  for (const rule of allRules) {
+    if (!byId.has(rule.id)) byId.set(rule.id, []);
+    byId.get(rule.id).push(rule);
+  }
+
+  const rules = [];
+  const conflicts = [];
+  for (const [id, entries] of [...byId.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+    const sorted = [...entries].sort(compareRulePrecedence);
+    const [winner, ...overridden] = sorted;
+    const effective = ruleProjectionRef(winner);
+    const overrides = overridden.map((rule) => ruleProjectionRef(rule));
+    rules.push({
+      id,
+      effective,
+      overrides,
+    });
+
+    if (overrides.length) {
+      conflicts.push({
+        rule_id: id,
+        winner: effective,
+        overridden: overrides,
+      });
+    }
+  }
+
+  return {
+    projection: "effective_rules_matrix",
+    project_id: authority.project_id || null,
+    precedence: "cycle > project > global > builtin",
+    rules,
+    conflicts,
+  };
+}
+
 export async function loadStructuredRulesAuthority(projectRoot = ".", repoRoot = process.cwd(), options = {}) {
   const builtinRules = await loadBuiltinRules(
     join(repoRoot, "rules", "builtin"),
@@ -689,6 +735,34 @@ function ruleRef(rule) {
     scope: rule.scope,
     source_path: rule.source_path || null,
   };
+}
+
+function ruleProjectionRef(rule) {
+  return {
+    id: rule.id,
+    scope: rule.scope,
+    severity: rule.severity,
+    label: rule.label,
+    hooks: rule.hooks || [],
+    source_path: rule.source_path || null,
+    source: rule.source || {},
+    evidence_refs: normalizeEvidenceRefs(rule.evidence_refs, rule.source_path),
+    content: rule.content,
+    enforcement: rule.enforcement,
+  };
+}
+
+function withProjectionEvidence(rule) {
+  return {
+    ...rule,
+    evidence_refs: normalizeEvidenceRefs(rule.evidence_refs, rule.source_path),
+  };
+}
+
+function normalizeEvidenceRefs(value, sourcePath = null) {
+  const refs = normalizeStringList(value);
+  if (sourcePath && !refs.includes(sourcePath)) refs.push(sourcePath);
+  return refs;
 }
 
 function normalizeStringList(value) {

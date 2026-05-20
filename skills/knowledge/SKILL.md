@@ -30,7 +30,8 @@ description: Inspect and maintain Hypo-Workflow Knowledge Ledger records, indexe
 5. 对于 `compact`，根据用户请求的操作显示或重新生成 `.pipeline/knowledge/knowledge.compact.md`。
 6. 对于 `index`，检查或重新生成 `.pipeline/knowledge/index/` 下的类别索引。
 7. 对于 `search`，按类别、标签、来源或文本过滤，仅对匹配的候选项打开原始记录。
-8. 在显示任何记录内容之前编辑类似密钥的字段。
+8. 对于 `global status|sync|search|view`，只默认读取 `~/.hypo-workflow/knowledge/projections/projects/<project-id>.compact.md` 和 `<project-id>.yaml`；只有显式 `global view <id>` 或狭窄 `global search` 才能打开全局 raw records。
+9. 在显示任何记录内容之前编辑类似密钥的字段。
 
 ## 指令语义
 
@@ -39,12 +40,18 @@ description: Inspect and maintain Hypo-Workflow Knowledge Ledger records, indexe
 - `compact`：显示或重新生成紧凑摘要。
 - `index`：显示或重新生成生成的类别索引。
 - `search`：按 `category`、`tag`、`source` 或自由文本过滤。
+- `global status`：显示当前项目是否有全局 projection，以及 SessionStart 会加载哪些 projection 文件。
+- `global sync`：从 accepted 全局记录、accepted consolidation candidates、项目 registry、基础设施 facts 和 metadata-only secret refs 重新生成当前项目的只读 projection。
+- `global search`：搜索全局 projection/index；默认不加载 raw global records。
+- `global view <id>`：显式查看一条全局 raw record，输出前必须脱敏。
 
 ## 安全规则
 
 - 切勿将原始 API 密钥、令牌、密码、授权头或密钥写入 `.pipeline/`。
 - 真实值属于 `~/.hypo-workflow/secrets.yaml` 或环境变量。
 - 保持 `.pipeline/state.yaml` 紧凑；不要在运行时状态中存储完整的知识记录。
+- 项目 Workflow 默认只能读取全局 projection，不能默认读取 `~/.hypo-workflow/knowledge/records/` 或 `candidates/`。
+- 全局 projection 不得包含 pending/rejected candidates、raw session、raw Notion blocks、raw maintenance evidence payload 或 raw secret。
 - 此技能不是运行器，不执行 Milestone。
 - M01 定义了契约。完整的钩子捕获和自动 SessionStart 集成属于后续 milestone。
 

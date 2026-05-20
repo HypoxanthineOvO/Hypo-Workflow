@@ -22,6 +22,7 @@ export const LIFECYCLE_LOG_FAMILIES = Object.freeze([
   "release",
   "watchdog",
   "chat",
+  "deep_plan",
 ]);
 
 export const LIFECYCLE_LOG_STATUSES = Object.freeze([
@@ -52,6 +53,13 @@ export const LIFECYCLE_LOG_STATUSES = Object.freeze([
   "remote_review_submitted",
   "rereview_passed",
   "merged",
+  "researching",
+  "module_drilldown",
+  "architecture_mapping",
+  "drafted",
+  "ready",
+  "revision",
+  "in_progress",
 ]);
 
 const RECENT_FAMILIES = new Set([
@@ -188,6 +196,7 @@ export function logFamily(type) {
   const normalized = normalizeLogType(type);
   if (!normalized) return null;
   if (normalized === "plan_review" || normalized.startsWith("plan_")) return "plan";
+  if (normalized.startsWith("deep_plan")) return "deep_plan";
   if (normalized.startsWith("cycle")) return "cycle";
   if (normalized.startsWith("feature")) return "feature";
   if (normalized.startsWith("milestone")) return "milestone";
@@ -195,8 +204,10 @@ export function logFamily(type) {
   if (normalized.startsWith("worker")) return "step";
   if (normalized.startsWith("patch")) return "patch";
   if (normalized.startsWith("pr")) return "pr";
+  if (normalized.startsWith("revision")) return "step";
   if (normalized.startsWith("acceptance") || normalized.startsWith("cycle_accept") || normalized.startsWith("cycle_reject")) return "acceptance";
   if (normalized.startsWith("sync")) return "sync";
+  if (normalized.startsWith("external_sync")) return "sync";
   if (normalized.startsWith("recovery") || normalized.includes("lease") || normalized.includes("takeover")) return "recovery";
   if (normalized.startsWith("handoff")) return "handoff";
   if (normalized.startsWith("derived")) return "derived_refresh";

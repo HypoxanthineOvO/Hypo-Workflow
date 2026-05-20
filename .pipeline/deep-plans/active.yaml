@@ -1,0 +1,6 @@
+active:
+  id: DP001
+  title: 根目录项目管理模式
+  status: ready_for_plan
+  package_path: .pipeline/deep-plans/DP001-root-project-management-mode
+  updated_at: "2026-05-18T23:15:30+08:00"

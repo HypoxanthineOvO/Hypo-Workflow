@@ -6514,3 +6514,1729 @@ entries:
       - "checkDocs/checkDocsLanguage/checkNarrativeDocsForRelease/checkReadmeFreshness: passing"
       - "node cli/bin/hypo-workflow sync --platform opencode --project . --check-only: derived=fresh"
       - "git diff --check: passing"
+  -
+    id: CYCLE-ARCHIVE-C15-20260518T152400+0800
+    type: cycle_archive
+    ref: C15
+    status: completed
+    timestamp: "2026-05-18T15:24:00+08:00"
+    summary: "Archived completed C15 local runtime before creating the next Cycle."
+    report: .pipeline/archives/C15-workflow-interaction-analysis-mode/summary.md
+    trigger: manual
+  -
+    id: CYCLE-NEW-C16-20260518T152400+0800
+    type: cycle_new
+    ref: C16
+    status: active
+    timestamp: "2026-05-18T15:24:00+08:00"
+    summary: "Created C16 for root-directory project management mode and initialized the Cycle for Deep Plan and local research."
+    trigger: manual
+  -
+    id: DEEP-PLAN-RESEARCH-C16-DP001-20260518T152400+0800
+    type: deep_plan_research
+    ref: C16/DP001
+    status: researching
+    timestamp: "2026-05-18T15:24:00+08:00"
+    summary: "Created the root project management mode Deep Plan package and recorded first-round local read-only research evidence across registry, TUI, sync, project summary, and status surfaces."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/summary.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-ASK-C16-DP001-20260518T153658+0800
+    type: deep_plan_ask
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T15:36:58+08:00"
+    summary: "Recorded user motivation: root mode should address long-lived maintenance objects such as Notion sync targets and writing articles, not just one-off Cycles or project registry summaries."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/summary.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-MAP-C16-DP001-20260518T154444+0800
+    type: deep_plan_map
+    ref: C16/DP001
+    status: architecture_mapping
+    timestamp: "2026-05-18T15:44:44+08:00"
+    summary: "Confirmed the generalized long-lived maintenance object mode and mapped initial components: maintenance lifecycle, object registry, object ledger, policy engine, operation queue, Notion adapter, and root entry."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/architecture.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-MAP-C16-DP001-ARTIFACTS-20260518T155001+0800
+    type: deep_plan_map
+    ref: C16/DP001
+    status: architecture_mapping
+    timestamp: "2026-05-18T15:50:01+08:00"
+    summary: "Accepted generalized maintenance mode as necessary because Notion sync must cover progress, architecture, prompts, reports, docs, and other Workflow artifacts; added artifact catalog and projection engine to the architecture."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/architecture.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-DRILL-C16-DP001-STORAGE-20260518T155928+0800
+    type: deep_plan_drill
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T15:59:28+08:00"
+    summary: "Recorded the storage sync template direction: all core Workflow artifacts are in scope, Notion is the first backend, ntn discovery must be read-only and scoped, and early milestones should build progress anchor pages before per-artifact storage decisions."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/architecture.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-OPTIONS-C16-DP001-20260518T160336+0800
+    type: deep_plan_ask
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T16:03:36+08:00"
+    summary: "Positioned the first version as Deep Research and recorded design options: Notion-first generic template, local authoritative projection, dry-run first, progress anchors, adoption tiers, and representative ntn discovery."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/readiness.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-DRILL-C16-DP001-PROJECT-HOME-20260518T160939+0800
+    type: deep_plan_drill
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T16:09:39+08:00"
+    summary: "Refined progress anchors into a Project Home page tree and narrowed first Notion/storage pilot to the current Hypo-Workflow project."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/architecture.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-RESEARCH-C16-DP001-NOTION-ACCESS-20260518T161727+0800
+    type: deep_plan_research
+    ref: C16/DP001
+    status: blocked
+    timestamp: "2026-05-18T16:17:27+08:00"
+    summary: "Ran read-only ntn discovery for the user-provided Notion path; authentication succeeded, but target title searches and empty page-only search returned zero pages, so schema discovery now requires a target page URL/id or integration sharing."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/readiness.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-RESEARCH-C16-DP001-NOTION-SCHEMA-20260518T162833+0800
+    type: deep_plan_research
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T16:28:33+08:00"
+    summary: "Used the provided Hypoxanthine's Home page URL for read-only ntn discovery; mapped Hypo Projects as an H1 page-section child-page collection and Hypo-Workflow as an existing pre-Workflow project page with README-style content and legacy V/C child pages."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/summary.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-DRILL-C16-DP001-LEGACY-RECONCILIATION-20260518T170822+0800
+    type: deep_plan_drill
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T17:08:22+08:00"
+    summary: "Recorded user correction that the existing Hypo-Workflow Notion page should be reorganized and merged with current Workflow artifacts into one unified Project Home, not appended to or separated into a new sync page."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/readiness.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-DRILL-C16-DP001-CONTENT-DOMAIN-TREE-20260518T171423+0800
+    type: deep_plan_drill
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T17:14:23+08:00"
+    summary: "Recorded that the canonical Notion Project Home tree is content-domain-first; timelines live inside content domains such as Cycle pages, and derived index pages must link back to canonical content pages."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/readiness.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-DRILL-C16-DP001-DOMAIN-SUBTREES-20260518T173327+0800
+    type: deep_plan_drill
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T17:33:27+08:00"
+    summary: "Recorded that Architecture, Knowledge, and Docs must each be canonical Project Home subpage trees, and narrowed the next discussion to concrete first-version tree choices."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/readiness.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-DRILL-C16-DP001-PLAIN-LANGUAGE-TREE-20260518T174058+0800
+    type: deep_plan_drill
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T17:40:58+08:00"
+    summary: "Recorded that the previous subtree questions used unclear internal terms; restated Progress and Architecture choices as plain-language page responsibilities, marked Docs as categorized, and left Prompts/Reports canonical placement undecided."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/readiness.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-DRILL-C16-DP001-PROJECT-HOME-TREE-ACCEPTED-20260518T174929+0800
+    type: deep_plan_drill
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T17:49:29+08:00"
+    summary: "Accepted the first Project Home content-domain subtree and Prompts/Reports placement: canonical prompts and reports live under Cycle pages, with global index pages linking back."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/summary.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-RESEARCH-C16-DP001-NOTION-MAPPING-20260518T175845+0800
+    type: deep_plan_research
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T17:58:45+08:00"
+    summary: "Read the Hypo-Workflow Notion page in read-only mode and generated a local mapping dry-run for 87 top-level blocks and 34 child pages against the accepted Project Home tree; no Notion writes were performed."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/notion-hypo-workflow-mapping.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-DRILL-C16-DP001-GLOBAL-WORKSPACE-20260518T180657+0800
+    type: deep_plan_drill
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T18:06:57+08:00"
+    summary: "Converted the Notion mapping dry-run report to Chinese and added the Global Workspace layer to the Deep Plan: project registry, project link graph, global rules, secret references, global knowledge index, sync targets, and maintenance queue. Secret handling is references-only with no raw values synced."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/summary.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-RESEARCH-C16-DP001-GLOBAL-PROJECTS-20260518T181941+0800
+    type: deep_plan_research
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T18:19:41+08:00"
+    summary: "Corrected the Global Secret boundary to allow raw keys only in a local global secret store, then ran a local project discovery pass: the current global registry has 2 entries, while /home/heyx top-level contains 28 .pipeline projects, 37 git projects, and 42 README/package/build candidates."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/summary.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-RESEARCH-C16-DP001-NOTION-PROJECTS-20260518T182752+0800
+    type: deep_plan_research
+    ref: C16/DP001
+    status: module_drilldown
+    timestamp: "2026-05-18T18:27:52+08:00"
+    summary: "Read the Notion Hypo Projects section in read-only mode and found 19 child pages, which do not match the 2-entry local registry or the 28 local top-level .pipeline projects. Recorded the need for three-way project reconciliation."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/summary.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-RESEARCH-C16-DP001-DR001-RECONCILIATION-20260518T190213+0800
+    type: deep_plan_research
+    ref: C16/DP001/DR001
+    status: completed
+    timestamp: "2026-05-18T19:02:13+08:00"
+    summary: "Recorded the Deep Research backlog and completed DR001 project reconciliation manifest, mapping local registry, local top-level projects, and Notion Hypo Projects child pages into matched, alias-matched, local-only, notion-only, possible-match, and relation-review groups."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/global-project-reconciliation.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-RESEARCH-C16-DP001-DR002-TAXONOMY-20260518T192156+0800
+    type: deep_plan_research
+    ref: C16/DP001/DR002
+    status: completed
+    timestamp: "2026-05-18T19:21:56+08:00"
+    summary: "Completed DR002 project classification taxonomy with registry inclusion thresholds, default actions, and DR001 project applications; next research item is the Global Workspace source-of-truth decision."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/project-classification-taxonomy.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-RESEARCH-C16-DP001-DR003-SOURCE-OF-TRUTH-20260518T193807+0800
+    type: deep_plan_research
+    ref: C16/DP001/DR003
+    status: completed
+    timestamp: "2026-05-18T19:38:07+08:00"
+    summary: "Completed DR003 Global Workspace source-of-truth decision: ~/.hypo-workflow/workspace.yaml is the user-level authority, ~/.hypo-workflow/projects.yaml remains the derived compatibility view for Global TUI/project switcher, and ~/.hypo-workflow/maintenance/ stores queues, ledgers, caches, and dry-run/apply evidence."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/global-workspace-source-of-truth.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-RESEARCH-C16-DP001-DR004-SECRET-STORE-DRAFT-20260518T201047+0800
+    type: deep_plan_research
+    ref: C16/DP001/DR004
+    status: drafted
+    timestamp: "2026-05-18T20:10:47+08:00"
+    summary: "Drafted DR004 Global Secret Store schema from user answers: ~/.hypo-workflow/secrets.yaml is the usable raw secret authority, Agent may read/migrate/use secrets and records audit events, while workspace/Notion/Knowledge/reports/diffs/logs only store projections and never raw values."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/global-secret-store-schema.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-RESEARCH-C16-DP001-DR004-SECRET-STORE-COMPLETED-20260518T211355+0800
+    type: deep_plan_research
+    ref: C16/DP001/DR004
+    status: completed
+    timestamp: "2026-05-18T21:13:55+08:00"
+    summary: "Completed DR004 Global Secret Store policy: ~/.hypo-workflow/secrets.yaml is unencrypted in v1 but must be chmod 600, Agent may auto-read raw secrets when task capabilities match, health checks use real provider calls by default with sanitized records, and Hypo-Claw API capabilities include notify, read status, pull tasks, and sync reports."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/global-secret-store-schema.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-RESEARCH-C16-DP001-DR005-DR006-SAMPLES-20260518T222108+0800
+    type: deep_plan_research
+    ref: C16/DP001/DR005-DR006
+    status: ready
+    timestamp: "2026-05-18T22:21:08+08:00"
+    summary: "Recorded representative sample selection for DR005/DR006 and updated successor relations: Hypo-Info is archived legacy for Hypo-Info-V2, Hypo-Agent is archived legacy for Hypo-Claw, Notion deep-read samples are Hypo-Info, Hypo-Agent, Hypo-GPU, and Hypo-Image, and local artifact inventory samples are Hypo-Info-V2/Hypo-Info, Hypo-Claw/Hypo-Agent, Hypo-GPU, Hypo-Writer, and the hypo-image skill."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/representative-sample-selection.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-RESEARCH-C16-DP001-DR005-DR012-COMPLETED-20260518T231530+0800
+    type: deep_plan_research
+    ref: C16/DP001/DR005-DR012
+    status: completed
+    timestamp: "2026-05-18T23:15:30+08:00"
+    summary: "Completed the DR005-DR012 research batch: representative Notion page deep read, sample Artifact Catalog inventory, Global Knowledge aggregation, Project Link Graph taxonomy, sync authority/conflict matrix, Maintenance Queue lifecycle, Global Rules projection, and conversion readiness checklist. Deep Plan is now ready_for_plan pending one implementation-boundary decision."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/conversion-readiness-checklist.md
+    trigger: manual
+  -
+    id: DEEP-PLAN-DECISION-C16-DP001-FINAL-GATED-APPLY-20260519T010013+0800
+    type: deep_plan_decision
+    ref: C16/DP001/D044
+    status: accepted
+    timestamp: "2026-05-19T01:00:13+08:00"
+    summary: "User confirmed that the first-version plan should include a real Notion apply path, but only as the final phase after schema/scanner/dry-run/merge plan review and explicit apply confirmation."
+    report: .pipeline/deep-plans/DP001-root-project-management-mode/conversion-readiness-checklist.md
+    trigger: manual
+  -
+    id: PLAN-P2-DECOMPOSE-C16-ROOT-MANAGEMENT-20260519T133213+0800
+    type: plan_decompose
+    ref: C16/P2
+    status: proposed
+    timestamp: "2026-05-19T13:32:13+08:00"
+    summary: "Converted DP001 into ordinary /hw:plan artifacts: reused C15 P0 authorization, captured Deep Research as P1 Discover, and generated a seven-milestone P2 technical route ending with final gated Notion apply. P2 is waiting for user confirmation before P3 prompt generation."
+    report: .plan-state/technical-route.md
+    trigger: manual
+  -
+    id: PLAN-P2-REVISION-C16-MAINTAIN-COMMAND-SURFACE-20260519T135029+0800
+    type: plan_decompose_revision
+    ref: C16/P2
+    status: revision
+    timestamp: "2026-05-19T13:50:29+08:00"
+    summary: "User challenged that Maintenance needs an explicit /hw:* command surface. Revised P2 to add `/hw:maintain` with status, scan, plan, queue, apply, verify, and log subcommands, and separated it from existing `/hw:sync` semantics."
+    report: .plan-state/technical-route.md
+    trigger: manual
+  -
+    id: PLAN-P1-DISCOVER-REVISION-C16-MAINTENANCE-RUNS-20260519T140400+0800
+    type: plan_discover_revision
+    ref: C16/P1
+    status: in_progress
+    timestamp: "2026-05-19T14:04:00+08:00"
+    summary: "User identified that previous Deep Plan covered Notion sync/global workspace but did not sufficiently discover proactive user-initiated Maintenance Runs, such as daily AI noon report. Returned P2 to P1 Discover revision before regenerating decomposition."
+    report: .plan-state/discover.yaml
+    trigger: manual
+  -
+    id: PLAN-P1-DISCOVER-C16-MAINTENANCE-RUNS-ROUND1-20260519T141130+0800
+    type: plan_discover
+    ref: C16/P1/maintenance-runs
+    status: in_progress
+    timestamp: "2026-05-19T14:11:30+08:00"
+    summary: "Captured first Maintenance Run discover round: daily AI noon report is an orchestration-style run that may create/publish WeChat drafts with confirmation and notify status; proactive maintenance also needs partitioned runs for many documents/subitems inside one object."
+    report: .plan-state/discover.yaml
+    trigger: manual
+  -
+    id: PLAN-P1-DISCOVER-C16-MAINTENANCE-RUNS-ROUND2-20260519T141511+0800
+    type: plan_discover
+    ref: C16/P1/maintenance-runs
+    status: in_progress
+    timestamp: "2026-05-19T14:15:11+08:00"
+    summary: "Captured second Maintenance Run discover round: partitioned maintenance should auto-discover subitems; maintenance initiation has system-initiated and user-directed modes; review granularity can be per-item or batch; Global Knowledge should include infrastructure/server facts with sensitivity and freshness metadata."
+    report: .plan-state/discover.yaml
+    trigger: manual
+  -
+    id: PLAN-P1-DISCOVER-C16-MAINTENANCE-RUNS-ROUND3-20260519T141912+0800
+    type: plan_discover
+    ref: C16/P1/maintenance-runs
+    status: in_progress
+    timestamp: "2026-05-19T14:19:12+08:00"
+    summary: "Captured third Maintenance Run discover round: system-initiated maintenance may notify and auto-update local docs with user notice and backups; user-directed templates should be learned/promoted from recurring runs; infrastructure/server facts may enter Global Knowledge while raw secrets remain Secret Store only."
+    report: .plan-state/discover.yaml
+    trigger: manual
+  -
+    id: PLAN-P1-DISCOVER-C16-MAINTENANCE-RUNS-ROUND4-20260519T142334+0800
+    type: plan_discover
+    ref: C16/P1/maintenance-runs
+    status: in_progress
+    timestamp: "2026-05-19T14:23:34+08:00"
+    summary: "Captured fourth Maintenance Run discover round: automatic local doc updates should use centralized maintenance backups plus git diff/patch evidence; recurring runs can generate candidate templates automatically; system-initiated maintenance should run a daily 04:00 global consolidation over chat records, with initial backfill from March 2026 to now."
+    report: .plan-state/discover.yaml
+    trigger: manual
+  -
+    id: PLAN-P1-DISCOVER-C16-MAINTENANCE-RUNS-ROUND5-20260519T142704+0800
+    type: plan_discover
+    ref: C16/P1/maintenance-runs
+    status: in_progress
+    timestamp: "2026-05-19T14:27:04+08:00"
+    summary: "Captured fifth Maintenance Run discover round: global consolidation should read Codex/OpenCode/Claude sessions and Notion, present outputs in Chinese, sync consolidation results to Notion, and support resumable sharded backfill."
+    report: .plan-state/discover.yaml
+    trigger: manual
+  -
+    id: PLAN-P2-DECOMPOSE-REVISION-C16-MAINTENANCE-RUNS-20260519T144237+0800
+    type: plan_decompose_revision
+    ref: C16/P2
+    status: proposed
+    timestamp: "2026-05-19T14:42:37+08:00"
+    summary: "Revised P2 after Maintenance Run discovery: expanded the plan to nine milestones covering /hw:maintain commands, Maintenance Run engine, template learning, scheduled 04:00 global consolidation, chat backfill, global projections, end-to-end dry-run review, and final gated Notion apply. P3 remains blocked until user confirms the technical route."
+    report: .plan-state/technical-route.md
+    trigger: manual
+  -
+    id: PLAN-P3-GENERATE-C16-ROOT-MAINTENANCE-20260519T150500+0800
+    type: plan_generate
+    ref: C16/P3
+    status: completed
+    timestamp: "2026-05-19T15:05:00+08:00"
+    summary: "User confirmed the revised P2 technical route and authorized Subagents. Generated nine C16 execution prompts, C16 architecture baseline, and P4 confirm summary. Cycle is waiting for P4 confirmation before /hw:start."
+    report: .pipeline/confirm-summary.md
+    trigger: manual
+  -
+    id: M1-START-C16-20260519T151813+0800
+    type: milestone_start
+    ref: C16/M1
+    status: active
+    timestamp: "2026-05-19T15:18:13+08:00"
+    summary: "Started C16-M1 Workspace Authority Schema And Object Registry after user confirmed P4 and authorized Subagents. Entered write_tests with Worker Separation recommended."
+    report: .pipeline/prompts/00-workspace-authority-schema-object-registry.md
+    trigger: manual
+  -
+    id: M1-TEST-WORKER-START-C16-20260519T152000+0800
+    type: worker_start
+    ref: C16/M1/test
+    status: active
+    timestamp: "2026-05-19T15:20:00+08:00"
+    summary: "Started C16-M1 test worker Gauss for workspace authority schema, project link graph, derived projects.yaml, and secret-ref RED tests."
+    report: .pipeline/reviews/C16/M1/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M1
+    worker:
+      role: test
+      id: "019e3f1b-26c1-7923-86a5-fd3974d88128"
+      nickname: Gauss
+      lifecycle: requested/started
+  -
+    id: M1-TEST-WORKER-COMPLETE-C16-20260519T152341+0800
+    type: worker_complete
+    ref: C16/M1/test
+    status: completed
+    timestamp: "2026-05-19T15:23:41+08:00"
+    summary: "C16-M1 test worker Gauss completed RED tests for workspace authority and project link graph. Focused command failed as expected because the root API exports are not implemented yet: buildProjectLinkGraph and deriveProjectRegistryFromWorkspace."
+    report: .pipeline/reviews/C16/M1/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M1
+    tests:
+      - "node --test core/test/global-config-registry.test.js core/test/workspace-authority.test.js core/test/project-link-graph.test.js: expected RED, 6 existing tests passed and 2 new test files failed on missing exports"
+    worker:
+      role: test
+      id: "019e3f1b-26c1-7923-86a5-fd3974d88128"
+      nickname: Gauss
+      lifecycle: completed
+  -
+    id: M1-IMPLEMENT-WORKER-COMPLETE-C16-20260519T153400+0800
+    type: worker_complete
+    ref: C16/M1/implement
+    status: completed
+    timestamp: "2026-05-19T15:34:00+08:00"
+    summary: "C16-M1 implement worker Heisenberg added workspace authority APIs and root exports. Main validation passed focused GREEN checks for global registry, workspace authority, and project link graph."
+    report: .pipeline/reviews/C16/M1/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M1
+    tests:
+      - "node --test core/test/global-config-registry.test.js core/test/workspace-authority.test.js core/test/project-link-graph.test.js: 15/15 passing"
+      - "git diff --check targeted M1 files: passing"
+    worker:
+      role: implement
+      id: "019e3f1f-8fe2-7903-83d8-e37ed1fdd7cb"
+      nickname: Heisenberg
+      lifecycle: completed
+  -
+    id: M1-AUDIT-BLOCKER-C16-20260519T154200+0800
+    type: worker_complete
+    ref: C16/M1/audit
+    status: needs_changes
+    timestamp: "2026-05-19T15:42:00+08:00"
+    summary: "C16-M1 audit worker Peirce found a blocker: derived projects.yaml output can carry raw secrets from compatibility registry fields such as acceptance.token or knowledge.password. Audit also warned that derived_views.projects_yaml.authority is not validated as derived_from_workspace. M1 returned to revision."
+    report: .pipeline/reviews/C16/M1/audit.md
+    trigger: auto
+    related_milestone: C16-M1
+    worker:
+      role: audit
+      id: "019e3f27-de63-79b3-bdb2-f4f2341113a1"
+      nickname: Peirce
+      lifecycle: completed_needs_changes
+  -
+    id: M1-TEST-REVISION-COMPLETE-C16-20260519T154300+0800
+    type: worker_complete
+    ref: C16/M1/test-revision
+    status: completed
+    timestamp: "2026-05-19T15:43:00+08:00"
+    summary: "C16-M1 test revision worker Kepler added audit-regression RED tests for stripping raw secrets from derived projects.yaml compatibility fields and validating derived_views.projects_yaml.authority. Focused command is expected RED with 15/17 passing before implementation fix."
+    report: .pipeline/reviews/C16/M1/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M1
+    tests:
+      - "node --test core/test/global-config-registry.test.js core/test/workspace-authority.test.js core/test/project-link-graph.test.js: expected RED, 15/17 passing"
+    worker:
+      role: test
+      id: "019e3f2b-0987-7a81-8ff7-71d6ac94fd83"
+      nickname: Kepler
+      lifecycle: completed
+  -
+    id: M1-IMPLEMENT-REVISION-COMPLETE-C16-20260519T155200+0800
+    type: worker_complete
+    ref: C16/M1/implement-revision
+    status: completed
+    timestamp: "2026-05-19T15:52:00+08:00"
+    summary: "C16-M1 implement revision worker Hilbert fixed the audit blocker by stripping raw-secret-looking compatibility fields from derived projects.yaml output and validating derived_views.projects_yaml.authority as derived_from_workspace. Main validation now passes 17/17 focused tests."
+    report: .pipeline/reviews/C16/M1/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M1
+    tests:
+      - "node --test core/test/global-config-registry.test.js core/test/workspace-authority.test.js core/test/project-link-graph.test.js: 17/17 passing"
+      - "git diff --check targeted M1 files: passing"
+    worker:
+      role: implement
+      id: "019e3f2e-b5a7-70b3-8cde-8f42f9b0924b"
+      nickname: Hilbert
+      lifecycle: completed
+  -
+    id: M1-AUDIT-RECHECK-BLOCKER-C16-20260519T155900+0800
+    type: worker_complete
+    ref: C16/M1/audit-recheck
+    status: needs_changes
+    timestamp: "2026-05-19T15:59:00+08:00"
+    summary: "C16-M1 audit recheck worker Hegel found the raw secret blocker still leaks through drift[].existing even though projects[] is sanitized. M1 remains in revision and needs a regression test covering the full derived result plus a drift sanitization fix."
+    report: .pipeline/reviews/C16/M1/audit-recheck.md
+    trigger: auto
+    related_milestone: C16-M1
+    tests:
+      - "node --test core/test/global-config-registry.test.js core/test/workspace-authority.test.js core/test/project-link-graph.test.js: 17/17 passing"
+      - "git diff --check targeted M1 files: passing"
+      - "read-only audit probe: raw token still present in drift[].existing"
+    worker:
+      role: audit
+      id: "019e3f3b-b35c-73a2-91e9-612eedb11c50"
+      nickname: Hegel
+      lifecycle: completed_needs_changes
+  -
+    id: M1-TEST-REVISION2-COMPLETE-C16-20260519T160800+0800
+    type: worker_complete
+    ref: C16/M1/test-revision-2
+    status: completed
+    timestamp: "2026-05-19T16:08:00+08:00"
+    summary: "C16-M1 test second revision worker Pauli added full derived-result RED coverage so raw compatibility secrets cannot leak through drift[].existing. Focused command is expected RED with 16/17 passing before drift sanitization fix."
+    report: .pipeline/reviews/C16/M1/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M1
+    tests:
+      - "node --test core/test/global-config-registry.test.js core/test/workspace-authority.test.js core/test/project-link-graph.test.js: expected RED, 16/17 passing"
+    worker:
+      role: test
+      id: "019e3f40-3261-74c0-8c29-ea2f690042e7"
+      nickname: Pauli
+      lifecycle: completed
+  -
+    id: M1-IMPLEMENT-REVISION2-COMPLETE-C16-20260519T161700+0800
+    type: worker_complete
+    ref: C16/M1/implement-revision-2
+    status: completed
+    timestamp: "2026-05-19T16:17:00+08:00"
+    summary: "C16-M1 implement second revision worker Hooke sanitized drift diagnostics so raw-secret-looking compatibility values cannot leak through drift[].existing or drift[].authority. Main focused validation passes 17/17 tests."
+    report: .pipeline/reviews/C16/M1/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M1
+    tests:
+      - "node --test core/test/global-config-registry.test.js core/test/workspace-authority.test.js core/test/project-link-graph.test.js: 17/17 passing"
+      - "git diff --check targeted M1 files: passing"
+    worker:
+      role: implement
+      id: "019e3f45-c067-7203-bbbf-d65a4dfd0405"
+      nickname: Hooke
+      lifecycle: completed
+  -
+    id: M1-AUDIT-RECHECK-PASS-C16-20260519T162500+0800
+    type: worker_complete
+    ref: C16/M1/audit-final
+    status: completed
+    timestamp: "2026-05-19T16:25:00+08:00"
+    summary: "C16-M1 final audit recheck passed. Raw compatibility secrets no longer leak through derived projects or drift diagnostics; derived_views.projects_yaml.authority validation is enforced; worker separation evidence is coherent."
+    report: .pipeline/reviews/C16/M1/audit-recheck.md
+    trigger: auto
+    related_milestone: C16-M1
+    tests:
+      - "node --test core/test/global-config-registry.test.js core/test/workspace-authority.test.js core/test/project-link-graph.test.js: 17/17 passing"
+      - "git diff --check targeted M1 files: passing"
+    worker:
+      role: audit
+      id: "019e3f4a-2f85-71b3-b47d-7d3ebb93c9dc"
+      nickname: Raman
+      lifecycle: completed
+  -
+    id: M1-COMPLETE-C16-20260519T162500+0800
+    type: milestone_complete
+    ref: C16/M1
+    status: completed
+    timestamp: "2026-05-19T16:25:00+08:00"
+    summary: "Completed C16-M1 Workspace Authority Schema And Object Registry. Added workspace authority APIs, project link graph helpers, derived projects.yaml drift checks, secret-safe compatibility projection, and lifecycle log schema support for C16 Deep Plan events."
+    report: .pipeline/reports/00-workspace-authority-schema-object-registry.report.md
+    trigger: auto
+    related_milestone: C16-M1
+    tests:
+      - "node --test core/test/global-config-registry.test.js core/test/workspace-authority.test.js core/test/project-link-graph.test.js: 17/17 passing"
+      - "node --test core/test/log-evidence.test.js: 5/5 passing"
+      - "cd core && npm test: 527/527 passing"
+      - "git diff --check targeted M1 files: passing"
+  -
+    id: M2-START-C16-20260519T162500+0800
+    type: milestone_start
+    ref: C16/M2
+    status: active
+    timestamp: "2026-05-19T16:25:00+08:00"
+    summary: "Started C16-M2 Artifact Catalog Scanner after C16-M1 completion. Current step is write_tests."
+    report: .pipeline/prompts/01-artifact-catalog-scanner.md
+    trigger: auto
+    related_milestone: C16-M2
+  -
+    id: M2-TEST-WORKER-START-C16-20260519T162700+0800
+    type: worker_start
+    ref: C16/M2/test
+    status: active
+    timestamp: "2026-05-19T16:27:00+08:00"
+    summary: "Started C16-M2 test worker Zeno for Artifact Catalog Scanner RED tests and evidence."
+    report: .pipeline/reviews/C16/M2/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M2
+    worker:
+      role: test
+      id: "019e3f52-27ca-7ca1-9066-76f99c577125"
+      nickname: Zeno
+      lifecycle: requested/started
+  -
+    id: M2-TEST-WORKER-COMPLETE-C16-20260519T163600+0800
+    type: worker_complete
+    ref: C16/M2/test
+    status: completed
+    timestamp: "2026-05-19T16:36:00+08:00"
+    summary: "C16-M2 test worker Zeno completed Artifact Catalog Scanner RED tests. Focused command is expected RED because scanArtifactCatalog is not implemented/exported yet; existing knowledge/log/progress tests passed."
+    report: .pipeline/reviews/C16/M2/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M2
+    tests:
+      - "node --test core/test/artifact-catalog.test.js core/test/knowledge-ledger.test.js core/test/log-evidence.test.js core/test/progress-table.test.js: expected RED, 15/16 passing; missing scanArtifactCatalog export"
+    worker:
+      role: test
+      id: "019e3f52-27ca-7ca1-9066-76f99c577125"
+      nickname: Zeno
+      lifecycle: completed
+  -
+    id: M2-IMPLEMENT-WORKER-START-C16-20260519T164300+0800
+    type: worker_start
+    ref: C16/M2/implement
+    status: active
+    timestamp: "2026-05-19T16:43:00+08:00"
+    summary: "C16-M2 implement worker Wegener is implementing scanArtifactCatalog and Artifact Catalog Scanner production behavior."
+    report: .pipeline/reviews/C16/M2/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M2
+    worker:
+      role: implement
+      id: "019e3f58-6184-7b53-b7e5-64d719c54fc5"
+      nickname: Wegener
+      lifecycle: requested/started
+  -
+    id: M2-IMPLEMENT-WORKER-COMPLETE-C16-20260519T165000+0800
+    type: worker_complete
+    ref: C16/M2/implement
+    status: completed
+    timestamp: "2026-05-19T16:50:00+08:00"
+    summary: "C16-M2 implement worker Wegener added scanArtifactCatalog and root export. Main focused validation passed Artifact Catalog plus neighboring knowledge/log/progress tests."
+    report: .pipeline/reviews/C16/M2/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M2
+    tests:
+      - "node --test core/test/artifact-catalog.test.js core/test/knowledge-ledger.test.js core/test/log-evidence.test.js core/test/progress-table.test.js: 19/19 passing"
+      - "git diff --check targeted M2 files: passing"
+    worker:
+      role: implement
+      id: "019e3f58-6184-7b53-b7e5-64d719c54fc5"
+      nickname: Wegener
+      lifecycle: completed
+  -
+    id: M2-AUDIT-COMPLETE-C16-20260519T165800+0800
+    type: worker_complete
+    ref: C16/M2/audit
+    status: completed
+    timestamp: "2026-05-19T16:58:00+08:00"
+    summary: "C16-M2 audit worker Nietzsche passed Artifact Catalog Scanner review: scanner is read-only, secret config refs are metadata-only, stale derived summaries remain derived, and parse_error/missing/not_applicable are distinct."
+    report: .pipeline/reviews/C16/M2/audit.md
+    trigger: auto
+    related_milestone: C16-M2
+    tests:
+      - "node --test core/test/artifact-catalog.test.js core/test/knowledge-ledger.test.js core/test/log-evidence.test.js core/test/progress-table.test.js: 19/19 passing"
+      - "git diff --check targeted M2 files: passing"
+    worker:
+      role: audit
+      id: "019e3f5e-a458-7263-a1d2-8276831e2e8c"
+      nickname: Nietzsche
+      lifecycle: completed
+  -
+    id: M2-COMPLETE-C16-20260519T165800+0800
+    type: milestone_complete
+    ref: C16/M2
+    status: completed
+    timestamp: "2026-05-19T16:58:00+08:00"
+    summary: "Completed C16-M2 Artifact Catalog Scanner. Added scanArtifactCatalog, workflow/pre-Workflow/skill/service/infrastructure artifact classification, stale derived summary checks, parse_error handling, and secret-ref metadata-only behavior."
+    report: .pipeline/reports/01-artifact-catalog-scanner.report.md
+    trigger: auto
+    related_milestone: C16-M2
+    tests:
+      - "node --test core/test/artifact-catalog.test.js core/test/knowledge-ledger.test.js core/test/log-evidence.test.js core/test/progress-table.test.js: 19/19 passing"
+      - "cd core && npm test: 531/531 passing"
+      - "git diff --check targeted M2 files: passing"
+  -
+    id: M3-START-C16-20260519T165800+0800
+    type: milestone_start
+    ref: C16/M3
+    status: active
+    timestamp: "2026-05-19T16:58:00+08:00"
+    summary: "Started C16-M3 Storage Sync Template And Notion Merge Dry-Run after C16-M2 completion. Current step is write_tests."
+    report: .pipeline/prompts/02-storage-sync-template-notion-dry-run.md
+    trigger: auto
+    related_milestone: C16-M3
+  -
+    id: HANDOFF-C16-M3-20260519T170000+0800
+    type: handoff_pause
+    ref: C16/M3
+    status: active
+    timestamp: "2026-05-19T17:00:00+08:00"
+    summary: "Paused the current execution turn after completing C16-M2 and starting C16-M3. Continuation is active with safe_resume_command /hw:resume and next action start_c16_m3_write_tests."
+    report: .pipeline/continuation.yaml
+    trigger: auto
+    related_milestone: C16-M3
+  -
+    id: M3-TEST-WORKER-START-C16-20260519T212100+0800
+    type: worker_start
+    ref: C16/M3/test
+    status: active
+    timestamp: "2026-05-19T21:21:00+08:00"
+    summary: "Resumed C16-M3 write_tests and started test worker Hume for Storage Sync Template and Notion Project Home dry-run RED tests."
+    report: .pipeline/reviews/C16/M3/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M3
+    worker:
+      role: test
+      id: "019e4064-9a71-7062-a189-4e8946bf6e5d"
+      nickname: Hume
+      lifecycle: requested/started
+  -
+    id: M3-TEST-WORKER-COMPLETE-C16-20260519T213000+0800
+    type: worker_complete
+    ref: C16/M3/test
+    status: completed
+    timestamp: "2026-05-19T21:30:00+08:00"
+    summary: "C16-M3 test worker Hume completed RED tests for Storage Sync Template and Notion Project Home dry-run. Focused command fails 0/6 as expected due to missing public APIs."
+    report: .pipeline/reviews/C16/M3/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M3
+    tests:
+      - "node --test core/test/storage-sync-template.test.js core/test/notion-project-home-dry-run.test.js: expected RED, 0/6 passing; missing buildStorageSyncTemplate, validateStorageSyncTemplate, planNotionProjectHomeDryRun"
+    worker:
+      role: test
+      id: "019e4064-9a71-7062-a189-4e8946bf6e5d"
+      nickname: Hume
+      lifecycle: completed
+  -
+    id: M3-IMPLEMENT-WORKER-COMPLETE-C16-20260519T214200+0800
+    type: worker_complete
+    ref: C16/M3/implement
+    status: completed
+    timestamp: "2026-05-19T21:42:00+08:00"
+    summary: "C16-M3 implement worker Arendt added backend-neutral Storage Sync Template and Notion Project Home dry-run APIs. Main validation passed focused, neighboring, full core, and targeted diff checks."
+    report: .pipeline/reviews/C16/M3/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M3
+    tests:
+      - "node --test core/test/storage-sync-template.test.js core/test/notion-project-home-dry-run.test.js: 6/6 passing"
+      - "node --test core/test/artifact-catalog.test.js core/test/workspace-authority.test.js: 11/11 passing"
+      - "cd core && npm test: 537/537 passing"
+      - "git diff --check targeted M3 files: passing"
+    worker:
+      role: implement
+      id: "019e406f-291f-75b1-a137-27d01d29db1d"
+      nickname: Arendt
+      lifecycle: completed
+  -
+    id: M3-AUDIT-COMPLETE-C16-20260519T214800+0800
+    type: worker_complete
+    ref: C16/M3/audit
+    status: completed
+    timestamp: "2026-05-19T21:48:00+08:00"
+    summary: "C16-M3 audit worker Locke passed Storage Sync Template and Notion dry-run review with no blockers. Residual real Notion apply risks remain gated to M9."
+    report: .pipeline/reviews/C16/M3/audit.md
+    trigger: auto
+    related_milestone: C16-M3
+    tests:
+      - "node --test core/test/storage-sync-template.test.js core/test/notion-project-home-dry-run.test.js: 6/6 passing"
+    worker:
+      role: audit
+      id: "019e407a-25a7-70c3-b9b2-0dfae86075ca"
+      nickname: Locke
+      lifecycle: completed
+  -
+    id: M3-COMPLETE-C16-20260519T214800+0800
+    type: milestone_complete
+    ref: C16/M3
+    status: completed
+    timestamp: "2026-05-19T21:48:00+08:00"
+    summary: "Completed C16-M3 Storage Sync Template And Notion Merge Dry-Run. Added backend-neutral projection template, read-only Notion dry-run planner, stable operation hashes, legacy merge-input classification, and redaction/no-write evidence."
+    report: .pipeline/reports/02-storage-sync-template-notion-dry-run.report.md
+    trigger: auto
+    related_milestone: C16-M3
+    tests:
+      - "node --test core/test/storage-sync-template.test.js core/test/notion-project-home-dry-run.test.js: 6/6 passing"
+      - "node --test core/test/artifact-catalog.test.js core/test/workspace-authority.test.js: 11/11 passing"
+      - "cd core && npm test: 537/537 passing"
+      - "git diff --check: passing"
+      - "python3 script-style Notion tests: blocked; missing /home/heyx/Hypo-Workflow/Notion-API.md secret token file"
+  -
+    id: M4-START-C16-20260519T214800+0800
+    type: milestone_start
+    ref: C16/M4
+    status: active
+    timestamp: "2026-05-19T21:48:00+08:00"
+    summary: "Started C16-M4 Maintenance Command Surface Queue Ledger And Evidence Store after C16-M3 completion. Current step is write_tests."
+    report: .pipeline/prompts/03-maintenance-command-queue-ledger-evidence.md
+    trigger: auto
+    related_milestone: C16-M4
+  -
+    id: M4-TEST-WORKER-COMPLETE-C16-20260519T215500+0800
+    type: worker_complete
+    ref: C16/M4/test
+    status: completed
+    timestamp: "2026-05-19T21:55:00+08:00"
+    summary: "C16-M4 test worker Banach completed RED tests for /hw:maintain command surface, maintenance queue lifecycle, side-effect gates, sanitized append-only ledger, evidence paths, and zh-CN rendering."
+    report: .pipeline/reviews/C16/M4/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M4
+    tests:
+      - "node --test core/test/maintenance-command-map.test.js core/test/maintenance-queue.test.js core/test/maintenance-ledger.test.js core/test/log-evidence.test.js: expected RED, 5/13 passing; missing maintain command/API exports"
+    worker:
+      role: test
+      id: "019e4080-f4f8-7e30-acce-b220caca30ec"
+      nickname: Banach
+      lifecycle: completed
+  -
+    id: M4-IMPLEMENT-WORKER-COMPLETE-C16-20260519T221800+0800
+    type: worker_complete
+    ref: C16/M4/implement
+    status: completed
+    timestamp: "2026-05-19T22:18:00+08:00"
+    summary: "C16-M4 implement worker Euclid added /hw:maintain command surface, maintenance queue/ledger/gate APIs, maintain Skill, and synchronized command-count docs to 50. Main validation passed focused, expanded, full core, and diff checks."
+    report: .pipeline/reviews/C16/M4/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M4
+    tests:
+      - "node --test core/test/maintenance-command-map.test.js core/test/maintenance-queue.test.js core/test/maintenance-ledger.test.js core/test/log-evidence.test.js: 13/13 passing"
+      - "node --test command/docs/skill expanded M4 suite: 39/39 passing"
+      - "cd core && npm test: 545/545 passing"
+      - "git diff --check: passing"
+    worker:
+      role: implement
+      id: "019e4086-2b4e-7593-914a-f5189c435786"
+      nickname: Euclid
+      lifecycle: completed
+  -
+    id: M4-AUDIT-COMPLETE-C16-20260519T222200+0800
+    type: worker_complete
+    ref: C16/M4/audit
+    status: completed
+    timestamp: "2026-05-19T22:22:00+08:00"
+    summary: "C16-M4 audit worker Turing passed /hw:maintain namespace, queue authority, side-effect gate, ledger redaction, evidence path, docs/skill sync, and worker separation review with no blockers."
+    report: .pipeline/reviews/C16/M4/audit.md
+    trigger: auto
+    related_milestone: C16-M4
+    tests:
+      - "node --test core/test/maintenance-command-map.test.js core/test/maintenance-queue.test.js core/test/maintenance-ledger.test.js core/test/log-evidence.test.js: 13/13 passing"
+      - "node --test command/docs/skill expanded M4 suite: 39/39 passing"
+    worker:
+      role: audit
+      id: "019e409a-91b1-79a1-998c-61bccc3a1020"
+      nickname: Turing
+      lifecycle: completed
+  -
+    id: M4-COMPLETE-C16-20260519T222200+0800
+    type: milestone_complete
+    ref: C16/M4
+    status: completed
+    timestamp: "2026-05-19T22:22:00+08:00"
+    summary: "Completed C16-M4 Maintenance Command Surface Queue Ledger And Evidence Store. Added /hw:maintain command family, maintenance queue/ledger/evidence helpers, side-effect gates, maintain Skill, and synchronized 50-command docs."
+    report: .pipeline/reports/03-maintenance-command-queue-ledger-evidence.report.md
+    trigger: auto
+    related_milestone: C16-M4
+    tests:
+      - "node --test core/test/maintenance-command-map.test.js core/test/maintenance-queue.test.js core/test/maintenance-ledger.test.js core/test/log-evidence.test.js: 13/13 passing"
+      - "node --test command/docs/skill expanded M4 suite: 39/39 passing"
+      - "cd core && npm test: 545/545 passing"
+      - "git diff --check: passing"
+  -
+    id: M5-START-C16-20260519T222200+0800
+    type: milestone_start
+    ref: C16/M5
+    status: active
+    timestamp: "2026-05-19T22:22:00+08:00"
+    summary: "Started C16-M5 Maintenance Run Engine And Template Learning after C16-M4 completion. Current step is write_tests."
+    report: .pipeline/prompts/04-maintenance-run-engine-template-learning.md
+    trigger: auto
+    related_milestone: C16-M5
+  -
+    id: M5-TEST-WORKER-COMPLETE-C16-20260519T222800+0800
+    type: worker_complete
+    ref: C16/M5/test
+    status: completed
+    timestamp: "2026-05-19T22:28:00+08:00"
+    summary: "C16-M5 test worker Parfit completed RED tests for Maintenance Run schema, orchestration planning, partitioned discovery, pause/resume/review transitions, backup/notification gates, ledger authority, and non-authoritative template learning."
+    report: .pipeline/reviews/C16/M5/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M5
+    tests:
+      - "node --test core/test/maintenance-run.test.js core/test/maintenance-template-learning.test.js core/test/maintenance-backup-policy.test.js core/test/maintenance-queue.test.js core/test/maintenance-ledger.test.js: expected RED, 6/16 passing; missing Maintenance Run/template API exports"
+    worker:
+      role: test
+      id: "019e409e-9cd7-7aa1-aeb0-f26280ed3c09"
+      nickname: Parfit
+      lifecycle: completed
+  -
+    id: M5-IMPLEMENT-WORKER-COMPLETE-C16-20260519T223702+0800
+    type: worker_complete
+    ref: C16/M5/implement
+    status: completed
+    timestamp: "2026-05-19T22:37:02+08:00"
+    summary: "C16-M5 implement worker Darwin completed Maintenance Run Engine and template learning APIs, including run schema validation, generic planning, partitioned discovery, lifecycle transitions, gated apply orchestration, ledger authority protection, and non-authoritative template candidates."
+    report: .pipeline/reviews/C16/M5/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M5
+    tests:
+      - "node --test core/test/maintenance-run.test.js core/test/maintenance-template-learning.test.js core/test/maintenance-backup-policy.test.js core/test/maintenance-queue.test.js core/test/maintenance-ledger.test.js: 16/16 passing"
+      - "node --test core/test/maintenance-command-map.test.js core/test/log-evidence.test.js: 7/7 passing"
+      - "cd core && npm test: 555/555 passing"
+      - "git diff --check: passing"
+    worker:
+      role: implement
+      id: "019e40a4-5bfa-73f0-bcbd-fad5494c41e0"
+      nickname: Darwin
+      lifecycle: completed
+  -
+    id: M5-AUDIT-COMPLETE-C16-20260519T224204+0800
+    type: worker_complete
+    ref: C16/M5/audit
+    status: completed
+    timestamp: "2026-05-19T22:42:04+08:00"
+    summary: "C16-M5 audit worker Bernoulli passed Maintenance Run boundary, side-effect gate binding, ledger authority, template review, redaction, and worker separation checks with no blockers."
+    report: .pipeline/reviews/C16/M5/audit.md
+    trigger: auto
+    related_milestone: C16-M5
+    tests:
+      - "node --test core/test/maintenance-run.test.js core/test/maintenance-template-learning.test.js core/test/maintenance-backup-policy.test.js core/test/maintenance-queue.test.js core/test/maintenance-ledger.test.js: 16/16 passing"
+      - "node --test core/test/maintenance-command-map.test.js core/test/log-evidence.test.js: 7/7 passing"
+    worker:
+      role: audit
+      id: "019e40ac-a142-7883-8f4e-6b0bdd53c112"
+      nickname: Bernoulli
+      lifecycle: completed
+  -
+    id: M5-COMPLETE-C16-20260519T224204+0800
+    type: milestone_complete
+    ref: C16/M5
+    status: completed
+    timestamp: "2026-05-19T22:42:04+08:00"
+    summary: "Completed C16-M5 Maintenance Run Engine And Template Learning. Added Maintenance Run lifecycle APIs, generic planning, partitioned discovery, gated apply orchestration, ledger authority protection, and non-authoritative template candidate learning."
+    report: .pipeline/reports/04-maintenance-run-engine-template-learning.report.md
+    trigger: auto
+    related_milestone: C16-M5
+    tests:
+      - "node --test core/test/maintenance-run.test.js core/test/maintenance-template-learning.test.js core/test/maintenance-backup-policy.test.js core/test/maintenance-queue.test.js core/test/maintenance-ledger.test.js: 16/16 passing"
+      - "node --test core/test/maintenance-command-map.test.js core/test/log-evidence.test.js: 7/7 passing"
+      - "cd core && npm test: 555/555 passing"
+      - "git diff --check: passing"
+  -
+    id: M6-START-C16-20260519T224204+0800
+    type: milestone_start
+    ref: C16/M6
+    status: active
+    timestamp: "2026-05-19T22:42:04+08:00"
+    summary: "Started C16-M6 Scheduled Global Consolidation And Chat Backfill after C16-M5 completion. Current step is write_tests."
+    report: .pipeline/prompts/05-scheduled-global-consolidation-chat-backfill.md
+    trigger: auto
+    related_milestone: C16-M6
+  -
+    id: M6-TEST-WORKER-COMPLETE-C16-20260519T224945+0800
+    type: worker_complete
+    ref: C16/M6/test
+    status: completed
+    timestamp: "2026-05-19T22:49:45+08:00"
+    summary: "C16-M6 test worker Descartes completed RED tests for scheduled global consolidation, source discovery, resumable historical backfill, redaction, Chinese sedimentation outputs, and Notion dry-run projection."
+    report: .pipeline/reviews/C16/M6/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M6
+    tests:
+      - "node --test core/test/global-consolidation.test.js core/test/session-source-discovery.test.js core/test/maintenance-backfill.test.js: expected RED, 0/9 passing; missing consolidation/backfill API exports"
+      - "node --test core/test/secret-ref-projection.test.js core/test/knowledge-ledger.test.js: blocked because core/test/secret-ref-projection.test.js does not exist"
+      - "node --test core/test/knowledge-ledger.test.js: 8/8 passing"
+    worker:
+      role: test
+      id: "019e40b3-1479-7ea2-8c61-70b0a10977bf"
+      nickname: Descartes
+      lifecycle: completed
+  -
+    id: M6-IMPLEMENT-WORKER-COMPLETE-C16-20260519T225621+0800
+    type: worker_complete
+    ref: C16/M6/implement
+    status: completed
+    timestamp: "2026-05-19T22:56:21+08:00"
+    summary: "C16-M6 implement worker Jason completed local-only global consolidation source discovery, system maintenance run planning, deterministic daily/weekly backfill shards, resume state, redacted Chinese candidate outputs, and Notion dry-run projection."
+    report: .pipeline/reviews/C16/M6/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M6
+    tests:
+      - "node --test core/test/global-consolidation.test.js core/test/session-source-discovery.test.js core/test/maintenance-backfill.test.js: 9/9 passing"
+      - "node --test core/test/knowledge-ledger.test.js: 8/8 passing"
+      - "cd core && npm test: 564/564 passing"
+      - "git diff --check: passing"
+    worker:
+      role: implement
+      id: "019e40b7-b728-7d22-9adb-0c6fd89aca84"
+      nickname: Jason
+      lifecycle: completed
+  -
+    id: M6-IMPLEMENT-REDACTION-REVISION-C16-20260519T225853+0800
+    type: step_complete
+    ref: C16/M6/implement/revision
+    status: completed
+    timestamp: "2026-05-19T22:58:53+08:00"
+    summary: "Strengthened C16-M6 consolidation-specific redaction after main-thread probe found secret assignment markers like password=[REDACTED] still present. Added scrubConsolidationSecretMarkers so source records, candidates, and Notion dry-run payload collapse secret assignment shapes to [REDACTED]."
+    report: .pipeline/reviews/C16/M6/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M6
+    tests:
+      - "node --test core/test/global-consolidation.test.js core/test/session-source-discovery.test.js core/test/maintenance-backfill.test.js: 9/9 passing"
+      - "node --test core/test/knowledge-ledger.test.js: 8/8 passing"
+      - "custom M6 serialization leak probe: secretLeak=false"
+      - "cd core && npm test: 564/564 passing"
+      - "git diff --check: passing"
+  -
+    id: M6-AUDIT-COMPLETE-C16-20260519T230142+0800
+    type: worker_complete
+    ref: C16/M6/audit
+    status: completed
+    timestamp: "2026-05-19T23:01:42+08:00"
+    summary: "C16-M6 audit worker Schrodinger passed safe-local source discovery, redaction and secret marker scrubbing, system maintenance run boundary, deterministic backfill, resume-state safety, Chinese candidate outputs, and Notion dry-run projection checks with no blockers."
+    report: .pipeline/reviews/C16/M6/audit.md
+    trigger: auto
+    related_milestone: C16-M6
+    tests:
+      - "node --test core/test/global-consolidation.test.js core/test/session-source-discovery.test.js core/test/maintenance-backfill.test.js: 9/9 passing"
+      - "node --test core/test/knowledge-ledger.test.js: 8/8 passing"
+      - "custom M6 serialization leak probe: secretLeak=false"
+      - "git diff --check: passing"
+    worker:
+      role: audit
+      id: "019e40bd-b876-7663-bd44-21dc2df3c75f"
+      nickname: Schrodinger
+      lifecycle: completed
+  -
+    id: M6-COMPLETE-C16-20260519T230142+0800
+    type: milestone_complete
+    ref: C16/M6
+    status: completed
+    timestamp: "2026-05-19T23:01:42+08:00"
+    summary: "Completed C16-M6 Scheduled Global Consolidation And Chat Backfill. Added safe-local source discovery, system consolidation run planning, deterministic backfill shards, resume state, redacted Chinese candidate outputs, and Notion dry-run projection."
+    report: .pipeline/reports/05-scheduled-global-consolidation-chat-backfill.report.md
+    trigger: auto
+    related_milestone: C16-M6
+    tests:
+      - "node --test core/test/global-consolidation.test.js core/test/session-source-discovery.test.js core/test/maintenance-backfill.test.js: 9/9 passing"
+      - "node --test core/test/knowledge-ledger.test.js: 8/8 passing"
+      - "custom M6 serialization leak probe: secretLeak=false"
+      - "cd core && npm test: 564/564 passing"
+      - "git diff --check: passing"
+  -
+    id: M7-START-C16-20260519T230142+0800
+    type: milestone_start
+    ref: C16/M7
+    status: active
+    timestamp: "2026-05-19T23:01:42+08:00"
+    summary: "Started C16-M7 Global Knowledge Rules And Secret Reference Projections after C16-M6 completion. Current step is write_tests."
+    report: .pipeline/prompts/06-global-knowledge-rules-secret-ref-projections.md
+    trigger: auto
+    related_milestone: C16-M7
+  -
+    id: M7-TEST-WORKER-COMPLETE-C16-20260519T230815+0800
+    type: worker_complete
+    ref: C16/M7/test
+    status: completed
+    timestamp: "2026-05-19T23:08:15+08:00"
+    summary: "C16-M7 test worker Halley completed RED tests for Global Knowledge projections, infrastructure facts, effective rules matrix, secret capability projections, Notion-projectable summaries, accepted consolidation candidates, and raw secret/raw Knowledge exclusion."
+    report: .pipeline/reviews/C16/M7/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M7
+    tests:
+      - "node --test core/test/global-knowledge-index.test.js core/test/rules-authority.test.js core/test/secret-ref-projection.test.js: expected RED, 6/12 passing; missing M7 projection API exports"
+      - "node --test core/test/knowledge-ledger.test.js core/test/knowledge-hooks.test.js: 11/11 passing"
+    worker:
+      role: test
+      id: "019e40c3-621c-71c2-aff9-3c8f8f6395f7"
+      nickname: Halley
+      lifecycle: completed
+  -
+    id: M7-IMPLEMENT-WORKER-COMPLETE-C16-20260519T231622+0800
+    type: worker_complete
+    ref: C16/M7/implement
+    status: completed
+    timestamp: "2026-05-19T23:16:22+08:00"
+    summary: "C16-M7 implement worker Erdos completed Global Knowledge projection, Infrastructure facts projection, effective rules matrix, metadata-only secret capability projection, and Notion-projectable safe global summaries with strict projection sanitization."
+    report: .pipeline/reviews/C16/M7/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M7
+    tests:
+      - "node --test core/test/global-knowledge-index.test.js core/test/rules-authority.test.js core/test/secret-ref-projection.test.js: 12/12 passing"
+      - "node --test core/test/knowledge-ledger.test.js core/test/knowledge-hooks.test.js: 11/11 passing"
+      - "cd core && npm test: 570/570 passing"
+      - "git diff --check: passing"
+    worker:
+      role: implement
+      id: "019e40c8-9c7e-7bc1-b4dd-d6498d60a037"
+      nickname: Erdos
+      lifecycle: completed
+  -
+    id: M7-AUDIT-WORKER-COMPLETE-C16-20260519T232000+0800
+    type: worker_complete
+    ref: C16/M7/audit
+    status: completed
+    timestamp: "2026-05-19T23:20:00+08:00"
+    summary: "C16-M7 audit worker Beauvoir passed Global Knowledge projection, rules matrix, metadata-only secret projection, accepted-candidate filtering, and Notion-projectable summary safety checks with two non-blocking warnings."
+    report: .pipeline/reviews/C16/M7/audit.md
+    trigger: auto
+    related_milestone: C16-M7
+    tests:
+      - "node --test core/test/global-knowledge-index.test.js core/test/rules-authority.test.js core/test/secret-ref-projection.test.js: 12/12 passing"
+      - "node --test core/test/knowledge-ledger.test.js core/test/knowledge-hooks.test.js: 11/11 passing"
+      - "cd core && npm test: 570/570 passing"
+      - "git diff --check: passing"
+    worker:
+      role: audit
+      id: "019e40d0-2b48-7f32-a5b2-f49e9684ed38"
+      nickname: Beauvoir
+      lifecycle: completed
+  -
+    id: M7-AUDIT-WARNING-REVISION-C16-20260519T232605+0800
+    type: step_complete
+    ref: C16/M7/audit/revision
+    status: completed
+    timestamp: "2026-05-19T23:26:05+08:00"
+    summary: "Resolved C16-M7 audit warnings by preserving compact evidence_refs without path, keeping safe Notion blocks for downstream payloads, and adding regression assertions plus serialization probe coverage."
+    report: .pipeline/reviews/C16/M7/audit.md
+    trigger: auto
+    related_milestone: C16-M7
+    tests:
+      - "node --test core/test/global-knowledge-index.test.js core/test/rules-authority.test.js core/test/secret-ref-projection.test.js: 12/12 passing"
+      - "node --test core/test/knowledge-ledger.test.js core/test/knowledge-hooks.test.js: 11/11 passing"
+      - "custom projection serialization probe: leak=false, evidenceRefs=[probe:evidence], safeBlocks=true"
+      - "cd core && npm test: 570/570 passing"
+      - "git diff --check: passing"
+  -
+    id: M7-COMPLETE-C16-20260519T232605+0800
+    type: milestone_complete
+    ref: C16/M7
+    status: completed
+    timestamp: "2026-05-19T23:26:05+08:00"
+    summary: "Completed C16-M7 Global Knowledge Rules And Secret Reference Projections. Added safe Global Knowledge, infrastructure fact, effective rules, metadata-only secret capability, and Notion-projectable summary projections."
+    report: .pipeline/reports/06-global-knowledge-rules-secret-ref-projections.report.md
+    trigger: auto
+    related_milestone: C16-M7
+    tests:
+      - "node --test core/test/global-knowledge-index.test.js core/test/rules-authority.test.js core/test/secret-ref-projection.test.js: 12/12 passing"
+      - "node --test core/test/knowledge-ledger.test.js core/test/knowledge-hooks.test.js: 11/11 passing"
+      - "custom projection serialization probe: leak=false, evidenceRefs=[probe:evidence], safeBlocks=true"
+      - "cd core && npm test: 570/570 passing"
+      - "git diff --check: passing"
+  -
+    id: M8-START-C16-20260519T232605+0800
+    type: milestone_start
+    ref: C16/M8
+    status: active
+    timestamp: "2026-05-19T23:26:05+08:00"
+    summary: "Started C16-M8 End To End Dry-Run Review Pack after C16-M7 completion. Current step is write_tests."
+    report: .pipeline/prompts/07-end-to-end-dry-run-review-pack.md
+    trigger: auto
+    related_milestone: C16-M8
+  -
+    id: M8-TEST-WORKER-START-C16-20260519T233004+0800
+    type: worker_start
+    ref: C16/M8/test
+    status: active
+    timestamp: "2026-05-19T23:30:04+08:00"
+    summary: "Started C16-M8 test worker Dalton to write RED tests for the end-to-end dry-run review bundle, deterministic hash, no-write enforcement, redaction scan, and Chinese review report."
+    report: .pipeline/reviews/C16/M8/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M8
+    worker:
+      role: test
+      id: "019e40db-7914-7ad3-8be2-d4843c6b2472"
+      nickname: Dalton
+      lifecycle: active
+  -
+    id: M8-TEST-WORKER-COMPLETE-C16-20260519T233449+0800
+    type: worker_complete
+    ref: C16/M8/test
+    status: completed
+    timestamp: "2026-05-19T23:34:49+08:00"
+    summary: "C16-M8 test worker Dalton completed RED tests for root management dry-run review bundle schema, stable content hash, review candidate buckets, redaction, no-write enforcement, and Chinese report output."
+    report: .pipeline/reviews/C16/M8/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M8
+    tests:
+      - "node --test core/test/root-management-dry-run.test.js core/test/sync-derived-map.test.js core/test/response-contract.test.js: expected RED, 7/13 passing; missing buildRootManagementDryRunBundle export"
+      - "node --test core/test/global-knowledge-index.test.js core/test/storage-sync-template.test.js core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 13/13 passing"
+      - "node --check core/test/root-management-dry-run.test.js: passing"
+    worker:
+      role: test
+      id: "019e40db-7914-7ad3-8be2-d4843c6b2472"
+      nickname: Dalton
+      lifecycle: completed
+  -
+    id: M8-IMPLEMENT-COMPLETE-C16-20260519T233909+0800
+    type: step_complete
+    ref: C16/M8/implement
+    status: completed
+    timestamp: "2026-05-19T23:39:09+08:00"
+    summary: "Implemented C16-M8 root management dry-run review bundle generation with stable content hash, no-write action separation, redaction scan, metadata-only secret references, and Chinese review report rendering."
+    report: .pipeline/reviews/C16/M8/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M8
+    tests:
+      - "node --test core/test/root-management-dry-run.test.js core/test/sync-derived-map.test.js core/test/response-contract.test.js: 13/13 passing"
+      - "node --test core/test/global-knowledge-index.test.js core/test/storage-sync-template.test.js core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 13/13 passing"
+      - "cd core && npm test: 576/576 passing"
+      - "git diff --check: passing"
+  -
+    id: M8-AUDIT-FAIL-C16-20260519T234541+0800
+    type: worker_complete
+    ref: C16/M8/audit
+    status: failed
+    timestamp: "2026-05-19T23:45:41+08:00"
+    summary: "C16-M8 audit worker Dirac failed the milestone because dry-run bundle sanitizer allowed raw Knowledge block containers such as blocks/raw_blocks and ordinary raw block text to enter the bundle; warnings also noted Notion operation action labels should be normalized to dry-run and implement worker identity evidence is main-thread only."
+    report: .pipeline/reviews/C16/M8/audit.md
+    trigger: auto
+    related_milestone: C16-M8
+    tests:
+      - "node --test core/test/root-management-dry-run.test.js core/test/sync-derived-map.test.js core/test/response-contract.test.js: 13/13 passing"
+      - "node --test core/test/global-knowledge-index.test.js core/test/storage-sync-template.test.js core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 13/13 passing"
+      - "cd core && npm test: 576/576 passing"
+      - "git diff --check: passing"
+      - "audit serialization probe: failed, raw blocks/raw_blocks leaked"
+    worker:
+      role: audit
+      id: "019e40e5-598b-7912-b9c5-67ce1447b6e6"
+      nickname: Dirac
+      lifecycle: completed
+  -
+    id: M8-AUDIT-REVISION-C16-20260519T234739+0800
+    type: step_complete
+    ref: C16/M8/implement/revision
+    status: completed
+    timestamp: "2026-05-19T23:47:39+08:00"
+    summary: "Resolved C16-M8 audit blocker by adding raw block container regression coverage, filtering blocks/raw_blocks/raw_blocks_payload from dry-run bundles, normalizing Notion operation action to dry-run, and preserving original write-looking intent as planned_operation metadata."
+    report: .pipeline/reviews/C16/M8/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M8
+    tests:
+      - "node --test core/test/root-management-dry-run.test.js core/test/sync-derived-map.test.js core/test/response-contract.test.js: 14/14 passing"
+      - "node --test core/test/global-knowledge-index.test.js core/test/storage-sync-template.test.js core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 13/13 passing"
+      - "raw block leak probe: hasBlocksKey=false, hasRawText=false, action=dry-run"
+      - "cd core && npm test: 577/577 passing"
+      - "git diff --check: passing"
+  -
+    id: M8-AUDIT-RECHECK-C16-20260519T235145+0800
+    type: worker_complete
+    ref: C16/M8/audit/recheck
+    status: completed
+    timestamp: "2026-05-19T23:51:45+08:00"
+    summary: "C16-M8 audit recheck passed. Dirac confirmed raw block containers/text are filtered, Notion action labels normalize to dry-run with planned_operation metadata, no-write boundaries hold, and metadata-only secret refs remain."
+    report: .pipeline/reviews/C16/M8/audit.md
+    trigger: auto
+    related_milestone: C16-M8
+    tests:
+      - "node --test core/test/root-management-dry-run.test.js core/test/sync-derived-map.test.js core/test/response-contract.test.js: 14/14 passing"
+      - "node --test core/test/global-knowledge-index.test.js core/test/storage-sync-template.test.js core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 13/13 passing"
+      - "cd core && npm test: 577/577 passing"
+      - "git diff --check: passing"
+      - "audit serialization probe: passing"
+    worker:
+      role: audit
+      id: "019e40e5-598b-7912-b9c5-67ce1447b6e6"
+      nickname: Dirac
+      lifecycle: completed
+  -
+    id: M8-COMPLETE-C16-20260519T235145+0800
+    type: milestone_complete
+    ref: C16/M8
+    status: completed
+    timestamp: "2026-05-19T23:51:45+08:00"
+    summary: "Completed C16-M8 End To End Dry-Run Review Pack. Added hash-stable no-write root management dry-run bundle, Chinese review report, redaction scan, action separation, and raw block leak protections."
+    report: .pipeline/reports/07-end-to-end-dry-run-review-pack.report.md
+    trigger: auto
+    related_milestone: C16-M8
+    tests:
+      - "node --test core/test/root-management-dry-run.test.js core/test/sync-derived-map.test.js core/test/response-contract.test.js: 14/14 passing"
+      - "node --test core/test/global-knowledge-index.test.js core/test/storage-sync-template.test.js core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 13/13 passing"
+      - "cd core && npm test: 577/577 passing"
+      - "git diff --check: passing"
+  -
+    id: M9-START-C16-20260519T235145+0800
+    type: milestone_start
+    ref: C16/M9
+    status: active
+    timestamp: "2026-05-19T23:51:45+08:00"
+    summary: "Started C16-M9 Final Gated Notion Apply And Verification after C16-M8 completion. Current step is write_tests."
+    report: .pipeline/prompts/08-final-gated-notion-apply-verification.md
+    trigger: auto
+    related_milestone: C16-M9
+  -
+    id: M9-TEST-WORKER-START-C16-20260519T235414+0800
+    type: worker_start
+    ref: C16/M9/test
+    status: active
+    timestamp: "2026-05-19T23:54:14+08:00"
+    summary: "Started C16-M9 test worker Tesla to write RED tests for final gated Notion apply, stale/mutated dry-run rejection, explicit confirmation, re-read verification, and sanitized ledger evidence."
+    report: .pipeline/reviews/C16/M9/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M9
+    worker:
+      role: test
+      id: "019e40f1-b633-78b2-8735-03dc1dc2b406"
+      nickname: Tesla
+      lifecycle: active
+  -
+    id: M9-TEST-WORKER-COMPLETE-C16-20260519T235846+0800
+    type: worker_complete
+    ref: C16/M9/test
+    status: completed
+    timestamp: "2026-05-19T23:58:46+08:00"
+    summary: "C16-M9 test worker Tesla completed RED tests for final gated Notion apply preflight, stale/mutated hash rejection, unsafe candidate rejection, raw payload rejection, approved operation subset, re-read verification, and sanitized ledger evidence."
+    report: .pipeline/reviews/C16/M9/test-evidence.md
+    trigger: auto
+    related_milestone: C16-M9
+    tests:
+      - "node --test core/test/notion-apply-gate.test.js core/test/maintenance-ledger.test.js core/test/root-management-dry-run.test.js: expected RED, 10/17 passing; missing applyApprovedNotionDryRunBundle export"
+      - "node --test core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 8/8 passing"
+      - "python -m pytest tests/test_notion_integration.py tests/test_notion_output_adapter.py tests/test_notion_mixed_mode.py: not run, python command unavailable"
+      - "python3 -m pytest tests/test_notion_integration.py tests/test_notion_output_adapter.py tests/test_notion_mixed_mode.py: collected 0 tests, exit code 5"
+    worker:
+      role: test
+      id: "019e40f1-b633-78b2-8735-03dc1dc2b406"
+      nickname: Tesla
+      lifecycle: completed
+  -
+    id: M9-IMPLEMENT-COMPLETE-C16-20260520T000255+0800
+    type: step_complete
+    ref: C16/M9/implement
+    status: completed
+    timestamp: "2026-05-20T00:02:55+08:00"
+    summary: "Implemented C16-M9 applyApprovedNotionDryRunBundle with explicit confirmation preflight, dry-run hash integrity checks, unsafe candidate and raw payload rejection, approved operation subset application, Notion re-read verification, and sanitized ledger evidence."
+    report: .pipeline/reviews/C16/M9/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M9
+    tests:
+      - "node --test core/test/notion-apply-gate.test.js core/test/maintenance-ledger.test.js core/test/root-management-dry-run.test.js: 17/17 passing"
+      - "node --test core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 8/8 passing"
+      - "python -m pytest tests/test_notion_integration.py tests/test_notion_output_adapter.py tests/test_notion_mixed_mode.py: not run, python command unavailable"
+      - "python3 -m pytest tests/test_notion_integration.py tests/test_notion_output_adapter.py tests/test_notion_mixed_mode.py: collected 0 tests, exit code 5"
+      - "cd core && npm test: 584/584 passing"
+      - "git diff --check: passing"
+  -
+    id: M9-AUDIT-FAIL-C16-20260520T000836+0800
+    type: worker_complete
+    ref: C16/M9/audit
+    status: failed
+    timestamp: "2026-05-20T00:08:36+08:00"
+    summary: "C16-M9 audit worker Mendel failed the milestone because explicit_user_confirmation=false still allowed Notion writes, empty target_page_ids could be bypassed by operation or reviewed-plan target_page_id fields, and reviewed_apply_plan dry_run_id/hash were not bound to the input bundle."
+    report: .pipeline/reviews/C16/M9/audit.md
+    trigger: auto
+    related_milestone: C16-M9
+    tests:
+      - "node --test core/test/notion-apply-gate.test.js core/test/maintenance-ledger.test.js core/test/root-management-dry-run.test.js: 17/17 passing"
+      - "node --test core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 8/8 passing"
+      - "cd core && npm test: 584/584 passing"
+      - "git diff --check: passing"
+      - "audit probes: failed, false confirmation and empty target_page_ids still wrote"
+    worker:
+      role: audit
+      id: "019e40fa-f5f3-77a2-9d9a-5094b069dbfe"
+      nickname: Mendel
+      lifecycle: completed
+  -
+    id: M9-IMPLEMENT-REVISION-C16-20260520T001325+0800
+    type: step_complete
+    ref: C16/M9/implement_revision
+    status: completed
+    timestamp: "2026-05-20T00:13:25+08:00"
+    summary: "C16-M9 audit revision completed: false explicit confirmation, empty target_page_ids, and reviewed apply plan dry-run id/hash mismatch now fail preflight before any Notion write; target authorization only uses explicit target_page_ids mapping."
+    report: .pipeline/reviews/C16/M9/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M9
+    tests:
+      - "node --test core/test/notion-apply-gate.test.js core/test/maintenance-ledger.test.js core/test/root-management-dry-run.test.js: 18/18 passing"
+      - "node --test core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 8/8 passing"
+      - "custom audit probes: false_confirmation ok=false writes=0; empty_targets ok=false writes=0; plan_id_mismatch ok=false writes=0"
+      - "python3 -m pytest tests/test_notion_integration.py tests/test_notion_output_adapter.py tests/test_notion_mixed_mode.py: collected 0 tests, exit code 5"
+      - "cd core && npm test: 585/585 passing"
+      - "git diff --check: passing"
+  -
+    id: M9-AUDIT-RECHECK-FAIL-C16-20260520T002025+0800
+    type: worker_complete
+    ref: C16/M9/audit_recheck
+    status: failed
+    timestamp: "2026-05-20T00:20:25+08:00"
+    summary: "C16-M9 audit recheck confirmed the first three blockers were fixed but failed on negated confirmation strings matching the approval regex; it also flagged missing reviewed_apply_plan dry_run_id/dry_run_hash as residual risk."
+    report: .pipeline/reviews/C16/M9/audit.md
+    trigger: auto
+    related_milestone: C16-M9
+    tests:
+      - "node --test core/test/notion-apply-gate.test.js core/test/maintenance-ledger.test.js core/test/root-management-dry-run.test.js: 18/18 passing"
+      - "node --test core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 8/8 passing"
+      - "cd core && npm test: 585/585 passing"
+      - "git diff --check: passing"
+      - "audit probes: not confirmed ok=true writes=1; do not approve applying ok=true writes=1"
+    worker:
+      role: audit
+      id: "019e40fa-f5f3-77a2-9d9a-5094b069dbfe"
+      nickname: Mendel
+      lifecycle: completed
+  -
+    id: M9-IMPLEMENT-SECOND-REVISION-C16-20260520T002025+0800
+    type: step_complete
+    ref: C16/M9/implement_second_revision
+    status: completed
+    timestamp: "2026-05-20T00:20:25+08:00"
+    summary: "C16-M9 second audit revision replaced natural-language confirmation regex with an exact dry-run id/hash confirmation phrase and made reviewed_apply_plan dry_run_id/dry_run_hash mandatory; negated strings, casual approval fragments, and missing plan binding now fail before writes."
+    report: .pipeline/reviews/C16/M9/implementation-evidence.md
+    trigger: auto
+    related_milestone: C16-M9
+    tests:
+      - "node --test core/test/notion-apply-gate.test.js core/test/maintenance-ledger.test.js core/test/root-management-dry-run.test.js: 18/18 passing"
+      - "node --test core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 8/8 passing"
+      - "python3 -m pytest tests/test_notion_integration.py tests/test_notion_output_adapter.py tests/test_notion_mixed_mode.py: collected 0 tests, exit code 5"
+      - "cd core && npm test: 585/585 passing"
+      - "git diff --check: passing"
+  -
+    id: M9-AUDIT-RECHECK-PASS-C16-20260520T002547+0800
+    type: worker_complete
+    ref: C16/M9/audit_recheck
+    status: completed
+    timestamp: "2026-05-20T00:25:47+08:00"
+    summary: "C16-M9 second audit recheck PASS: negated/casual confirmation strings and missing reviewed plan id/hash fail before writes; exact id/hash confirmation and boolean true structured confirmation write only to explicit target_page_ids mapping."
+    report: .pipeline/reviews/C16/M9/audit.md
+    trigger: auto
+    related_milestone: C16-M9
+    tests:
+      - "node --test core/test/notion-apply-gate.test.js core/test/maintenance-ledger.test.js core/test/root-management-dry-run.test.js: 18/18 passing"
+      - "node --test core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 8/8 passing"
+      - "cd core && npm test: 585/585 passing"
+      - "python3 -m pytest tests/test_notion_integration.py tests/test_notion_output_adapter.py tests/test_notion_mixed_mode.py: collected 0 tests, exit code 5"
+      - "git diff --check: passing"
+    worker:
+      role: audit
+      id: "019e40fa-f5f3-77a2-9d9a-5094b069dbfe"
+      nickname: Mendel
+      lifecycle: closed
+  -
+    id: M9-COMPLETE-C16-20260520T002547+0800
+    type: milestone_complete
+    ref: C16/M9
+    status: completed
+    timestamp: "2026-05-20T00:25:47+08:00"
+    summary: "Completed C16-M9 Final Gated Notion Apply And Verification with approved dry-run bundle apply gate, exact confirmation binding, explicit target bindings, stale/unsafe/raw payload rejection, re-read verification, and sanitized ledger evidence."
+    report: .pipeline/reports/08-final-gated-notion-apply-verification.report.md
+    trigger: auto
+    related_milestone: C16-M9
+    tests:
+      - "node --test core/test/notion-apply-gate.test.js core/test/maintenance-ledger.test.js core/test/root-management-dry-run.test.js: 18/18 passing"
+      - "node --test core/test/notion-project-home-dry-run.test.js core/test/maintenance-run.test.js: 8/8 passing"
+      - "cd core && npm test: 585/585 passing"
+      - "python3 -m pytest tests/test_notion_integration.py tests/test_notion_output_adapter.py tests/test_notion_mixed_mode.py: collected 0 tests, exit code 5"
+      - "git diff --check: passing"
+  -
+    id: CYCLE-PENDING-ACCEPTANCE-C16-20260520T002547+0800
+    type: cycle_pending_acceptance
+    ref: C16
+    status: pending_acceptance
+    timestamp: "2026-05-20T00:25:47+08:00"
+    summary: "C16 automated work completed all 9 milestones for root project management mode and is waiting for user acceptance or rejection."
+    report: .pipeline/reports/08-final-gated-notion-apply-verification.report.md
+    trigger: auto
+  -
+    id: C16-ACCEPTANCE-FEEDBACK-MAINTAIN-SCHEDULER-20260520T004122+0800
+    type: patch_fix
+    ref: C16/acceptance-feedback/maintenance-scheduler
+    status: completed
+    timestamp: "2026-05-20T00:41:22+08:00"
+    summary: "Added a real daily 04:00 maintenance scheduler entry after user acceptance feedback: `hypo-workflow maintain-scheduler --dry-run` and `scripts/maintenance-scheduler.sh` now create safe-local global_consolidation evidence and append a sanitized maintenance ledger event without remote writes."
+    report: .pipeline/reports/05-scheduled-global-consolidation-chat-backfill.report.md
+    trigger: user-feedback
+    related_milestone: C16-M6
+    tests:
+      - "node --test core/test/global-consolidation.test.js core/test/session-source-discovery.test.js core/test/maintenance-backfill.test.js core/test/maintenance-command-map.test.js core/test/skill-spec.test.js: 16/16 passing"
+      - "scripts/maintenance-scheduler.sh /home/heyx/Hypo-Workflow --home /tmp/hw-maintain-smoke --fixture-root /home/heyx/Hypo-Workflow/core/test/fixtures/global-consolidation --now 2026-05-20T04:00:00+08:00 --dry-run: created global_consolidation evidence and ledger event; remote_writes_enabled=false"
+      - "cd core && npm test: 587/587 passing"
+      - "python3 -m pytest tests/test_notion_integration.py tests/test_notion_output_adapter.py tests/test_notion_mixed_mode.py: collected 0 tests, exit code 5"
+      - "git diff --check: passing"
+  -
+    id: C16-WORKFLOW-NOTION-QQ-SYNC-20260520T013752+0800
+    type: external_sync
+    ref: C16/workflow-self-sync/notion-qq
+    status: completed
+    timestamp: "2026-05-20T01:37:52+08:00"
+    summary: "Executed user-authorized Workflow self sync to Notion by creating a safe child page under the existing Hypo-Workflow page, then dispatched the local remaining sync scheme to Hypo-Claw QQ in four sanitized segments."
+    report: .pipeline/reports/C16-workflow-notion-sync-20260520.report.md
+    trigger: user-authorized
+    related_milestone: C16-M9
+    evidence:
+      notion_parent_page_id: "528322b7-e9d5-40bd-a2e8-8350602c9feb"
+      notion_created_page_id: "365819d0-6774-811a-b4d0-e50c27a743d6"
+      notion_created_page_url: "https://www.notion.so/C16-2026-05-20-365819d06774811ab4d0e50c27a743d6"
+      notion_child_count: 63
+      qq_segments_sent: 4
+      qq_provider: qq_bot_official
+      qq_external_contacted: true
+    tests:
+      - "Notion dry-run: create mode, parent page 528322b7-e9d5-40bd-a2e8-8350602c9feb, 63 child blocks"
+      - "Notion read-back: created page 365819d0-6774-811a-b4d0-e50c27a743d6, title matched, parent matched, child_count=63"
+      - "Hypo-Claw QQ live-roundtrip: 4/4 segments returned status=sent, externalContacted=true, provider=qq_bot_official"
+      - "git diff --check -- .pipeline/reports/C16-workflow-notion-sync-20260520.report.md: passing"
+  -
+    id: CYCLE-REJECT-C16-20260520T130827+0800
+    type: cycle_reject
+    ref: C16
+    status: rejected
+    timestamp: "2026-05-20T13:08:27+08:00"
+    summary: "User rejected C16 acceptance because the Notion sync created an additional child page instead of reconciling and organizing the existing Hypo-Workflow page together with its existing child pages."
+    feedback_ref: .pipeline/acceptance/cycle-C16-rejection-20260520T130827+0800.yaml
+    next_action: resume_revision
+    route: needs_revision
+  -
+    id: C16-REVISION-MAINTAIN-NOTION-MERGE-SPEC-20260520T131841+0800
+    type: revision_progress
+    ref: C16/revision/notion-legacy-merge-spec
+    status: completed
+    timestamp: "2026-05-20T13:18:41+08:00"
+    summary: "Generated a Maintain dry-run specification for reconciling the existing Hypo-Workflow Notion page and child pages with current local Workflow documentation and artifacts; no Notion write was performed."
+    trigger: user-request
+    related_milestone: C16-M9
+    evidence_refs:
+      - ~/.hypo-workflow/maintenance/evidence/dry-runs/hypo-workflow-notion-legacy-merge-spec-20260520T130827+0800.md
+    validations:
+      - "Maintenance queue YAML parsed successfully and required queue item fields were present"
+      - "Maintenance ledger YAML parsed successfully"
+      - "Notion remote read observed 88 top-level blocks including the existing C16 sync child page"
+    next_action: "Generate full block/page manifest dry-run before any remote write"
+  -
+    id: C16-REVISION-MAINTAIN-NOTION-SCAN-MANIFEST-DRAFT-20260520T133030+0800
+    type: revision_progress
+    ref: C16/revision/notion-scan-manifest-merge-draft
+    status: completed
+    timestamp: "2026-05-20T13:30:30+08:00"
+    summary: "Completed Maintain scan, source_id-level manifest, and merge draft for the Hypo-Workflow Notion reconciliation. Outputs cover 88 top-level Notion blocks, 35 child pages, 70 local files, and 193 manifest rows. No Notion write was performed."
+    trigger: user-request
+    related_milestone: C16-M9
+    evidence_refs:
+      - ~/.hypo-workflow/maintenance/evidence/scan/hypo-workflow-notion-scan-20260520T133000+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/dry-runs/hypo-workflow-notion-merge-manifest-20260520T133000+0800.csv
+      - ~/.hypo-workflow/maintenance/evidence/dry-runs/hypo-workflow-notion-merge-manifest-20260520T133000+0800.md
+      - ~/.hypo-workflow/maintenance/evidence/dry-runs/hypo-workflow-notion-merge-draft-20260520T133000+0800.md
+    validations:
+      - "Maintenance queue YAML parsed successfully and queue item required fields are present"
+      - "Maintenance ledger YAML parsed successfully"
+      - "Generated manifest rows: 193"
+    next_action: "Review merge draft and decide whether to generate first-stage safe structure apply payload"
+  -
+    id: C16-REVISION-MAINTAIN-NOTION-SAFE-STRUCTURE-PAYLOAD-20260520T133817+0800
+    type: revision_progress
+    ref: C16/revision/notion-safe-structure-apply-payload
+    status: completed
+    timestamp: "2026-05-20T13:38:17+08:00"
+    summary: "Generated a first-stage safe structure apply payload dry-run for the Hypo-Workflow Notion page. It contains 15 candidate operations, all non-destructive, and no Notion write was performed."
+    trigger: user-request
+    related_milestone: C16-M9
+    evidence_refs:
+      - ~/.hypo-workflow/maintenance/evidence/dry-runs/hypo-workflow-notion-safe-structure-apply-payload-20260520T134500+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/dry-runs/hypo-workflow-notion-safe-structure-apply-payload-20260520T134500+0800.md
+    validations:
+      - "Payload JSON parsed successfully"
+      - "Candidate operations: 15"
+      - "Destructive operations: 0"
+    next_action: "Review payload and decide whether to authorize actual first-stage safe structure apply"
+  -
+    id: C16-REVISION-MAINTAIN-NOTION-SAFE-STRUCTURE-APPLY-20260520T134506+0800
+    type: external_sync
+    ref: C16/revision/notion-safe-structure-apply
+    status: completed
+    timestamp: "2026-05-20T13:45:06+08:00"
+    summary: "Applied user-authorized first-stage safe structure changes to the Hypo-Workflow Notion page. Updated two top summary blocks and appended 66 structure/index blocks; no block deletion, archive, or page cleanup was performed."
+    trigger: user-authorized
+    related_milestone: C16-M9
+    evidence_refs:
+      - ~/.hypo-workflow/maintenance/backups/hypo-workflow-notion-before-safe-structure-apply-20260520T135500+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/apply-results/hypo-workflow-notion-safe-structure-apply-20260520T134500+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/verify-results/hypo-workflow-notion-safe-structure-verify-20260520T134506+0800.json
+    validations:
+      - "Read-back top-level block count after apply: 154"
+      - "Verified refreshed current status summary"
+      - "Verified Project Home navigation and Overview/Progress/Architecture/Docs/Knowledge/Prompts Index/Reports Index/Legacy Archive/Review Required sections"
+      - "Deleted or archived blocks: 0"
+    next_action: "Review Notion page; optional second-stage cleanup requires separate explicit confirmation"
+  -
+    id: C16-REVISION-MAINTAIN-NOTION-DOMAIN-REBUILD-20260520T135041+0800
+    type: external_sync
+    ref: C16/revision/notion-domain-rebuild
+    status: completed
+    timestamp: "2026-05-20T13:50:41+08:00"
+    summary: "Created 8 content-domain child pages under the Hypo-Workflow Notion page and copied/organized legacy/current sources into them. This addresses the user feedback that indexes alone were insufficient; no legacy block or page was deleted or archived."
+    trigger: user-authorized
+    related_milestone: C16-M9
+    evidence_refs:
+      - ~/.hypo-workflow/maintenance/backups/hypo-workflow-notion-before-domain-rebuild-20260520T135041+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/apply-results/hypo-workflow-notion-domain-rebuild-20260520T135041+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/verify-results/hypo-workflow-notion-domain-rebuild-verify-20260520T135041+0800.json
+    validations:
+      - "Created domain pages: 8"
+      - "Verified domain pages present under parent"
+      - "Verified all created domain pages have content"
+      - "Read-back top-level block count after apply: 162"
+      - "Deleted or archived blocks: 0"
+    next_action: "User review of domain pages; destructive cleanup/archive old positions requires separate explicit confirmation"
+  -
+    id: C16-REVISION-MAINTAIN-NOTION-LEGACY-PAGE-COPY-20260520T140000+0800
+    type: external_sync
+    ref: C16/revision/notion-legacy-page-copy
+    status: completed
+    timestamp: "2026-05-20T14:00:00+08:00"
+    summary: "Copied all 35 existing legacy child pages into their target content-domain pages as domain-internal page copies. This creates real domain placement rather than name-only indexes. Original legacy pages were left intact pending separate cleanup authorization."
+    trigger: user-authorized
+    related_milestone: C16-M9
+    evidence_refs:
+      - ~/.hypo-workflow/maintenance/backups/hypo-workflow-notion-before-legacy-page-copy-20260520T140000+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/apply-results/hypo-workflow-notion-legacy-page-copy-20260520T140000+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/verify-results/hypo-workflow-notion-legacy-page-copy-verify-20260520T140000+0800.json
+    validations:
+      - "Legacy pages seen: 35"
+      - "Domain-internal page copies created: 35"
+      - "Skipped legacy pages: 0"
+      - "All created copies verified non-empty"
+      - "Original legacy pages deleted or archived: 0"
+    next_action: "Review copied pages; optional archive of original legacy pages requires separate destructive cleanup confirmation"
+  -
+    id: C16-REVISION-MAINTAIN-NOTION-CLEANUP-20260520T141500+0800
+    type: external_sync
+    ref: C16/revision/notion-cleanup
+    status: completed
+    timestamp: "2026-05-20T14:15:00+08:00"
+    summary: "Executed user-authorized cleanup after a complete recursive Notion backup. Archived 152 copied or superseded root-level blocks/pages, leaving the root Hypo-Workflow page with only two summary blocks and eight domain child pages."
+    trigger: user-authorized
+    related_milestone: C16-M9
+    evidence_refs:
+      - ~/.hypo-workflow/maintenance/backups/hypo-workflow-notion-recursive-before-cleanup-20260520T141500+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/dry-runs/hypo-workflow-notion-cleanup-plan-20260520T141500+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/apply-results/hypo-workflow-notion-cleanup-archive-20260520T141500+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/verify-results/hypo-workflow-notion-cleanup-verify-20260520T141500+0800.json
+    validations:
+      - "Recursive backup complete: 8982 blocks, 103 pages, max_depth=5, errors=0"
+      - "Cleanup planned archives: 152"
+      - "Cleanup archived: 152"
+      - "Cleanup errors: 0"
+      - "Root child count after verify: 10"
+      - "Domain page count after verify: 8"
+      - "Domain-internal legacy copies after verify: 35"
+    next_action: "User review of cleaned Notion Project Home"
+  -
+    id: C16-REVISION-MAINTAIN-NOTION-READABILITY-20260520T142800+0800
+    type: external_sync
+    ref: C16/revision/notion-readability
+    status: completed
+    timestamp: "2026-05-20T14:28:00+08:00"
+    summary: "Improved Notion Project Home readability: set icons for root/domain/copy pages, refreshed the root summary callouts as external Overview, removed trailing dashboard and source-id noise, and verified the root is two summaries plus eight iconized domain pages."
+    trigger: user-authorized
+    related_milestone: C16-M9
+    evidence_refs:
+      - ~/.hypo-workflow/maintenance/backups/hypo-workflow-notion-recursive-before-readability-20260520T142800+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/apply-results/hypo-workflow-notion-readability-apply-20260520T142800+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/apply-results/hypo-workflow-notion-domain-readability-cleanup-20260520T142800+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/verify-results/hypo-workflow-notion-readability-verify-20260520T142800+0800.json
+    validations:
+      - "Readability backup complete: 2654 blocks, 43 pages, errors=0"
+      - "Icons updated pages: 44"
+      - "Root child count after verify: 10"
+      - "Domain page count after verify: 8"
+      - "Domain-internal copies after verify: 35"
+      - "Domain source-id noise blocks after verify: 0"
+    next_action: "User review of improved Notion Project Home readability"
+  -
+    id: C16-REVISION-MAINTAIN-NOTION-TITLE-OVERVIEW-POLISH-20260520T144500+0800
+    type: external_sync
+    ref: C16/revision/notion-title-overview-polish
+    status: completed
+    timestamp: "2026-05-20T14:45:00+08:00"
+    summary: "Polished Notion readability per user feedback: replaced Overview quote blocks with regular paragraphs and removed the '归位 —' prefix from all 35 domain-internal copied pages."
+    trigger: user-authorized
+    related_milestone: C16-M9
+    evidence_refs:
+      - ~/.hypo-workflow/maintenance/backups/hypo-workflow-notion-before-title-overview-polish-20260520T144500+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/apply-results/hypo-workflow-notion-title-overview-polish-20260520T144500+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/verify-results/hypo-workflow-notion-title-overview-polish-verify-20260520T144500+0800.json
+    validations:
+      - "Overview quote blocks after verify: 0"
+      - "Renamed pages: 35"
+      - "Titles with '归位 —' prefix after verify: 0"
+    next_action: "User review of polished Notion pages"
+  -
+    id: C16-REVISION-MAINTAIN-NOTION-MARKDOWN-RENDER-20260520T150000+0800
+    type: external_sync
+    ref: C16/revision/notion-markdown-render
+    status: completed
+    timestamp: "2026-05-20T15:00:00+08:00"
+    summary: "Converted pseudo Markdown/plain-text code blocks in the reorganized Hypo-Workflow Notion pages into ordinary Notion blocks while keeping real code/config blocks as code."
+    trigger: user-authorized
+    related_milestone: C16-M9
+    evidence_refs:
+      - ~/.hypo-workflow/maintenance/backups/hypo-workflow-notion-before-markdown-render-20260520T150000+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/apply-results/hypo-workflow-notion-markdown-render-20260520T150000+0800.json
+    validations:
+      - "Code blocks seen: 191"
+      - "Converted pseudo Markdown/plain-text blocks: 44"
+      - "Kept real code/config blocks: 147"
+      - "Conversion errors: 0"
+    next_action: "User review of rendered Notion pages"
+  -
+    id: C16-REVISION-MAINTAIN-NOTION-TOP-MARKER-CLEANUP-20260520T160000+0800
+    type: external_sync
+    ref: C16/revision/notion-top-marker-cleanup
+    status: completed
+    timestamp: "2026-05-20T16:00:00+08:00"
+    summary: "Fixed remaining Notion organization defects reported by the user screenshot: removed top[n]/quote/Markdown marker residue from domain pages, converted headings/lists/code to native Notion blocks, and archived one empty marker block."
+    trigger: user-feedback
+    related_milestone: C16-M9
+    evidence_refs:
+      - ~/.hypo-workflow/maintenance/backups/hypo-workflow-notion-before-top-marker-cleanup-20260520T160000+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/dry-runs/hypo-workflow-notion-top-marker-cleanup-dry-run-20260520T160000+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/apply-results/hypo-workflow-notion-top-marker-cleanup-20260520T160000+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/apply-results/hypo-workflow-notion-top-marker-cleanup-followup-20260520T160000+0800.json
+      - ~/.hypo-workflow/maintenance/evidence/verify-results/hypo-workflow-notion-top-marker-cleanup-final-verify-20260520T160000+0800.json
+    validations:
+      - "Initial residue findings: 29"
+      - "Processed polluted blocks: 29"
+      - "Apply errors: 0"
+      - "Final residual top[n]/quote/Markdown marker count: 0"
+      - "Verified 8 domain pages after cleanup"
+    next_action: "User review of cleaned Notion domain pages"
+  -
+    id: C16-REVISION-GLOBAL-KNOWLEDGE-PROJECTION-20260520T163000+0800
+    type: step_complete
+    ref: C16/revision/global-knowledge-projection-sessionstart
+    status: completed
+    timestamp: "2026-05-20T16:30:00+08:00"
+    summary: "Implemented project-scoped global Knowledge projections for Workflow SessionStart: projects load compact/index projection files only, raw global records and candidates stay on-demand, and the SessionStart hook now emits valid JSON only."
+    trigger: user-request
+    related_milestone: C16-M7
+    evidence_refs:
+      - ~/.hypo-workflow/knowledge/projections/projects/hypo-workflow.yaml
+      - ~/.hypo-workflow/knowledge/projections/projects/hypo-workflow.compact.md
+    validations:
+      - "node --test core/test/knowledge-ledger.test.js core/test/global-knowledge-index.test.js core/test/sync-standardization.test.js: 16/16 passing"
+      - "SessionStart hook JSON parse: passing; additionalContext contains Global Knowledge compact and load log"
+      - "git diff --check focused files: passing"
+    next_action: "Use /hw:knowledge global sync/status/search semantics to expand global Knowledge without loading raw records by default"
+  -
+    id: C16-REVISION-ALPHA-RELEASE-20260520T191524+0800
+    type: release
+    ref: C16/revision/v13.0.0-alpha.1
+    status: completed
+    timestamp: "2026-05-20T19:15:24+08:00"
+    summary: "Prepared v13.0.0-alpha.1 alpha release metadata for the C16 major root-management change set; push is user-authorized, while tag, publish, and remote release creation remain out of scope."
+    trigger: user-request
+    related_milestone: C16-M9
+    evidence_refs:
+      - CHANGELOG.md
+      - README.md
+      - README.en.md
+      - docs/release/v13.0.0-alpha.1.md
+      - docs/en/release/v13.0.0-alpha.1.md
+    validations:
+      - "npm test from core: 588/588 passing"
+      - "node cli/bin/hypo-workflow sync --platform opencode --project . --check-only: derived=fresh"
+      - "checkDocs, checkDocsLanguage, checkNarrativeDocsForRelease, checkReadmeFreshness: PASS"
+      - "git diff --check: passing"
+    next_action: "Commit and push the v13.0.0-alpha.1 alpha change set to github/main; do not create a tag, publish package, or create a remote release."
