@@ -1,5 +1,6 @@
 import { posix } from "node:path";
 import { detectSecretLeaks, redactSecrets } from "../evidence/index.js";
+import { cloneJson, isPlainObject } from "../utils/index.js";
 
 export const REVIEW_VERDICTS = Object.freeze(["pass", "warn", "needs_changes", "critical"]);
 export const REVIEW_SURFACES = Object.freeze(["skills", "hooks", "agents", "commands", "generated_adapters"]);
@@ -197,12 +198,4 @@ function normalizeSkipReason(value) {
   if (typeof value === "string") return value;
   if (isPlainObject(value) && value.reason) return String(value.reason);
   return "skipped by review coverage policy";
-}
-
-function cloneJson(value) {
-  return JSON.parse(JSON.stringify(value));
-}
-
-function isPlainObject(value) {
-  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }

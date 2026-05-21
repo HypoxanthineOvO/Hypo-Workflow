@@ -1,0 +1,3 @@
+{"timestamp":"2026-05-20T01:20:00.000Z","type":"session_meta","payload":{"id":"missing-assistant-fixture","timestamp":"2026-05-20T01:20:00.000Z","cwd":"/tmp/final-assistant-output-fixture","originator":"codex_cli_rs"}}
+{"timestamp":"2026-05-20T01:20:01.000Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"This fixture intentionally has no assistant response."}]}}
+{"timestamp":"2026-05-20T01:20:02.000Z","type":"event_msg","payload":{"type":"turn_aborted","reason":"fixture ends before assistant output"}}

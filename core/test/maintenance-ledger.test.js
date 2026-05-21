@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { parseYaml } from "../src/config/index.js";
 import * as api from "../src/index.js";
 
 test("maintenance ledger append helper is append-only and redacts raw secrets", async () => {
@@ -26,8 +27,9 @@ test("maintenance ledger append helper is append-only and redacts raw secrets", 
     evidence_refs: ["~/.hypo-workflow/maintenance/evidence/verify/mq-001.yaml"],
   }));
 
-  const ledgerSource = await readFile(join(root, "maintenance", "ledger.yaml"), "utf8");
-  const validation = validateMaintenanceLedger(ledgerSource);
+  const ledgerPath = join(root, "maintenance", "ledger.jsonl");
+  const events = await readJsonlEvents(ledgerPath);
+  const validation = validateMaintenanceLedger({ events });
 
   assert.equal(validation.ok, true, validation.errors.join("\n"));
   assert.equal(validation.events.length, 2);
@@ -35,9 +37,14 @@ test("maintenance ledger append helper is append-only and redacts raw secrets", 
     "ml-20260519-scan",
     "ml-20260519-verify",
   ]);
-  assert.match(ledgerSource, /safe_count/);
-  assert.doesNotMatch(ledgerSource, /raw-maintenance-token|raw-maintenance-api-key|hunter2/);
-  assert.match(ledgerSource, /\[REDACTED\]/);
+  assert.equal(events[0].metadata.safe_count, 3);
+  const serialized = JSON.stringify(events);
+  assert.doesNotMatch(serialized, /raw-maintenance-token|raw-maintenance-api-key|hunter2/);
+  assert.match(serialized, /\[REDACTED\]/);
+  await assertCompactSummary(ledgerPath, {
+    event_count: 2,
+    latest_event_id: "ml-20260519-verify",
+  });
 });
 
 test("maintenance evidence paths cover scan, dry-run, apply, verify, and backup surfaces", () => {
@@ -115,6 +122,22 @@ test("maintenance status and log render Chinese user-visible summaries for zh-CN
 function requireApi(name) {
   assert.equal(typeof api[name], "function", `expected ${name} to be exported from ../src/index.js`);
   return api[name];
+}
+
+async function readJsonlEvents(file) {
+  assert.match(file, /\.jsonl$/, `${file} must be a JSONL authority file`);
+  const source = await readFile(file, "utf8");
+  return source.trimEnd().split("\n").filter(Boolean).map((line) => JSON.parse(line));
+}
+
+async function assertCompactSummary(jsonlPath, expected) {
+  const summaryPath = jsonlPath.replace(/\.jsonl$/, ".summary.yaml");
+  const summary = parseYaml(await readFile(summaryPath, "utf8"));
+  assert.equal(summary.authority, "jsonl");
+  assert.equal(summary.authority_path, jsonlPath);
+  assert.equal(summary.event_count, expected.event_count);
+  assert.equal(summary.latest_event_id, expected.latest_event_id);
+  assert.equal(summary.events, undefined, "compact summary must not be the maintenance write authority");
 }
 
 function ledgerEvent(overrides = {}) {

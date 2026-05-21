@@ -2,6 +2,10 @@
 
 本页是面向用户和 Agent 的配置治理矩阵。配置的解析顺序是 project config > global config > built-in default；project config 通常是 `.pipeline/config.yaml`，global config 通常是 `~/.hypo-workflow/config.yaml`。Hypo-Workflow 不是后台 runner，配置只决定 Agent 如何规划、执行、审查和确认。
 
+`loadLayeredConfig` 会按 project `.pipeline/config.yaml` > user `~/.hypo-workflow/config.yaml` > safe defaults 合并配置，并返回来源追踪。safe defaults 包含 `integrations.hypo_claw`、`integrations.hypo_writer`、`projects`、`output.timezone` 和 `project_linkage.seeds`，路径使用 `~` 或运行时 HOME 派生，不包含本机绝对路径。
+
+用户配置迁移必须显式执行：`hypo-workflow config migrate` 只输出 dry-run 计划和 YAML，`hypo-workflow config migrate --write` 才写入 `~/.hypo-workflow/config.yaml`。`hypo-workflow sync` 在缺少用户配置时只输出迁移提示，不静默写用户级配置。
+
 ## 配置层级
 
 | 层级 | 文件 | 用途 | 写入边界 |

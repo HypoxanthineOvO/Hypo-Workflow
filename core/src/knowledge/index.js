@@ -151,7 +151,7 @@ export function normalizeKnowledgeRecord(record = {}, options = {}) {
     created_at: record.created_at || new Date().toISOString(),
     summary: String(record.summary || "").trim(),
     details: isPlainObject(record.details) ? record.details : {},
-    tags: normalizeStringList(record.tags).map((tag) => slugify(tag)),
+    tags: normalizeKnowledgeTags(record.tags),
     categories: normalizeCategories(record.categories),
     refs: isPlainObject(record.refs) ? record.refs : {},
     ...(Array.isArray(record.secret_refs) ? { secret_refs: normalizeSecretRefs(record.secret_refs) } : {}),
@@ -324,7 +324,7 @@ export async function appendKnowledgeRecord(projectRoot, record, options = {}) {
   const recordsDir = join(root, "records");
   await mkdir(recordsDir, { recursive: true });
   const path = join(recordsDir, `${normalized.id}.yaml`);
-  await writeFile(path, `${stringifyKnowledgeYaml(normalized)}\n`, "utf8");
+  await writeFile(path, `${(await stringifySharedYaml(normalized)).trimEnd()}\n`, "utf8");
   return { record: normalized, path };
 }
 
@@ -338,7 +338,7 @@ export async function rebuildKnowledgeIndexes(projectRoot, options = {}) {
   for (const category of KNOWLEDGE_INDEX_CATEGORIES) {
     const index = buildCategoryIndex(category, records, options);
     const path = join(indexDir, `${category}.yaml`);
-    await writeFile(path, `${stringifyKnowledgeYaml(index)}\n`, "utf8");
+    await writeFile(path, `${(await stringifySharedYaml(index)).trimEnd()}\n`, "utf8");
     files[category] = path;
   }
 
@@ -378,7 +378,7 @@ export async function loadKnowledgeRecords(projectRoot, options = {}) {
   const records = [];
   for (const entry of entries.filter((item) => item.isFile() && item.name.endsWith(".yaml")).sort((a, b) => a.name.localeCompare(b.name))) {
     const path = join(recordsDir, entry.name);
-    const record = parseKnowledgeYaml(await readFile(path, "utf8"));
+    const record = await parseSharedYaml(await readFile(path, "utf8"));
     const normalized = normalizeKnowledgeRecord(record, options);
     const result = validateKnowledgeRecord(normalized);
     if (!result.ok) {
@@ -448,6 +448,12 @@ function normalizeCategories(value) {
     return normalized === "secret-ref" ? "secret-refs" : normalized;
   }).filter((category) => KNOWLEDGE_INDEX_CATEGORIES.includes(category)))];
   return KNOWLEDGE_INDEX_CATEGORIES.filter((category) => normalized.includes(category));
+}
+
+function normalizeKnowledgeTags(value) {
+  return normalizeStringList(value)
+    .map((tag) => tag.toLowerCase().replace(/[_\s]+/g, "-"))
+    .filter(Boolean);
 }
 
 function normalizeSecretRefs(secretRefs) {
@@ -678,117 +684,12 @@ function stableStringify(value) {
   return JSON.stringify(value);
 }
 
-function stringifyKnowledgeYaml(value, indent = 0) {
-  if (!isPlainObject(value)) return `${" ".repeat(indent)}${formatScalar(value)}`;
-  const lines = [];
-  for (const [key, child] of Object.entries(value)) {
-    if (Array.isArray(child)) {
-      lines.push(`${" ".repeat(indent)}${key}:`);
-      for (const item of child) {
-        if (isPlainObject(item)) {
-          lines.push(`${" ".repeat(indent + 2)}-`);
-          lines.push(stringifyKnowledgeYaml(item, indent + 4));
-        } else {
-          lines.push(`${" ".repeat(indent + 2)}- ${formatScalar(item)}`);
-        }
-      }
-    } else if (isPlainObject(child)) {
-      lines.push(`${" ".repeat(indent)}${key}:`);
-      lines.push(stringifyKnowledgeYaml(child, indent + 2));
-    } else {
-      lines.push(`${" ".repeat(indent)}${key}: ${formatScalar(child)}`);
-    }
-  }
-  return lines.join("\n");
+async function parseSharedYaml(source) {
+  const { parseYaml } = await import("../config/index.js");
+  return parseYaml(source);
 }
 
-function parseKnowledgeYaml(source) {
-  const lines = source
-    .split(/\r?\n/)
-    .filter((raw) => raw.trim() && !raw.trimStart().startsWith("#"))
-    .map((raw) => ({ indent: raw.match(/^ */)[0].length, text: raw.trim() }));
-  let index = 0;
-
-  function parseNode(indent) {
-    return lines[index]?.text.startsWith("-") ? parseArray(indent) : parseObject(indent);
-  }
-
-  function parseArray(indent) {
-    const value = [];
-    while (index < lines.length && lines[index].indent === indent && lines[index].text.startsWith("-")) {
-      const rest = lines[index].text.slice(1).trim();
-      index += 1;
-      if (!rest) {
-        value.push(index < lines.length && lines[index].indent > indent ? parseNode(lines[index].indent) : null);
-        continue;
-      }
-      if (rest.startsWith('"') || rest.startsWith("'") || rest.startsWith("[")) {
-        value.push(parseScalar(rest));
-        continue;
-      }
-      const pair = parseYamlKeyValue(rest);
-      if (!pair) {
-        value.push(parseScalar(rest));
-        continue;
-      }
-      const item = {};
-      item[pair.key] = pair.rawValue
-        ? parseScalar(pair.rawValue)
-        : index < lines.length && lines[index].indent > indent
-          ? parseNode(lines[index].indent)
-          : {};
-      if (index < lines.length && lines[index].indent > indent) {
-        Object.assign(item, parseObject(lines[index].indent));
-      }
-      value.push(item);
-    }
-    return value;
-  }
-
-  function parseObject(indent) {
-    const object = {};
-    while (index < lines.length && lines[index].indent === indent && !lines[index].text.startsWith("-")) {
-      const pair = parseYamlKeyValue(lines[index].text);
-      index += 1;
-      if (!pair) continue;
-      object[pair.key] = pair.rawValue
-        ? parseScalar(pair.rawValue)
-        : index < lines.length && lines[index].indent > indent
-          ? parseNode(lines[index].indent)
-          : {};
-    }
-    return object;
-  }
-
-  return lines.length ? parseNode(lines[0].indent) : {};
-}
-
-function parseYamlKeyValue(text) {
-  const match = /^([^:]+):(.*)$/.exec(text);
-  return match ? { key: match[1].trim(), rawValue: match[2].trim() } : null;
-}
-
-function parseScalar(value) {
-  const trimmed = value.trim();
-  if (trimmed === "true") return true;
-  if (trimmed === "false") return false;
-  if (trimmed === "null") return null;
-  if (/^-?\d+$/.test(trimmed)) return Number(trimmed);
-  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
-    return trimmed.slice(1, -1);
-  }
-  if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-    const inner = trimmed.slice(1, -1).trim();
-    return inner ? inner.split(",").map((item) => parseScalar(item.trim())) : [];
-  }
-  return trimmed;
-}
-
-function formatScalar(value) {
-  if (typeof value === "string") {
-    if (!value || /[:#\n]/.test(value) || /^\s|\s$/.test(value)) return JSON.stringify(value);
-    return value;
-  }
-  if (value === null || value === undefined) return "null";
-  return String(value);
+async function stringifySharedYaml(value) {
+  const { stringifyYaml } = await import("../config/index.js");
+  return stringifyYaml(value);
 }

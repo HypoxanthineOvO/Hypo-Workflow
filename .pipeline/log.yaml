@@ -8240,3 +8240,1941 @@ entries:
       - "checkDocs, checkDocsLanguage, checkNarrativeDocsForRelease, checkReadmeFreshness: PASS"
       - "git diff --check: passing"
     next_action: "Commit and push the v13.0.0-alpha.1 alpha change set to github/main; do not create a tag, publish package, or create a remote release."
+  -
+    id: C16-PROJECT-LINKAGE-PLANNING-20260520T195517+0800
+    type: plan_review
+    ref: C16/post-release/project-linkage-planning
+    status: recorded
+    timestamp: "2026-05-20T19:55:17+08:00"
+    summary: "Discussed next planning direction for cross-project sedimentation and linkage: enumerate current local/Notion/Workflow projects, classify canonical vs legacy/review objects, and evaluate Hypo-Claw CLI notifications as a completion hook after project work."
+    trigger: user-request
+    related_milestone: C16-M6
+    evidence_refs:
+      - .pipeline/deep-plans/DP001-root-project-management-mode/global-project-reconciliation.md
+      - .pipeline/deep-plans/DP001-root-project-management-mode/project-classification-taxonomy.md
+      - /home/heyx/Hypo-Claw/src/cli.ts
+    next_action: "If approved, open a follow-up plan for project registry enrichment, completion-event notification schema, and Hypo-Claw CLI integration gates."
+  -
+    id: C16-PROJECT-LINKAGE-P3-GENERATE-20260520T230416+0800
+    type: plan_generate
+    ref: C16/project-linkage/p3-generate
+    status: completed
+    timestamp: "2026-05-20T23:04:16+08:00"
+    summary: "Generated C16 project linkage follow-up plan artifacts and six execution prompts for first-batch project registry, stop-event detection, final assistant output capture, Hypo-Claw QQ adapter, 00:30 daily summary, and end-to-end dry-run."
+    trigger: user-confirmed
+    related_milestone: C16-M10
+    evidence_refs:
+      - .plan-state/project-linkage-decompose.yaml
+      - .plan-state/project-linkage-technical-route.md
+      - .plan-state/project-linkage-generate.yaml
+      - .pipeline/confirm-summary-project-linkage.md
+      - .pipeline/prompts/09-project-linkage-registry-seed.md
+      - .pipeline/prompts/10-project-stop-event-detection.md
+      - .pipeline/prompts/11-final-assistant-output-capture.md
+      - .pipeline/prompts/12-hypo-claw-qq-notification-adapter.md
+      - .pipeline/prompts/13-daily-project-summary-0030.md
+      - .pipeline/prompts/14-project-linkage-e2e-dry-run.md
+    validations:
+      - "P2 user confirmation received"
+      - "Subagent authorization received"
+      - "Prompts generated in append mode without overwriting C16-M1..M9 prompts"
+    next_action: "Wait for P4 confirmation before executing C16-M10"
+  -
+    id: C16-M10-LEASE-TAKEOVER-20260520T232311+0800
+    type: lease_takeover
+    ref: C16/M10/start
+    status: completed
+    timestamp: "2026-05-20T23:23:11+08:00"
+    summary: "Took over stale execution lease from earlier C16 revision work; previous lease expired at 2026-05-20T15:05:00+08:00 and C16-M10 project linkage execution is now starting from write_tests."
+    trigger: user-start
+    related_milestone: C16-M10
+  -
+    id: C16-M10-START-20260520T232311+0800
+    type: milestone_start
+    ref: C16/M10/write_tests
+    status: active
+    timestamp: "2026-05-20T23:23:11+08:00"
+    summary: "Started C16-M10 Project Linkage Registry Seed execution at write_tests after P4 confirmation through /hw:start."
+    trigger: user-start
+    related_milestone: C16-M10
+    evidence_refs:
+      - .pipeline/prompts/09-project-linkage-registry-seed.md
+    next_action: "Start test worker for project linkage registry RED tests"
+  -
+    id: C16-M10-TEST-WORKER-START-20260520T232311+0800
+    type: worker_start
+    ref: C16/M10/test
+    status: active
+    timestamp: "2026-05-20T23:23:11+08:00"
+    summary: "Started C16-M10 test worker Godel to write RED tests for the project linkage registry seed, canonical first-batch project set, legacy relations, and no-external-write boundary."
+    trigger: auto
+    related_milestone: C16-M10
+    report: .pipeline/reviews/C16/M10/test-evidence.md
+    worker:
+      role: test
+      id: "019e45fc-bf87-7381-a797-d40cfa925276"
+      nickname: Godel
+      lifecycle: requested/started
+  -
+    id: C16-M10-TEST-WORKER-COMPLETE-20260520T233102+0800
+    type: worker_complete
+    ref: C16/M10/test
+    status: completed
+    timestamp: "2026-05-20T23:31:02+08:00"
+    summary: "C16-M10 test worker Godel added RED tests for buildProjectLinkageRegistry and recorded expected RED failure because the API is not implemented/exported yet."
+    trigger: auto
+    related_milestone: C16-M10
+    report: .pipeline/reviews/C16/M10/test-evidence.md
+    tests:
+      - "node --test core/test/project-linkage-registry.test.js: RED, 0/4 passing, missing buildProjectLinkageRegistry export"
+      - "node --test core/test/project-linkage-registry.test.js core/test/project-link-graph.test.js core/test/workspace-authority.test.js: RED, 11/15 passing; failures isolated to new registry tests"
+    worker:
+      role: test
+      id: "019e45fc-bf87-7381-a797-d40cfa925276"
+      nickname: Godel
+      lifecycle: completed/closed
+  -
+    id: C16-M10-IMPLEMENT-START-20260520T233102+0800
+    type: step_start
+    ref: C16/M10/implement
+    status: active
+    timestamp: "2026-05-20T23:31:02+08:00"
+    summary: "Started C16-M10 implement step after RED tests; implementation must satisfy project linkage registry contract without editing test assets."
+    trigger: auto
+    related_milestone: C16-M10
+    next_action: "Start implement worker for buildProjectLinkageRegistry"
+  -
+    id: C16-M10-IMPLEMENT-COMPLETE-20260520T233820+0800
+    type: worker_complete
+    ref: C16/M10/implement
+    status: completed
+    timestamp: "2026-05-20T23:38:20+08:00"
+    summary: "C16-M10 implement worker Rawls added metadata-only buildProjectLinkageRegistry in core/src/workspace/index.js and recorded implementation evidence."
+    trigger: auto
+    related_milestone: C16-M10
+    report: .pipeline/reviews/C16/M10/implementation-evidence.md
+    tests:
+      - "node --test core/test/project-linkage-registry.test.js core/test/project-link-graph.test.js core/test/workspace-authority.test.js: 15/15 passing"
+      - "git diff --check -- core/src/workspace/index.js .pipeline/reviews/C16/M10/implementation-evidence.md: passing"
+    worker:
+      role: implement
+      id: "019e4600-217f-74a0-ab9f-aa46d3d39105"
+      nickname: Rawls
+      lifecycle: completed/closed
+  -
+    id: C16-M10-AUDIT-START-20260520T233820+0800
+    type: worker_start
+    ref: C16/M10/audit
+    status: active
+    timestamp: "2026-05-20T23:38:20+08:00"
+    summary: "Started C16-M10 audit worker to review project linkage registry scope, legacy relation correctness, metadata-only boundary, and worker separation evidence."
+    trigger: auto
+    related_milestone: C16-M10
+    report: .pipeline/reviews/C16/M10/audit.md
+    worker:
+      role: audit
+      id: "019e4602-c7c2-7dd0-88dd-86b824fb754f"
+      nickname: Cicero
+      lifecycle: requested/started
+  -
+    id: C16-M10-AUDIT-COMPLETE-20260520T234503+0800
+    type: worker_complete
+    ref: C16/M10/audit
+    status: completed
+    timestamp: "2026-05-20T23:45:03+08:00"
+    summary: "C16-M10 audit worker Cicero returned PASS for project linkage registry seed scope, legacy relation handling, metadata-only boundary, and worker separation evidence."
+    trigger: auto
+    related_milestone: C16-M10
+    report: .pipeline/reviews/C16/M10/audit.md
+    tests:
+      - "node --test core/test/project-linkage-registry.test.js core/test/project-link-graph.test.js core/test/workspace-authority.test.js: 15/15 passing"
+    worker:
+      role: audit
+      id: "019e4602-c7c2-7dd0-88dd-86b824fb754f"
+      nickname: Cicero
+      lifecycle: completed/closed
+  -
+    id: C16-M10-COMPLETE-20260520T234503+0800
+    type: milestone_complete
+    ref: C16/M10
+    status: completed
+    timestamp: "2026-05-20T23:45:03+08:00"
+    summary: "Completed C16-M10 Project Linkage Registry Seed: buildProjectLinkageRegistry now exposes the seven first-batch canonical projects, two legacy replaced_by relations, and metadata-only side-effect flags."
+    trigger: auto
+    related_milestone: C16-M10
+    report: .pipeline/reports/09-project-linkage-registry-seed.report.md
+    validations:
+      - "node --test core/test/project-linkage-registry.test.js core/test/project-link-graph.test.js core/test/workspace-authority.test.js: 15/15 passing"
+      - "cd core && npm test: 592/592 passing"
+      - "git diff --check: passing"
+    next_action: "Continue to C16-M11 Project Stop Event Detection write_tests"
+  -
+    id: C16-M11-START-20260520T234503+0800
+    type: milestone_start
+    ref: C16/M11/write_tests
+    status: active
+    timestamp: "2026-05-20T23:45:03+08:00"
+    summary: "Started C16-M11 Project Stop Event Detection at write_tests."
+    trigger: auto
+    related_milestone: C16-M11
+    evidence_refs:
+      - .pipeline/prompts/10-project-stop-event-detection.md
+    next_action: "Start test worker for terminal project stop event RED tests"
+  -
+    id: C16-M11-TEST-WORKER-START-20260520T234503+0800
+    type: worker_start
+    ref: C16/M11/test
+    status: active
+    timestamp: "2026-05-20T23:45:03+08:00"
+    summary: "Started C16-M11 test worker Volta to write RED tests for terminal project stop event detection and non-terminal/manual-pause negative cases."
+    trigger: auto
+    related_milestone: C16-M11
+    report: .pipeline/reviews/C16/M11/test-evidence.md
+    worker:
+      role: test
+      id: "019e4605-ebc4-7931-8700-903ae3fe9c66"
+      nickname: Volta
+      lifecycle: requested/started
+  -
+    id: C16-M11-TEST-WORKER-COMPLETE-20260520T235234+0800
+    type: worker_complete
+    ref: C16/M11/test
+    status: completed
+    timestamp: "2026-05-20T23:52:34+08:00"
+    summary: "C16-M11 test worker Volta added RED tests for classifyProjectStopEvent and buildProjectStopEvent; failures are isolated to the missing exports."
+    trigger: auto
+    related_milestone: C16-M11
+    report: .pipeline/reviews/C16/M11/test-evidence.md
+    tests:
+      - "node --test core/test/project-stop-event.test.js core/test/lifecycle-regression.test.js core/test/completion-report-contract.test.js: RED, 9/14 passing, missing classifyProjectStopEvent/buildProjectStopEvent exports"
+      - "node --test core/test/lifecycle-regression.test.js core/test/completion-report-contract.test.js: 9/9 passing"
+    worker:
+      role: test
+      id: "019e4605-ebc4-7931-8700-903ae3fe9c66"
+      nickname: Volta
+      lifecycle: completed/closed
+  -
+    id: C16-M11-IMPLEMENT-START-20260520T235234+0800
+    type: step_start
+    ref: C16/M11/implement
+    status: active
+    timestamp: "2026-05-20T23:52:34+08:00"
+    summary: "Started C16-M11 implement step after RED tests; implementation must classify terminal project stop events without planning external actions."
+    trigger: auto
+    related_milestone: C16-M11
+    next_action: "Implement classifyProjectStopEvent and buildProjectStopEvent"
+  -
+    id: C16-M11-IMPLEMENT-COMPLETE-20260520T235918+0800
+    type: step_complete
+    ref: C16/M11/implement
+    status: completed
+    timestamp: "2026-05-20T23:59:18+08:00"
+    summary: "Implemented classifyProjectStopEvent and buildProjectStopEvent as local metadata-only project stop event helpers."
+    trigger: auto
+    related_milestone: C16-M11
+    report: .pipeline/reviews/C16/M11/implementation-evidence.md
+    tests:
+      - "node --test core/test/project-stop-event.test.js core/test/lifecycle-regression.test.js core/test/completion-report-contract.test.js: 14/14 passing"
+      - "git diff --check -- core/src/workspace/index.js .pipeline/reviews/C16/M11/implementation-evidence.md: passing"
+  -
+    id: C16-M11-AUDIT-START-20260520T235918+0800
+    type: worker_start
+    ref: C16/M11/audit
+    status: active
+    timestamp: "2026-05-20T23:59:18+08:00"
+    summary: "Started C16-M11 audit worker to review terminal-state accuracy, manual pause negative behavior, dedupe stability, no external action plan, and worker evidence."
+    trigger: auto
+    related_milestone: C16-M11
+    report: .pipeline/reviews/C16/M11/audit.md
+    worker:
+      role: audit
+      id: "019e4609-cfac-7e91-a27d-60079c0bb5a5"
+      nickname: Mendel
+      lifecycle: requested/started
+  -
+    id: C16-M11-AUDIT-COMPLETE-20260521T000000+0800
+    type: worker_complete
+    ref: C16/M11/audit
+    status: completed
+    timestamp: "2026-05-21T00:00:00+08:00"
+    summary: "C16-M11 audit worker Mendel returned PASS for terminal-state accuracy, manual pause negative behavior, dedupe stability, no external action plan, and worker evidence."
+    trigger: auto
+    related_milestone: C16-M11
+    report: .pipeline/reviews/C16/M11/audit.md
+    tests:
+      - "node --test core/test/project-stop-event.test.js core/test/lifecycle-regression.test.js core/test/completion-report-contract.test.js: 14/14 passing"
+    worker:
+      role: audit
+      id: "019e4609-cfac-7e91-a27d-60079c0bb5a5"
+      nickname: Mendel
+      lifecycle: completed/closed
+  -
+    id: C16-M11-COMPLETE-20260521T000000+0800
+    type: milestone_complete
+    ref: C16/M11
+    status: completed
+    timestamp: "2026-05-21T00:00:00+08:00"
+    summary: "Completed C16-M11 Project Stop Event Detection: terminal project stop events are classified locally while manual chat pauses and auto-continuing intermediate milestones do not emit."
+    trigger: auto
+    related_milestone: C16-M11
+    report: .pipeline/reports/10-project-stop-event-detection.report.md
+    validations:
+      - "node --test core/test/project-stop-event.test.js core/test/lifecycle-regression.test.js core/test/completion-report-contract.test.js: 14/14 passing"
+      - "cd core && npm test: 597/597 passing"
+      - "git diff --check: passing"
+    next_action: "Continue to C16-M12 Final Assistant Output Capture write_tests"
+  -
+    id: C16-M12-START-20260521T000000+0800
+    type: milestone_start
+    ref: C16/M12/write_tests
+    status: active
+    timestamp: "2026-05-21T00:00:00+08:00"
+    summary: "Started C16-M12 Final Assistant Output Capture at write_tests."
+    trigger: auto
+    related_milestone: C16-M12
+    evidence_refs:
+      - .pipeline/prompts/11-final-assistant-output-capture.md
+    next_action: "Start test worker for Codex final assistant output capture RED tests"
+  -
+    id: C16-M12-TEST-WORKER-START-20260521T000000+0800
+    type: worker_start
+    ref: C16/M12/test
+    status: active
+    timestamp: "2026-05-21T00:00:00+08:00"
+    summary: "Started C16-M12 test worker Peirce to write RED tests for exact Codex final assistant output capture, missing-output hard failure, and OpenCode unsupported/probe behavior."
+    trigger: auto
+    related_milestone: C16-M12
+    report: .pipeline/reviews/C16/M12/test-evidence.md
+    worker:
+      role: test
+      id: "019e460e-fdb0-72b2-8838-7b8e16e5c0ab"
+      nickname: Peirce
+      lifecycle: requested/started
+  -
+    id: C16-M12-TEST-WORKER-COMPLETE-20260521T000828+0800
+    type: worker_complete
+    ref: C16/M12/test
+    status: completed
+    timestamp: "2026-05-21T00:08:28+08:00"
+    summary: "C16-M12 test worker Peirce added RED tests and fixtures for exact Codex final assistant output capture, missing-output hard failure, and OpenCode probe-only behavior."
+    trigger: auto
+    related_milestone: C16-M12
+    report: .pipeline/reviews/C16/M12/test-evidence.md
+    tests:
+      - "node --test core/test/final-assistant-output.test.js: RED, 0/5 passing, missing final-output capture exports"
+      - "node --test core/test/session-source-discovery.test.js: 3/3 passing"
+      - "node --test core/test/final-assistant-output.test.js core/test/session-source-discovery.test.js: RED isolated to new tests"
+    worker:
+      role: test
+      id: "019e460e-fdb0-72b2-8838-7b8e16e5c0ab"
+      nickname: Peirce
+      lifecycle: completed/closed
+  -
+    id: C16-M12-IMPLEMENT-COMPLETE-20260521T000828+0800
+    type: step_complete
+    ref: C16/M12/implement
+    status: completed
+    timestamp: "2026-05-21T00:08:28+08:00"
+    summary: "Implemented Codex final assistant output capture with explicit path/session-id lookup, exact output preservation, capture_failed behavior, and OpenCode probe-only boundary."
+    trigger: auto
+    related_milestone: C16-M12
+    report: .pipeline/reviews/C16/M12/implementation-evidence.md
+    tests:
+      - "node --test core/test/final-assistant-output.test.js core/test/session-source-discovery.test.js: 8/8 passing"
+      - "git diff --check -- core/src/workspace/index.js .pipeline/reviews/C16/M12/implementation-evidence.md: passing"
+  -
+    id: C16-M12-AUDIT-START-20260521T000828+0800
+    type: worker_start
+    ref: C16/M12/audit
+    status: active
+    timestamp: "2026-05-21T00:08:28+08:00"
+    summary: "Started C16-M12 audit worker to review exact output preservation, no-redaction/no-truncation behavior, fail-closed capture semantics, and unsupported-platform honesty."
+    trigger: auto
+    related_milestone: C16-M12
+    report: .pipeline/reviews/C16/M12/audit.md
+    worker:
+      role: audit
+      id: "019e4613-8735-78f3-83c9-52bd83c2d912"
+      nickname: Kant
+      lifecycle: requested/started
+  -
+    id: C16-M12-AUDIT-COMPLETE-20260521T001842+0800
+    type: worker_complete
+    ref: C16/M12/audit
+    status: completed
+    timestamp: "2026-05-21T00:18:42+08:00"
+    summary: "C16-M12 audit worker Kant returned PASS for exact Codex output preservation, no-redaction/no-truncation behavior, capture_failed semantics, and OpenCode probe-only honesty."
+    trigger: auto
+    related_milestone: C16-M12
+    report: .pipeline/reviews/C16/M12/audit.md
+    tests:
+      - "node --test core/test/final-assistant-output.test.js core/test/session-source-discovery.test.js: 8/8 passing"
+    worker:
+      role: audit
+      id: "019e4613-8735-78f3-83c9-52bd83c2d912"
+      nickname: Kant
+      lifecycle: completed/closed
+  -
+    id: C16-M12-COMPLETE-20260521T001842+0800
+    type: milestone_complete
+    ref: C16/M12
+    status: completed
+    timestamp: "2026-05-21T00:18:42+08:00"
+    summary: "Completed C16-M12 Final Assistant Output Capture: Codex JSONL sessions can now yield exact final assistant output, missing output fails closed, and OpenCode remains probe-only."
+    trigger: auto
+    related_milestone: C16-M12
+    report: .pipeline/reports/11-final-assistant-output-capture.report.md
+    validations:
+      - "node --test core/test/final-assistant-output.test.js core/test/session-source-discovery.test.js: 8/8 passing"
+      - "cd core && npm test: 602/602 passing"
+      - "git diff --check: passing"
+    next_action: "Continue to C16-M13 Hypo-Claw QQ Notification Adapter write_tests"
+  -
+    id: C16-M13-START-20260521T001842+0800
+    type: milestone_start
+    ref: C16/M13/write_tests
+    status: active
+    timestamp: "2026-05-21T00:18:42+08:00"
+    summary: "Started C16-M13 Hypo-Claw QQ Notification Adapter at write_tests."
+    trigger: auto
+    related_milestone: C16-M13
+    evidence_refs:
+      - .pipeline/prompts/12-hypo-claw-qq-notification-adapter.md
+    next_action: "Start test worker for Hypo-Claw notification formatter, segmentation, mode, and retry queue RED tests"
+  -
+    id: C16-M13-TEST-WORKER-COMPLETE-20260521T002800+0800
+    type: worker_complete
+    ref: C16/M13/test
+    status: completed
+    timestamp: "2026-05-21T00:28:00+08:00"
+    summary: "C16-M13 test worker Fermat completed RED tests for Hypo-Claw QQ notification formatting, segmentation, dry-run/test boundaries, CLI invocation shape, and retry queue preservation."
+    trigger: auto
+    related_milestone: C16-M13
+    report: .pipeline/reviews/C16/M13/test-evidence.md
+    tests:
+      - "node --test core/test/hypo-claw-notification.test.js: RED, 0/5 passing, missing notification adapter exports"
+      - "node --test core/test/project-stop-event.test.js core/test/final-assistant-output.test.js: 10/10 passing"
+    worker:
+      role: test
+      id: "019e4617-8250-77d1-a28a-3ece983d3e12"
+      nickname: Fermat
+      lifecycle: completed
+  -
+    id: C16-M13-IMPLEMENT-COMPLETE-20260521T002800+0800
+    type: step_complete
+    ref: C16/M13/implement
+    status: completed
+    timestamp: "2026-05-21T00:28:00+08:00"
+    summary: "Implemented Hypo-Claw notification adapter with project-stop formatter, deterministic segmenter, dry-run/test local modes, notify CLI invocation, and local retry queue handling on failure."
+    trigger: auto
+    related_milestone: C16-M13
+    report: .pipeline/reviews/C16/M13/implementation-evidence.md
+    tests:
+      - "node --test core/test/hypo-claw-notification.test.js core/test/maintenance-ledger.test.js: 8/8 passing"
+      - "node --test core/test/hypo-claw-notification.test.js core/test/project-stop-event.test.js core/test/final-assistant-output.test.js core/test/maintenance-ledger.test.js: 18/18 passing"
+      - "cd core && npm test: 607/607 passing"
+      - "git diff --check targeted M13 files: passing"
+  -
+    id: C16-M13-AUDIT-START-20260521T002800+0800
+    type: worker_start
+    ref: C16/M13/audit
+    status: active
+    timestamp: "2026-05-21T00:28:00+08:00"
+    summary: "Started C16-M13 audit worker to review external-action boundary, no-truncation behavior, QQ-only Hypo-Claw CLI scope, and retry evidence."
+    trigger: auto
+    related_milestone: C16-M13
+    report: .pipeline/reviews/C16/M13/audit.md
+    worker:
+      role: audit
+      id: "019e461b-ef5d-7552-9fd2-91cafb6fa1a2"
+      nickname: Nietzsche
+      lifecycle: requested/started
+  -
+    id: C16-M13-AUDIT-FAIL-20260521T003800+0800
+    type: worker_complete
+    ref: C16/M13/audit
+    status: failed
+    timestamp: "2026-05-21T00:38:00+08:00"
+    summary: "C16-M13 audit worker Nietzsche found blockers: notify did not send actual segments and lacked adapter-level external-action confirmation."
+    trigger: auto
+    related_milestone: C16-M13
+    report: .pipeline/reviews/C16/M13/audit.md
+    worker:
+      role: audit
+      id: "019e461b-ef5d-7552-9fd2-91cafb6fa1a2"
+      nickname: Nietzsche
+      lifecycle: completed/fail
+  -
+    id: C16-M13-AUDIT-REVISION-20260521T003800+0800
+    type: step_complete
+    ref: C16/M13/audit_revision
+    status: completed
+    timestamp: "2026-05-21T00:38:00+08:00"
+    summary: "Revised Hypo-Claw notification adapter after audit: notify now requires confirmed=true, sends ordered CLI calls per segment with metadata, and no longer reports direct QQ contact on CLI failure."
+    trigger: auto
+    related_milestone: C16-M13
+    report: .pipeline/reviews/C16/M13/implementation-evidence.md
+    tests:
+      - "node --test core/test/hypo-claw-notification.test.js: 7/7 passing"
+      - "node --test core/test/hypo-claw-notification.test.js core/test/maintenance-ledger.test.js: 10/10 passing"
+      - "node --test core/test/hypo-claw-notification.test.js core/test/project-stop-event.test.js core/test/final-assistant-output.test.js core/test/maintenance-ledger.test.js: 20/20 passing"
+      - "cd core && npm test: 609/609 passing"
+      - "git diff --check targeted M13 files: passing"
+  -
+    id: C16-M13-AUDIT-RECHECK-START-20260521T003800+0800
+    type: worker_start
+    ref: C16/M13/audit_recheck
+    status: active
+    timestamp: "2026-05-21T00:38:00+08:00"
+    summary: "Requested C16-M13 audit recheck for segment-send and confirmation-gate blocker closure."
+    trigger: auto
+    related_milestone: C16-M13
+    report: .pipeline/reviews/C16/M13/audit.md
+    worker:
+      role: audit
+      id: "019e461b-ef5d-7552-9fd2-91cafb6fa1a2"
+      nickname: Nietzsche
+      lifecycle: recheck_requested
+  -
+    id: C16-M13-AUDIT-RECHECK-COMPLETE-20260521T004500+0800
+    type: worker_complete
+    ref: C16/M13/audit_recheck
+    status: completed
+    timestamp: "2026-05-21T00:45:00+08:00"
+    summary: "C16-M13 audit recheck PASS: segment delivery and confirmation gate blockers are closed; no real QQ send was performed."
+    trigger: auto
+    related_milestone: C16-M13
+    report: .pipeline/reviews/C16/M13/audit.md
+    tests:
+      - "node --test core/test/hypo-claw-notification.test.js core/test/maintenance-ledger.test.js: 10/10 passing"
+      - "git diff --check targeted M13 files: passing"
+    worker:
+      role: audit
+      id: "019e461b-ef5d-7552-9fd2-91cafb6fa1a2"
+      nickname: Nietzsche
+      lifecycle: completed/pass
+  -
+    id: C16-M13-COMPLETE-20260521T004500+0800
+    type: milestone_complete
+    ref: C16/M13
+    status: completed
+    timestamp: "2026-05-21T00:45:00+08:00"
+    summary: "Completed C16-M13 Hypo-Claw QQ Notification Adapter with formatter, deterministic segmentation, dry-run/test modes, confirmed notify CLI calls, and retry queue preservation."
+    trigger: auto
+    related_milestone: C16-M13
+    report: .pipeline/reports/12-hypo-claw-qq-notification-adapter.report.md
+    validations:
+      - "node --test core/test/hypo-claw-notification.test.js core/test/maintenance-ledger.test.js: 10/10 passing"
+      - "node --test core/test/hypo-claw-notification.test.js core/test/project-stop-event.test.js core/test/final-assistant-output.test.js core/test/maintenance-ledger.test.js: 20/20 passing"
+      - "cd core && npm test: 609/609 passing"
+      - "git diff --check: passing"
+    next_action: "Continue to C16-M14 Daily Project Summary At 00:30 write_tests"
+  -
+    id: C16-M14-START-20260521T004500+0800
+    type: milestone_start
+    ref: C16/M14/write_tests
+    status: active
+    timestamp: "2026-05-21T00:45:00+08:00"
+    summary: "Started C16-M14 Daily Project Summary At 00:30 at write_tests."
+    trigger: auto
+    related_milestone: C16-M14
+    evidence_refs:
+      - .pipeline/prompts/13-daily-project-summary-0030.md
+    next_action: "Start test worker for daily project summary timezone window, aggregation, failure-first rendering, and segmentation RED tests"
+  -
+    id: C16-M14-TEST-WORKER-COMPLETE-20260521T005800+0800
+    type: worker_complete
+    ref: C16/M14/test
+    status: completed
+    timestamp: "2026-05-21T00:58:00+08:00"
+    summary: "C16-M14 test worker Sartre completed RED tests for 00:30 Asia/Shanghai windowing, multi-project aggregation, dedupe, failure-first rendering, retry-needed items, and dry-run/test no-side-effect segmentation."
+    trigger: auto
+    related_milestone: C16-M14
+    report: .pipeline/reviews/C16/M14/test-evidence.md
+    tests:
+      - "node --test core/test/daily-project-summary.test.js: RED, missing daily summary APIs and retry-needed rendering"
+      - "node --test core/test/project-stop-event.test.js core/test/hypo-claw-notification.test.js core/test/project-linkage-registry.test.js: 16/16 passing"
+  -
+    id: C16-M14-IMPLEMENT-COMPLETE-20260521T005800+0800
+    type: step_complete
+    ref: C16/M14/implement
+    status: completed
+    timestamp: "2026-05-21T00:58:00+08:00"
+    summary: "Implemented daily project summary helpers with Asia/Shanghai 00:30 windowing, event/progress aggregation, retry/failure-first Chinese rendering, dedupe, and dry-run/test Hypo-Claw segmentation reuse."
+    trigger: auto
+    related_milestone: C16-M14
+    report: .pipeline/reviews/C16/M14/implementation-evidence.md
+    tests:
+      - "node --test core/test/daily-project-summary.test.js core/test/global-consolidation.test.js core/test/maintenance-backfill.test.js: 12/12 passing"
+      - "node --test core/test/daily-project-summary.test.js core/test/hypo-claw-notification.test.js core/test/global-consolidation.test.js core/test/maintenance-backfill.test.js: 19/19 passing"
+      - "cd core && npm test: 613/613 passing"
+      - "git diff --check targeted M14 files: passing"
+  -
+    id: C16-M14-AUDIT-START-20260521T005800+0800
+    type: worker_start
+    ref: C16/M14/audit
+    status: active
+    timestamp: "2026-05-21T00:58:00+08:00"
+    summary: "Started C16-M14 audit worker to review timezone/window correctness, dedupe, failure-first rendering, Hypo-Claw segmentation reuse, and no Notion/QQ side effects."
+    trigger: auto
+    related_milestone: C16-M14
+    report: .pipeline/reviews/C16/M14/audit.md
+    worker:
+      role: audit
+      id: "019e4629-392b-7752-a1b4-279e7b6bd81c"
+      nickname: Planck
+      lifecycle: requested/started
+  -
+    id: C16-M14-AUDIT-FAIL-20260521T010800+0800
+    type: worker_complete
+    ref: C16/M14/audit
+    status: failed
+    timestamp: "2026-05-21T01:08:00+08:00"
+    summary: "C16-M14 audit worker Planck found blockers: default UTC timestamp handling could shift the 00:30 Asia/Shanghai window, and no scheduled dry-run/CLI integration path existed."
+    trigger: auto
+    related_milestone: C16-M14
+    report: .pipeline/reviews/C16/M14/audit.md
+    worker:
+      role: audit
+      id: "019e4629-392b-7752-a1b4-279e7b6bd81c"
+      nickname: Planck
+      lifecycle: completed/fail
+  -
+    id: C16-M14-AUDIT-REVISION-20260521T010800+0800
+    type: step_complete
+    ref: C16/M14/audit_revision
+    status: completed
+    timestamp: "2026-05-21T01:08:00+08:00"
+    summary: "Revised daily project summary after audit: offset/Z times normalize to Asia/Shanghai before window resolution, and a safe-local daily-summary scheduler plus CLI/wrapper now creates dry-run evidence."
+    trigger: auto
+    related_milestone: C16-M14
+    report: .pipeline/reviews/C16/M14/implementation-evidence.md
+    tests:
+      - "node --test core/test/daily-project-summary.test.js core/test/global-consolidation.test.js core/test/maintenance-backfill.test.js: 14/14 passing"
+      - "node --test core/test/daily-project-summary.test.js core/test/hypo-claw-notification.test.js core/test/global-consolidation.test.js core/test/maintenance-backfill.test.js: 21/21 passing"
+      - "cd core && npm test: 615/615 passing"
+      - "git diff --check targeted M14 files: passing"
+  -
+    id: C16-M14-AUDIT-RECHECK-START-20260521T010800+0800
+    type: worker_start
+    ref: C16/M14/audit_recheck
+    status: active
+    timestamp: "2026-05-21T01:08:00+08:00"
+    summary: "Requested C16-M14 audit recheck for UTC/Asia-Shanghai window normalization and daily-summary scheduler/CLI integration."
+    trigger: auto
+    related_milestone: C16-M14
+    report: .pipeline/reviews/C16/M14/audit.md
+    worker:
+      role: audit
+      id: "019e4629-392b-7752-a1b4-279e7b6bd81c"
+      nickname: Planck
+      lifecycle: recheck_requested
+  -
+    id: C16-M14-AUDIT-RECHECK-COMPLETE-20260521T011500+0800
+    type: worker_complete
+    ref: C16/M14/audit_recheck
+    status: completed
+    timestamp: "2026-05-21T01:15:00+08:00"
+    summary: "C16-M14 audit recheck PASS: UTC/Asia-Shanghai window normalization and dry-run scheduler/CLI integration blockers are closed."
+    trigger: auto
+    related_milestone: C16-M14
+    report: .pipeline/reviews/C16/M14/audit.md
+    tests:
+      - "node --test core/test/daily-project-summary.test.js core/test/global-consolidation.test.js core/test/maintenance-backfill.test.js: 14/14 passing"
+      - "node --test core/test/daily-project-summary.test.js core/test/hypo-claw-notification.test.js core/test/global-consolidation.test.js core/test/maintenance-backfill.test.js: 21/21 passing"
+      - "git diff --check targeted M14 files: passing"
+    worker:
+      role: audit
+      id: "019e4629-392b-7752-a1b4-279e7b6bd81c"
+      nickname: Planck
+      lifecycle: completed/pass
+  -
+    id: C16-M14-COMPLETE-20260521T011500+0800
+    type: milestone_complete
+    ref: C16/M14
+    status: completed
+    timestamp: "2026-05-21T01:15:00+08:00"
+    summary: "Completed C16-M14 Daily Project Summary At 00:30 with Asia/Shanghai windowing, failure-first rendering, dry-run Hypo-Claw segmentation, and safe-local scheduler/CLI evidence."
+    trigger: auto
+    related_milestone: C16-M14
+    report: .pipeline/reports/13-daily-project-summary-0030.report.md
+    validations:
+      - "node --test core/test/daily-project-summary.test.js core/test/global-consolidation.test.js core/test/maintenance-backfill.test.js: 14/14 passing"
+      - "node --test core/test/daily-project-summary.test.js core/test/hypo-claw-notification.test.js core/test/global-consolidation.test.js core/test/maintenance-backfill.test.js: 21/21 passing"
+      - "cd core && npm test: 615/615 passing"
+      - "git diff --check: passing"
+    next_action: "Continue to C16-M15 Project Linkage End To End Dry-Run write_tests"
+  -
+    id: C16-M15-START-20260521T011500+0800
+    type: milestone_start
+    ref: C16/M15/write_tests
+    status: active
+    timestamp: "2026-05-21T01:15:00+08:00"
+    summary: "Started C16-M15 Project Linkage End To End Dry-Run at write_tests."
+    trigger: auto
+    related_milestone: C16-M15
+    evidence_refs:
+      - .pipeline/prompts/14-project-linkage-e2e-dry-run.md
+    next_action: "Start test worker for project linkage end-to-end dry-run bundle, no-external-action assertions, missing final output negative path, and daily summary assertions"
+  -
+    id: C16-M15-TEST-COMPLETE-20260521T012000+0800
+    type: step_complete
+    ref: C16/M15/write_tests
+    status: completed
+    timestamp: "2026-05-21T01:20:00+08:00"
+    summary: "C16-M15 RED tests added project linkage end-to-end dry-run coverage for valid final-output notification, missing-output blocking, daily summary failure ordering, and no external side effects."
+    trigger: auto
+    related_milestone: C16-M15
+    report: .pipeline/reviews/C16/M15/test-evidence.md
+    tests:
+      - "node --test core/test/project-linkage-e2e.test.js: expected RED, missing buildProjectLinkageE2EDryRunBundle export"
+      - "node --test core/test/project-stop-event.test.js core/test/final-assistant-output.test.js core/test/hypo-claw-notification.test.js core/test/daily-project-summary.test.js: 23/23 passing"
+  -
+    id: C16-M15-IMPLEMENT-COMPLETE-20260521T012500+0800
+    type: step_complete
+    ref: C16/M15/implement
+    status: completed
+    timestamp: "2026-05-21T01:25:00+08:00"
+    summary: "Implemented buildProjectLinkageE2EDryRunBundle and generated a local dry-run bundle proving valid stop notification segmentation, capture-failure blocking, daily summary failure inclusion, and no QQ/Notion/publish/spawn side effects."
+    trigger: auto
+    related_milestone: C16-M15
+    report: .pipeline/reviews/C16/M15/implementation-evidence.md
+    evidence_refs:
+      - .pipeline/reviews/C16/M15/e2e-dry-run-bundle.json
+    tests:
+      - "node --test core/test/project-linkage-e2e.test.js core/test/project-stop-event.test.js core/test/final-assistant-output.test.js core/test/hypo-claw-notification.test.js core/test/daily-project-summary.test.js: 25/25 passing"
+      - "git diff --check: passing"
+  -
+    id: C16-M15-AUDIT-COMPLETE-20260521T013000+0800
+    type: worker_complete
+    ref: C16/M15/audit
+    status: completed
+    timestamp: "2026-05-21T01:30:00+08:00"
+    summary: "C16-M15 audit PASS: no false complete notification, exact output preserved through segmentation, missing final output blocks notification, and dry-run side-effect traps remain untouched."
+    trigger: auto
+    related_milestone: C16-M15
+    report: .pipeline/reviews/C16/M15/audit.md
+    tests:
+      - "node --test core/test/project-linkage-e2e.test.js core/test/project-stop-event.test.js core/test/final-assistant-output.test.js core/test/hypo-claw-notification.test.js core/test/daily-project-summary.test.js: 25/25 passing"
+      - "cd core && npm test: 617/617 passing"
+      - "git diff --check: passing"
+    worker:
+      role: audit
+      lifecycle: completed/pass
+  -
+    id: C16-M15-COMPLETE-20260521T013000+0800
+    type: milestone_complete
+    ref: C16/M15
+    status: completed
+    timestamp: "2026-05-21T01:30:00+08:00"
+    summary: "Completed C16-M15 Project Linkage End To End Dry-Run with dry-run bundle project-linkage-e2e-29ae0178245b, one valid notification dry-run, one capture-failure block, and failure-first daily summary evidence."
+    trigger: auto
+    related_milestone: C16-M15
+    report: .pipeline/reports/14-project-linkage-e2e-dry-run.report.md
+    validations:
+      - "node --test core/test/project-linkage-e2e.test.js core/test/project-stop-event.test.js core/test/final-assistant-output.test.js core/test/hypo-claw-notification.test.js core/test/daily-project-summary.test.js: 25/25 passing"
+      - "cd core && npm test: 617/617 passing"
+      - "git diff --check: passing"
+    next_action: "Return C16 to pending acceptance"
+  -
+    id: C16-PENDING-ACCEPTANCE-20260521T013000+0800
+    type: cycle_pending_acceptance
+    ref: C16
+    status: pending_acceptance
+    timestamp: "2026-05-21T01:30:00+08:00"
+    summary: "C16 all 15 milestones are complete after the project linkage revision; waiting for user acceptance."
+    trigger: auto
+    report: .pipeline/reports/14-project-linkage-e2e-dry-run.report.md
+    validations:
+      - "cd core && npm test: 617/617 passing"
+      - "git diff --check: passing"
+  -
+    id: C16-AUTOMATION-REAL-NOTIFY-CRON-20260521T015500+0800
+    type: step_complete
+    ref: C16/automation/real-notify-cron
+    status: completed
+    timestamp: "2026-05-21T01:55:00+08:00"
+    summary: "After user authorization, enabled real daily-summary Hypo-Claw notify mode, installed user crontab entries, and added a one-time 2026-05-22 noon AI news generation scheduler."
+    trigger: user_request
+    related_milestone: C16-M15
+    evidence_refs:
+      - scripts/daily-summary-scheduler.sh
+      - scripts/news-noon-scheduler.sh
+      - cli/bin/hypo-workflow
+      - core/src/maintenance/daily-project-summary.js
+      - core/src/workspace/index.js
+    external_side_effects:
+      - "Hypo-Claw real notify smoke succeeded through http://localhost:3000; returned thread_id=thr_6fe164f7-18fc-420e-8547-005123879965."
+      - "User crontab installed Hypo-Workflow automation block for 00:30 daily real QQ summary, 04:00 safe-local consolidation, and 2026-05-22 12:00 one-time noon news generation."
+    validations:
+      - "node --test core/test/hypo-claw-notification.test.js core/test/daily-project-summary.test.js core/test/global-consolidation.test.js: 20/20 passing"
+      - "cd core && npm test: 619/619 passing"
+      - "git diff --check: passing"
+      - "systemctl is-active cron: active"
+      - "Hypo-Writer news generate help: exit 0"
+    residual_risks:
+      - "The 2026-05-22 noon news task depends on Hypo-Info-V2 refresh/export and Hypo-Writer local generation succeeding at runtime."
+      - "The noon news task creates a local WeChat audit package only; it does not create a WeChat draft or publish."
+      - "Daily summary real QQ delivery depends on Hypo-Claw service availability at http://localhost:3000."
+  -
+    id: C16-AUTOMATION-QQ-DELIVERY-EVIDENCE-20260521T011858+0800
+    type: step_complete
+    ref: C16/automation/qq-delivery-evidence-and-news-output
+    status: completed
+    timestamp: "2026-05-21T01:18:58+08:00"
+    summary: "Corrected noon news output placement to the Hypo-Writer canonical issue path and fixed Hypo-Claw notification success detection so CLI thread creation is no longer treated as QQ delivery."
+    trigger: user_feedback
+    related_milestone: C16-M15
+    evidence_refs:
+      - scripts/news-noon-scheduler.sh
+      - core/src/workspace/index.js
+      - core/src/maintenance/daily-project-summary.js
+      - core/test/hypo-claw-notification.test.js
+      - core/test/daily-project-summary.test.js
+      - ~/.hypo-workflow/maintenance/evidence/daily-project-summary/daily-project-summary-20260521-notification.yaml
+    external_side_effects:
+      - "Real Hypo-Claw QQ private target diagnostic sent successfully with QQ official external_message_id evidence."
+      - "Real daily-summary scheduler notify rerun completed with notification_status=sent and qq_contacted=true."
+    validations:
+      - "node --test core/test/hypo-claw-notification.test.js core/test/daily-project-summary.test.js: 16/16 passing"
+      - "scripts/news-noon-scheduler.sh --check: passing"
+      - "git diff --check: passing"
+    residual_risks:
+      - "QQ client visibility still depends on the configured private target openid and QQ robot delivery/display behavior."
+      - "The 2026-05-22 noon news task still depends on Hypo-Info-V2 refresh/export availability at runtime."
+  -
+    id: C16-AUTOMATION-YESTERDAY-TO-NOW-QQ-REPORT-20260521T012436+0800
+    type: step_complete
+    ref: C16/automation/yesterday-to-now-qq-report
+    status: completed
+    timestamp: "2026-05-21T01:24:36+08:00"
+    summary: "Sent a real Hypo-Claw QQ private-target report covering 2026-05-20 00:00:00+08:00 through 2026-05-21 01:24:36+08:00, including Hook status and the plan for Hook-safe notification dispatch."
+    trigger: user_request
+    related_milestone: C16-M15
+    external_side_effects:
+      - "Real QQ message sent via Hypo-Claw private target; QQ official external_message_id returned."
+    evidence_refs:
+      - .pipeline/PROGRESS.md
+      - hooks/README.md
+      - hooks/codex-notify.sh
+      - .claude/settings.local.json
+    validations:
+      - "Hypo-Claw qqChannel.runLivePrivateRoundtrip returned sent=true, externalContacted=true, outbound_status=sent."
+    residual_risks:
+      - "Hook-triggered Hypo-Claw notification is not implemented yet; current real delivery is scheduler/cron or manual private-target send."
+      - "Planned Hook-safe lane should write pending notification evidence first and let a confirmed dispatcher send through Hypo-Claw with external_message_id verification."
+  -
+    id: C16-AUTOMATION-PROJECT-EVENTS-NOON-NEWS-20260521T141612+0800
+    type: step_complete
+    ref: C16/automation/project-events-noon-news
+    status: completed
+    timestamp: "2026-05-21T14:16:12+08:00"
+    summary: "Reworked the noon AI news scheduler from direct Hypo-Info/Hypo-Writer coupling into an append-only project-events ledger route: artifact.ready -> writer.issue.ready -> optional confirmed Hypo-Claw private-target notification."
+    trigger: user_request
+    related_milestone: C16-M15
+    evidence_refs:
+      - core/src/project-events/index.js
+      - core/test/project-events.test.js
+      - cli/bin/hypo-workflow
+      - scripts/news-noon-scheduler.sh
+      - core/src/index.js
+    validations:
+      - "node --test core/test/project-events.test.js: 4/4 passing"
+      - "bash -n scripts/news-noon-scheduler.sh: passing"
+      - "node cli/bin/hypo-workflow --help: passing"
+      - "npm test --prefix core: 624/624 passing"
+      - "git diff --check -- core/src/project-events/index.js cli/bin/hypo-workflow scripts/news-noon-scheduler.sh core/src/index.js core/test/project-events.test.js: passing"
+    external_side_effects:
+      - "No QQ notification was sent during this implementation; notify remains gated by --notify/--confirmed or NEWS_NOON_NOTIFY/NEWS_NOON_CONFIRMED."
+      - "No WeChat draft was created and no publish action was added."
+    residual_risks:
+      - "Runtime success still depends on Hypo-Info-V2 refresh/export and Hypo-Writer local generation availability at the scheduled time."
+      - "Confirmed QQ notification depends on Hypo-Claw private-target delivery evidence."
+  -
+    id: C16-AUTOMATION-NOON-NEWS-DEFAULT-QQ-20260521T145214+0800
+    type: step_complete
+    ref: C16/automation/noon-news-default-qq
+    status: completed
+    timestamp: "2026-05-21T14:52:14+08:00"
+    summary: "Changed the noon AI news scheduler to send confirmed Hypo-Claw QQ notification by default after the Writer issue is ready; disabling now requires explicit NEWS_NOON_NOTIFY=false or 0."
+    trigger: user_feedback
+    related_milestone: C16-M15
+    evidence_refs:
+      - scripts/news-noon-scheduler.sh
+      - core/test/project-events.test.js
+      - user crontab
+    validations:
+      - "bash -n scripts/news-noon-scheduler.sh: passing"
+      - "scripts/news-noon-scheduler.sh --help: shows QQ notification enabled by default"
+      - "node --test core/test/project-events.test.js: 5/5 passing"
+      - "npm test --prefix core: 625/625 passing"
+      - "git diff --check -- scripts/news-noon-scheduler.sh core/test/project-events.test.js: passing"
+    external_side_effects:
+      - "Updated the user crontab comment for the 2026-05-22 noon news job to reflect default QQ notification."
+    residual_risks:
+      - "The scheduled job still depends on Hypo-Info-V2, Hypo-Writer, Hypo-Claw, and http://localhost:3000 being available at 2026-05-22 12:00 Asia/Shanghai."
+  -
+    id: C16-AUTOMATION-PROJECT-STOP-QQ-DISPATCH-20260521T153154+0800
+    type: step_complete
+    ref: C16/automation/project-stop-qq-dispatch
+    status: completed
+    timestamp: "2026-05-21T15:31:54+08:00"
+    summary: "Implemented Hook-safe project completion/stop QQ notification dispatch: hooks enqueue pending notifications locally, and a confirmed cron dispatcher sends them through Hypo-Claw private target with QQ delivery evidence."
+    trigger: user_feedback
+    related_milestone: C16-M15
+    evidence_refs:
+      - core/src/project-notifications/index.js
+      - core/test/project-notifications.test.js
+      - cli/bin/hypo-workflow
+      - core/src/claude-hooks/index.js
+      - hooks/codex-notify.sh
+      - hooks/README.md
+      - scripts/project-notification-dispatcher.sh
+      - user crontab
+    validations:
+      - "node --test core/test/project-notifications.test.js: 6/6 passing"
+      - "node --test core/test/project-notifications.test.js core/test/project-stop-event.test.js core/test/hypo-claw-notification.test.js core/test/project-linkage-e2e.test.js: 22/22 passing"
+      - "node --test core/test/claude-smoke-readiness.test.js core/test/knowledge-hooks.test.js core/test/chat-hooks.test.js: 7/7 passing"
+      - "npm test --prefix core: 631/631 passing"
+      - "scripts/project-notification-dispatcher.sh /home/heyx/Hypo-Workflow && node cli/bin/hypo-workflow project-notifications status --home \"$HOME\": pending=0 sent=0 blocked=0 total=0"
+      - "bash -n scripts/project-notification-dispatcher.sh hooks/codex-notify.sh: passing"
+      - "git diff --check -- core/src/project-notifications/index.js core/src/workspace/index.js core/src/claude-hooks/index.js cli/bin/hypo-workflow hooks/codex-notify.sh scripts/project-notification-dispatcher.sh core/test/project-notifications.test.js: passing"
+    external_side_effects:
+      - "Installed a user crontab entry that runs scripts/project-notification-dispatcher.sh every minute and logs to ~/.hypo-workflow/notifications/project-notification-dispatcher-cron.log."
+      - "No QQ project-stop notification was sent during the final smoke because the pending queue was empty."
+    residual_risks:
+      - "Real delivery still depends on Hypo-Claw and http://localhost:3000 being available when the dispatcher runs."
+      - "The next real project terminal event should produce the first live project-stop QQ delivery evidence."
+  -
+    id: C16-AUTOMATION-PROJECT-STOP-QQ-LIVE-DIAGNOSTIC-20260521T160836+0800
+    type: step_complete
+    ref: C16/automation/project-stop-qq-live-diagnostic
+    status: completed
+    timestamp: "2026-05-21T16:08:36+08:00"
+    summary: "Diagnosed why no project-stop QQ had appeared: cron dispatcher was running, but the pending queue was empty. Sent two live diagnostic project-stop notifications and persisted QQ delivery evidence for the second."
+    trigger: user_feedback
+    related_milestone: C16-M15
+    evidence_refs:
+      - ~/.hypo-workflow/notifications/project-stop-pending.yaml
+      - ~/.hypo-workflow/notifications/project-notification-dispatcher-cron.log
+      - core/src/project-notifications/index.js
+      - core/test/project-notifications.test.js
+    validations:
+      - "node cli/bin/hypo-workflow project-notifications status --home \"$HOME\": pending=0 sent=2 blocked=0 total=2"
+      - "Manual diagnostic dispatch #1: status=sent attempted=1 sent=1 external_contacted=true qq_contacted=true"
+      - "Manual diagnostic dispatch #2: status=sent attempted=1 sent=1 external_contacted=true qq_contacted=true"
+      - "Second diagnostic queue record persisted notification_result.qq_delivery.external_message_id=ROBOT1.0_6bKUcZAcnq6-jZUPYsPryZhl15TiIPrPz70WEiIj6SSV8lmRS8VrgNcktvdnZhFHMGFqMqLZAeI2ugKB61tt2w!!"
+      - "node --test core/test/project-notifications.test.js: 6/6 passing"
+      - "node --test core/test/project-notifications.test.js core/test/hypo-claw-notification.test.js: 15/15 passing"
+      - "git diff --check -- core/src/project-notifications/index.js core/test/project-notifications.test.js: passing"
+    external_side_effects:
+      - "Sent two live QQ diagnostic project-stop notifications through Hypo-Claw private target."
+    residual_risks:
+      - "If the user still cannot see the message in the QQ client despite official external_message_id evidence, the remaining issue is likely target/account/client visibility on the Hypo-Claw QQ side rather than Hypo-Workflow dispatch."
+  -
+    id: AUDIT-001-20260521T160000+0800
+    type: audit
+    ref: audit-001
+    status: completed
+    timestamp: "2026-05-21T16:00:00+08:00"
+    summary: "Full project audit: 3 Critical (hardcoded paths, duplicated utils, God Module), 7 Warning (Writer CLI coupling, dual YAML parsers, module bloat, ledger O(n) rewrites, test runner broken), 6 Info."
+    report: .pipeline/audits/audit-001.md
+    trigger: user
+  -
+    id: C17-CYCLE-NEW-20260521T163254+0800
+    type: cycle_new
+    ref: C17
+    status: active
+    timestamp: "2026-05-21T16:32:54+08:00"
+    summary: "Created C17 audit remediation cycle after archiving C16 local runtime artifacts as pending_acceptance."
+    trigger: user
+    previous_cycle: C16
+    archive: .pipeline/archives/C16-root-project-management-mode
+    context_sources:
+      - audit
+  -
+    id: C17-PLAN-DISCOVER-START-20260521T163254+0800
+    type: plan_discover
+    ref: C17/P1
+    status: in_progress
+    timestamp: "2026-05-21T16:32:54+08:00"
+    summary: "Started C17 planning discovery from audit-001 with candidate milestones for utils extraction, config-driven paths, YAML unification, workspace decomposition, ledger strategy, and regression."
+    trigger: user
+    evidence_refs:
+      - .pipeline/audits/audit-001.md
+      - .plan-state/c17-audit-remediation-discover.yaml
+  -
+    id: C17-PLAN-DISCOVER-CONSTRAINTS-20260521T164500+0800
+    type: plan_discover
+    ref: C17/P1
+    status: in_progress
+    timestamp: "2026-05-21T16:45:00+08:00"
+    summary: "Recorded user planning constraints: fix all audit findings, use layered configuration authority, and complete full workspace module decomposition within C17."
+    trigger: user
+    evidence_refs:
+      - .plan-state/c17-audit-remediation-discover.yaml
+  -
+    id: C17-PLAN-DISCOVER-COMPLETE-20260521T172500+0800
+    type: plan_discover
+    ref: C17/P1
+    status: completed
+    timestamp: "2026-05-21T17:25:00+08:00"
+    summary: "Completed C17 P1 discovery: docs/examples must update, config migration is explicit command plus sync/start prompt with no silent user config writes, and old YAML ledgers will be migrated once to JSONL."
+    trigger: user
+    evidence_refs:
+      - .plan-state/c17-audit-remediation-discover.yaml
+  -
+    id: C17-PLAN-DECOMPOSE-START-20260521T172500+0800
+    type: plan_decompose
+    ref: C17/P2
+    status: in_progress
+    timestamp: "2026-05-21T17:25:00+08:00"
+    summary: "Entered C17 P2 technical route and milestone decomposition."
+    trigger: user
+  -
+    id: C17-PLAN-DECOMPOSE-PROPOSED-20260521T171800+0800
+    type: plan_decompose
+    ref: C17/P2
+    status: proposed
+    timestamp: "2026-05-21T17:18:00+08:00"
+    summary: "Generated C17 P2 proposed technical route with seven milestones covering audit baseline, utils extraction, layered config migration, js-yaml unification, clean workspace split, JSONL ledger/barrel cleanup, and audit closure."
+    trigger: assistant
+    evidence_refs:
+      - .plan-state/c17-decompose.yaml
+      - .plan-state/c17-technical-route.md
+  -
+    id: C17-PLAN-DECOMPOSE-CONFIRMED-20260521T171900+0800
+    type: plan_decompose
+    ref: C17/P2
+    status: confirmed
+    timestamp: "2026-05-21T17:19:00+08:00"
+    summary: "User confirmed C17 P2 and authorized Subagent execution with recommended worker separation."
+    trigger: user
+    evidence_refs:
+      - .plan-state/c17-decompose.yaml
+      - .plan-state/c17-technical-route.md
+  -
+    id: C17-PLAN-GENERATE-COMPLETE-20260521T172000+0800
+    type: plan_generate
+    ref: C17/P3
+    status: completed
+    timestamp: "2026-05-21T17:20:00+08:00"
+    summary: "Generated seven C17 execution prompts and P4 confirmation summary; execution is ready for /hw:start."
+    trigger: assistant
+    evidence_refs:
+      - .plan-state/c17-generate.yaml
+      - .pipeline/confirm-summary.md
+  -
+    id: C17-M0-LEASE-TAKEOVER-20260521T172100+0800
+    type: lease_takeover
+    ref: C17-M0
+    status: completed
+    timestamp: "2026-05-21T17:21:00+08:00"
+    summary: "Took over stale C16 execution lease and created C17-M0 execution lease for /hw:start."
+    trigger: user
+    previous_lease:
+      cycle_id: C16
+      session_id: codex-c16-m10-20260520T232311+0800
+      expires_at: "2026-05-21T00:38:42+08:00"
+  -
+    id: C17-M0-WRITE-TESTS-START-20260521T172100+0800
+    type: step_start
+    ref: C17-M0/write_tests
+    status: in_progress
+    timestamp: "2026-05-21T17:21:00+08:00"
+    summary: "Started C17-M0 write_tests with authorized test worker for root npm test and audit inventory red tests."
+    trigger: user
+    evidence_refs:
+      - .pipeline/prompts/00-audit-baseline-and-root-test-entry.md
+      - .pipeline/reviews/C17/M0/test-evidence.md
+  -
+    id: C17-M0-WRITE-TESTS-COMPLETE-20260521T172300+0800
+    type: step_complete
+    ref: C17-M0/write_tests
+    status: completed
+    timestamp: "2026-05-21T17:23:00+08:00"
+    summary: "Test worker Dirac completed RED tests for root npm test and audit inventory export."
+    trigger: subagent
+    worker:
+      role: test
+      id: "019e49d3-a2ce-74b0-b82f-38d908f89a30"
+      nickname: Dirac
+      lifecycle: closed
+    evidence_refs:
+      - core/test/audit-baseline.test.js
+      - .pipeline/reviews/C17/M0/test-evidence.md
+    validations:
+      - "npm test: RED exit 254 because root package.json is missing"
+      - "node --test core/test/audit-baseline.test.js: RED exit 1 because root package.json and buildAuditInventory export are missing"
+  -
+    id: C17-M0-IMPLEMENT-START-20260521T172300+0800
+    type: step_start
+    ref: C17-M0/implement
+    status: in_progress
+    timestamp: "2026-05-21T17:23:00+08:00"
+    summary: "Started C17-M0 implement worker for root package metadata and audit inventory implementation."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M0/implementation-evidence.md
+  -
+    id: C17-PLAN-DISCOVER-YAML-LEDGER-EXPORTS-20260521T171500+0800
+    type: plan_discover
+    ref: C17/P1
+    status: in_progress
+    timestamp: "2026-05-21T17:15:00+08:00"
+    summary: "Recorded technical route decisions: use js-yaml for YAML unification, append-only JSONL plus compact YAML summaries for ledgers, and broad barrel export cleanup where feasible."
+    trigger: user
+    evidence_refs:
+      - .plan-state/c17-audit-remediation-discover.yaml
+  -
+    id: C17-PLAN-DISCOVER-WORKSPACE-BREAKING-SPLIT-20260521T170500+0800
+    type: plan_discover
+    ref: C17/P1
+    status: in_progress
+    timestamp: "2026-05-21T17:05:00+08:00"
+    summary: "Recorded user decision to perform a clean workspace split without preserving workspace/index.js as a compatibility re-export shim."
+    trigger: user
+    evidence_refs:
+      - .plan-state/c17-audit-remediation-discover.yaml
+  -
+    id: C17-PLAN-DISCOVER-TEST-CONFIG-20260521T165500+0800
+    type: plan_discover
+    ref: C17/P1
+    status: in_progress
+    timestamp: "2026-05-21T16:55:00+08:00"
+    summary: "Recorded user decisions that root npm test must run directly and layered config migration must auto-generate user-level configuration."
+    trigger: user
+    evidence_refs:
+      - .plan-state/c17-audit-remediation-discover.yaml
+  -
+    id: C17-M0-IMPLEMENT-COMPLETE-20260521T172400+0800
+    type: step_complete
+    ref: C17-M0/implement
+    status: completed
+    timestamp: "2026-05-21T17:24:00+08:00"
+    summary: "Implemented root npm test entry and audit inventory helper; focused audit baseline and root npm test now pass."
+    trigger: assistant
+    worker:
+      role: implement
+      id: codex-c17-m0-implement
+      lifecycle: closed
+    evidence_refs:
+      - package.json
+      - core/src/audit-inventory/index.js
+      - core/src/index.js
+      - .pipeline/reviews/C17/M0/implementation-evidence.md
+    validations:
+      - "node --test core/test/audit-baseline.test.js: pass, 2 tests"
+      - "npm test: pass, 633 tests"
+      - "git diff --check: pass"
+  -
+    id: C17-M0-GREEN-VALIDATION-20260521T172600+0800
+    type: step_complete
+    ref: C17-M0/run_tests_green
+    status: completed
+    timestamp: "2026-05-21T17:26:00+08:00"
+    summary: "Main thread verified C17-M0 GREEN: focused audit baseline tests, root npm test, and git diff check all pass."
+    trigger: assistant
+    validations:
+      - "node --test core/test/audit-baseline.test.js: 2/2 passing"
+      - "npm test: 633/633 passing"
+      - "git diff --check: passing"
+  -
+    id: C17-M0-AUDIT-START-20260521T172600+0800
+    type: step_start
+    ref: C17-M0/review_code
+    status: in_progress
+    timestamp: "2026-05-21T17:26:00+08:00"
+    summary: "Started audit worker for C17-M0 diff, evidence, and worker separation review."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M0/audit.md
+  -
+    id: C17-M0-AUDIT-COMPLETE-20260521T173000+0800
+    type: step_complete
+    ref: C17-M0/review_code
+    status: completed
+    timestamp: "2026-05-21T17:30:00+08:00"
+    summary: "Audit worker Faraday passed C17-M0 with no blockers."
+    trigger: subagent
+    worker:
+      role: audit
+      id: "019e49dd-20a8-7432-83f2-94f6217950b2"
+      nickname: Faraday
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M0/audit.md
+  -
+    id: C17-M0-COMPLETE-20260521T173000+0800
+    type: milestone_complete
+    ref: C17-M0
+    status: completed
+    timestamp: "2026-05-21T17:30:00+08:00"
+    summary: "Completed C17-M0: root npm test entry and audit inventory baseline are in place."
+    trigger: assistant
+    report: .pipeline/reports/00-audit-baseline-and-root-test-entry.report.md
+    validations:
+      - "node --test core/test/audit-baseline.test.js: 2/2 passing"
+      - "npm test: 633/633 passing"
+      - "git diff --check: passing"
+  -
+    id: C17-M1-WRITE-TESTS-START-20260521T173000+0800
+    type: step_start
+    ref: C17-M1/write_tests
+    status: in_progress
+    timestamp: "2026-05-21T17:30:00+08:00"
+    summary: "Started C17-M1 write_tests for shared utils layer extraction."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/prompts/01-shared-utils-layer-extraction.md
+      - .pipeline/reviews/C17/M1/test-evidence.md
+  -
+    id: C17-M1-WRITE-TESTS-COMPLETE-20260521T173300+0800
+    type: step_complete
+    ref: C17-M1/write_tests
+    status: completed
+    timestamp: "2026-05-21T17:33:00+08:00"
+    summary: "Test worker Aquinas completed RED tests for shared utils layer; focused tests fail because core/src/utils/index.js is missing."
+    trigger: subagent
+    worker:
+      role: test
+      id: "019e49df-fc2f-7562-b422-b9210f9ed99a"
+      nickname: Aquinas
+      lifecycle: closed
+    evidence_refs:
+      - core/test/utils.test.js
+      - .pipeline/reviews/C17/M1/test-evidence.md
+    validations:
+      - "node --test core/test/utils.test.js: RED 0/7 passing, ERR_MODULE_NOT_FOUND for core/src/utils/index.js"
+  -
+    id: C17-M1-IMPLEMENT-START-20260521T173300+0800
+    type: step_start
+    ref: C17-M1/implement
+    status: in_progress
+    timestamp: "2026-05-21T17:33:00+08:00"
+    summary: "Started C17-M1 implement worker for shared utils layer extraction."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M1/implementation-evidence.md
+  -
+    id: C17-M1-IMPLEMENT-COMPLETE-20260521T173638+0800
+    type: step_complete
+    ref: C17-M1/implement
+    status: completed
+    timestamp: "2026-05-21T17:36:38+08:00"
+    summary: "Implemented shared utils module and migrated six low-risk production modules to use the shared helpers."
+    trigger: assistant
+    worker:
+      role: implement
+      id: "codex-c17-m1-implement"
+      nickname: Codex
+      lifecycle: closed
+    evidence_refs:
+      - core/src/utils/index.js
+      - core/src/evidence/index.js
+      - core/src/reviews/index.js
+      - core/src/storage-sync/index.js
+      - core/src/domains/index.js
+      - core/src/project-events/index.js
+      - core/src/maintenance/project-linkage-e2e.js
+      - .pipeline/reviews/C17/M1/implementation-evidence.md
+    validations:
+      - "node --test core/test/utils.test.js: 7/7 passing"
+      - "npm test: 640/640 passing"
+      - "git diff --check: passing"
+  -
+    id: C17-M1-GREEN-VALIDATION-20260521T174044+0800
+    type: step_complete
+    ref: C17-M1/run_tests_green
+    status: completed
+    timestamp: "2026-05-21T17:40:44+08:00"
+    summary: "Main thread verified C17-M1 GREEN: focused utils tests, root npm test, duplicate-helper residual scan, and git diff check are acceptable."
+    trigger: assistant
+    validations:
+      - "node --test core/test/utils.test.js: 7/7 passing"
+      - "npm test: 640/640 passing"
+      - "rg 'function isPlainObject|function compactTimestamp|function stableStringify|async function writeYaml' core/src: remaining matches are outside the C17-M1 slice or reserved for later milestones"
+      - "git diff --check: passing"
+  -
+    id: C17-M1-AUDIT-START-20260521T174044+0800
+    type: step_start
+    ref: C17-M1/review_code
+    status: in_progress
+    timestamp: "2026-05-21T17:40:44+08:00"
+    summary: "Started audit worker for C17-M1 shared utils extraction, migration review, and worker separation review."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M1/audit.md
+  -
+    id: C17-M1-AUDIT-COMPLETE-20260521T174326+0800
+    type: step_complete
+    ref: C17-M1/review_code
+    status: completed
+    timestamp: "2026-05-21T17:43:26+08:00"
+    summary: "Audit worker Arendt passed C17-M1 with no blockers and two non-blocking warnings."
+    trigger: subagent
+    worker:
+      role: audit
+      id: "019e49e9-8423-75b2-9ec1-6125c403975e"
+      nickname: Arendt
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M1/audit.md
+  -
+    id: C17-M1-COMPLETE-20260521T174326+0800
+    type: milestone_complete
+    ref: C17-M1
+    status: completed
+    timestamp: "2026-05-21T17:43:26+08:00"
+    summary: "Completed C17-M1: shared utils layer exists and the first low-risk duplicate helper slice is migrated."
+    trigger: assistant
+    report: .pipeline/reports/01-shared-utils-layer-extraction.report.md
+    validations:
+      - "node --test core/test/utils.test.js: 7/7 passing"
+      - "npm test: 640/640 passing"
+      - "git diff --check: passing"
+  -
+    id: C17-M2-WRITE-TESTS-START-20260521T174326+0800
+    type: step_start
+    ref: C17-M2/write_tests
+    status: in_progress
+    timestamp: "2026-05-21T17:43:26+08:00"
+    summary: "Started C17-M2 write_tests for layered config, explicit migration, and hardcoded path removal."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/prompts/02-layered-config-and-integration-migration.md
+      - .pipeline/reviews/C17/M2/test-evidence.md
+  -
+    id: C17-M2-WRITE-TESTS-COMPLETE-20260521T174846+0800
+    type: step_complete
+    ref: C17-M2/write_tests
+    status: completed
+    timestamp: "2026-05-21T17:48:46+08:00"
+    summary: "Test worker James completed RED tests for layered config, explicit migration, no silent user writes, and hardcoded path removal."
+    trigger: subagent
+    worker:
+      role: test
+      id: "019e49ec-6f91-7142-9d70-12671bc1e665"
+      nickname: James
+      lifecycle: closed
+    evidence_refs:
+      - core/test/layered-config-integration.test.js
+      - .pipeline/reviews/C17/M2/test-evidence.md
+    validations:
+      - "node --test core/test/layered-config-integration.test.js: RED 5/5 failing"
+      - "npm test: RED 640 passing / 5 failing, failures isolated to C17-M2 RED tests"
+      - "rg -n '/home/heyx' core/src scripts: hardcoded runtime/source paths remain"
+  -
+    id: C17-M2-IMPLEMENT-START-20260521T174846+0800
+    type: step_start
+    ref: C17-M2/implement
+    status: in_progress
+    timestamp: "2026-05-21T17:48:46+08:00"
+    summary: "Started C17-M2 implement worker for layered config APIs, explicit migration behavior, and hardcoded path refactor."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M2/implementation-evidence.md
+  -
+    id: C17-M2-IMPLEMENT-COMPLETE-20260521T181026+0800
+    type: step_complete
+    ref: C17-M2/implement
+    status: completed
+    timestamp: "2026-05-21T18:10:26+08:00"
+    summary: "Implement worker Ptolemy completed layered config migration and hardcoded path removal; root npm test has one stale assertion requiring test revision."
+    trigger: subagent
+    worker:
+      role: implement
+      id: "019e49f1-4e8d-7960-9652-7764a4415eb7"
+      nickname: Ptolemy
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M2/implementation-evidence.md
+    validations:
+      - "node --test core/test/layered-config-integration.test.js: 5/5 passing"
+      - "rg -n '/home/heyx' core/src scripts: no matches"
+      - "git diff --check: passing"
+      - "npm test: 644/645 passing; stale project-notifications assertion conflicts with C17-M2 path-removal requirement"
+  -
+    id: C17-M2-TEST-REVISION-START-20260521T181026+0800
+    type: step_start
+    ref: C17-M2/review_tests
+    status: in_progress
+    timestamp: "2026-05-21T18:10:26+08:00"
+    summary: "Started test revision worker to update stale project notification dispatcher assertion after hardcoded path removal."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M2/test-revision-evidence.md
+  -
+    id: C17-M2-TEST-REVISION-COMPLETE-20260521T181322+0800
+    type: step_complete
+    ref: C17-M2/review_tests
+    status: completed
+    timestamp: "2026-05-21T18:13:22+08:00"
+    summary: "Test revision worker Archimedes updated the stale project notification dispatcher assertion to HOME-derived path semantics."
+    trigger: subagent
+    worker:
+      role: test
+      id: "019e4a04-8368-7d53-b7a4-3277b949b949"
+      nickname: Archimedes
+      lifecycle: closed
+    evidence_refs:
+      - core/test/project-notifications.test.js
+      - .pipeline/reviews/C17/M2/test-revision-evidence.md
+    validations:
+      - "node --test core/test/project-notifications.test.js: 6/6 passing"
+      - "rg -n '/home/heyx' core/src scripts: no matches"
+      - "npm test: 644/645 passing before lifecycle log status normalization"
+  -
+    id: C17-M2-GREEN-VALIDATION-20260521T181439+0800
+    type: step_complete
+    ref: C17-M2/run_tests_green
+    status: completed
+    timestamp: "2026-05-21T18:14:39+08:00"
+    summary: "Main thread verified C17-M2 GREEN: focused config/notification tests, root npm test, hardcoded path scan, and git diff check all pass."
+    trigger: assistant
+    validations:
+      - "node --test core/test/layered-config-integration.test.js core/test/project-notifications.test.js: 11/11 passing"
+      - "rg -n '/home/heyx' core/src scripts: no matches"
+      - "npm test: 645/645 passing"
+      - "git diff --check: passing"
+  -
+    id: C17-M2-AUDIT-START-20260521T181439+0800
+    type: step_start
+    ref: C17-M2/review_code
+    status: in_progress
+    timestamp: "2026-05-21T18:14:39+08:00"
+    summary: "Started audit worker for C17-M2 layered config migration, path cleanup, migration write gates, and worker separation review."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M2/audit.md
+  -
+    id: C17-M2-AUDIT-COMPLETE-20260521T181900+0800
+    type: step_complete
+    ref: C17-M2/review_code
+    status: completed
+    timestamp: "2026-05-21T18:19:00+08:00"
+    summary: "Audit worker Hegel passed C17-M2 with no blockers and one non-blocking prompt parameter warning."
+    trigger: subagent
+    worker:
+      role: audit
+      id: "019e4a08-6e35-7582-a5e5-7867418c261e"
+      nickname: Hegel
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M2/audit.md
+  -
+    id: C17-M2-COMPLETE-20260521T181900+0800
+    type: milestone_complete
+    ref: C17-M2
+    status: completed
+    timestamp: "2026-05-21T18:19:00+08:00"
+    summary: "Completed C17-M2: layered config, explicit user config migration, and hardcoded runtime path removal are in place."
+    trigger: assistant
+    report: .pipeline/reports/02-layered-config-and-integration-migration.report.md
+    validations:
+      - "node --test core/test/layered-config-integration.test.js core/test/project-notifications.test.js: 11/11 passing"
+      - "rg -n '/home/heyx' core/src scripts: no matches"
+      - "npm test: 645/645 passing"
+      - "git diff --check: passing"
+  -
+    id: C17-M3-WRITE-TESTS-START-20260521T181900+0800
+    type: step_start
+    ref: C17-M3/write_tests
+    status: in_progress
+    timestamp: "2026-05-21T18:19:00+08:00"
+    summary: "Started C17-M3 write_tests for js-yaml backed config and knowledge parser compatibility."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/prompts/03-yaml-parser-unification-with-js-yaml.md
+      - .pipeline/reviews/C17/M3/test-evidence.md
+  -
+    id: C17-M3-WRITE-TESTS-COMPLETE-20260521T182404+0800
+    type: step_complete
+    ref: C17-M3/write_tests
+    status: completed
+    timestamp: "2026-05-21T18:24:04+08:00"
+    summary: "Test worker Avicenna completed RED tests for js-yaml parser compatibility, knowledge/config semantic parity, and explicit dependency declaration."
+    trigger: subagent
+    worker:
+      role: test
+      id: "019e4a0c-e6d0-79c3-be0d-82f14a823d59"
+      nickname: Avicenna
+      lifecycle: closed
+    evidence_refs:
+      - core/test/yaml-parser-unification.test.js
+      - .pipeline/reviews/C17/M3/test-evidence.md
+    validations:
+      - "node --test core/test/yaml-parser-unification.test.js: RED 1/5 passing, 4 failing"
+      - "node --test core/test/global-config-registry.test.js core/test/knowledge-ledger.test.js core/test/knowledge-opencode-gate.test.js: 17/17 passing"
+  -
+    id: C17-M3-IMPLEMENT-START-20260521T182404+0800
+    type: step_start
+    ref: C17-M3/implement
+    status: in_progress
+    timestamp: "2026-05-21T18:24:04+08:00"
+    summary: "Started C17-M3 implement worker for js-yaml dependency declaration, shared parser wrapper, and knowledge parser migration."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M3/implementation-evidence.md
+  -
+    id: C17-M3-IMPLEMENT-COMPLETE-20260521T183512+0800
+    type: step_complete
+    ref: C17-M3/implement
+    status: completed
+    timestamp: "2026-05-21T18:35:12+08:00"
+    summary: "Implement worker Banach completed js-yaml parser unification and main thread integrated the rules parser compatibility fix."
+    trigger: assistant
+    worker:
+      role: implement
+      id: "019e4a11-f5f9-7740-9af6-23002963a998"
+      nickname: Banach
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M3/implementation-evidence.md
+    validations:
+      - "node --test core/test/yaml-parser-unification.test.js: 5/5 passing"
+      - "node --test core/test/global-config-registry.test.js core/test/knowledge-ledger.test.js core/test/knowledge-opencode-gate.test.js: 17/17 passing"
+      - "npm test: 650/650 passing"
+      - "git diff --check: passing"
+  -
+    id: C17-M3-GREEN-VALIDATION-20260521T183512+0800
+    type: step_complete
+    ref: C17-M3/run_tests_green
+    status: completed
+    timestamp: "2026-05-21T18:35:12+08:00"
+    summary: "Main thread verified C17-M3 GREEN: YAML focused tests, config/knowledge/progressive-discover regressions, root npm test, and git diff check all pass."
+    trigger: assistant
+    validations:
+      - "node --test core/test/yaml-parser-unification.test.js core/test/global-config-registry.test.js core/test/knowledge-ledger.test.js core/test/knowledge-opencode-gate.test.js core/test/progressive-discover.test.js: 29/29 passing"
+      - "npm test: 650/650 passing"
+      - "git diff --check: passing"
+  -
+    id: C17-M3-AUDIT-START-20260521T183512+0800
+    type: step_start
+    ref: C17-M3/review_code
+    status: in_progress
+    timestamp: "2026-05-21T18:35:12+08:00"
+    summary: "Started audit worker for C17-M3 dependency scope, shared parser migration, knowledge parser removal, rules compatibility, and worker separation review."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M3/audit.md
+  -
+    id: C17-M3-AUDIT-COMPLETE-20260521T183854+0800
+    type: step_complete
+    ref: C17-M3/review_code
+    status: completed
+    timestamp: "2026-05-21T18:38:54+08:00"
+    summary: "Audit worker Pascal passed C17-M3 with no blockers and one non-blocking dirty-worktree warning."
+    trigger: subagent
+    worker:
+      role: audit
+      id: "019e4a1b-8c6b-78a2-abea-1e3d7a7436f1"
+      nickname: Pascal
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M3/audit.md
+  -
+    id: C17-M3-COMPLETE-20260521T183854+0800
+    type: milestone_complete
+    ref: C17-M3
+    status: completed
+    timestamp: "2026-05-21T18:38:54+08:00"
+    summary: "Completed C17-M3: config and knowledge YAML parsing are unified on js-yaml."
+    trigger: assistant
+    report: .pipeline/reports/03-yaml-parser-unification-with-js-yaml.report.md
+    validations:
+      - "node --test core/test/yaml-parser-unification.test.js core/test/global-config-registry.test.js core/test/knowledge-ledger.test.js core/test/knowledge-opencode-gate.test.js core/test/progressive-discover.test.js: 29/29 passing"
+      - "npm test: 650/650 passing"
+      - "git diff --check: passing"
+  -
+    id: C17-M4-WRITE-TESTS-START-20260521T183854+0800
+    type: step_start
+    ref: C17-M4/write_tests
+    status: in_progress
+    timestamp: "2026-05-21T18:38:54+08:00"
+    summary: "Started C17-M4 write_tests for clean workspace module split, stale import scan, and behavior equivalence."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/prompts/04-workspace-clean-module-split.md
+      - .pipeline/reviews/C17/M4/test-evidence.md
+  -
+    id: C17-M4-WRITE-TESTS-COMPLETE-20260521T184413+0800
+    type: step_complete
+    ref: C17-M4/write_tests
+    status: completed
+    timestamp: "2026-05-21T18:44:13+08:00"
+    summary: "Test worker Carver completed RED tests for explicit workspace modules, no legacy workspace public export, stale import scan, and focused behavior equivalence."
+    trigger: subagent
+    worker:
+      role: test
+      id: "019e4a1f-1df6-7fc1-a4d4-68b1094cad59"
+      nickname: Carver
+      lifecycle: closed
+    evidence_refs:
+      - core/test/workspace-module-split.test.js
+      - .pipeline/reviews/C17/M4/test-evidence.md
+    validations:
+      - "node --test core/test/workspace-module-split.test.js: RED 1/5 passing, 4 failing"
+      - "workspace behavior baseline command: 34/34 passing"
+      - "rg -n 'workspace/index|from .*/workspace' core/src core/test docs README.md README.en.md: stale imports remain"
+  -
+    id: C17-M4-IMPLEMENT-START-20260521T184413+0800
+    type: step_start
+    ref: C17-M4/implement
+    status: in_progress
+    timestamp: "2026-05-21T18:44:13+08:00"
+    summary: "Started C17-M4 implement worker for workspace God Module split, import migration, docs update, and old workspace entry removal."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M4/implementation-evidence.md
+  -
+    id: C17-M4-IMPLEMENT-COMPLETE-20260521T185535+0800
+    type: step_complete
+    ref: C17-M4/implement
+    status: completed
+    timestamp: "2026-05-21T18:55:35+08:00"
+    summary: "Implement worker Turing completed the clean workspace module split and removed the legacy workspace public entry."
+    trigger: subagent
+    worker:
+      role: implement
+      id: "019e4a23-b4e8-7712-b5a5-4108fe6e74f4"
+      nickname: Turing
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M4/implementation-evidence.md
+    validations:
+      - "node --test core/test/workspace-module-split.test.js: 5/5 passing"
+      - "workspace behavior baseline command: 34/34 passing"
+      - "npm test: 655/655 passing"
+      - "git diff --check: passing"
+  -
+    id: C17-M4-GREEN-VALIDATION-20260521T185535+0800
+    type: step_complete
+    ref: C17-M4/run_tests_green
+    status: completed
+    timestamp: "2026-05-21T18:55:35+08:00"
+    summary: "Main thread verified C17-M4 GREEN: workspace split focused tests, behavior baseline, root npm test, and git diff check all pass."
+    trigger: assistant
+    validations:
+      - "node --test core/test/workspace-module-split.test.js core/test/workspace-authority.test.js core/test/project-link-graph.test.js core/test/project-stop-event.test.js core/test/final-assistant-output.test.js core/test/hypo-claw-notification.test.js core/test/project-linkage-registry.test.js: 39/39 passing"
+      - "npm test: 655/655 passing"
+      - "git diff --check: passing"
+  -
+    id: C17-M4-AUDIT-START-20260521T185535+0800
+    type: step_start
+    ref: C17-M4/review_code
+    status: in_progress
+    timestamp: "2026-05-21T18:55:35+08:00"
+    summary: "Started audit worker for C17-M4 clean workspace split, no compatibility shim, stale import scan, and circular dependency review."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M4/audit.md
+  -
+    id: C17-M4-AUDIT-COMPLETE-20260521T191724+0800
+    type: step_complete
+    ref: C17-M4/review_code
+    status: completed
+    timestamp: "2026-05-21T19:17:24+08:00"
+    summary: "Audit worker Jason passed C17-M4 with no blockers and one aggregate dirty-worktree warning."
+    trigger: subagent
+    worker:
+      role: audit
+      id: "019e4a2e-20b1-71e2-8cf8-ae675145cdcc"
+      nickname: Jason
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M4/audit.md
+  -
+    id: C17-M4-COMPLETE-20260521T191724+0800
+    type: milestone_complete
+    ref: C17-M4
+    status: completed
+    timestamp: "2026-05-21T19:17:24+08:00"
+    summary: "Completed C17-M4: workspace God Module split is clean and the legacy public entry is removed."
+    trigger: assistant
+    report: .pipeline/reports/04-workspace-clean-module-split.report.md
+    validations:
+      - "node --test core/test/workspace-module-split.test.js core/test/workspace-authority.test.js core/test/project-link-graph.test.js core/test/project-stop-event.test.js core/test/final-assistant-output.test.js core/test/hypo-claw-notification.test.js core/test/project-linkage-registry.test.js: 39/39 passing"
+      - "npm test: 655/655 passing"
+      - "git diff --check: passing"
+  -
+    id: C17-M5-WRITE-TESTS-START-20260521T191724+0800
+    type: step_start
+    ref: C17-M5/write_tests
+    status: in_progress
+    timestamp: "2026-05-21T19:17:24+08:00"
+    summary: "Started C17-M5 write_tests for JSONL ledger authority, migration idempotency, compact YAML summaries, and export cleanup scans."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/prompts/05-ledger-jsonl-migration-and-barrel-export-cleanup.md
+      - .pipeline/reviews/C17/M5/test-evidence.md
+  -
+    id: C17-M5-WRITE-TESTS-COMPLETE-20260521T192658+0800
+    type: step_complete
+    ref: C17-M5/write_tests
+    status: completed
+    timestamp: "2026-05-21T19:26:58+08:00"
+    summary: "Test worker McClintock completed RED tests for JSONL ledger helpers, migration idempotency, affected subsystem authority paths, and public export cleanup."
+    trigger: subagent
+    worker:
+      role: test
+      id: "019e4a42-86a0-7701-90e1-8fb8bdc669ca"
+      nickname: McClintock
+      lifecycle: closed
+    evidence_refs:
+      - core/test/ledger-jsonl-migration.test.js
+      - .pipeline/reviews/C17/M5/test-evidence.md
+    validations:
+      - "node --test core/test/ledger-jsonl-migration.test.js: RED 0/6 passing, 6 failing"
+      - "node --test core/test/project-events.test.js core/test/project-notifications.test.js core/test/daily-project-summary.test.js core/test/maintenance-ledger.test.js: 21/21 passing"
+      - "node --test core/test/global-consolidation.test.js: 5/5 passing"
+      - "rg -n 'ledger.yaml|export \\* from' core/src core/test docs README.md README.en.md: legacy ledger authorities and broad exports remain"
+  -
+    id: C17-M5-IMPLEMENT-START-20260521T192658+0800
+    type: step_start
+    ref: C17-M5/implement
+    status: in_progress
+    timestamp: "2026-05-21T19:26:58+08:00"
+    summary: "Started C17-M5 implement worker for JSONL ledger helpers, one-time YAML migration, subsystem ledger authority migration, compact summaries, and export cleanup."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M5/implementation-evidence.md
+  -
+    id: C17-M5-IMPLEMENT-COMPLETE-20260521T193913+0800
+    type: step_complete
+    ref: C17-M5/implement
+    status: completed
+    timestamp: "2026-05-21T19:39:13+08:00"
+    summary: "Implement worker Heisenberg completed JSONL ledger helpers, affected writer migrations, and explicit root export cleanup; stale tests still need revision."
+    trigger: subagent
+    worker:
+      role: implement
+      id: "019e4a4a-cfaa-7841-8a8f-2533d20636e3"
+      nickname: Heisenberg
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M5/implementation-evidence.md
+    validations:
+      - "node --test core/test/ledger-jsonl-migration.test.js: 6/6 passing"
+      - "git diff --check: passing"
+      - "npm test: 650/661 passing before stale YAML/barrel test revision"
+  -
+    id: C17-M5-TEST-REVISION-START-20260521T193913+0800
+    type: step_start
+    ref: C17-M5/review_tests
+    status: in_progress
+    timestamp: "2026-05-21T19:39:13+08:00"
+    summary: "Started test revision worker to update stale YAML ledger authority and broad root barrel assertions to the C17-M5 JSONL/explicit-export contract."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M5/test-revision-evidence.md
+  -
+    id: C17-M5-TEST-REVISION-COMPLETE-20260521T194912+0800
+    type: step_complete
+    ref: C17-M5/review_tests
+    status: completed
+    timestamp: "2026-05-21T19:49:12+08:00"
+    summary: "Test revision worker Plato updated stale YAML ledger authority and broad root barrel assertions to JSONL and explicit export contracts."
+    trigger: subagent
+    worker:
+      role: test
+      id: "019e4a55-f671-7983-acf3-743fe003ab36"
+      nickname: Plato
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M5/test-revision-evidence.md
+    validations:
+      - "targeted ledger/export tests: 41/41 passing"
+      - "npm test: 661/661 passing"
+  -
+    id: C17-M5-GREEN-VALIDATION-20260521T194912+0800
+    type: step_complete
+    ref: C17-M5/run_tests_green
+    status: completed
+    timestamp: "2026-05-21T19:49:12+08:00"
+    summary: "Main thread verified C17-M5 GREEN: JSONL ledger focused tests, related subsystem tests, root npm test, static scan classification, and git diff check pass."
+    trigger: assistant
+    validations:
+      - "node --test core/test/project-events.test.js core/test/project-notifications.test.js core/test/daily-project-summary.test.js core/test/maintenance-ledger.test.js core/test/global-consolidation.test.js core/test/workspace-module-split.test.js core/test/ledger-jsonl-migration.test.js core/test/maintenance-backup-policy.test.js: 41/41 passing"
+      - "npm test: 661/661 passing"
+      - "git diff --check: passing"
+      - "rg -n 'ledger.yaml|export \\* from' core/src core/test docs README.md README.en.md: remaining matches classified as non-M5 authority, migration/self-test, fixtures, or analysis lane"
+  -
+    id: C17-M5-AUDIT-START-20260521T194912+0800
+    type: step_start
+    ref: C17-M5/review_code
+    status: in_progress
+    timestamp: "2026-05-21T19:49:12+08:00"
+    summary: "Started audit worker for C17-M5 JSONL ledger authority, one-time migration, compact summaries, export cleanup, scan classification, and worker separation review."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M5/audit.md
+  -
+    id: C17-M5-AUDIT-COMPLETE-20260521T195803+0800
+    type: step_complete
+    ref: C17-M5/review_code
+    status: completed
+    timestamp: "2026-05-21T19:58:03+08:00"
+    summary: "Audit worker Helmholtz passed C17-M5 JSONL ledger migration and explicit export cleanup with no blockers."
+    trigger: subagent
+    worker:
+      role: audit
+      id: "019e4a61-f404-7df1-9268-4efaa5902ea9"
+      nickname: Helmholtz
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M5/audit.md
+  -
+    id: C17-M5-COMPLETE-20260521T195803+0800
+    type: milestone_complete
+    ref: C17-M5
+    status: completed
+    timestamp: "2026-05-21T19:58:03+08:00"
+    summary: "Completed C17-M5: JSONL ledger authority, one-time YAML migration, compact summaries, and explicit export cleanup are in place."
+    trigger: assistant
+    report: .pipeline/reports/05-ledger-jsonl-migration-and-barrel-export-cleanup.report.md
+    validations:
+      - "targeted ledger/export tests: 41/41 passing"
+      - "npm test: 661/661 passing"
+      - "git diff --check: passing"
+  -
+    id: C17-M6-WRITE-TESTS-START-20260521T195803+0800
+    type: step_start
+    ref: C17-M6/write_tests
+    status: in_progress
+    timestamp: "2026-05-21T19:58:03+08:00"
+    summary: "Started C17-M6 final regression evidence for root tests, audit inventory deltas, stale runtime path/import/parser/export scans, and release readiness."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/prompts/06-full-audit-closure-and-release-readiness.md
+      - .pipeline/reviews/C17/M6/test-evidence.md
+  -
+    id: C17-M6-TEST-WORKER-START-20260521T195952+0800
+    type: worker_started
+    ref: C17-M6/write_tests
+    status: in_progress
+    timestamp: "2026-05-21T19:59:52+08:00"
+    summary: "Started test worker Hilbert for final C17 regression and audit-inventory evidence."
+    trigger: assistant
+    worker:
+      role: test
+      id: "019e4a67-e5ca-77b1-bd5f-9a2bbf07f10a"
+      nickname: Hilbert
+      lifecycle: started
+    evidence_refs:
+      - .pipeline/reviews/C17/M6/test-evidence.md
+  -
+    id: C17-M6-WRITE-TESTS-COMPLETE-20260521T200303+0800
+    type: step_complete
+    ref: C17-M6/write_tests
+    status: completed
+    timestamp: "2026-05-21T20:03:03+08:00"
+    summary: "Test worker Hilbert completed final regression and scan evidence with no blockers."
+    trigger: subagent
+    worker:
+      role: test
+      id: "019e4a67-e5ca-77b1-bd5f-9a2bbf07f10a"
+      nickname: Hilbert
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M6/test-evidence.md
+    validations:
+      - "npm test: 661/661 passing"
+      - "git diff --check: passing"
+      - "rg -n '/home/heyx' core/src scripts: no matches"
+      - "workspace/parser/export/ledger scans: pass with classified residuals"
+  -
+    id: C17-M6-IMPLEMENT-START-20260521T200303+0800
+    type: step_start
+    ref: C17-M6/implement
+    status: in_progress
+    timestamp: "2026-05-21T20:03:03+08:00"
+    summary: "Started implement worker Kepler for final C17 closure reports and project summary updates."
+    trigger: assistant
+    worker:
+      role: implement
+      id: "019e4a6b-4ae5-74e0-95ab-28404995eb1c"
+      nickname: Kepler
+      lifecycle: started
+    evidence_refs:
+      - .pipeline/reviews/C17/M6/implementation-evidence.md
+  -
+    id: C17-M6-IMPLEMENT-COMPLETE-20260521T200917+0800
+    type: step_complete
+    ref: C17-M6/implement
+    status: completed
+    timestamp: "2026-05-21T20:09:17+08:00"
+    summary: "Implement worker Kepler generated C17 audit closure reports and refreshed project summary; warning-count source mismatch was normalized to audited IDs."
+    trigger: subagent
+    worker:
+      role: implement
+      id: "019e4a6b-4ae5-74e0-95ab-28404995eb1c"
+      nickname: Kepler
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M6/implementation-evidence.md
+      - .pipeline/reports/C17-audit-closure.report.md
+      - .pipeline/reports/06-full-audit-closure-and-release-readiness.report.md
+      - PROJECT-SUMMARY.md
+  -
+    id: C17-M6-AUDIT-START-20260521T200917+0800
+    type: step_start
+    ref: C17-M6/review_code
+    status: in_progress
+    timestamp: "2026-05-21T20:09:17+08:00"
+    summary: "Started final audit for C17-M6 closure matrix, validation evidence, follow-up classification, and worker separation."
+    trigger: assistant
+    evidence_refs:
+      - .pipeline/reviews/C17/M6/audit.md
+  -
+    id: C17-M6-AUDIT-COMPLETE-20260521T202011+0800
+    type: step_complete
+    ref: C17-M6/review_code
+    status: completed
+    timestamp: "2026-05-21T20:20:11+08:00"
+    summary: "Audit worker Pauli passed C17-M6 final closure audit with no blockers."
+    trigger: subagent
+    worker:
+      role: audit
+      id: "019e4a72-911d-7b62-948c-5459f509db27"
+      nickname: Pauli
+      lifecycle: closed
+    evidence_refs:
+      - .pipeline/reviews/C17/M6/audit.md
+  -
+    id: C17-M6-COMPLETE-20260521T202011+0800
+    type: milestone_complete
+    ref: C17-M6
+    status: completed
+    timestamp: "2026-05-21T20:20:11+08:00"
+    summary: "Completed C17-M6: final regression, closure matrix, release readiness report, project summary, and audit verdict are complete."
+    trigger: assistant
+    report: .pipeline/reports/06-full-audit-closure-and-release-readiness.report.md
+    validations:
+      - "npm test: 661/661 passing"
+      - "git diff --check: passing"
+      - "hardcoded path scan: no matches"
+      - "final audit: PASS"
+  -
+    id: CYCLE-PENDING-ACCEPTANCE-C17-20260521T202011+0800
+    type: cycle_pending_acceptance
+    ref: C17
+    status: pending_acceptance
+    timestamp: "2026-05-21T20:20:11+08:00"
+    summary: "C17 automated audit remediation completed and is waiting for user acceptance or rejection."
+    trigger: assistant
+    report: .pipeline/reports/C17-audit-closure.report.md
+  -
+    id: RELEASE-v13.0.0-alpha.1-20260521T213156+0800
+    type: release
+    ref: v13.0.0-alpha.1
+    status: completed
+    timestamp: "2026-05-21T21:31:56+08:00"
+    summary: "Prepared v13.0.0-alpha.1 with C16 root project management mode plus C17 audit remediation, release notes, changelog, root test validation, and final scans."
+    trigger: user
+    report: docs/release/v13.0.0-alpha.1.md
+    validations:
+      - "npm test: 661/661 passing"
+      - "node --test core/test/docs-governance.test.js: 8/8 passing"
+      - "git diff --check: passing"
+      - "rg -n '/home/heyx' core/src scripts: no matches"

@@ -4,11 +4,13 @@
 # 触发时机：Codex config.toml 的 notify 配置
 # 这是 Codex 唯一支持的 Hook 事件
 # observability, not a runner: do not resume, advance state, delete locks, or execute workflow commands here.
+# Terminal-state handling is hook-safe: only enqueue local pending QQ evidence; dispatch is a separate confirmed command.
 
 set -euo pipefail
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
 scripts_dir="$script_dir/../scripts"
+workflow_root="$(cd "$script_dir/.." && pwd)"
 cwd="$(pwd)"
 pipeline_dir="$cwd/.pipeline"
 state_file="$pipeline_dir/state.yaml"
@@ -25,6 +27,14 @@ fi
 
 status="$(printf '%s\n' "$summary" | sed -n 's/^Status: //p' | head -n1)"
 if [[ "$status" != "running" ]]; then
+  node "$workflow_root/cli/bin/hypo-workflow" project-notifications enqueue \
+    --home "$HOME" \
+    --project-id "$(basename "$cwd" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')" \
+    --project-name "$(basename "$cwd")" \
+    --project-path "$cwd" \
+    --platform codex \
+    --state-file "$state_file" \
+    --status "$status" >/dev/null 2>&1 || true
   exit 0
 fi
 

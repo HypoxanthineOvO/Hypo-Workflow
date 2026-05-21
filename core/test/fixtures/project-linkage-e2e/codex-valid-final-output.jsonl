@@ -1,0 +1,2 @@
+{"timestamp":"2026-05-20T23:56:00+08:00","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"Please finish the e2e dry-run."}]}}
+{"timestamp":"2026-05-20T23:57:00+08:00","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Valid final assistant output for project linkage e2e.\n\n```bash\nprintf 'preserve dry-run notification text'\n```\n\nThis exact output must appear once in stop notification dry-run segments."}]}}

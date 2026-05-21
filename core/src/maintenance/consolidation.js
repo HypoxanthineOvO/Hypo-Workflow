@@ -5,9 +5,13 @@ import {
   discoverConsolidationSources,
   scrubConsolidationSecretMarkers,
 } from "./session-sources.js";
-import { parseYaml, stringifyYaml } from "../config/index.js";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { stringifyYaml } from "../config/index.js";
+import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
+import {
+  appendJsonlLedgerEntry,
+  jsonlLedgerPathFor,
+} from "../ledger/index.js";
 
 const CANDIDATE_FIELDS = Object.freeze({
   knowledge: "knowledge_candidates",
@@ -387,20 +391,9 @@ function localDate(value) {
 }
 
 async function appendSchedulerLedgerEvent(root, event) {
-  const ledgerFile = join(root, "ledger.yaml");
-  let ledger = { events: [] };
-  try {
-    ledger = parseYaml(await readFile(ledgerFile, "utf8"));
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-  }
-  const next = {
-    ...(ledger && typeof ledger === "object" ? ledger : {}),
-    events: [...(Array.isArray(ledger?.events) ? ledger.events : []), redactSecrets(event)],
-  };
-  await mkdir(dirname(ledgerFile), { recursive: true });
-  await writeFile(ledgerFile, `${stringifyYaml(next).trimEnd()}\n`, "utf8");
-  return { path: ledgerFile, event: redactSecrets(event), ledger: next };
+  const sanitized = redactSecrets(event);
+  const appended = await appendJsonlLedgerEntry(jsonlLedgerPathFor(join(root, "ledger.jsonl")), sanitized);
+  return { path: appended.path, event: sanitized, ledger: appended.ledger };
 }
 
 function flattenRecords(sources) {

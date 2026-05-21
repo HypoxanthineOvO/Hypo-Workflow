@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { hasText, isPlainObject } from "../utils/index.js";
 
 const PROJECT_HOME_SLOT_DEFINITIONS = Object.freeze([
   { id: "overview", title: "Overview", authority: "derived", projections: ["summary", "overview"], kinds: ["project_overview"] },
@@ -435,14 +436,6 @@ function sortForCanonical(value) {
     result[key] = sortForCanonical(value[key]);
     return result;
   }, {});
-}
-
-function isPlainObject(value) {
-  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
-}
-
-function hasText(value) {
-  return typeof value === "string" && value.trim().length > 0;
 }
 
 function toArray(value) {

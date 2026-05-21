@@ -1,6 +1,6 @@
 # Changelog
 
-## v13.0.0-alpha.1 - 2026-05-20
+## v13.0.0-alpha.1 - 2026-05-21
 
 ### Features
 
@@ -8,22 +8,29 @@
 - 新增 `/hw:maintain` 命令族，覆盖 `status`、`scan`、`plan`、`queue`、`run`、`apply`、`verify` 和 `log`，将长期维护对象从 Cycle/Patch 中拆出。
 - 新增每日 04:00 全局沉淀本地入口 `hypo-workflow maintain-scheduler --dry-run` 与 `scripts/maintenance-scheduler.sh`，生成 safe-local evidence 和 maintenance ledger event。
 - 新增项目级 Global Knowledge projection，SessionStart 只读加载 compact/index projection 文件，不加载 raw global records 或 raw candidates。
+- 新增 C17 审计修复闭环：根目录 `npm test`、审计 inventory、共享 utils、分层配置迁移、`js-yaml` 统一、workspace clean split、JSONL ledger authority 和显式 public export surface。
 
 ### Fixes
 
 - 修订 C16 Notion 同步策略：从“创建额外同步子页”改为 legacy reconciliation，整理现有 Hypo-Workflow 主页及既有子页面，并保留备份、dry-run、显式授权和读回验证证据。
 - 强化 Notion apply gate：要求 dry-run hash、reviewed apply plan、精确确认短语、显式 target binding、re-read verification 和 sanitized ledger/evidence。
 - 修复 SessionStart hook stdout 契约，确保只输出可解析 JSON，并将 Global Knowledge compact 作为 additional context 注入。
+- 修复 `core/src` 与 `scripts` 中的 `/home/heyx/...` runtime/source 假设，相关路径改为分层配置或 `$HOME` 派生。
+- 修复 `workspace/index.js` God Module，删除旧 public entry 并拆为 workspace authority、project linkage、project stop events、Codex capture 和 notification sender 五个模块。
+- 修复 config/knowledge YAML parser 分裂，统一使用 `js-yaml`。
+- 修复 project events、notifications、maintenance、daily summary、global consolidation 的长期 YAML ledger authority 重写，迁移为 append-only JSONL。
+- 修复 root broad barrel export，改为显式 named re-export。
 
 ### Docs
 
-- README / README.en 更新到 v13.0.0-alpha.1 预发布说明入口。
+- README / README.en 更新到 v13.0.0-alpha.1 预发布说明入口，并覆盖 C16 全局维护与 C17 审计修复范围。
 - 新增中英文 v13.0.0-alpha.1 release notes。
 - 同步版本源、OpenCode/Claude/Codex package metadata、默认配置版本和 generator `HW_VERSION`。
 
 ### Tests
 
-- `cd core && npm test`: 588/588 passing。
+- `npm test`: 661/661 passing。
+- C17 final scans: `git diff --check` passing；`rg -n '/home/heyx' core/src scripts` 无命中；workspace/parser/export/ledger scans 为 PASS with classified residual。
 - `node --test core/test/knowledge-ledger.test.js core/test/global-knowledge-index.test.js core/test/sync-standardization.test.js`: 16/16 passing，来自 Global Knowledge projection 修订记录。
 - SessionStart hook JSON parse: passing。
 - `git diff --check`: passing。

@@ -2,6 +2,7 @@ import { access, readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { loadProjectRegistry, parseYaml } from "../config/index.js";
+import { validateWorkspaceRelations } from "../project-linkage/index.js";
 
 const REQUIRED_WORKSPACE_SECTIONS = Object.freeze([
   "workspace",
@@ -11,41 +12,6 @@ const REQUIRED_WORKSPACE_SECTIONS = Object.freeze([
   "policies",
   "secret_refs",
   "derived_views",
-]);
-
-const SUPPORTED_RELATION_TYPES = Object.freeze([
-  "replaced_by",
-  "predecessor_of",
-  "successor_of",
-  "forked_from",
-  "split_into",
-  "merged_into",
-  "depends_on",
-  "feeds_content_to",
-  "publishes_to",
-  "uses_service",
-  "provides_skill_to",
-  "shares_secret_ref",
-  "shares_rules",
-  "shares_knowledge",
-  "syncs_to",
-  "tracked_by",
-  "related_to",
-]);
-
-const SUPPORTED_RELATION_DIRECTIONS = Object.freeze(["from_to", "bidirectional"]);
-const REQUIRED_RELATION_FIELDS = Object.freeze([
-  "id",
-  "from",
-  "to",
-  "type",
-  "status",
-  "authority",
-  "direction",
-  "evidence_refs",
-  "projection",
-  "created_at",
-  "updated_at",
 ]);
 
 const RAW_SECRET_KEYS = /^(value|secret|secrets|token|api_key|apikey|password|private_key|credential|credentials)$/i;
@@ -81,20 +47,10 @@ export function validateWorkspaceAuthority(workspace, options = {}) {
 
   errors.push(...validateObjects(workspace));
   errors.push(...validateSecretRefs(workspace));
-  errors.push(...validateRelationList(workspace));
+  errors.push(...validateWorkspaceRelations(workspace, { throwOnError: false }).errors);
   errors.push(...validateObjectReferenceLists(workspace));
   errors.push(...validateDerivedViews(workspace));
 
-  return finishValidation(errors, options);
-}
-
-export function validateWorkspaceRelations(workspace, options = {}) {
-  const errors = [];
-  if (!isPlainObject(workspace)) {
-    errors.push("workspace authority must be an object");
-  } else {
-    errors.push(...validateRelationList(workspace));
-  }
   return finishValidation(errors, options);
 }
 
@@ -161,47 +117,6 @@ export async function loadWorkspaceAuthority(options = {}) {
   };
 }
 
-export function buildProjectLinkGraph(workspace, options = {}) {
-  validateWorkspaceRelations(workspace, { throwOnError: true });
-  const projectIds = new Set((workspace.objects || [])
-    .filter((object) => object?.type === "project")
-    .map((object) => String(object.id)));
-  const edges = (workspace.relations || [])
-    .filter((relation) => projectIds.has(String(relation.from)) && projectIds.has(String(relation.to)))
-    .map((relation) => ({
-      id: String(relation.id),
-      from: String(relation.from),
-      to: String(relation.to),
-      type: String(relation.type),
-      status: relation.status,
-      authority: relation.authority,
-      direction: relation.direction,
-      evidence_refs: Array.isArray(relation.evidence_refs) ? [...relation.evidence_refs] : [],
-      projection: clone(relation.projection || {}),
-    }));
-  const drift = detectDerivedProjectLinkDrift(edges, options.derivedProjects || options.derived_projects || []);
-
-  return {
-    edges,
-    drift,
-    successorsOf(id) {
-      return edges
-        .filter((edge) => edge.from === id)
-        .map((edge) => edge.to)
-        .sort();
-    },
-    predecessorsOf(id) {
-      return edges
-        .filter((edge) => edge.to === id)
-        .map((edge) => edge.from)
-        .sort();
-    },
-    displayLinksFor(id) {
-      return deriveDisplayLinks(edges, id);
-    },
-  };
-}
-
 function validateObjects(workspace) {
   const errors = [];
   if (!Array.isArray(workspace.objects)) return errors;
@@ -260,43 +175,6 @@ function validateSecretRefs(workspace) {
   return errors;
 }
 
-function validateRelationList(workspace) {
-  const errors = [];
-  const objectIds = new Set((workspace.objects || []).map((object) => String(object?.id || "")));
-  const relationIds = new Set();
-  if (!Array.isArray(workspace.relations)) return errors;
-
-  for (const relation of workspace.relations) {
-    if (!isPlainObject(relation)) {
-      errors.push("relations entries must be objects");
-      continue;
-    }
-    const missing = REQUIRED_RELATION_FIELDS.filter((field) => isEmptyRelationField(relation[field]));
-    if (missing.length) {
-      errors.push(`relation id or required metadata missing: required ${missing.join(", ")}`);
-    }
-    if (hasText(relation.id)) {
-      if (relationIds.has(String(relation.id))) {
-        errors.push(`duplicate relation id: ${relation.id}`);
-      } else {
-        relationIds.add(String(relation.id));
-      }
-    }
-    for (const endpoint of ["from", "to"]) {
-      if (hasText(relation[endpoint]) && !objectIds.has(String(relation[endpoint]))) {
-        errors.push(`unknown relation endpoint: ${relation[endpoint]}`);
-      }
-    }
-    if (hasText(relation.type) && !SUPPORTED_RELATION_TYPES.includes(String(relation.type))) {
-      errors.push(`unsupported relation type: ${relation.type}`);
-    }
-    if (hasText(relation.direction) && !SUPPORTED_RELATION_DIRECTIONS.includes(String(relation.direction))) {
-      errors.push(`unsupported relation direction: ${relation.direction}`);
-    }
-  }
-  return errors;
-}
-
 function validateObjectReferenceLists(workspace) {
   const errors = [];
   if (!Array.isArray(workspace.objects)) return errors;
@@ -350,54 +228,6 @@ function deriveProjectRecord(object, existing = {}, options = {}) {
   };
 }
 
-function deriveDisplayLinks(edges, id) {
-  const links = [];
-  for (const edge of edges) {
-    if (edge.to === id) {
-      links.push({
-        id: edge.id,
-        direction: "incoming",
-        related_object_id: edge.from,
-        type: inverseDisplayType(edge.type, "incoming"),
-        source_type: edge.type,
-        authority: "workspace.yaml",
-      });
-    }
-    if (edge.from === id) {
-      links.push({
-        id: edge.id,
-        direction: "outgoing",
-        related_object_id: edge.to,
-        type: inverseDisplayType(edge.type, "outgoing"),
-        source_type: edge.type,
-        authority: "workspace.yaml",
-      });
-    }
-  }
-  return links.sort((a, b) => a.id.localeCompare(b.id) || a.direction.localeCompare(b.direction));
-}
-
-function inverseDisplayType(type, direction) {
-  if (type === "replaced_by") return direction === "incoming" ? "successor_of" : "predecessor_of";
-  return type;
-}
-
-function detectDerivedProjectLinkDrift(edges, derivedProjects) {
-  const drift = [];
-  const derivedById = new Map(normalizeExistingProjects(derivedProjects).map((project) => [String(project.id), project]));
-  for (const [id, project] of derivedById.entries()) {
-    const successors = edges.filter((edge) => edge.from === id).map((edge) => edge.to).sort();
-    const predecessors = edges.filter((edge) => edge.to === id).map((edge) => edge.from).sort();
-    if (Array.isArray(project.successors) && !sameValue([...project.successors].sort(), successors)) {
-      drift.push({ id, field: "successors", existing: clone(project.successors), authority: successors, reason: "derived_view_drift" });
-    }
-    if (Array.isArray(project.predecessors) && !sameValue([...project.predecessors].sort(), predecessors)) {
-      drift.push({ id, field: "predecessors", existing: clone(project.predecessors), authority: predecessors, reason: "derived_view_drift" });
-    }
-  }
-  return drift;
-}
-
 function containsRawSecretValue(value, options = {}, path = []) {
   if (!isPlainObject(value) && !Array.isArray(value)) return false;
   if (Array.isArray(value)) {
@@ -427,12 +257,6 @@ function stripRawSecretFields(value) {
     sanitized[key] = stripRawSecretFields(child);
   }
   return sanitized;
-}
-
-function isEmptyRelationField(value) {
-  if (Array.isArray(value)) return value.length === 0;
-  if (isPlainObject(value)) return Object.keys(value).length === 0;
-  return !hasText(value);
 }
 
 function finishValidation(errors, options) {

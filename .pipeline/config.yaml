@@ -1,5 +1,5 @@
 pipeline:
-  name: "C16 根目录项目管理模式"
+  name: "C17 审计修复与架构减债"
   source: local
   output: local
   prompts_dir: .pipeline/prompts

@@ -7,14 +7,25 @@ import { spawnSync } from "node:child_process";
 import {
   DEFAULT_GLOBAL_CONFIG,
   buildGlobalTuiModel,
+  buildConfigMigrationPlan,
   loadConfig,
+  loadLayeredConfig,
   normalizeAutomationPolicy,
   normalizeProfile,
+  parseYaml,
   registerProject,
+  renderConfigMigrationPrompt,
   renderGlobalTuiSnapshot,
   runMaintenanceScheduler,
+  runDailyProjectSummaryScheduler,
   runProjectSync,
+  emitProjectEvent,
+  dispatchProjectStopNotifications,
+  enqueueProjectStopNotification,
+  loadPendingNotifications,
+  routeProjectEvent,
   stringifyYaml,
+  writeUserConfigMigration,
   writeConfig,
 } from "../../core/src/index.js";
 
@@ -39,6 +50,8 @@ try {
     await doctor();
   } else if (command === "sync") {
     await sync(args.slice(1));
+  } else if (command === "config") {
+    await configCommand(args.slice(1));
   } else if (command === "profile") {
     await profile(args.slice(1));
   } else if (command === "install") {
@@ -47,6 +60,12 @@ try {
     await initProject(args.slice(1));
   } else if (command === "maintain-scheduler") {
     await maintainScheduler(args.slice(1));
+  } else if (command === "daily-summary-scheduler") {
+    await dailySummaryScheduler(args.slice(1));
+  } else if (command === "project-events") {
+    await projectEvents(args.slice(1));
+  } else if (command === "project-notifications") {
+    await projectNotifications(args.slice(1));
   } else {
     throw new Error(`Unknown command: ${command}`);
   }
@@ -125,6 +144,29 @@ async function sync(flags) {
     ? ` derived=${result.derived_health.ok ? "fresh" : `stale:${result.derived_health.stale_count}/errors:${result.derived_health.error_count}`}`
     : "";
   process.stdout.write(`Synced project ${project} mode=${result.mode} operations=${result.operations.join(",")}${derived}\n`);
+  if (result.config_migration?.prompt) {
+    process.stdout.write(`${result.config_migration.prompt}\n`);
+  }
+}
+
+async function configCommand(flags) {
+  const action = flags[0];
+  if (action !== "migrate") {
+    throw new Error("config requires migrate");
+  }
+  const rest = flags.slice(1);
+  const home = resolve(valueAfter(rest, "--home") || homedir());
+  const project = resolve(valueAfter(rest, "--project") || ".");
+  const layered = await loadLayeredConfig({ projectRoot: project, homeDir: home });
+  const plan = buildConfigMigrationPlan({ userConfigFile: layered.files.user });
+  if (rest.includes("--write")) {
+    const result = await writeUserConfigMigration(plan, { confirm: true });
+    process.stdout.write(`Wrote ${result.target_path}\n`);
+    return;
+  }
+  process.stdout.write(renderConfigMigrationPrompt(plan));
+  process.stdout.write("\n\n");
+  process.stdout.write(plan.yaml);
 }
 
 async function profile(flags) {
@@ -245,6 +287,152 @@ async function maintainScheduler(flags) {
   process.stdout.write(`Cron install example: crontab -e -> 0 4 * * * ${join(project, "scripts", "maintenance-scheduler.sh")} ${project}\n`);
 }
 
+async function dailySummaryScheduler(flags) {
+  const home = resolve(valueAfter(flags, "--home") || homedir());
+  const project = resolve(valueAfter(flags, "--project") || ".");
+  const now = valueAfter(flags, "--now");
+  const notify = flags.includes("--notify");
+  const result = await runDailyProjectSummaryScheduler({
+    home_dir: home,
+    mode: notify ? "notify" : "dry-run",
+    confirmed: flags.includes("--confirmed"),
+    language: "zh-CN",
+    hypo_claw_cli: valueAfter(flags, "--hypo-claw-cli"),
+    hypo_claw_args: valuesAfter(flags, "--hypo-claw-arg"),
+    thread_id: valueAfter(flags, "--thread-id"),
+    server: valueAfter(flags, "--server"),
+  }, {
+    now,
+  });
+  if (!result.ok) {
+    process.stderr.write(`Daily summary scheduler blocked: ${result.errors.join("; ")}\n`);
+    process.exit(1);
+  }
+  process.stdout.write(`Daily summary scheduler: daily_project_summary ${result.scheduler.schedule.expression} status=${result.scheduler.status}\n`);
+  process.stdout.write(`Evidence: ${result.evidence_paths.summary}\n`);
+  process.stdout.write(`Ledger: ${result.ledger_path}\n`);
+  process.stdout.write(`remote_writes_enabled=${result.scheduler.remote_writes_enabled} external_contacted=${result.scheduler.external_contacted} notification_status=${result.notification?.status || "unknown"} apply_required=${result.scheduler.apply_required}\n`);
+  process.stdout.write(`Cron install example: crontab -e -> 30 0 * * * ${join(project, "scripts", "daily-summary-scheduler.sh")} ${project} --notify --confirmed\n`);
+}
+
+async function projectEvents(flags) {
+  const action = flags[0];
+  if (!["emit", "route"].includes(action)) {
+    throw new Error("project-events requires emit or route");
+  }
+  const rest = flags.slice(1);
+  const home = resolve(valueAfter(rest, "--home") || homedir());
+  const now = valueAfter(rest, "--now");
+
+  if (action === "emit") {
+    const metadata = metadataFromFlags(rest);
+    const result = await emitProjectEvent({
+      home_dir: home,
+      event_type: valueAfter(rest, "--event-type"),
+      status: valueAfter(rest, "--status"),
+      source_project: valueAfter(rest, "--source-project"),
+      target_project: valueAfter(rest, "--target-project"),
+      object_ref: valueAfter(rest, "--object-ref"),
+      summary: valueAfter(rest, "--summary"),
+      evidence_refs: valuesAfter(rest, "--evidence-ref"),
+      metadata,
+    }, { now });
+    process.stdout.write(`Project event emitted: ${result.event.event_type} id=${result.event.id} status=${result.event.status}\n`);
+    process.stdout.write(`Ledger: ${result.ledger_path}\n`);
+    return;
+  }
+
+  const notify = rest.includes("--notify");
+  const customHypoClawCli = valueAfter(rest, "--hypo-claw-cli");
+  const result = await routeProjectEvent({
+    home_dir: home,
+    event_id: valueAfter(rest, "--event-id"),
+    route: valueAfter(rest, "--route") || "writer.news.issue",
+    topic: valueAfter(rest, "--topic"),
+    report_date: valueAfter(rest, "--report-date"),
+    input_url: valueAfter(rest, "--input-url"),
+    writer_root: valueAfter(rest, "--writer-root"),
+    issue_out: valueAfter(rest, "--issue-out"),
+    dry_run: rest.includes("--dry-run"),
+    notify,
+    confirmed: rest.includes("--confirmed"),
+    hypo_claw_cli: customHypoClawCli,
+    hypo_claw_args: valuesAfter(rest, "--hypo-claw-arg"),
+    hypo_claw_private_target: notify && !customHypoClawCli,
+    thread_id: valueAfter(rest, "--thread-id"),
+    server: valueAfter(rest, "--server"),
+  }, { now });
+  if (!result.ok) {
+    process.stderr.write(`Project event route blocked: ${result.errors.join("; ")}\n`);
+    process.exit(1);
+  }
+  process.stdout.write(`Project event routed: ${result.source_event.id} -> ${result.writer_issue_event.id}\n`);
+  process.stdout.write(`Writer issue: ${result.writer_issue_event.object_ref}\n`);
+  process.stdout.write(`Notification: ${result.notification?.status || "unknown"} external_contacted=${result.notification?.external_contacted === true}\n`);
+  process.stdout.write(`Ledger: ${result.ledger_path}\n`);
+}
+
+async function projectNotifications(flags) {
+  const action = flags[0];
+  if (!["enqueue", "dispatch", "status"].includes(action)) {
+    throw new Error("project-notifications requires enqueue, dispatch, or status");
+  }
+  const rest = flags.slice(1);
+  const home = resolve(valueAfter(rest, "--home") || homedir());
+  const queuePath = valueAfter(rest, "--queue");
+  const now = valueAfter(rest, "--now");
+
+  if (action === "status") {
+    const state = await loadPendingNotifications({ home_dir: home, queue_path: queuePath });
+    const entries = state.queue.entries || [];
+    process.stdout.write(`Project notifications queue: ${state.path}\n`);
+    process.stdout.write(`pending=${entries.filter((entry) => entry.status === "pending").length} sent=${entries.filter((entry) => entry.status === "sent").length} blocked=${entries.filter((entry) => String(entry.status || "").startsWith("blocked")).length} total=${entries.length}\n`);
+    return;
+  }
+
+  if (action === "enqueue") {
+    const stateFile = valueAfter(rest, "--state-file");
+    const result = await enqueueProjectStopNotification({
+      home_dir: home,
+      queue_path: queuePath,
+      project: {
+        id: valueAfter(rest, "--project-id") || "hypo-workflow",
+        display_name: valueAfter(rest, "--project-name") || valueAfter(rest, "--project-id") || "Hypo-Workflow",
+        path: valueAfter(rest, "--project-path") || process.cwd(),
+      },
+      source_platform: valueAfter(rest, "--platform") || "codex",
+      workflow_state: stateFile ? parseYaml(await readFile(resolve(stateFile), "utf8")) : { pipeline: { status: valueAfter(rest, "--status") || "completed" } },
+      status: valueAfter(rest, "--status"),
+      final_assistant_output: valueAfter(rest, "--final-output"),
+      session_path: valueAfter(rest, "--session-path"),
+      session_id: valueAfter(rest, "--session-id"),
+      occurred_at: now,
+      terminal_at: now,
+    }, { now });
+    process.stdout.write(`Project notification enqueue: status=${result.status} enqueued=${result.enqueued === true}\n`);
+    if (result.queue_path) process.stdout.write(`Queue: ${result.queue_path}\n`);
+    if (result.entry?.id) process.stdout.write(`Entry: ${result.entry.id}\n`);
+    if (!result.ok) process.exitCode = 1;
+    return;
+  }
+
+  const customHypoClawCli = valueAfter(rest, "--hypo-claw-cli");
+  const result = await dispatchProjectStopNotifications({
+    home_dir: home,
+    queue_path: queuePath,
+    confirmed: rest.includes("--confirmed"),
+    hypo_claw_private_target: !customHypoClawCli,
+    hypo_claw_cli: customHypoClawCli,
+    hypo_claw_args: valuesAfter(rest, "--hypo-claw-arg"),
+    thread_id: valueAfter(rest, "--thread-id"),
+    server: valueAfter(rest, "--server"),
+  }, { now });
+  process.stdout.write(`Project notifications dispatch: status=${result.status} attempted=${result.attempted} sent=${result.sent}\n`);
+  process.stdout.write(`Queue: ${result.queue_path}\n`);
+  process.stdout.write(`external_contacted=${result.external_contacted} qq_contacted=${result.qq_contacted}\n`);
+  if (!result.ok && result.attempted > 0) process.exitCode = 1;
+}
+
 async function readOrDefaultConfig() {
   if (await exists(globalConfigPath())) return loadConfig(globalConfigPath());
   return { ...DEFAULT_GLOBAL_CONFIG, profiles: profileIndex() };
@@ -295,12 +483,28 @@ function help() {
   process.stdout.write("  setup [--platform codex|claude-code|opencode] [--model <name>] [--yes]\n");
   process.stdout.write("  tui [--snapshot]\n");
   process.stdout.write("  doctor\n");
+  process.stdout.write("  config migrate [--write] [--home <dir>] [--project <dir>]\n");
   process.stdout.write("  sync [--light|--deep] [--check-only|--repair] --platform opencode|claude-code|cursor|copilot|trae --project <dir>\n");
   process.stdout.write("  profile list|use <name>|edit <name> [--platform <name>] [--model <name>]\n");
   process.stdout.write("  install opencode|codex|claude\n");
   process.stdout.write("  init-project --platform opencode --project <dir> [--automation manual|balanced|full]\n");
   process.stdout.write("  maintain-scheduler [--dry-run] [--home <dir>] [--project <dir>] [--schedule '04:00 Asia/Shanghai']\n");
+  process.stdout.write("  daily-summary-scheduler [--dry-run|--notify --confirmed] [--home <dir>] [--project <dir>] [--now <iso>] [--thread-id <id>] [--server <url>]\n");
+  process.stdout.write("  project-events emit|route [--home <dir>] [--event-type <type>] [--route writer.news.issue] [--dry-run|--notify --confirmed]\n");
+  process.stdout.write("  project-notifications enqueue|dispatch|status [--home <dir>] [--confirmed] [--server <url>]\n");
   process.stdout.write("\nPipeline execution remains inside OpenCode, Codex, or Claude Code agents.\n");
+}
+
+function metadataFromFlags(flags) {
+  const metadata = {};
+  for (let index = 0; index < flags.length; index += 1) {
+    if (flags[index] !== "--metadata") continue;
+    const pair = flags[index + 1] || "";
+    const eq = pair.indexOf("=");
+    if (eq < 0) continue;
+    metadata[pair.slice(0, eq)] = pair.slice(eq + 1);
+  }
+  return metadata;
 }
 
 function binaryState(name) {
@@ -311,6 +515,14 @@ function binaryState(name) {
 function valueAfter(values, flag) {
   const index = values.indexOf(flag);
   return index >= 0 ? values[index + 1] : undefined;
+}
+
+function valuesAfter(values, flag) {
+  const found = [];
+  for (let index = 0; index < values.length; index += 1) {
+    if (values[index] === flag && values[index + 1]) found.push(values[index + 1]);
+  }
+  return found.length > 0 ? found : undefined;
 }
 
 function globalConfigPath() {

@@ -1,7 +1,15 @@
 import { access, chmod, copyFile, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
-import { DEFAULT_GLOBAL_CONFIG, loadConfig, parseYaml, stringifyYaml } from "../config/index.js";
+import {
+  DEFAULT_GLOBAL_CONFIG,
+  buildConfigMigrationPlan,
+  loadConfig,
+  loadLayeredConfig,
+  parseYaml,
+  renderConfigMigrationPrompt,
+  stringifyYaml,
+} from "../config/index.js";
 import { writeOpenCodeArtifacts } from "../artifacts/opencode.js";
 import { writeClaudeCodeAgentArtifacts, writeClaudeCodePluginArtifacts } from "../artifacts/claude.js";
 import { writeThirdPartyAdapterArtifacts } from "../artifacts/third-party.js";
@@ -38,8 +46,24 @@ export async function runProjectSync(projectRoot = ".", options = {}) {
 
   const light = await runLightSync(root, { ...options, now });
   const operations = ["light_sync", ...light.operations];
-  const config = await loadConfig(join(root, ".pipeline", "config.yaml")).catch(() => DEFAULT_GLOBAL_CONFIG);
+  const layeredConfig = await loadLayeredConfig({
+    projectRoot: root,
+    userConfigFile: options.userConfigFile,
+    homeDir: options.homeDir,
+  });
+  const config = layeredConfig.config;
   operations.push("config_check");
+  let configMigration = null;
+  if (!layeredConfig.sources.user.exists) {
+    const plan = buildConfigMigrationPlan({ userConfigFile: layeredConfig.files.user });
+    configMigration = {
+      required: true,
+      target_path: plan.target_path,
+      prompt: renderConfigMigrationPrompt(plan),
+      dry_run: true,
+    };
+    operations.push("config_migration_prompt");
+  }
   let claudeCodeSettings = null;
   let claudeCodeAgents = null;
   let claudeCodeHooks = null;
@@ -96,6 +120,7 @@ export async function runProjectSync(projectRoot = ".", options = {}) {
   if (claudeCodeAgents) result.claude_code_agents = claudeCodeAgents;
   if (claudeCodeHooks) result.claude_code_hooks = claudeCodeHooks;
   if (thirdPartyAdapter) result.third_party_adapter = thirdPartyAdapter;
+  if (configMigration) result.config_migration = configMigration;
 
   if (mode === "deep") {
     result.dependency_scan = await scanDependencies(root);

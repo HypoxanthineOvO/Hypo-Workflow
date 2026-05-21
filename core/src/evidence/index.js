@@ -1,3 +1,5 @@
+import { isPlainObject, stableStringify } from "../utils/index.js";
+
 const DEFAULT_REPLACEMENT = "[REDACTED]";
 const SECRET_KEY_PATTERNS = Object.freeze([
   "api_key",
@@ -128,16 +130,4 @@ function classifySecretPattern(value) {
   if (text.includes("token")) return "token";
   if (text.includes("secret")) return "secret";
   return "api_key";
-}
-
-function stableStringify(value) {
-  if (Array.isArray(value)) return `[${value.map((item) => stableStringify(item)).join(",")}]`;
-  if (isPlainObject(value)) {
-    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`).join(",")}}`;
-  }
-  return JSON.stringify(value);
-}
-
-function isPlainObject(value) {
-  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }

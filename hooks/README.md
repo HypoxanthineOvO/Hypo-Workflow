@@ -36,6 +36,20 @@ node hooks/claude-hook.mjs <EventName>
 
 Stop 会阻止缺失 `state.yaml`、`log.yaml`、`PROGRESS.md`、最终步骤 report 等关键证据；metrics 和 derived refresh gap 只作为 warning。Compact 事件输出 resume packet，明确当前 Cycle/Milestone/step、下一步、自动化边界和最近事件，避免压缩后重放已完成步骤。PermissionRequest 按 `claude_code.profile` 决策：`developer` 本地宽松，`standard` 对破坏性/外部副作用 ask，`strict` 对高风险操作 deny。
 
+## Project Stop QQ Notifications
+
+项目停止通知分两段执行：
+
+- Hook-safe enqueue：Claude Stop hook 和 Codex notify hook 在终态时只写本地 pending queue `~/.hypo-workflow/notifications/project-stop-pending.yaml`，不直接发 QQ。
+- Confirmed dispatcher：`scripts/project-notification-dispatcher.sh` 由 cron 每分钟运行，调用 `hypo-workflow project-notifications dispatch --confirmed`，通过 Hypo-Claw private target 发送，并要求 QQ `external_message_id` evidence 才标记为 sent。
+
+手动查看和发送：
+
+```bash
+hypo-workflow project-notifications status
+hypo-workflow project-notifications dispatch --confirmed --server http://localhost:3000
+```
+
 ## Chat Recovery
 
 M13 起，Hook 规范额外支持 `/hw:chat` 的追加对话语义：

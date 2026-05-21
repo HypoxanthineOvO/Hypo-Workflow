@@ -1,0 +1,97 @@
+{
+  "projects": [
+    {
+      "id": "hypo-workflow",
+      "display_name": "Hypo-Workflow",
+      "path": "/home/heyx/Hypo-Workflow"
+    },
+    {
+      "id": "hypo-claw",
+      "display_name": "Hypo-Claw",
+      "path": "/home/heyx/Hypo-Claw"
+    }
+  ],
+  "runs": [
+    {
+      "project": {
+        "id": "hypo-workflow",
+        "display_name": "Hypo-Workflow",
+        "path": "/home/heyx/Hypo-Workflow"
+      },
+      "source_platform": "codex",
+      "session": {
+        "id": "codex-session-e2e-valid",
+        "ref": "core/test/fixtures/project-linkage-e2e/codex-valid-final-output.jsonl"
+      },
+      "session_path": "core/test/fixtures/project-linkage-e2e/codex-valid-final-output.jsonl",
+      "workflow_state": {
+        "pipeline": {
+          "name": "Hypo-Workflow",
+          "status": "waiting_acceptance",
+          "prompts_total": 15,
+          "prompts_completed": 15
+        },
+        "current": {
+          "phase": "waiting_acceptance",
+          "prompt_name": "C16-M15 Project Linkage End To End Dry-Run",
+          "step": null
+        },
+        "continuation": {
+          "auto_continue_available": false
+        }
+      },
+      "progress_summary": {
+        "cycle_id": "C16",
+        "milestone_id": "C16-M15",
+        "prompt_name": "C16-M15 Project Linkage End To End Dry-Run",
+        "completed_steps": ["write_tests"],
+        "current_step": "waiting_acceptance",
+        "summary": "The project linkage e2e dry-run reached waiting acceptance."
+      },
+      "occurred_at": "2026-05-20T23:58:00+08:00",
+      "terminal_at": "2026-05-20T23:57:45+08:00"
+    },
+    {
+      "project": {
+        "id": "hypo-claw",
+        "display_name": "Hypo-Claw",
+        "path": "/home/heyx/Hypo-Claw"
+      },
+      "source_platform": "codex",
+      "session": {
+        "id": "codex-session-e2e-missing-final",
+        "ref": "core/test/fixtures/project-linkage-e2e/codex-missing-final-output.jsonl"
+      },
+      "session_path": "core/test/fixtures/project-linkage-e2e/codex-missing-final-output.jsonl",
+      "workflow_state": {
+        "pipeline": {
+          "name": "Hypo-Claw",
+          "status": "failed",
+          "prompts_total": 3,
+          "prompts_completed": 2
+        },
+        "current": {
+          "phase": "failed",
+          "prompt_name": "Hypo-Claw stop notification transport",
+          "step": null
+        },
+        "continuation": {
+          "auto_continue_available": false
+        }
+      },
+      "progress_summary": {
+        "cycle_id": "HC-04",
+        "milestone_id": "HC-04-M03",
+        "prompt_name": "Hypo-Claw stop notification transport",
+        "completed_steps": ["detect_stop_state"],
+        "current_step": "capture_final_assistant_output",
+        "summary": "The project reached a terminal stop state but final assistant output is missing."
+      },
+      "occurred_at": "2026-05-20T23:59:00+08:00",
+      "terminal_at": "2026-05-20T23:58:50+08:00"
+    }
+  ],
+  "expected": {
+    "valid_final_output": "Valid final assistant output for project linkage e2e.\n\n```bash\nprintf 'preserve dry-run notification text'\n```\n\nThis exact output must appear once in stop notification dry-run segments."
+  }
+}

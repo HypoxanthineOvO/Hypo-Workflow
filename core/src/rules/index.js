@@ -58,7 +58,8 @@ export async function loadRulesSummary(projectRoot = ".", repoRoot = process.cwd
     } else {
       off += 1;
     }
-    lines.push(`${rule.name}\t${rule.label || "workflow"}\t${severity}\t${(rule.hooks || []).join(",") || "—"}`);
+    const ruleId = getRuleId(rule);
+    lines.push(`${ruleId}\t${rule.label || "workflow"}\t${severity}\t${(rule.hooks || []).join(",") || "—"}`);
   }
 
   lines.push("");
@@ -68,7 +69,7 @@ export async function loadRulesSummary(projectRoot = ".", repoRoot = process.cwd
   for (const rule of builtin) {
     const severity = resolveSeverity(rule, preset.rules, preset.activePacks);
     if (severity !== "off" && Array.isArray(rule.hooks) && rule.hooks.includes("always")) {
-      lines.push(`- ${rule.name} (${severity})`);
+      lines.push(`- ${getRuleId(rule)} (${severity})`);
     }
   }
 
@@ -457,7 +458,7 @@ async function loadPreset(repoRoot, projectRoot, builtin, options = {}) {
   let source = "builtin defaults";
   let activePacks = [];
   try {
-    projectRules = parseYaml(await readFile(projectRulesFile, "utf8"));
+    projectRules = parseRulesYaml(await readFile(projectRulesFile, "utf8"));
     ({ presetName, activePacks } = resolveExtends(projectRules.extends));
     source = ".pipeline/rules.yaml";
   } catch {
@@ -470,7 +471,7 @@ async function loadPreset(repoRoot, projectRoot, builtin, options = {}) {
   const packRules = {};
   for (const rule of builtin) {
     if (rule.pack && activePacks.includes(rule.pack)) {
-      packRules[rule.name] = rule.pack_default_severity || "warn";
+      packRules[getRuleId(rule)] = rule.pack_default_severity || "warn";
     }
   }
   return {
@@ -486,13 +487,28 @@ async function loadPreset(repoRoot, projectRoot, builtin, options = {}) {
 }
 
 function resolveSeverity(rule, rules, activePacks) {
-  if (rules[rule.name]) {
-    return rules[rule.name];
+  const ruleId = getRuleId(rule);
+  if (rules[ruleId]) {
+    return rules[ruleId];
   }
   if (rule.pack && activePacks.includes(rule.pack)) {
     return rule.pack_default_severity || "warn";
   }
   return rule.default_severity || "warn";
+}
+
+function getRuleId(rule = {}) {
+  return rule.name || rule.id;
+}
+
+function parseRulesYaml(raw) {
+  try {
+    return parseYaml(raw);
+  } catch (error) {
+    const quotedPackExtends = raw.replace(/^(\s*-\s*)(@[^\s#]+)(\s*(?:#.*)?)$/gm, "$1\"$2\"$3");
+    if (quotedPackExtends === raw) throw error;
+    return parseYaml(quotedPackExtends);
+  }
 }
 
 function resolveExtends(value) {

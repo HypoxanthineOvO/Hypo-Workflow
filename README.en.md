@@ -89,7 +89,7 @@ Current version exposes **50 user-facing commands** and **1 internal watchdog** 
 | [Platforms Reference](docs/en/reference/platforms.md) | Platform capability matrix |
 | [Generated Artifacts](docs/en/reference/generated-artifacts.md) | Generated adapter and docs sources |
 | [Configuration Reference](docs/en/reference/configuration.md) | Automation, gates, profiles, and worker separation |
-| [v13.0.0-alpha.1 Release Notes](docs/en/release/v13.0.0-alpha.1.md) | C16 global maintenance, Notion legacy reconciliation, and Knowledge projection alpha |
+| [v13.0.0-alpha.1 Release Notes](docs/en/release/v13.0.0-alpha.1.md) | C16 global maintenance, C17 audit remediation, workspace split, and JSONL ledger alpha |
 
 ## License
 

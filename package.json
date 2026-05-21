@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test core/test/*.test.js"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.1"
+  }
+}

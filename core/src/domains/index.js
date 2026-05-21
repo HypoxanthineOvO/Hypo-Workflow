@@ -1,5 +1,6 @@
 import { access, readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
+import { hasText } from "../utils/index.js";
 
 const LOCAL_DOMAIN_ID = /^[a-z0-9][a-z0-9-]*$/;
 const EXTERNAL_REF_PREFIX = /^(github|git|https?|npm):|^@[^/]+\/[^/]+/i;
@@ -218,10 +219,6 @@ function toList(value) {
 
 function normalizeText(value) {
   return String(value || "").toLowerCase().replace(/[^a-z0-9+_-]+/g, " ").trim();
-}
-
-function hasText(value) {
-  return typeof value === "string" && value.trim().length > 0;
 }
 
 async function readOptional(path) {

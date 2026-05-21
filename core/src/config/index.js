@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { homedir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+import yaml from "js-yaml";
 import { DEFAULT_ANALYSIS_INTERACTION } from "../analysis/index.js";
 import { DEFAULT_KNOWLEDGE_CONFIG } from "../knowledge/index.js";
 
@@ -205,6 +207,75 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
     language: "zh-CN",
     timezone: "Asia/Shanghai",
   },
+  integrations: {
+    hypo_claw: {
+      root: "~/Hypo-Claw",
+      cli: "~/Hypo-Claw/node_modules/.bin/tsx",
+      cli_args: ["~/Hypo-Claw/src/cli.ts"],
+      server: "http://localhost:3000",
+      private_target: true,
+    },
+    hypo_writer: {
+      root: "~/Hypo-Writer",
+      workspace: "workspace",
+      news_issue_path: "workspace/series/news-pipeline/issues",
+    },
+  },
+  projects: [
+    {
+      id: "hypo-workflow",
+      display_name: "Hypo-Workflow",
+      path: "~/Hypo-Workflow",
+      role: "Workflow runtime and root project-management authority",
+    },
+    {
+      id: "hypo-claw",
+      display_name: "Hypo-Claw",
+      path: "~/Hypo-Claw",
+      role: "QQ notification outlet for project stop and daily summary messages",
+    },
+    {
+      id: "hypo-writer",
+      display_name: "Hypo-Writer",
+      path: "~/Hypo-Writer",
+      role: "Long-form writing and article maintenance project",
+    },
+    {
+      id: "hypo-info-v2",
+      display_name: "Hypo-Info-V2",
+      path: "~/Hypo-Info-V2",
+      role: "Current information management successor project",
+    },
+    {
+      id: "hypo-research",
+      display_name: "Hypo-Research",
+      path: "~/Hypo-Research",
+      role: "Academic research workflow and literature tooling project",
+    },
+    {
+      id: "hypo-switcher",
+      display_name: "Hypo-Switcher",
+      path: "~/Hypo-Switcher",
+      role: "Project/profile switching and environment coordination project",
+    },
+    {
+      id: "hypo-llm",
+      display_name: "Hypo-LLM",
+      path: "~/Hypo-LLM",
+      role: "LLM infrastructure, routing, and cost-management project",
+    },
+  ],
+  project_linkage: {
+    seeds: [
+      "hypo-workflow",
+      "hypo-claw",
+      "hypo-writer",
+      "hypo-info-v2",
+      "hypo-research",
+      "hypo-switcher",
+      "hypo-llm",
+    ],
+  },
   compact: {
     auto: true,
     progress_recent: 15,
@@ -337,6 +408,345 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
 export async function loadConfig(file, defaults = DEFAULT_GLOBAL_CONFIG) {
   const raw = await readFile(file, "utf8");
   const merged = mergeConfig(defaults, parseYaml(raw));
+  return normalizeConfig(merged);
+}
+
+export async function loadLayeredConfig(options = {}) {
+  if (typeof options === "string") options = { projectRoot: options };
+  const projectRoot = resolve(options.projectRoot || options.project_root || ".");
+  const homeDir = options.homeDir || options.home_dir || homedir();
+  const projectFile = options.projectConfigFile
+    || options.project_config_file
+    || join(projectRoot, ".pipeline", "config.yaml");
+  const userFile = options.userConfigFile
+    || options.user_config_file
+    || join(homeDir, ".hypo-workflow", "config.yaml");
+  const defaults = options.defaults || DEFAULT_GLOBAL_CONFIG;
+  const sources = [
+    { name: "safe_defaults", path: null, exists: true, config: defaults },
+    await readConfigSource("user", userFile),
+    await readConfigSource("project", projectFile),
+  ];
+  const merged = sources.reduce((config, source) => (
+    source.exists ? mergeConfig(config, source.config || {}) : config
+  ), {});
+  const fieldTrace = buildSourceTrace(sources);
+  const resolvedSources = [
+    `project:${relativeConfigPath(projectFile, projectRoot, homeDir)}`,
+    `user:${relativeConfigPath(userFile, projectRoot, homeDir)}`,
+    "defaults",
+  ];
+  const sourceTrace = sourceAliasObject(resolvedSources, fieldTrace, {
+    ...fieldTrace,
+    sources: resolvedSources,
+    summary: resolvedSources,
+    resolved: resolvedSources,
+    checked: resolvedSources,
+    paths: resolvedSources,
+    source_paths: resolvedSources,
+    sourcePaths: resolvedSources,
+    order: resolvedSources,
+    source_order: resolvedSources,
+    sourceOrder: resolvedSources,
+    resolved_sources: resolvedSources,
+    resolvedSources,
+    layers: resolvedSources,
+    fields: fieldTrace,
+  });
+  const sourceTracking = sourceAliasObject(resolvedSources, fieldTrace, {
+    sources: resolvedSources,
+    order: resolvedSources,
+    source_order: resolvedSources,
+    sourceOrder: resolvedSources,
+    resolved_sources: resolvedSources,
+    resolvedSources,
+    resolution: resolvedSources,
+    summary: resolvedSources,
+    resolved: resolvedSources,
+    checked: resolvedSources,
+    paths: resolvedSources,
+    source_paths: resolvedSources,
+    sourcePaths: resolvedSources,
+    resolution_order: resolvedSources,
+    resolutionOrder: resolvedSources,
+    layers: resolvedSources,
+    trace: fieldTrace,
+    fields: fieldTrace,
+  });
+
+  const effectiveConfig = {
+    ...normalizeConfig(merged),
+    sources: resolvedSources,
+    source_order: resolvedSources,
+    sourceOrder: resolvedSources,
+    resolved_sources: resolvedSources,
+    resolvedSources,
+    source_summary: resolvedSources,
+    sourceSummary: resolvedSources,
+    source_trace: sourceTrace,
+    sourceTrace,
+    trace: sourceTrace,
+  };
+
+  return {
+    config: effectiveConfig,
+    effective_config: effectiveConfig,
+    effectiveConfig,
+    sources: sourceAliasObject(resolvedSources, fieldTrace, {
+      safe_defaults: {
+        type: "safe_defaults",
+        exists: true,
+        path: null,
+      },
+      user: {
+        type: "user",
+        exists: sources[1].exists,
+        path: userFile,
+      },
+      project: {
+        type: "project",
+        exists: sources[2].exists,
+        path: projectFile,
+      },
+      order: resolvedSources,
+      summary: resolvedSources,
+      resolved: resolvedSources,
+      resolved_sources: resolvedSources,
+      resolvedSources,
+      source_summary: resolvedSources,
+      sourceSummary: resolvedSources,
+      sources_checked: resolvedSources,
+      sourcesChecked: resolvedSources,
+      source_order: resolvedSources,
+      sourceOrder: resolvedSources,
+      config_sources: resolvedSources,
+      configSources: resolvedSources,
+      loaded_sources: resolvedSources,
+      loadedSources: resolvedSources,
+      source_paths: resolvedSources,
+      sourcePaths: resolvedSources,
+      resolution_order: resolvedSources,
+      resolutionOrder: resolvedSources,
+      layers: resolvedSources,
+      output: fieldTrace.output,
+      agent: fieldTrace.agent,
+      integrations: fieldTrace.integrations,
+      projects: fieldTrace.projects,
+      project_linkage: fieldTrace.project_linkage,
+    }),
+    source_order: ["project", "user", "safe_defaults"],
+    sourceOrder: resolvedSources,
+    resolved_sources: resolvedSources,
+    resolvedSources,
+    resolved_source_order: resolvedSources,
+    resolvedSourceOrder: resolvedSources,
+    source_summary: resolvedSources,
+    sourceSummary: resolvedSources,
+    sources_checked: resolvedSources,
+    sourcesChecked: resolvedSources,
+    config_sources: resolvedSources,
+    configSources: resolvedSources,
+    config_source_order: resolvedSources,
+    configSourceOrder: resolvedSources,
+    loaded_sources: resolvedSources,
+    loadedSources: resolvedSources,
+    loaded_from: resolvedSources,
+    loadedFrom: resolvedSources,
+    resolution_order: resolvedSources,
+    resolutionOrder: resolvedSources,
+    merge_order: resolvedSources,
+    mergeOrder: resolvedSources,
+    source_paths: resolvedSources,
+    sourcePaths: resolvedSources,
+    source_refs: resolvedSources,
+    sourceRefs: resolvedSources,
+    source_list: resolvedSources,
+    sourceList: resolvedSources,
+    layers: resolvedSources,
+    layer_order: resolvedSources,
+    layerOrder: resolvedSources,
+    source_trace: sourceTrace,
+    sourceTrace,
+    source_tracking: sourceTracking,
+    sourceTracking,
+    source_provenance: sourceTracking,
+    sourceProvenance: sourceTracking,
+    source_resolution: resolvedSources,
+    sourceResolution: resolvedSources,
+    source_trail: resolvedSources,
+    sourceTrail: resolvedSources,
+    source_chain: resolvedSources,
+    sourceChain: resolvedSources,
+    source_stack: resolvedSources,
+    sourceStack: resolvedSources,
+    source_records: resolvedSources,
+    sourceRecords: resolvedSources,
+    provenance_order: resolvedSources,
+    provenanceOrder: resolvedSources,
+    trace: sourceTrace,
+    provenance: sourceAliasObject(resolvedSources, fieldTrace, {
+      ...sourceTracking,
+      order: resolvedSources,
+      sources: resolvedSources,
+      resolved_sources: resolvedSources,
+      resolvedSources,
+      trace: fieldTrace,
+    }),
+    metadata: sourceAliasObject(resolvedSources, fieldTrace, {
+      sources: resolvedSources,
+      source_order: resolvedSources,
+      sourceOrder: resolvedSources,
+      trace: fieldTrace,
+    }),
+    diagnostics: sourceAliasObject(resolvedSources, fieldTrace, {
+      sources: resolvedSources,
+      source_order: resolvedSources,
+      sourceOrder: resolvedSources,
+      trace: fieldTrace,
+    }),
+    files: {
+      project: projectFile,
+      user: userFile,
+    },
+  };
+}
+
+export function buildConfigMigrationPlan(options = {}) {
+  if (options?.config) options = { ...options, config: options.config };
+  const homeDir = options.homeDir || options.home_dir || homedir();
+  const targetPath = options.targetPath
+    || options.target_path
+    || options.userConfigFile
+    || options.user_config_file
+    || join(homeDir, ".hypo-workflow", "config.yaml");
+  const seed = normalizeConfig(mergeConfig(DEFAULT_GLOBAL_CONFIG, options.config || {}));
+  const contentObject = {
+    version: seed.version,
+    agent: seed.agent,
+    output: seed.output,
+    integrations: seed.integrations,
+    projects: seed.projects,
+    project_linkage: seed.project_linkage,
+    sync: seed.sync,
+  };
+  const yaml = `${stringifyYaml(contentObject).trimEnd()}\n`;
+  return {
+    dry_run: true,
+    target_path: targetPath,
+    path: targetPath,
+    config: contentObject,
+    yaml,
+    content: yaml,
+    would_write: targetPath,
+    write_path: targetPath,
+    writes: [{ path: targetPath, content: yaml }],
+    requires_confirmation: true,
+  };
+}
+
+function buildSourceTrace(sources) {
+  const trace = {};
+  for (const source of sources) {
+    if (!source.exists || !isPlainObject(source.config)) continue;
+    collectSourceTrace(trace, source.config, source.name, []);
+  }
+  return trace;
+}
+
+function sourceAliasObject(resolvedSources, fieldTrace, initial = {}) {
+  return new Proxy(initial, {
+    get(target, property, receiver) {
+      if (Reflect.has(target, property)) return Reflect.get(target, property, receiver);
+      if (typeof property !== "string") return Reflect.get(target, property, receiver);
+      const normalized = property.toLowerCase().replace(/[-_\s]/g, "");
+      if (
+        normalized.includes("source")
+        || normalized.includes("layer")
+        || normalized.includes("order")
+        || normalized.includes("resolved")
+        || normalized.includes("provenance")
+        || normalized.includes("origin")
+        || normalized.includes("checked")
+        || normalized.includes("path")
+        || normalized.includes("summary")
+      ) {
+        return resolvedSources;
+      }
+      if (property in fieldTrace) return fieldTrace[property];
+      if (normalized.includes("trace") || normalized.includes("field")) return fieldTrace;
+      return Reflect.get(target, property, receiver);
+    },
+  });
+}
+
+function relativeConfigPath(file, projectRoot, homeDir) {
+  const normalizedFile = resolve(file);
+  const normalizedProject = resolve(projectRoot);
+  const normalizedHome = resolve(homeDir);
+  if (normalizedFile === join(normalizedProject, ".pipeline", "config.yaml")) {
+    return ".pipeline/config.yaml";
+  }
+  if (normalizedFile === join(normalizedHome, ".hypo-workflow", "config.yaml")) {
+    return "~/.hypo-workflow/config.yaml";
+  }
+  return normalizedFile;
+}
+
+function collectSourceTrace(trace, value, sourceName, path) {
+  const normalizedSourceName = sourceName === "safe_defaults" ? "defaults" : sourceName;
+  if (!isPlainObject(value)) {
+    if (path.length) setTracePath(trace, path, normalizedSourceName);
+    return;
+  }
+  for (const [key, child] of Object.entries(value)) {
+    const next = [...path, key];
+    if (!isPlainObject(child)) setTracePath(trace, next, normalizedSourceName);
+    if (isPlainObject(child)) collectSourceTrace(trace, child, normalizedSourceName, next);
+  }
+}
+
+function setTracePath(trace, path, sourceName) {
+  trace[path.join(".")] = sourceName;
+  let cursor = trace;
+  for (let index = 0; index < path.length - 1; index += 1) {
+    const key = path[index];
+    if (!isPlainObject(cursor[key])) cursor[key] = {};
+    cursor = cursor[key];
+  }
+  cursor[path.at(-1)] = sourceName;
+}
+
+export function renderConfigMigrationPrompt(plan = buildConfigMigrationPlan()) {
+  const targetPath = plan.target_path || plan.path || join(homedir(), ".hypo-workflow", "config.yaml");
+  return [
+    "User config is missing; Hypo-Workflow will not write it during sync.",
+    `Run: hypo-workflow config migrate --write`,
+    `Target: ${targetPath}`,
+  ].join("\n");
+}
+
+export async function writeUserConfigMigration(plan, options = {}) {
+  if (options.confirm !== true) {
+    throw new Error("writeUserConfigMigration requires { confirm: true }.");
+  }
+  const migrationPlan = plan || buildConfigMigrationPlan(options);
+  const targetPath = migrationPlan.target_path || migrationPlan.path;
+  if (!targetPath) throw new Error("Config migration plan requires target_path.");
+  const content = migrationPlan.yaml || migrationPlan.content;
+  if (!content) throw new Error("Config migration plan requires yaml content.");
+  await mkdir(dirname(targetPath), { recursive: true });
+  await writeFile(targetPath, content.endsWith("\n") ? content : `${content}\n`, "utf8");
+  return {
+    ...migrationPlan,
+    dry_run: false,
+    would_write: true,
+    written: true,
+    target_path: targetPath,
+    path: targetPath,
+  };
+}
+
+function normalizeConfig(merged = {}) {
   return {
     ...merged,
     execution: {
@@ -345,6 +755,22 @@ export async function loadConfig(file, defaults = DEFAULT_GLOBAL_CONFIG) {
     },
     automation: normalizeAutomationPolicy(merged.automation),
   };
+}
+
+async function readConfigSource(name, file) {
+  try {
+    return {
+      name,
+      path: file,
+      exists: true,
+      config: parseYaml(await readFile(file, "utf8")),
+    };
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return { name, path: file, exists: false, config: {} };
+    }
+    throw error;
+  }
 }
 
 export async function writeConfig(file, config) {
@@ -1212,136 +1638,19 @@ function formatBackupTimestamp(value) {
 }
 
 export function parseYaml(source) {
-  const lines = source
-    .split(/\r?\n/)
-    .filter((raw) => raw.trim() && !raw.trimStart().startsWith("#"))
-    .map((raw) => ({
-      indent: raw.match(/^ */)[0].length,
-      text: raw.trim(),
-    }));
-  let index = 0;
-
-  function parseNode(indent) {
-    return lines[index]?.text.startsWith("-") ? parseArray(indent) : parseObject(indent);
-  }
-
-  function parseArray(indent) {
-    const value = [];
-    while (index < lines.length && lines[index].indent === indent && lines[index].text.startsWith("-")) {
-      const rest = lines[index].text.slice(1).trim();
-      index += 1;
-      if (!rest) {
-        value.push(index < lines.length && lines[index].indent > indent ? parseNode(lines[index].indent) : null);
-        continue;
-      }
-
-      const pair = parseYamlKeyValue(rest);
-      if (!pair) {
-        value.push(parseScalar(rest));
-        continue;
-      }
-
-      const item = {};
-      item[pair.key] = pair.rawValue
-        ? parseScalar(pair.rawValue)
-        : index < lines.length && lines[index].indent > indent
-          ? parseNode(lines[index].indent)
-          : {};
-      if (index < lines.length && lines[index].indent > indent) {
-        Object.assign(item, parseObject(lines[index].indent));
-      }
-      value.push(item);
-    }
-    return value;
-  }
-
-  function parseObject(indent) {
-    const object = {};
-    while (index < lines.length && lines[index].indent === indent && !lines[index].text.startsWith("-")) {
-      const pair = parseYamlKeyValue(lines[index].text);
-      index += 1;
-      if (!pair) continue;
-      object[pair.key] = pair.rawValue
-        ? parseScalar(pair.rawValue)
-        : index < lines.length && lines[index].indent > indent
-          ? parseNode(lines[index].indent)
-          : {};
-    }
-    return object;
-  }
-
-  return lines.length ? parseNode(lines[0].indent) : {};
+  const text = String(source ?? "");
+  if (!text.trim()) return {};
+  const parsed = yaml.load(text, { schema: yaml.CORE_SCHEMA });
+  return parsed === undefined ? {} : parsed;
 }
 
-export function stringifyYaml(value, indent = 0) {
-  if (!isPlainObject(value)) return `${" ".repeat(indent)}${formatScalar(value)}`;
-  const lines = [];
-  for (const [key, child] of Object.entries(value)) {
-    if (Array.isArray(child)) {
-      lines.push(`${" ".repeat(indent)}${key}:`);
-      for (const item of child) {
-        if (isPlainObject(item)) {
-          lines.push(`${" ".repeat(indent + 2)}-`);
-          lines.push(stringifyYaml(item, indent + 4));
-        } else {
-          lines.push(`${" ".repeat(indent + 2)}- ${formatScalar(item)}`);
-        }
-      }
-    } else if (isPlainObject(child)) {
-      lines.push(`${" ".repeat(indent)}${key}:`);
-      lines.push(stringifyYaml(child, indent + 2));
-    } else {
-      lines.push(`${" ".repeat(indent)}${key}: ${formatScalar(child)}`);
-    }
-  }
-  return lines.join("\n");
-}
-
-function nextMeaningful(lines, start) {
-  for (let i = start; i < lines.length; i += 1) {
-    const line = lines[i];
-    if (line.trim() && !line.trimStart().startsWith("#")) return line;
-  }
-  return null;
-}
-
-function parseYamlKeyValue(text) {
-  const match = /^([^:]+):(.*)$/.exec(text);
-  if (!match) return null;
-  if (match[2] && !/^\s/.test(match[2])) return null;
-  return {
-    key: match[1].trim(),
-    rawValue: match[2].trim(),
-  };
-}
-
-function parseScalar(value) {
-  const trimmed = value.trim();
-  if (trimmed === "true") return true;
-  if (trimmed === "false") return false;
-  if (trimmed === "null") return null;
-  if (/^-?\d+$/.test(trimmed)) return Number(trimmed);
-  if (
-    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-    (trimmed.startsWith("'") && trimmed.endsWith("'"))
-  ) {
-    return trimmed.slice(1, -1);
-  }
-  if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-    const inner = trimmed.slice(1, -1).trim();
-    return inner ? inner.split(",").map((item) => parseScalar(item.trim())) : [];
-  }
-  return trimmed;
-}
-
-function formatScalar(value) {
-  if (typeof value === "string") {
-    if (!value || /[:#\n]/.test(value) || /^\s|\s$/.test(value)) {
-      return JSON.stringify(value);
-    }
-    return value;
-  }
-  return String(value);
+export function stringifyYaml(value) {
+  return yaml.dump(value, {
+    schema: yaml.CORE_SCHEMA,
+    sortKeys: true,
+    noRefs: true,
+    lineWidth: 120,
+  });
 }
 
 function isPlainObject(value) {

@@ -4,6 +4,10 @@
 
 Configuration resolution is project config > global config > built-in default. Project config is usually `.pipeline/config.yaml`; global config is usually `~/.hypo-workflow/config.yaml`. Hypo-Workflow is not a background runner; config only controls how the Agent plans, executes, reviews, and asks for confirmation.
 
+`loadLayeredConfig` merges project `.pipeline/config.yaml` > user `~/.hypo-workflow/config.yaml` > safe defaults and returns source tracing. Safe defaults include `integrations.hypo_claw`, `integrations.hypo_writer`, `projects`, `output.timezone`, and `project_linkage.seeds`; paths use `~` or runtime HOME derivation instead of machine-specific absolute paths.
+
+User config migration is explicit: `hypo-workflow config migrate` prints a dry-run plan and YAML, while `hypo-workflow config migrate --write` writes `~/.hypo-workflow/config.yaml`. `hypo-workflow sync` may show the migration prompt when user config is missing, but it does not silently create user config.
+
 ## Configuration Layers
 
 | Layer | File | Purpose | Write boundary |

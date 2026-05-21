@@ -5,6 +5,7 @@ import { mkdtemp, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
+import { parseYaml } from "../src/config/index.js";
 import * as api from "../src/index.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -69,7 +70,16 @@ test("maintenance scheduler entry creates daily 04:00 safe-local evidence and le
   assert.ok(result.evidence_paths.outputs.endsWith("mr-global-consolidation-20260520-outputs.yaml"));
   assert.ok(result.evidence_paths.notion_dry_run.endsWith("mr-global-consolidation-20260520-notion-dry-run.yaml"));
   assert.match(await readFile(result.evidence_paths.outputs, "utf8"), /knowledge_candidates/);
-  assert.match(await readFile(result.ledger_path, "utf8"), /global_consolidation_scheduled/);
+  const events = await readJsonlEvents(result.ledger_path);
+  assert.equal(events.length, 1);
+  assert.equal(events[0].event_type, "global_consolidation_scheduled");
+  assert.equal(events[0].metadata.remote_writes_enabled, false);
+  assert.equal(events[0].metadata.apply_required, false);
+  assert.equal(result.scheduler.status, "completed");
+  await assertCompactSummary(result.ledger_path, {
+    event_count: 1,
+    latest_event_id: events[0].id,
+  });
 });
 
 test("CLI maintain-scheduler dry-run is a real cron-callable entry and does not require remote writes", async () => {
@@ -93,7 +103,10 @@ test("CLI maintain-scheduler dry-run is a real cron-callable entry and does not 
   assert.match(output, /04:00 Asia\/Shanghai/);
   assert.match(output, /remote_writes_enabled=false/);
   assert.match(output, /crontab/);
-  assert.match(await readFile(join(home, ".hypo-workflow", "maintenance", "ledger.yaml"), "utf8"), /global_consolidation_scheduled/);
+  const events = await readJsonlEvents(join(home, ".hypo-workflow", "maintenance", "ledger.jsonl"));
+  assert.equal(events.at(-1).event_type, "global_consolidation_scheduled");
+  assert.equal(events.at(-1).metadata.remote_writes_enabled, false);
+  assert.equal(events.at(-1).metadata.apply_required, false);
 });
 
 test("global consolidation outputs Chinese sedimentation candidates after redaction and sensitivity classification", async () => {
@@ -185,6 +198,22 @@ test("Notion consolidation projection is dry-run content only and never invokes 
 function requireApi(name) {
   assert.equal(typeof api[name], "function", `expected ${name} to be exported from ../src/index.js`);
   return api[name];
+}
+
+async function readJsonlEvents(file) {
+  assert.match(file, /\.jsonl$/, `${file} must be a JSONL authority file`);
+  const source = await readFile(file, "utf8");
+  return source.trimEnd().split("\n").filter(Boolean).map((line) => JSON.parse(line));
+}
+
+async function assertCompactSummary(jsonlPath, expected) {
+  const summaryPath = jsonlPath.replace(/\.jsonl$/, ".summary.yaml");
+  const summary = parseYaml(await readFile(summaryPath, "utf8"));
+  assert.equal(summary.authority, "jsonl");
+  assert.equal(summary.authority_path, jsonlPath);
+  assert.equal(summary.event_count, expected.event_count);
+  assert.equal(summary.latest_event_id, expected.latest_event_id);
+  assert.equal(summary.events, undefined, "compact summary must not be the maintenance write authority");
 }
 
 function assertReadOnlyNotionClient() {

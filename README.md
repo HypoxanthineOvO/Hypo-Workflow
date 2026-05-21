@@ -113,7 +113,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | [Platforms Reference](docs/reference/platforms.md) | 六个平台能力表 |
 | [Generated Artifacts](docs/reference/generated-artifacts.md) | OpenCode、第三方适配、压缩视图和文档引用的生成来源 |
 | [OpenCode Guide](docs/platforms/opencode.md) | OpenCode 指令、智能体角色、模型矩阵和边界 |
-| [v13.0.0-alpha.1 发布说明](docs/release/v13.0.0-alpha.1.md) | C16 全局维护、Notion legacy reconciliation 和 Knowledge projection 预发布 |
+| [v13.0.0-alpha.1 发布说明](docs/release/v13.0.0-alpha.1.md) | C16 全局维护、C17 审计修复、workspace 拆分和 JSONL ledger 预发布 |
 | [Cursor Guide](docs/platforms/cursor.md) | Cursor 仓库规则 |
 | [GitHub Copilot Guide](docs/platforms/copilot.md) | GitHub Copilot 仓库指令 |
 | [Trae Guide](docs/platforms/trae.md) | Trae 项目规则 |

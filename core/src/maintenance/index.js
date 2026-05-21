@@ -2,9 +2,40 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { parseYaml, stringifyYaml } from "../config/index.js";
 import { redactSecrets, validateSecretSafeEvidence } from "../evidence/index.js";
-export * from "./session-sources.js";
-export * from "./consolidation.js";
-export * from "./root-dry-run.js";
+import {
+  appendJsonlLedgerEntry,
+  jsonlLedgerPathFor,
+} from "../ledger/index.js";
+export {
+  CONSOLIDATION_SOURCE_KINDS,
+  discoverConsolidationSources,
+  canonicalSourceKinds,
+  classifyAndRedactRecord,
+  scrubConsolidationSecretMarkers,
+} from "./session-sources.js";
+export {
+  planGlobalConsolidationRun,
+  runMaintenanceScheduler,
+  planHistoricalBackfillShards,
+  buildConsolidationResumeState,
+  generateGlobalConsolidationOutputs,
+  projectConsolidationToNotionDryRun,
+} from "./consolidation.js";
+export {
+  buildRootManagementDryRunBundle,
+  applyApprovedNotionDryRunBundle,
+  renderRootDryRunReviewReport,
+} from "./root-dry-run.js";
+export {
+  resolveDailyProjectSummaryWindow,
+  buildDailyProjectSummary,
+  renderDailyProjectSummary,
+  sendDailyProjectSummary,
+  runDailyProjectSummaryScheduler,
+} from "./daily-project-summary.js";
+export {
+  buildProjectLinkageE2EDryRunBundle,
+} from "./project-linkage-e2e.js";
 
 export const MAINTENANCE_QUEUE_STATUSES = Object.freeze([
   "queued",
@@ -591,27 +622,16 @@ export function evaluateMaintenanceSideEffectGate(input = {}) {
 }
 
 export async function appendMaintenanceLedgerEvent(root, event = {}, options = {}) {
-  const ledgerFile = options.ledgerFile || join(root, "maintenance", "ledger.yaml");
-  let ledger = { events: [] };
-  try {
-    ledger = parseYaml(await readFile(ledgerFile, "utf8"));
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-  }
-
   const normalized = normalizeLedgerEvent(event);
-  const next = {
-    ...ledger,
-    events: [...(Array.isArray(ledger.events) ? ledger.events : []), normalized],
-  };
-  const validation = validateMaintenanceLedger(next);
+  const ledgerFile = jsonlLedgerPathFor(options.ledgerFile || join(root, "maintenance", "ledger.jsonl"));
+  const appended = await appendJsonlLedgerEntry(ledgerFile, normalized, {
+    legacy_path: options.legacyLedgerFile,
+  });
+  const validation = validateMaintenanceLedger(appended.ledger);
   if (!validation.ok) {
     throw new Error(`Invalid maintenance ledger:\n${validation.errors.join("\n")}`);
   }
-
-  await mkdir(dirname(ledgerFile), { recursive: true });
-  await writeFile(ledgerFile, `${stringifyYaml(next).trimEnd()}\n`, "utf8");
-  return { event: normalized, ledger: next, path: ledgerFile };
+  return { event: normalized, ledger: appended.ledger, path: appended.path };
 }
 
 export function validateMaintenanceLedger(input = {}) {

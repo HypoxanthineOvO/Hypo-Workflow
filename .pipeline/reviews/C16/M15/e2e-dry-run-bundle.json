@@ -1,0 +1,487 @@
+{
+  "kind": "project_linkage_e2e_dry_run_bundle",
+  "schema_version": "1",
+  "mode": "dry-run",
+  "bundle_id": "project-linkage-e2e-29ae0178245b",
+  "bundle_hash": "sha256:29ae0178245bd89593fd9845cb68929b45be89f10b79094b3a7acd1ad1062aaf",
+  "generated_at": "2026-05-21T00:30:00+08:00",
+  "sections": {
+    "registry": {
+      "schema_version": "1",
+      "projects": [
+        {
+          "id": "hypo-workflow",
+          "display_name": "Hypo-Workflow",
+          "path": "/home/heyx/Hypo-Workflow",
+          "role": "Workflow runtime and root project-management authority",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        },
+        {
+          "id": "hypo-claw",
+          "display_name": "Hypo-Claw",
+          "path": "/home/heyx/Hypo-Claw",
+          "role": "QQ notification outlet for project stop and daily summary messages",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        },
+        {
+          "id": "hypo-writer",
+          "display_name": "Hypo-Writer",
+          "path": "/home/heyx/Hypo-Writer",
+          "role": "Long-form writing and article maintenance project",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        },
+        {
+          "id": "hypo-info-v2",
+          "display_name": "Hypo-Info-V2",
+          "path": "/home/heyx/Hypo-Info-V2",
+          "role": "Current information management successor project",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        },
+        {
+          "id": "hypo-research",
+          "display_name": "Hypo-Research",
+          "path": "/home/heyx/Hypo-Research",
+          "role": "Academic research workflow and literature tooling project",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        },
+        {
+          "id": "hypo-switcher",
+          "display_name": "Hypo-Switcher",
+          "path": "/home/heyx/Hypo-Switcher",
+          "role": "Project/profile switching and environment coordination project",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        },
+        {
+          "id": "hypo-llm",
+          "display_name": "Hypo-LLM",
+          "path": "/home/heyx/Hypo-LLM",
+          "role": "LLM infrastructure, routing, and cost-management project",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        }
+      ],
+      "relations": [
+        {
+          "id": "edge-hypo-agent-replaced-by-claw",
+          "from": "hypo-agent",
+          "to": "hypo-claw",
+          "type": "replaced_by",
+          "status": "confirmed",
+          "authority": "user",
+          "direction": "from_to",
+          "evidence_refs": [
+            "user-confirmation-2026-05-18"
+          ],
+          "projection": {
+            "project_home": true,
+            "global_graph": true,
+            "notion": "summary_link_only"
+          }
+        },
+        {
+          "id": "edge-hypo-info-replaced-by-v2",
+          "from": "hypo-info",
+          "to": "hypo-info-v2",
+          "type": "replaced_by",
+          "status": "confirmed",
+          "authority": "user",
+          "direction": "from_to",
+          "evidence_refs": [
+            "user-confirmation-2026-05-18"
+          ],
+          "projection": {
+            "project_home": true,
+            "global_graph": true,
+            "notion": "summary_link_only"
+          }
+        }
+      ],
+      "active_notification_targets": [
+        {
+          "id": "hypo-workflow",
+          "display_name": "Hypo-Workflow",
+          "path": "/home/heyx/Hypo-Workflow",
+          "role": "Workflow runtime and root project-management authority",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        },
+        {
+          "id": "hypo-claw",
+          "display_name": "Hypo-Claw",
+          "path": "/home/heyx/Hypo-Claw",
+          "role": "QQ notification outlet for project stop and daily summary messages",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        },
+        {
+          "id": "hypo-writer",
+          "display_name": "Hypo-Writer",
+          "path": "/home/heyx/Hypo-Writer",
+          "role": "Long-form writing and article maintenance project",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        },
+        {
+          "id": "hypo-info-v2",
+          "display_name": "Hypo-Info-V2",
+          "path": "/home/heyx/Hypo-Info-V2",
+          "role": "Current information management successor project",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        },
+        {
+          "id": "hypo-research",
+          "display_name": "Hypo-Research",
+          "path": "/home/heyx/Hypo-Research",
+          "role": "Academic research workflow and literature tooling project",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        },
+        {
+          "id": "hypo-switcher",
+          "display_name": "Hypo-Switcher",
+          "path": "/home/heyx/Hypo-Switcher",
+          "role": "Project/profile switching and environment coordination project",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        },
+        {
+          "id": "hypo-llm",
+          "display_name": "Hypo-LLM",
+          "path": "/home/heyx/Hypo-LLM",
+          "role": "LLM infrastructure, routing, and cost-management project",
+          "stop_notifications_enabled": true,
+          "daily_summary_enabled": true
+        }
+      ],
+      "planned_actions": [],
+      "remote_writes_enabled": false,
+      "external_actions_enabled": false
+    },
+    "stop_events": {
+      "events": [
+        {
+          "id": "project-stop:hypo-workflow:waiting_acceptance:codex:codex-session-e2e-valid:2026-05-20t23-57-45+08-00",
+          "dedupe_key": "project-stop:hypo-workflow:waiting_acceptance:codex:codex-session-e2e-valid:2026-05-20t23-57-45+08-00",
+          "project_id": "hypo-workflow",
+          "project_display_name": "Hypo-Workflow",
+          "project_path": "/home/heyx/Hypo-Workflow",
+          "stop_reason": "waiting_acceptance",
+          "occurred_at": "2026-05-20T23:58:00+08:00",
+          "terminal_at": "2026-05-20T23:57:45+08:00",
+          "progress_summary": {
+            "cycle_id": "C16",
+            "milestone_id": "C16-M15",
+            "prompt_name": "C16-M15 Project Linkage End To End Dry-Run",
+            "completed_steps": [
+              "write_tests"
+            ],
+            "current_step": "waiting_acceptance",
+            "summary": "The project linkage e2e dry-run reached waiting acceptance."
+          },
+          "source_platform": "codex",
+          "session_ref": "core/test/fixtures/project-linkage-e2e/codex-valid-final-output.jsonl",
+          "session_hint": "codex-session-e2e-valid",
+          "notification_state": "dry_run_ready",
+          "evidence": {
+            "mode": "local_append_only",
+            "path": "~/.hypo-workflow/maintenance/project-stop-events/events.yaml"
+          },
+          "planned_actions": [],
+          "remote_writes_enabled": false,
+          "external_actions_enabled": false
+        },
+        {
+          "id": "project-stop:hypo-claw:failed:codex:codex-session-e2e-missing-final:2026-05-20t23-58-50+08-00",
+          "dedupe_key": "project-stop:hypo-claw:failed:codex:codex-session-e2e-missing-final:2026-05-20t23-58-50+08-00",
+          "project_id": "hypo-claw",
+          "project_display_name": "Hypo-Claw",
+          "project_path": "/home/heyx/Hypo-Claw",
+          "stop_reason": "failed",
+          "occurred_at": "2026-05-20T23:59:00+08:00",
+          "terminal_at": "2026-05-20T23:58:50+08:00",
+          "progress_summary": {
+            "cycle_id": "HC-04",
+            "milestone_id": "HC-04-M03",
+            "prompt_name": "Hypo-Claw stop notification transport",
+            "completed_steps": [
+              "detect_stop_state"
+            ],
+            "current_step": "capture_final_assistant_output",
+            "summary": "The project reached a terminal stop state but final assistant output is missing."
+          },
+          "source_platform": "codex",
+          "session_ref": "core/test/fixtures/project-linkage-e2e/codex-missing-final-output.jsonl",
+          "session_hint": "codex-session-e2e-missing-final",
+          "notification_state": "blocked_capture_failed",
+          "evidence": {
+            "mode": "local_append_only",
+            "path": "~/.hypo-workflow/maintenance/project-stop-events/events.yaml"
+          },
+          "planned_actions": [],
+          "remote_writes_enabled": false,
+          "external_actions_enabled": false
+        }
+      ]
+    },
+    "capture_results": {
+      "results": [
+        {
+          "project_id": "hypo-workflow",
+          "status": "captured",
+          "platform": "codex",
+          "output": "Valid final assistant output for project linkage e2e.\n\n```bash\nprintf 'preserve dry-run notification text'\n```\n\nThis exact output must appear once in stop notification dry-run segments.",
+          "captured_at": "2026-05-20T23:57:00+08:00",
+          "source": {
+            "kind": "codex_jsonl",
+            "path": "core/test/fixtures/project-linkage-e2e/codex-valid-final-output.jsonl"
+          },
+          "side_effect": "local_read",
+          "planned_external_actions": [],
+          "lookup": {
+            "mode": "explicit_path"
+          }
+        },
+        {
+          "project_id": "hypo-claw",
+          "status": "capture_failed",
+          "platform": "codex",
+          "reason": "assistant output not found",
+          "side_effect": "local_read",
+          "planned_external_actions": [],
+          "source": {
+            "kind": "codex_jsonl",
+            "path": "core/test/fixtures/project-linkage-e2e/codex-missing-final-output.jsonl"
+          },
+          "lookup": {
+            "mode": "explicit_path"
+          }
+        }
+      ]
+    },
+    "notification_dry_run": {
+      "results": [
+        {
+          "project_id": "hypo-workflow",
+          "status": "dry_run",
+          "mode": "dry-run",
+          "channel": "hypo-claw-qq",
+          "external_contacted": false,
+          "qq_contacted": false,
+          "spawned": false,
+          "message": "[Project Stop] Hypo-Workflow\nProject: Hypo-Workflow (hypo-workflow)\nStop reason: waiting_acceptance\nOccurred at: 2026-05-20T23:58:00+08:00\nSource platform: codex\nCycle: C16\nMilestone: C16-M15\nPrompt: C16-M15 Project Linkage End To End Dry-Run\nCurrent step: waiting_acceptance\nCompleted steps: write_tests\nProgress note: The project linkage e2e dry-run reached waiting acceptance.\n\nFinal assistant output:\nValid final assistant output for project linkage e2e.\n\n```bash\nprintf 'preserve dry-run notification text'\n```\n\nThis exact output must appear once in stop notification dry-run segments.",
+          "segments": [
+            {
+              "index": 1,
+              "total": 2,
+              "body": "[Project Stop] Hypo-Workflow\nProject: Hypo-Workflow (hypo-workflow)\nStop reason: waiting_acceptance\nOccurred at: 2026-05-20T23:58:00+08:00\nSource platform: codex\nCycle: C16\nMilestone: C16-M15\nPrompt: C16-M15 Project Linkage End To End Dry-Run\nCurrent step: waiting_acceptance\nCompleted steps: write_tests\nProgress note: "
+            },
+            {
+              "index": 2,
+              "total": 2,
+              "body": "The project linkage e2e dry-run reached waiting acceptance.\n\nFinal assistant output:\nValid final assistant output for project linkage e2e.\n\n```bash\nprintf 'preserve dry-run notification text'\n```\n\nThis exact output must appear once in stop notification dry-run segments."
+            }
+          ],
+          "cli": {
+            "command": "/home/heyx/Hypo-Claw/src/cli.ts",
+            "args": [
+              "--stdin",
+              "--notify",
+              "--server",
+              "http://localhost:3000"
+            ]
+          }
+        },
+        {
+          "project_id": "hypo-claw",
+          "status": "blocked",
+          "reason": "capture failed: assistant output not found",
+          "mode": "dry-run",
+          "channel": "hypo-claw-qq",
+          "external_contacted": false,
+          "qq_contacted": false,
+          "spawned": false,
+          "segments": []
+        }
+      ]
+    },
+    "daily_summary": {
+      "summary": {
+        "kind": "daily_project_summary",
+        "language": "zh-CN",
+        "window": {
+          "timezone": "Asia/Shanghai",
+          "boundary_time": "00:30",
+          "start": "2026-05-20T00:30:00+08:00",
+          "end": "2026-05-21T00:30:00+08:00",
+          "boundary": "start_inclusive_end_exclusive"
+        },
+        "projects": [
+          {
+            "id": "hypo-workflow",
+            "display_name": "Hypo-Workflow",
+            "path": "/home/heyx/Hypo-Workflow"
+          },
+          {
+            "id": "hypo-claw",
+            "display_name": "Hypo-Claw",
+            "path": "/home/heyx/Hypo-Claw"
+          }
+        ],
+        "notification_failures": [
+          {
+            "id": "capture-failed-hypo-claw",
+            "project_id": "hypo-claw",
+            "project_display_name": "Hypo-Claw",
+            "occurred_at": "2026-05-20T23:59:00+08:00",
+            "status": "failed",
+            "reason": "assistant output capture failed: assistant output not found",
+            "retry_needed": true
+          }
+        ],
+        "retry_needed_items": [
+          {
+            "id": "capture-failed-hypo-claw",
+            "project_id": "hypo-claw",
+            "project_display_name": "Hypo-Claw",
+            "occurred_at": "2026-05-20T23:59:00+08:00",
+            "status": "failed",
+            "reason": "assistant output capture failed: assistant output not found",
+            "retry_needed": true
+          }
+        ],
+        "project_stop_events": [
+          {
+            "id": "project-stop:hypo-workflow:waiting_acceptance:codex:codex-session-e2e-valid:2026-05-20t23-57-45+08-00",
+            "dedupe_key": "project-stop:hypo-workflow:waiting_acceptance:codex:codex-session-e2e-valid:2026-05-20t23-57-45+08-00",
+            "project_id": "hypo-workflow",
+            "project_display_name": "Hypo-Workflow",
+            "project_path": "/home/heyx/Hypo-Workflow",
+            "stop_reason": "waiting_acceptance",
+            "occurred_at": "2026-05-20T23:58:00+08:00",
+            "terminal_at": "2026-05-20T23:57:45+08:00",
+            "progress_summary": {
+              "cycle_id": "C16",
+              "milestone_id": "C16-M15",
+              "prompt_name": "C16-M15 Project Linkage End To End Dry-Run",
+              "completed_steps": [
+                "write_tests"
+              ],
+              "current_step": "waiting_acceptance",
+              "summary": "The project linkage e2e dry-run reached waiting acceptance."
+            },
+            "source_platform": "codex",
+            "session_ref": "core/test/fixtures/project-linkage-e2e/codex-valid-final-output.jsonl",
+            "session_hint": "codex-session-e2e-valid",
+            "notification_state": "dry_run_ready",
+            "evidence": {
+              "mode": "local_append_only",
+              "path": "~/.hypo-workflow/maintenance/project-stop-events/events.yaml"
+            },
+            "planned_actions": [],
+            "remote_writes_enabled": false,
+            "external_actions_enabled": false
+          },
+          {
+            "id": "project-stop:hypo-claw:failed:codex:codex-session-e2e-missing-final:2026-05-20t23-58-50+08-00",
+            "dedupe_key": "project-stop:hypo-claw:failed:codex:codex-session-e2e-missing-final:2026-05-20t23-58-50+08-00",
+            "project_id": "hypo-claw",
+            "project_display_name": "Hypo-Claw",
+            "project_path": "/home/heyx/Hypo-Claw",
+            "stop_reason": "failed",
+            "occurred_at": "2026-05-20T23:59:00+08:00",
+            "terminal_at": "2026-05-20T23:58:50+08:00",
+            "progress_summary": {
+              "cycle_id": "HC-04",
+              "milestone_id": "HC-04-M03",
+              "prompt_name": "Hypo-Claw stop notification transport",
+              "completed_steps": [
+                "detect_stop_state"
+              ],
+              "current_step": "capture_final_assistant_output",
+              "summary": "The project reached a terminal stop state but final assistant output is missing."
+            },
+            "source_platform": "codex",
+            "session_ref": "core/test/fixtures/project-linkage-e2e/codex-missing-final-output.jsonl",
+            "session_hint": "codex-session-e2e-missing-final",
+            "notification_state": "blocked_capture_failed",
+            "evidence": {
+              "mode": "local_append_only",
+              "path": "~/.hypo-workflow/maintenance/project-stop-events/events.yaml"
+            },
+            "planned_actions": [],
+            "remote_writes_enabled": false,
+            "external_actions_enabled": false
+          }
+        ],
+        "progress_records": [
+          {
+            "id": "progress-hypo-workflow-project-stop:hypo-workflow:waiting_acceptance:codex:codex-session-e2e-valid:2026-05-20t23-57-45+08-00",
+            "project_id": "hypo-workflow",
+            "occurred_at": "2026-05-20T23:58:00+08:00",
+            "summary": "The project linkage e2e dry-run reached waiting acceptance."
+          },
+          {
+            "id": "progress-hypo-claw-project-stop:hypo-claw:failed:codex:codex-session-e2e-missing-final:2026-05-20t23-58-50+08-00",
+            "project_id": "hypo-claw",
+            "occurred_at": "2026-05-20T23:59:00+08:00",
+            "summary": "The project reached a terminal stop state but final assistant output is missing."
+          }
+        ],
+        "project_counts": {
+          "hypo_workflow": {
+            "stop_events": 1,
+            "progress_records": 1
+          },
+          "hypo_claw": {
+            "stop_events": 1,
+            "progress_records": 1
+          }
+        },
+        "remote_writes_enabled": false,
+        "external_actions_enabled": false
+      },
+      "message": "每日项目摘要\n窗口：2026-05-20T00:30:00+08:00 至 2026-05-21T00:30:00+08:00（Asia/Shanghai，起始含、结束不含）\n\n通知失败 / 需要重试\n- Hypo-Claw：assistant output capture failed: assistant output not found\n\n项目动态\n- Hypo-Workflow\n  - 停止：waiting_acceptance，The project linkage e2e dry-run reached waiting acceptance.\n  - 进度：The project linkage e2e dry-run reached waiting acceptance.\n- Hypo-Claw\n  - 停止：failed，The project reached a terminal stop state but final assistant output is missing.\n  - 进度：The project reached a terminal stop state but final assistant output is missing.",
+      "notification": {
+        "status": "dry_run",
+        "mode": "dry-run",
+        "channel": "hypo-claw-qq",
+        "external_contacted": false,
+        "qq_contacted": false,
+        "spawned": false,
+        "remote_writes_enabled": false,
+        "message": "每日项目摘要\n窗口：2026-05-20T00:30:00+08:00 至 2026-05-21T00:30:00+08:00（Asia/Shanghai，起始含、结束不含）\n\n通知失败 / 需要重试\n- Hypo-Claw：assistant output capture failed: assistant output not found\n\n项目动态\n- Hypo-Workflow\n  - 停止：waiting_acceptance，The project linkage e2e dry-run reached waiting acceptance.\n  - 进度：The project linkage e2e dry-run reached waiting acceptance.\n- Hypo-Claw\n  - 停止：failed，The project reached a terminal stop state but final assistant output is missing.\n  - 进度：The project reached a terminal stop state but final assistant output is missing.",
+        "segments": [
+          {
+            "index": 1,
+            "total": 2,
+            "body": "每日项目摘要\n窗口：2026-05-20T00:30:00+08:00 至 2026-05-21T00:30:00+08:00（Asia/Shanghai，起始含、结束不含）\n\n通知失败 / 需要重试\n- Hypo-Claw：assistant output capture failed: assistant output not found\n\n项目动态\n- Hypo-Workflow\n  - 停止：waiting_acceptance，The project linkage e2e dry-run reached waiting acceptance.\n  - 进度：The project linkage e2e dry-run "
+          },
+          {
+            "index": 2,
+            "total": 2,
+            "body": "reached waiting acceptance.\n- Hypo-Claw\n  - 停止：failed，The project reached a terminal stop state but final assistant output is missing.\n  - 进度：The project reached a terminal stop state but final assistant output is missing."
+          }
+        ]
+      }
+    },
+    "no_external_side_effects": {
+      "qq_sent": false,
+      "notion_written": false,
+      "publish_called": false,
+      "spawned": false,
+      "remote_writes_enabled": false,
+      "external_actions_enabled": false
+    }
+  },
+  "remote_writes_enabled": false,
+  "external_actions_enabled": false,
+  "publish_enabled": false,
+  "planned_actions": []
+}

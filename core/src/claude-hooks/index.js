@@ -2,6 +2,7 @@ import { access, readFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { DEFAULT_GLOBAL_CONFIG, loadConfig, parseYaml } from "../config/index.js";
 import { buildClaudeStatusSurface } from "../claude-status/index.js";
+import { enqueueProjectStopNotification } from "../project-notifications/index.js";
 
 const PROTECTED_PIPELINE_FILES = Object.freeze([
   ".pipeline/state.yaml",
@@ -65,7 +66,7 @@ export async function evaluateClaudeHookEvent(event, payload = {}, options = {})
   const root = resolve(payload.cwd || options.projectRoot || ".");
   const eventName = normalizeEventName(event);
   if (eventName === "ProgressMonitor") return renderProgressMonitor(root);
-  if (eventName === "Stop") return evaluateStop(root);
+  if (eventName === "Stop") return evaluateStop(root, payload);
   if (eventName === "PermissionRequest") return evaluatePermission(root, payload);
   if (["SessionStart", "UserPromptSubmit"].includes(eventName)) return renderResumeOutput(root, payload, "Hypo-Workflow Resume");
   if (["PreCompact", "PostCompact"].includes(eventName)) return renderResumeOutput(root, payload, "Compact Resume Packet");
@@ -115,10 +116,38 @@ async function renderResumeOutput(root, payload, title) {
   };
 }
 
-async function evaluateStop(root) {
+async function evaluateStop(root, payload = {}) {
   const context = await loadHookContext(root);
   if (!context.state.pipeline) return {};
-  if (context.state.pipeline.status && context.state.pipeline.status !== "running") return {};
+  if (context.state.pipeline.status && context.state.pipeline.status !== "running") {
+    const pending = await enqueueStopNotificationFromHook(root, context, payload).catch((error) => ({
+      ok: false,
+      status: "hook_enqueue_failed",
+      errors: [error.message],
+    }));
+    if (pending.enqueued) {
+      return {
+        systemMessage: `Hypo-Workflow project stop notification queued: ${pending.queue_path}. Run: hypo-workflow project-notifications dispatch --confirmed`,
+        project_stop_notification: {
+          status: pending.status,
+          queue_path: pending.queue_path,
+          entry_id: pending.entry?.id || null,
+          external_contacted: false,
+          qq_contacted: false,
+        },
+      };
+    }
+    if (pending.status === "skipped") return {};
+    return {
+      systemMessage: `Hypo-Workflow project stop notification enqueue failed: ${(pending.errors || []).join("; ")}`,
+      project_stop_notification: {
+        status: pending.status,
+        errors: pending.errors || [],
+        external_contacted: false,
+        qq_contacted: false,
+      },
+    };
+  }
 
   const missing = [];
   if (!await exists(join(root, ".pipeline", "state.yaml"))) missing.push(".pipeline/state.yaml");
@@ -144,6 +173,36 @@ async function evaluateStop(root) {
   return {
     systemMessage: `Hypo-Workflow warnings: ${warnings.join("; ")}`,
   };
+}
+
+async function enqueueStopNotificationFromHook(root, context, payload = {}) {
+  const projectId = projectIdFromContext(root, context);
+  const current = context.state.current || {};
+  const cycle = context.cycle.cycle || {};
+  const progressSummary = {
+    cycle_id: cycle.number ? `C${cycle.number}` : context.acceptance?.cycle_id || null,
+    milestone_id: current.milestone_id || current.prompt_name || null,
+    prompt_name: current.prompt_name || current.prompt_file || null,
+    current_step: current.step || null,
+    summary: `${context.state.pipeline?.name || projectId} stopped with status ${context.state.pipeline?.status || "unknown"}.`,
+  };
+  return enqueueProjectStopNotification({
+    home_dir: payload.notification_home_dir || payload.notificationHomeDir || process.env.HOME,
+    project: {
+      id: projectId,
+      display_name: displayName(projectId, context.state.pipeline?.name),
+      path: root,
+    },
+    source_platform: "claude-code",
+    workflow_state: context.state,
+    status: context.state.pipeline?.status,
+    final_assistant_output: payload.final_assistant_output || payload.finalAssistantOutput || payload.transcript_tail || payload.message,
+    session_path: payload.session_path || payload.sessionPath,
+    session_id: payload.session_id || payload.sessionId,
+    occurred_at: new Date().toISOString(),
+    terminal_at: context.state.pipeline?.finished || new Date().toISOString(),
+    progress_summary: progressSummary,
+  });
 }
 
 async function evaluatePermission(root, payload) {
@@ -263,6 +322,21 @@ function recentLogLines(logText) {
 
 function firstMeaningfulLine(text) {
   return text.split(/\r?\n/).map((line) => line.trim()).find(Boolean);
+}
+
+function projectIdFromContext(root, context = {}) {
+  const configured = context.config.project?.id || context.config.pipeline?.project_id;
+  if (configured) return slugify(configured);
+  return slugify(basename(root));
+}
+
+function displayName(projectId, pipelineName) {
+  if (pipelineName && pipelineName !== "unknown") return pipelineName;
+  return projectId.split("-").map((part) => part ? `${part[0].toUpperCase()}${part.slice(1)}` : part).join("-");
+}
+
+function slugify(value) {
+  return String(value || "project").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "project";
 }
 
 async function readYaml(file) {

@@ -1,9 +1,10 @@
 cycle:
-  number: 16
-  name: "根目录项目管理模式"
-  type: feature
-  status: active
-  started: "2026-05-18T15:24:00+08:00"
+  number: 17
+  name: "审计修复与架构减债"
+  type: refactor
+  status: pending_acceptance
+  started: "2026-05-21T16:32:54+08:00"
+  finished: "2026-05-21T20:20:11+08:00"
   preset: tdd
   workflow_kind: build
   lifecycle_policy:
@@ -12,11 +13,12 @@ cycle:
     accept:
       next: complete
   continuations: []
-  context_sources: []
-  previous_cycle: 15
-  summary: "C16 reopened after user rejection: Notion sync must reconcile the existing Hypo-Workflow page and its child pages instead of creating an additional child sync page only."
-  lessons: null
+  context_sources:
+    - audit
+  previous_cycle: 16
+  summary: "C17 completed audit remediation across seven milestones: root tests, shared utils, layered config, js-yaml, workspace split, JSONL ledger, explicit exports, and final audit closure."
   acceptance:
-    state: rejected
-    rejected_at: "2026-05-20T13:08:27+08:00"
-    feedback_ref: .pipeline/acceptance/cycle-C16-rejection-20260520T130827+0800.yaml
+    mode: auto
+    state: pending
+    requested_at: "2026-05-21T20:20:11+08:00"
+  lessons: "For audit-remediation cycles, keep a source-ID closure matrix and classify broad detector residuals separately from release blockers."

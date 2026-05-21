@@ -108,17 +108,25 @@ test("run engine does not expose ledgerFile override from user-controlled apply 
   });
 
   assert.equal(result.ok, true, result.errors?.join("\n"));
-  assert.match(result.ledger_path, /maintenance\/ledger\.yaml$/);
+  assert.match(result.ledger_path, /maintenance\/ledger\.jsonl$/);
   assert.notEqual(result.ledger_path, maliciousLedger);
   await assert.rejects(() => readFile(maliciousLedger, "utf8"), /ENOENT/);
 
-  const defaultLedger = await readFile(join(root, "maintenance", "ledger.yaml"), "utf8");
-  assert.match(defaultLedger, /mr-20260519-local-read/);
+  const events = await readJsonlEvents(join(root, "maintenance", "ledger.jsonl"));
+  assert.ok(events.some((event) => event.event_type === "maintenance_run_applying"));
+  assert.ok(events.some((event) => event.metadata?.run_id === "mr-20260519-local-read"));
+  assert.ok(events.some((event) => /^ml-20260519T163500\+0800-mr-20260519-local-read-run-applying$/.test(event.id)));
 });
 
 function requireApi(name) {
   assert.equal(typeof api[name], "function", `expected ${name} to be exported from ../src/index.js`);
   return api[name];
+}
+
+async function readJsonlEvents(file) {
+  assert.match(file, /\.jsonl$/, `${file} must be a JSONL authority file`);
+  const source = await readFile(file, "utf8");
+  return source.trimEnd().split("\n").filter(Boolean).map((line) => JSON.parse(line));
 }
 
 function systemDocumentRun() {

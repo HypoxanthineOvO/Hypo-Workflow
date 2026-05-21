@@ -2,7 +2,7 @@
 # Hypo-Workflow Maintenance Scheduler
 #
 # Cron example:
-#   0 4 * * * /home/heyx/Hypo-Workflow/scripts/maintenance-scheduler.sh /home/heyx/Hypo-Workflow
+#   0 4 * * * ${HOME}/Hypo-Workflow/scripts/maintenance-scheduler.sh ${HOME}/Hypo-Workflow
 #
 # This scheduler only creates safe-local dry-run evidence. It does not perform
 # remote writes, Notion apply, service restarts, or pipeline execution.

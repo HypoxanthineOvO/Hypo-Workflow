@@ -1,26 +1,44 @@
-# C16 P4 Confirm Summary
+# C17 P4 Confirm Summary
 
-状态：P3 Generate completed，等待 P4 确认后才可 `/hw:start`。
+## Cycle
 
-## 生成产物
+- Cycle：C17
+- 名称：审计修复与架构减债
+- 类型：refactor
+- Preset：tdd
+- 状态：等待确认开始执行
 
-| Milestone | Prompt |
-|---|---|
-| C16-M1 Workspace Authority Schema And Object Registry | `.pipeline/prompts/00-workspace-authority-schema-object-registry.md` |
-| C16-M2 Artifact Catalog Scanner | `.pipeline/prompts/01-artifact-catalog-scanner.md` |
-| C16-M3 Storage Sync Template And Notion Merge Dry-Run | `.pipeline/prompts/02-storage-sync-template-notion-dry-run.md` |
-| C16-M4 Maintenance Command Surface Queue Ledger And Evidence Store | `.pipeline/prompts/03-maintenance-command-queue-ledger-evidence.md` |
-| C16-M5 Maintenance Run Engine And Template Learning | `.pipeline/prompts/04-maintenance-run-engine-template-learning.md` |
-| C16-M6 Scheduled Global Consolidation And Chat Backfill | `.pipeline/prompts/05-scheduled-global-consolidation-chat-backfill.md` |
-| C16-M7 Global Knowledge Rules And Secret Reference Projections | `.pipeline/prompts/06-global-knowledge-rules-secret-ref-projections.md` |
-| C16-M8 End To End Dry-Run Review Pack | `.pipeline/prompts/07-end-to-end-dry-run-review-pack.md` |
-| C16-M9 Final Gated Notion Apply And Verification | `.pipeline/prompts/08-final-gated-notion-apply-verification.md` |
+## 已确认边界
 
-## 执行契约
+- 全修审计发现：Critical、Warning、Info 均纳入 C17。
+- 根目录 `npm test` 必须直接可运行。
+- 配置 authority 分层读取：项目配置、用户全局配置、安全默认值。
+- 配置迁移通过显式命令触发；`sync/start` 只能提示，不能静默写用户级配置。
+- `workspace/index.js` 一次切干净，不保留兼容 re-export shim。
+- YAML 统一采用 `js-yaml`。
+- ledger 新写入采用 append-only JSONL；旧 YAML ledger 一次性迁移；compact YAML 只做人读摘要。
+- 文档/examples 同步新显式模块 import。
+- barrel export 尽量清理干净。
+- Subagent 已授权，执行采用 recommended worker separation。
 
-- Worker Separation：`recommended`
-- 执行子工作器授权：已授权 `/hw:start` 和 `/hw:resume`
-- 每个 prompt 都包含 `Subworker Assignment Plan`
-- 每个 prompt 都保留 P2 的 `technical_solution`、`technical_route`、`research_required`、`risks_and_alternatives`、`validation_path`、`audit_focus`
-- 真实 Notion apply 仅允许在 C16-M9，且必须消费已审核 dry-run bundle 并获得显式确认
-- P3 后必须等待 P4 确认，确认后才可 `/hw:start`
+## 执行 Prompt
+
+| # | Prompt | 主题 |
+|---|---|---|
+| 00 | `.pipeline/prompts/00-audit-baseline-and-root-test-entry.md` | 根目录测试入口与审计基线 |
+| 01 | `.pipeline/prompts/01-shared-utils-layer-extraction.md` | 共享 utils 层 |
+| 02 | `.pipeline/prompts/02-layered-config-and-integration-migration.md` | 分层配置与集成迁移 |
+| 03 | `.pipeline/prompts/03-yaml-parser-unification-with-js-yaml.md` | js-yaml 统一 parser |
+| 04 | `.pipeline/prompts/04-workspace-clean-module-split.md` | workspace clean split |
+| 05 | `.pipeline/prompts/05-ledger-jsonl-migration-and-barrel-export-cleanup.md` | JSONL ledger 与 barrel cleanup |
+| 06 | `.pipeline/prompts/06-full-audit-closure-and-release-readiness.md` | 审计闭环与发布就绪 |
+
+## 必须验证
+
+- 每个 Milestone 至少运行 focused tests、`npm test` 和 `git diff --check`。
+- 最终必须运行 hardcoded path、workspace stale import、parser split、ledger authority 和 export cleanup 扫描。
+- Audit worker 必须拒绝伪测试、静默用户配置写入、workspace shim、长期 YAML/JSONL 双写和 stale docs/examples。
+
+## 下一步
+
+确认后使用 `/hw:start` 开始 C17-M0。
