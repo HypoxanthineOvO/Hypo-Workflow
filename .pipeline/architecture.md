@@ -1,69 +1,59 @@
-# C17 Architecture — Audit Remediation And Structural Debt Reduction
+# C18 Architecture — 指令质量审查与集成同步方案
 
 ## 工作类型
 
-C17 是 refactor Cycle，目标是关闭 2026-05-21 审计发现的 Critical、Warning 和 Info 问题。C17 接受 breaking cleanup：根目录测试入口、配置 authority、workspace 模块边界、YAML parser、ledger 存储和 public exports 都可以在本 Cycle 一次性调整，但必须通过真实测试、扫描和审计 closure report 证明改动安全。
+C18 是 refactor/build Cycle，目标是把 Hypo-Workflow 的质量治理指令升级为可执行、可评分、可闭环优化的命令体系，并建立源仓库到 `~/Codex-VSP` 与 `~/VSP-Open-Code` 的集成同步开发流程。
 
 ## 架构目标
 
-1. Root Test And Audit Baseline
-   - 仓库根目录必须提供可直接运行的 `npm test`。
-   - 审计 inventory 记录 hardcoded paths、重复 helper、workspace stale imports、parser 分裂、ledger 写入模式和 barrel export 状态。
+1. Audit Engineering Method
+   - `/hw:audit` 保留治理 gate 定位，但升级为 Intake-first 的工程审计。
+   - 方法论采用 GQM、ISO/IEC 25010、ATAM-lite 和 SWEBOK。
+   - 顶层输出模型从旧六维扫描改为 Experience / Engineering / Risk。
+   - Critical finding 默认阻断，非阻断质量改进进入 Action Queue 或 `/hw:quality`。
 
-2. Shared Utils Layer
-   - `core/src/utils/index.js` 成为低层工具函数 authority。
-   - 重复的 `isPlainObject`、clone、timestamp、YAML write、stable stringify、safe id 等 helper 必须迁移或有明确理由保留。
+2. Quality Command
+   - `/hw:quality` 成为一等命令。
+   - 支持一次性 scorecard、baseline、compare、review 和 action queue。
+   - 评分采用 1-5 evidence-backed rubric，核心维度为 Correctness、Maintainability、Structure/Organization。
+   - Quality 可以 gate 质量阈值，但不替代 Audit 的风险治理职责。
 
-3. Layered Configuration Authority
-   - 配置读取顺序为项目 `.pipeline/config.yaml`、用户级 `~/.hypo-workflow/config.yaml`、安全默认值。
-   - 项目路径、Hypo-Claw、Hypo-Writer、timezone 和 project linkage seed 不再硬编码在 runtime source。
-   - 配置迁移通过显式命令触发；`sync/start` 只能提示，不能静默写用户级配置。
+3. Optimize Command
+   - `/hw:optimize` 是闭环编排命令，不是后台自动重构器。
+   - Canonical loop 为 `Audit + Quality -> Optimize Implement/Test -> Audit + Quality`。
+   - 开始实现前必须定义 correctness contract、backup、budget、validation path 和手动/自动边界。
+   - 大范围或边界不清的优化必须转 Plan，小修复可转 Patch。
 
-4. YAML Parser Authority
-   - `js-yaml` 是 config 与 knowledge YAML 的统一 parser/dumper。
-   - 自研 partial parser 不再分裂维护。
+4. Integration Sync Workflow
+   - 集成同步是开发流程和 release gate，不新增用户命令。
+   - 每次源仓库功能或指令语义变化后，必须做 source summary、target inspection、gap analysis、target adaptation plan、target validation、target records 和 source backlink。
+   - 不复制源仓库 runtime `.pipeline/state.yaml`、`.pipeline/cycle.yaml` 或 `.pipeline/log.yaml` 到目标仓库。
 
-5. Workspace Clean Split
-   - `workspace/index.js` God Module 拆为明确领域模块：
-     - `workspace-authority`
-     - `project-linkage`
-     - `project-stop-events`
-     - `codex-capture`
-     - `notification-sender`
-   - 不保留 `workspace/index.js` re-export 兼容 shim。
-   - 所有 runtime/test/docs imports 一次迁移到新模块边界。
-
-6. Append-Only Ledger Layer
-   - 高频 ledger 新写入采用 append-only JSONL。
-   - 旧 YAML ledger 一次性迁移到 JSONL。
-   - compact YAML 只作为人读摘要，不作为长期双写 authority。
-
-7. Explicit Public Exports
-   - `core/src/index.js` 不再大面积 `export *` 平铺所有模块。
-   - public exports 尽量改为显式或 namespace export。
-   - README、docs 和 examples 必须同步新 import 路径。
+5. Target Adaptation Boundary
+   - `~/Codex-VSP` 和 `~/VSP-Open-Code` 是目标集成仓库，不是源仓库派生目录。
+   - C18-M5 只读检查目标仓库并生成适配计划。
+   - C18-M6 必须在用户确认具体文件清单后才能写目标仓库。
 
 ## 外部副作用边界
 
-- C17 不需要真实 Notion 写入、真实 QQ 发送或服务重启。
-- 用户级配置迁移只在显式命令下写入。
-- `sync/start` 可检测缺失配置并提示迁移命令，但不得静默写入 `~/.hypo-workflow/config.yaml`。
-- 系统级依赖安装不自动执行；Node 依赖变更必须反映在 package manifest/lockfile 中。
+- C18-M1 到 C18-M5 不写 `~/Codex-VSP` 或 `~/VSP-Open-Code`。
+- C18-M6 写目标仓库前必须读取 C18-M5 适配计划并获得用户确认。
+- 目标仓库已有 dirty worktree 时，必须保留用户未提交改动，不得回滚或覆盖无关文件。
+- 不需要网络、系统级依赖安装或服务重启。
 
 ## Milestone 顺序
 
-1. Audit Baseline And Root Test Entry
-2. Shared Utils Layer Extraction
-3. Layered Config And Integration Migration
-4. YAML Parser Unification With js-yaml
-5. Workspace Clean Module Split
-6. Ledger JSONL Migration And Barrel Export Cleanup
-7. Full Audit Closure And Release Readiness
+1. Audit Engineering Method Upgrade
+2. Quality Command And Report Contract
+3. Optimize Closed-Loop Command
+4. Integration Sync Workflow As Development And Release Gate
+5. Source-Side Status, Docs, And Full Regression Closure
+6. Target Repository Adaptation After Confirmation
 
 ## 验收规则
 
 - 每个实现 Milestone 必须保留 P2 技术路线字段。
 - 每个 prompt 必须包含 Subworker Assignment Plan。
-- 每个 Milestone 至少运行 focused tests、`npm test` 和 `git diff --check`。
-- 最终审计必须扫描 hardcoded path、workspace stale import、parser split、ledger authority 和 barrel export 状态。
-- 审计工作器必须拒绝伪测试、静默用户配置写入、workspace shim、长期 YAML/JSONL 双写和 stale docs/examples。
+- 每个 Milestone 至少运行 focused tests 和 `git diff --check`；最终运行 `npm test`。
+- 测试必须覆盖命令注册、Skill/spec、OpenCode adapter/docs、report/state/action paths 和 no-command integration sync contract。
+- Audit worker 必须拒绝只验证文本存在但不覆盖命令映射、生成 docs、adapter 或状态契约的伪测试。

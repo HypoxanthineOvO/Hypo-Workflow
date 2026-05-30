@@ -12,7 +12,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 - Claude Code exposes canonical commands through plugin-root `commands/` files under a plugin whose namespace is `hw`; those slash-command files must load the existing Hypo-Workflow skill files instead of duplicating a second implementation
 - Claude Code `/hw:*` entries are plugin slash-command mappings backed by the existing `skills/*/SKILL.md` authority
 - Claude Code native `/resume` remains owned by Claude Code; Hypo-Workflow must never register or document bare `/resume` as an alias for `/hw:resume`
-- V12 canonical namespace contains 50 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Maintenance, Docs, Review, Explain, and Utility groups, plus an internal cron-only watchdog skill
+- V13 canonical namespace contains 52 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Maintenance, Docs, Review, Quality, Optimize, Explain, and Utility groups, plus an internal cron-only watchdog skill
 - slash commands are exact and namespace-scoped
 - slash commands take precedence over fuzzy natural-language matching
 - natural-language commands remain valid for backward compatibility
@@ -42,6 +42,8 @@ For the user-facing command map, see `SKILL.md`.
 - `/hw:init`
 - `/hw:release`
 - `/hw:audit`
+- `/hw:quality`
+- `/hw:optimize`
 - `/hw:debug`
 - `/hw:chat`
 - `/hw:analysis`
@@ -74,7 +76,7 @@ For the user-facing command map, see `SKILL.md`.
 3. parse remaining tokens as command arguments
 4. flags are order-independent
 5. if a command is unknown, return exactly:
-   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:maintain, /hw:maintain status, /hw:maintain scan, /hw:maintain plan, /hw:maintain queue, /hw:maintain run, /hw:maintain apply, /hw:maintain verify, /hw:maintain log, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:maintain, /hw:maintain status, /hw:maintain scan, /hw:maintain plan, /hw:maintain queue, /hw:maintain run, /hw:maintain apply, /hw:maintain verify, /hw:maintain log, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:quality, /hw:optimize, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 6. if a known command receives an unsupported flag, stop and report the unsupported flag explicitly instead of guessing
 7. if a prompt selector is ambiguous, list the candidates and stop
 8. plan and review commands load `plan/PLAN-SKILL.md` before execution
@@ -263,7 +265,7 @@ Supported forms:
 Behavior:
 
 - read `SKILL.md` command tables as the source of truth
-- `/hw:help` lists all 50 user-facing commands grouped under Setup, Pipeline, Plan, Analysis, Lifecycle, Maintenance, Docs, Review, Explain, and Utility
+- `/hw:help` lists all 52 user-facing commands grouped under Setup, Pipeline, Plan, Analysis, Lifecycle, Maintenance, Docs, Review, Quality, Optimize, Explain, and Utility
 - `/hw:help --quick` returns a compact cheat sheet
 - `/hw:help <cmd>` returns detailed usage, flags, and examples for the requested command
 
@@ -418,9 +420,47 @@ Supported flags:
 
 Behavior:
 
-- follow the four-step audit workflow in `references/audit-spec.md`
-- scan all six dimensions by default
+- follow the Intake-first engineering audit workflow in `references/audit-spec.md`
+- scan Experience / Engineering / Risk by default
 - write the detailed report to `.pipeline/audits/` and append an audit log entry
+
+### `/hw:quality`
+
+Supported forms:
+
+- `/hw:quality`
+- `/hw:quality scorecard`
+- `/hw:quality baseline`
+- `/hw:quality compare`
+- `/hw:quality review`
+- `/hw:quality action queue`
+
+Behavior:
+
+- load `skills/quality/SKILL.md`
+- generate evidence-backed quality scorecards, baselines, comparisons, reviews, or action queues
+- use 1-5 scoring with Overall >= 4 and core dimensions >= 3 as the quality gate
+- core dimensions are Correctness, Maintainability, and Structure/Organization
+- write reports under `.pipeline/quality/quality-NNN.md`
+- maintain `.pipeline/quality/state.yaml` and `.pipeline/quality/actions.yaml` when state tracking is active
+- escalate Critical risk, security, data-loss, or governance findings to `/hw:audit`
+
+### `/hw:optimize`
+
+Supported forms:
+
+- `/hw:optimize`
+- `/hw:optimize --scope <path>`
+- `/hw:optimize --budget <n>`
+
+Behavior:
+
+- load `skills/optimize/SKILL.md`
+- run the closed loop `Audit + Quality -> Optimize Implement/Test -> Audit + Quality`
+- require correctness contract, backup, budget, validation path, and scope before edits
+- route small clear fixes to `/hw:patch`
+- route broad, boundary-unclear, or architectural optimization to `/hw:plan`
+- persist `.pipeline/quality/optimize-state.yaml`, action updates, reports, and lifecycle evidence
 
 ### `/hw:debug`
 

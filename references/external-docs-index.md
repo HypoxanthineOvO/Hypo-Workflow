@@ -21,7 +21,7 @@ This index records external official documentation surfaces that Hypo-Workflow a
 | Server HTTP API | https://opencode.ai/docs/server/ | Confirm `opencode serve`, OpenAPI endpoint behavior, auth environment variables, and API groups before adding programmatic integrations. |
 | SDK | https://opencode.ai/docs/sdk/ | Confirm generated SDK usage when replacing raw HTTP calls or building dashboard/server integrations. |
 | Plugins | https://opencode.ai/docs/plugins/ | Confirm plugin events, hooks, and custom tool extension points before editing `.opencode/plugins/hypo-workflow.ts`. |
-| TUI plugins | https://opencode.ai/docs/tui/ | Confirm TUI extension behavior before editing `plugins/opencode/templates/plugin-tui.tsx` or `tui.json`. |
+| TUI plugins | https://opencode.ai/docs/tui/ | Confirm TUI extension behavior before reintroducing generated TUI slot plugins; VSP OpenCode uses built-in Workflow UI, so the legacy `plugin-tui.tsx` / `tui.json` path is disabled. |
 | MCP servers | https://opencode.ai/docs/mcp-servers/ | Confirm local/remote MCP config, context cost caveats, headers, OAuth, and docs lookup patterns. |
 | Context7 MCP example | https://opencode.ai/docs/mcp-servers/#context7 | Use as the official OpenCode-backed pattern for on-demand documentation lookup through `context7`, including optional `CONTEXT7_API_KEY`. |
 | Slash commands | https://opencode.ai/docs/commands/ | Confirm `.opencode/commands/*.md` command behavior before changing `/hw-*` generation. |

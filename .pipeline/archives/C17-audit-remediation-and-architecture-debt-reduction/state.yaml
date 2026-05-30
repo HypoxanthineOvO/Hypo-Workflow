@@ -1,0 +1,347 @@
+acceptance:
+  cycle_id: C17
+  mode: auto
+  scope: cycle
+  state: accepted
+  updated_at: 2026-05-29T18:05:08+08:00
+current:
+  phase: completed
+  prompt_file: .pipeline/prompts/06-full-audit-closure-and-release-readiness.md
+  prompt_index: 6
+  prompt_name: C17-M6 Full Audit Closure And Release Readiness
+  step: null
+  step_index: 0
+history:
+  completed_prompts:
+    - completed_at: 2026-05-21T17:30:00+08:00
+      id: C17-M0
+      prompt_file: .pipeline/prompts/00-audit-baseline-and-root-test-entry.md
+      prompt_index: 0
+      report_file: .pipeline/reports/00-audit-baseline-and-root-test-entry.report.md
+      result: pass
+    - completed_at: 2026-05-21T17:43:26+08:00
+      id: C17-M1
+      prompt_file: .pipeline/prompts/01-shared-utils-layer-extraction.md
+      prompt_index: 1
+      report_file: .pipeline/reports/01-shared-utils-layer-extraction.report.md
+      result: pass
+    - completed_at: 2026-05-21T18:19:00+08:00
+      id: C17-M2
+      prompt_file: .pipeline/prompts/02-layered-config-and-integration-migration.md
+      prompt_index: 2
+      report_file: .pipeline/reports/02-layered-config-and-integration-migration.report.md
+      result: pass
+    - completed_at: 2026-05-21T18:38:54+08:00
+      id: C17-M3
+      prompt_file: .pipeline/prompts/03-yaml-parser-unification-with-js-yaml.md
+      prompt_index: 3
+      report_file: .pipeline/reports/03-yaml-parser-unification-with-js-yaml.report.md
+      result: pass
+    - completed_at: 2026-05-21T19:17:24+08:00
+      id: C17-M4
+      prompt_file: .pipeline/prompts/04-workspace-clean-module-split.md
+      prompt_index: 4
+      report_file: .pipeline/reports/04-workspace-clean-module-split.report.md
+      result: pass
+    - completed_at: 2026-05-21T19:58:03+08:00
+      id: C17-M5
+      prompt_file: .pipeline/prompts/05-ledger-jsonl-migration-and-barrel-export-cleanup.md
+      prompt_index: 5
+      report_file: .pipeline/reports/05-ledger-jsonl-migration-and-barrel-export-cleanup.report.md
+      result: pass
+    - completed_at: 2026-05-21T20:20:11+08:00
+      id: C17-M6
+      prompt_file: .pipeline/prompts/06-full-audit-closure-and-release-readiness.md
+      prompt_index: 6
+      report_file: .pipeline/reports/06-full-audit-closure-and-release-readiness.report.md
+      result: pass
+last_heartbeat: 2026-05-21T20:20:11+08:00
+milestones:
+  - audit_worker:
+      evidence: .pipeline/reviews/C17/M0/audit.md
+      id: 019e49dd-20a8-7432-83f2-94f6217950b2
+      nickname: Faraday
+      status: completed
+    completed_at: 2026-05-21T17:30:00+08:00
+    id: C17-M0
+    implement_worker:
+      evidence: .pipeline/reviews/C17/M0/implementation-evidence.md
+      id: 019e49d6-db13-7e01-9fa2-bef1883f5196
+      nickname: Darwin
+      status: completed
+    name: Audit Baseline And Root Test Entry
+    prompt_file: .pipeline/prompts/00-audit-baseline-and-root-test-entry.md
+    report_file: .pipeline/reports/00-audit-baseline-and-root-test-entry.report.md
+    started_at: 2026-05-21T17:21:00+08:00
+    status: completed
+    test_worker:
+      evidence: .pipeline/reviews/C17/M0/test-evidence.md
+      id: 019e49d3-a2ce-74b0-b82f-38d908f89a30
+      nickname: Dirac
+      status: completed
+    validations:
+      - 'node --test core/test/audit-baseline.test.js: 2/2 passing'
+      - 'npm test: 633/633 passing'
+      - 'git diff --check: passing'
+  - audit_worker:
+      evidence: .pipeline/reviews/C17/M1/audit.md
+      id: 019e49e9-8423-75b2-9ec1-6125c403975e
+      nickname: Arendt
+      status: completed
+    completed_at: 2026-05-21T17:43:26+08:00
+    id: C17-M1
+    implement_worker:
+      evidence: .pipeline/reviews/C17/M1/implementation-evidence.md
+      id: 019e49e2-ecfc-75a2-99d0-b2ea6fe30dc8
+      nickname: Schrodinger
+      status: completed
+    name: Shared Utils Layer Extraction
+    prompt_file: .pipeline/prompts/01-shared-utils-layer-extraction.md
+    report_file: .pipeline/reports/01-shared-utils-layer-extraction.report.md
+    started_at: 2026-05-21T17:30:00+08:00
+    status: completed
+    test_worker:
+      evidence: .pipeline/reviews/C17/M1/test-evidence.md
+      id: 019e49df-fc2f-7562-b422-b9210f9ed99a
+      nickname: Aquinas
+      status: completed
+    validations:
+      - 'node --test core/test/utils.test.js: 7/7 passing'
+      - 'npm test: 640/640 passing'
+      - >-
+        rg 'function isPlainObject|function compactTimestamp|function stableStringify|async function writeYaml'
+        core/src: expected remaining matches outside C17-M1 slice / C17-M3 writeYaml
+      - 'git diff --check: passing'
+  - audit_worker:
+      evidence: .pipeline/reviews/C17/M2/audit.md
+      id: 019e4a08-6e35-7582-a5e5-7867418c261e
+      nickname: Hegel
+      status: completed
+    completed_at: 2026-05-21T18:19:00+08:00
+    id: C17-M2
+    implement_worker:
+      evidence: .pipeline/reviews/C17/M2/implementation-evidence.md
+      id: 019e49f1-4e8d-7960-9652-7764a4415eb7
+      nickname: Ptolemy
+      status: completed
+    name: Layered Config And Integration Migration
+    prompt_file: .pipeline/prompts/02-layered-config-and-integration-migration.md
+    report_file: .pipeline/reports/02-layered-config-and-integration-migration.report.md
+    started_at: 2026-05-21T17:43:26+08:00
+    status: completed
+    test_revision_worker:
+      evidence: .pipeline/reviews/C17/M2/test-revision-evidence.md
+      id: 019e4a04-8368-7d53-b7a4-3277b949b949
+      nickname: Archimedes
+      status: completed
+    test_worker:
+      evidence: .pipeline/reviews/C17/M2/test-evidence.md
+      id: 019e49ec-6f91-7142-9d70-12671bc1e665
+      nickname: James
+      status: completed
+    validations:
+      - 'node --test core/test/layered-config-integration.test.js core/test/project-notifications.test.js: 11/11 passing'
+      - 'rg -n ''/home/heyx'' core/src scripts: no matches'
+      - 'npm test: 645/645 passing'
+      - 'git diff --check: passing'
+  - audit_worker:
+      evidence: .pipeline/reviews/C17/M3/audit.md
+      id: 019e4a1b-8c6b-78a2-abea-1e3d7a7436f1
+      nickname: Pascal
+      status: completed
+    completed_at: 2026-05-21T18:38:54+08:00
+    id: C17-M3
+    implement_worker:
+      evidence: .pipeline/reviews/C17/M3/implementation-evidence.md
+      id: 019e4a11-f5f9-7740-9af6-23002963a998
+      nickname: Banach
+      status: completed
+    name: YAML Parser Unification With js-yaml
+    prompt_file: .pipeline/prompts/03-yaml-parser-unification-with-js-yaml.md
+    report_file: .pipeline/reports/03-yaml-parser-unification-with-js-yaml.report.md
+    started_at: 2026-05-21T18:19:00+08:00
+    status: completed
+    test_worker:
+      evidence: .pipeline/reviews/C17/M3/test-evidence.md
+      id: 019e4a0c-e6d0-79c3-be0d-82f14a823d59
+      nickname: Avicenna
+      status: completed
+    validations:
+      - >-
+        node --test core/test/yaml-parser-unification.test.js core/test/global-config-registry.test.js
+        core/test/knowledge-ledger.test.js core/test/knowledge-opencode-gate.test.js
+        core/test/progressive-discover.test.js: 29/29 passing
+      - 'npm test: 650/650 passing'
+      - 'git diff --check: passing'
+  - audit_worker:
+      evidence: .pipeline/reviews/C17/M4/audit.md
+      id: 019e4a2e-20b1-71e2-8cf8-ae675145cdcc
+      nickname: Jason
+      status: completed
+    completed_at: 2026-05-21T19:17:24+08:00
+    id: C17-M4
+    implement_worker:
+      evidence: .pipeline/reviews/C17/M4/implementation-evidence.md
+      id: 019e4a23-b4e8-7712-b5a5-4108fe6e74f4
+      nickname: Turing
+      status: completed
+    name: Workspace Clean Module Split
+    prompt_file: .pipeline/prompts/04-workspace-clean-module-split.md
+    report_file: .pipeline/reports/04-workspace-clean-module-split.report.md
+    started_at: 2026-05-21T18:38:54+08:00
+    status: completed
+    test_worker:
+      evidence: .pipeline/reviews/C17/M4/test-evidence.md
+      id: 019e4a1f-1df6-7fc1-a4d4-68b1094cad59
+      nickname: Carver
+      status: completed
+    validations:
+      - >-
+        node --test core/test/workspace-module-split.test.js core/test/workspace-authority.test.js
+        core/test/project-link-graph.test.js core/test/project-stop-event.test.js
+        core/test/final-assistant-output.test.js core/test/hypo-claw-notification.test.js
+        core/test/project-linkage-registry.test.js: 39/39 passing
+      - 'npm test: 655/655 passing'
+      - 'git diff --check: passing'
+  - audit_worker:
+      evidence: .pipeline/reviews/C17/M5/audit.md
+      id: 019e4a61-f404-7df1-9268-4efaa5902ea9
+      nickname: Helmholtz
+      status: completed
+    completed_at: 2026-05-21T19:58:03+08:00
+    id: C17-M5
+    implement_worker:
+      evidence: .pipeline/reviews/C17/M5/implementation-evidence.md
+      id: 019e4a4a-cfaa-7841-8a8f-2533d20636e3
+      nickname: Heisenberg
+      status: completed
+    name: Ledger JSONL Migration And Barrel Export Cleanup
+    prompt_file: .pipeline/prompts/05-ledger-jsonl-migration-and-barrel-export-cleanup.md
+    report_file: .pipeline/reports/05-ledger-jsonl-migration-and-barrel-export-cleanup.report.md
+    started_at: 2026-05-21T19:17:24+08:00
+    status: completed
+    test_revision_worker:
+      evidence: .pipeline/reviews/C17/M5/test-revision-evidence.md
+      id: 019e4a55-f671-7983-acf3-743fe003ab36
+      nickname: Plato
+      status: completed
+    test_worker:
+      evidence: .pipeline/reviews/C17/M5/test-evidence.md
+      id: 019e4a42-86a0-7701-90e1-8fb8bdc669ca
+      nickname: McClintock
+      status: completed
+    validations:
+      - >-
+        node --test core/test/project-events.test.js core/test/project-notifications.test.js
+        core/test/daily-project-summary.test.js core/test/maintenance-ledger.test.js
+        core/test/global-consolidation.test.js core/test/workspace-module-split.test.js
+        core/test/ledger-jsonl-migration.test.js core/test/maintenance-backup-policy.test.js: 41/41 passing
+      - 'npm test: 661/661 passing'
+      - 'git diff --check: passing'
+      - >-
+        rg -n 'ledger.yaml|export \* from' core/src core/test docs README.md README.en.md: remaining matches classified
+        as non-M5 authority, migration/self-test, fixtures, or analysis lane
+  - audit_worker:
+      evidence: .pipeline/reviews/C17/M6/audit.md
+      id: 019e4a72-911d-7b62-948c-5459f509db27
+      nickname: Pauli
+      status: completed
+    completed_at: 2026-05-21T20:20:11+08:00
+    id: C17-M6
+    implement_worker:
+      evidence: .pipeline/reviews/C17/M6/implementation-evidence.md
+      id: 019e4a6b-4ae5-74e0-95ab-28404995eb1c
+      nickname: Kepler
+      status: completed
+    name: Full Audit Closure And Release Readiness
+    prompt_file: .pipeline/prompts/06-full-audit-closure-and-release-readiness.md
+    report_file: .pipeline/reports/06-full-audit-closure-and-release-readiness.report.md
+    started_at: 2026-05-21T19:58:03+08:00
+    status: completed
+    test_worker:
+      evidence: .pipeline/reviews/C17/M6/test-evidence.md
+      id: 019e4a67-e5ca-77b1-bd5f-9a2bbf07f10a
+      nickname: Hilbert
+      status: completed
+    validations:
+      - 'npm test: 661/661 passing'
+      - 'git diff --check: passing'
+      - 'rg -n ''/home/heyx'' core/src scripts: no matches'
+      - 'workspace/parser/export/ledger scans: pass with classified residuals'
+      - 'audit inventory current: hardcoded_paths=0, workspace_imports=0, yaml_parsers=1 unified entry, barrel_exports=0'
+pipeline:
+  finished: 2026-05-29T18:05:08+08:00
+  name: C17 审计修复与架构减债
+  prompts_completed: 7
+  prompts_total: 7
+  started: 2026-05-21T16:32:54+08:00
+  status: completed
+planning:
+  architecture_constraints:
+    - workspace/index.js must not remain as a compatibility re-export shim after decomposition.
+    - All internal imports and tests must migrate to the new module boundaries in the same Cycle.
+  candidate_milestones:
+    - id: C17-M0
+      name: Audit Baseline And Test Entry Stabilization
+      status: candidate
+    - id: C17-M1
+      name: Shared Utils Extraction
+      status: candidate
+    - id: C17-M2
+      name: Configuration-Driven Paths And Integrations
+      status: candidate
+    - id: C17-M3
+      name: YAML Parser Unification With js-yaml
+      status: candidate
+    - id: C17-M4
+      name: Workspace Module Decomposition
+      status: candidate
+    - id: C17-M5
+      name: Ledger Append Strategy Barrel Cleanup And Release Regression
+      status: candidate
+    - id: C17-M6
+      name: Full Audit Closure And Release Readiness
+      status: candidate
+  confirmed_requirements:
+    barrel_export_cleanup: broad_cleanup_preferred
+    config_authority: layered
+    config_migration_silent_user_write: forbidden
+    config_migration_trigger: explicit_command_plus_sync_start_prompt
+    docs_examples_import_update: required
+    layered_config_migration: auto_generate_user_config
+    ledger_migration: one_time_yaml_to_jsonl
+    ledger_strategy: append_only_jsonl_with_compact_yaml_summary
+    root_npm_test: mandatory
+    scope: all_findings
+    workspace_compatibility_shim: none_cut_clean
+    workspace_decomposition: complete_in_c17
+    yaml_unification: js_yaml_dependency
+  context_sources:
+    - audit
+  interaction_depth: high
+  p0_configure:
+    acceptance_mode: auto
+    evidence: .plan-state/p0-configure.yaml
+    execution_subworkers: authorized
+    source: reused_previous_cycle_snapshot
+    worker_separation_mode: recommended
+  p2:
+    decompose: .plan-state/c17-decompose.yaml
+    milestone_count: 7
+    status: confirmed
+    technical_route: .plan-state/c17-technical-route.md
+  p3:
+    confirm_summary: .pipeline/confirm-summary.md
+    generate: .plan-state/c17-generate.yaml
+    prompt_count: 7
+    status: completed
+  plan_mode: interactive
+  source: audit-001
+  status: p4_confirm
+  technical_route_decisions:
+    config_migration: explicit_command_plus_sync_start_prompt
+    docs: update_public_docs_and_examples
+    exports: broad_cleanup_preferred
+    ledger: append_only_jsonl_with_compact_yaml_summary
+    ledger_migration: one_time_yaml_to_jsonl
+    yaml: js_yaml_dependency

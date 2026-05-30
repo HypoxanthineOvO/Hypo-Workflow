@@ -2,7 +2,7 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { normalizeAnalysisInteraction } from "../analysis/index.js";
-import { commandMap } from "../commands/index.js";
+import { commandMap, legacyOpenCodeCommandName } from "../commands/index.js";
 import { DEFAULT_GLOBAL_CONFIG, buildModelPoolOpenCodeAgents, mergeConfig, normalizeExecutionBashPolicy } from "../config/index.js";
 import { normalizeProfile, selectProfile } from "../profile/index.js";
 import {
@@ -12,9 +12,10 @@ import {
 } from "../rules/index.js";
 import { ASK_QUESTIONS_GUIDANCE, renderDeepSeekToolCallingRules } from "./agent-guidance.js";
 
-const HW_VERSION = "13.0.0-alpha.1";
+const HW_VERSION = "13.1.0-alpha.1";
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(MODULE_DIR, "..", "..", "..");
+const DEPRECATED_TUI_PLUGIN_REF = ".opencode/tui/hypo-workflow-tui.tsx";
 
 export const OPENCODE_AGENTS = Object.freeze([
   {
@@ -106,24 +107,21 @@ export async function writeOpenCodeArtifacts(outDir, options = {}) {
   const adapterDir = outDir.endsWith(".opencode") ? outDir : join(outDir, ".opencode");
   const projectRoot = dirname(adapterDir);
   const rootConfig = renderOpenCodeConfig(profile, { includePlugins: true });
-  const tuiConfig = renderOpenCodeTuiConfig();
   const adapterConfig = renderOpenCodeConfig(profile, { includePlugins: false });
   await mkdir(join(adapterDir, "commands"), { recursive: true });
   await mkdir(join(adapterDir, "agents"), { recursive: true });
   await mkdir(join(adapterDir, "plugins"), { recursive: true });
   await mkdir(join(adapterDir, "runtime"), { recursive: true });
-  await mkdir(join(adapterDir, "tui"), { recursive: true });
   await rm(join(adapterDir, "plugins", "hypo-workflow.js"), { force: true });
   await rm(join(adapterDir, "plugins", "hypo-workflow-status.js"), { force: true });
   await rm(join(adapterDir, "plugins", "hypo-workflow-tui.tsx"), { force: true });
   await rm(join(adapterDir, "commands", "hw-dashboard.md"), { force: true });
+  await removeDeprecatedOpenCodeTuiArtifacts(projectRoot, adapterDir);
 
   for (const command of commandMap("opencode")) {
-    await writeFile(
-      join(adapterDir, "commands", `${command.opencode.slice(1)}.md`),
-      renderCommand(command),
-      "utf8",
-    );
+    await rm(join(adapterDir, "commands", `${legacyOpenCodeCommandName(command.canonical).slice(1)}.md`), { force: true });
+    await rm(join(adapterDir, "commands", `${command.opencode.slice(1)}.md`), { force: true });
+    await writeFile(join(adapterDir, "commands", `${command.opencode.slice(1)}.md`), renderCommand(command), "utf8");
   }
 
   for (const agent of renderableOpenCodeAgents(profile)) {
@@ -133,7 +131,6 @@ export async function writeOpenCodeArtifacts(outDir, options = {}) {
   await writeFile(join(adapterDir, "opencode.json"), `${JSON.stringify(adapterConfig, null, 2)}\n`, "utf8");
   await writeFile(join(adapterDir, "hypo-workflow.json"), `${JSON.stringify(renderHypoWorkflowMetadata(profile), null, 2)}\n`, "utf8");
   await writeFile(join(projectRoot, "opencode.json"), `${JSON.stringify(injectCommands(rootConfig), null, 2)}\n`, "utf8");
-  await writeFile(join(projectRoot, "tui.json"), `${JSON.stringify(tuiConfig, null, 2)}\n`, "utf8");
   const rulesAuthority = await loadArtifactRulesAuthority(projectRoot, options);
   if (rulesAuthority) {
     await writeStructuredHabitsDocument(projectRoot, REPO_ROOT, {
@@ -153,11 +150,6 @@ export async function writeOpenCodeArtifacts(outDir, options = {}) {
   await writeFile(
     join(adapterDir, "runtime", "hypo-workflow-hooks.js"),
     await renderOpenCodeHookPolicyModule(),
-    "utf8",
-  );
-  await writeFile(
-    join(adapterDir, "tui", "hypo-workflow-tui.tsx"),
-    await renderOpenCodeStatusTuiPlugin(),
     "utf8",
   );
 }
@@ -281,7 +273,7 @@ export function renderOpenCodeConfig(profile, options = {}) {
 export function injectCommands(config) {
   const commands = {};
   for (const cmd of commandMap("opencode")) {
-    const opencodeName = cmd.opencode?.slice(1); // /hw-start -> hw-start
+    const opencodeName = cmd.opencode?.slice(1); // /hw:start -> hw:start
     if (!opencodeName) continue;
     const skillName = (cmd.skill || "").replace("skills/", "").replace("/SKILL.md", "");
     commands[opencodeName] = {
@@ -296,9 +288,7 @@ export function injectCommands(config) {
 export function renderOpenCodeTuiConfig() {
   return {
     $schema: "https://opencode.ai/tui.json",
-    plugin: [
-      ".opencode/tui/hypo-workflow-tui.tsx",
-    ],
+    plugin: [],
   };
 }
 
@@ -389,7 +379,7 @@ async function renderPluginTemplate(profile = {}) {
 }
 
 export async function renderOpenCodeStatusTuiPlugin() {
-  return renderTemplate("plugin-tui.tsx");
+  return "";
 }
 
 export async function renderOpenCodeStatusModule() {
@@ -409,6 +399,38 @@ async function renderTemplate(name) {
   const templatePath = resolve(REPO_ROOT, "plugins", "opencode", "templates", name);
   const template = await readFile(templatePath, "utf8");
   return template.replaceAll("__HW_VERSION__", HW_VERSION);
+}
+
+async function removeDeprecatedOpenCodeTuiArtifacts(projectRoot, adapterDir) {
+  await rm(join(adapterDir, "tui", "hypo-workflow-tui.tsx"), { force: true });
+  await removeDeprecatedOpenCodeTuiConfig(projectRoot);
+}
+
+async function removeDeprecatedOpenCodeTuiConfig(projectRoot) {
+  const file = join(projectRoot, "tui.json");
+  let config;
+  try {
+    config = JSON.parse(await readFile(file, "utf8"));
+  } catch {
+    return;
+  }
+  const plugin = config.plugin;
+  const plugins = Array.isArray(plugin) ? plugin : typeof plugin === "string" ? [plugin] : null;
+  if (!plugins?.includes(DEPRECATED_TUI_PLUGIN_REF)) return;
+
+  const nextPlugins = plugins.filter((entry) => entry !== DEPRECATED_TUI_PLUGIN_REF);
+  if (nextPlugins.length === 0 && Object.keys(config).every((key) => key === "$schema" || key === "plugin")) {
+    await rm(file, { force: true });
+    return;
+  }
+
+  const nextConfig = { ...config };
+  if (nextPlugins.length) {
+    nextConfig.plugin = Array.isArray(plugin) ? nextPlugins : nextPlugins[0];
+  } else {
+    delete nextConfig.plugin;
+  }
+  await writeFile(file, `${JSON.stringify(nextConfig, null, 2)}\n`, "utf8");
 }
 
 function extractRecentEventHelpers(source) {

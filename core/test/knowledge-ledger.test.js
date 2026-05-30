@@ -235,8 +235,8 @@ test("knowledge command is exposed through the canonical OpenCode command map", 
   const commands = commandMap("opencode");
   const knowledge = commandByCanonical("/hw:knowledge");
 
-  assert.equal(commands.length, 50);
-  assert.equal(knowledge.opencode, "/hw-knowledge");
+  assert.equal(commands.length, 52);
+  assert.equal(knowledge.opencode, "/hw:knowledge");
   assert.equal(knowledge.agent, "hw-compact");
   assert.equal(knowledge.route, "tool");
   assert.equal(knowledge.skill, "skills/knowledge/SKILL.md");

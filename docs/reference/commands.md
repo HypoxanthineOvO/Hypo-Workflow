@@ -1,6 +1,6 @@
 # 命令参考
 
-本页由 `core/src/commands/index.js` 生成。当前用户命令数量：50。命令名、平台映射和 Skill 路径保留英文/代码格式。阅读时以 Canonical 列为用户入口，以 OpenCode 列为平台映射；新增或删除命令必须先修改 command registry，再刷新本页。
+本页由 `core/src/commands/index.js` 生成。当前用户命令数量：52。命令名、平台映射和 Skill 路径保留英文/代码格式。阅读时以 Canonical 列为用户入口，以 OpenCode 列为平台映射；新增或删除命令必须先修改 command registry，再刷新本页。
 
 | Canonical | OpenCode | Agent | Skill |
 |---|---|---|---|
@@ -48,6 +48,8 @@
 | `/hw:init` | `/hw-init` | `hw-plan` | `skills/init/SKILL.md` |
 | `/hw:check` | `/hw-check` | `hw-status` | `skills/check/SKILL.md` |
 | `/hw:audit` | `/hw-audit` | `hw-review` | `skills/audit/SKILL.md` |
+| `/hw:quality` | `/hw-quality` | `hw-review` | `skills/quality/SKILL.md` |
+| `/hw:optimize` | `/hw-optimize` | `hw-build` | `skills/optimize/SKILL.md` |
 | `/hw:release` | `/hw-release` | `hw-build` | `skills/release/SKILL.md` |
 | `/hw:debug` | `/hw-debug` | `hw-debug` | `skills/debug/SKILL.md` |
 | `/hw:help` | `/hw-help` | `hw-status` | `skills/help/SKILL.md` |

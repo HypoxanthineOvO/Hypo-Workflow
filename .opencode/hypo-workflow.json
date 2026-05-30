@@ -16,7 +16,7 @@
       "model": "deepseek-v4-flash"
     },
     "test": {
-      "model": "deepseek-v4-pro"
+      "model": "mimo-v2.5-pro"
     },
     "code-a": {
       "model": "mimo-v2.5-pro"
@@ -25,13 +25,16 @@
       "model": "deepseek-v4-pro"
     },
     "debug": {
-      "model": "deepseek-v4-pro"
+      "model": "mimo-v2.5-pro"
     },
     "docs": {
       "model": "deepseek-v4-pro"
     },
     "report": {
       "model": "deepseek-v4-flash"
+    },
+    "hw-review": {
+      "model": "deepseek-v4-pro"
     }
   },
   "model_pool": {
@@ -101,354 +104,368 @@
     "confirm_system_install": false
   },
   "fileGuard": "standard",
-  "version": "13.0.0-alpha.1",
+  "version": "13.1.0-alpha.1",
   "commandMap": [
     {
       "canonical": "/hw:start",
-      "opencode": "/hw-start",
+      "opencode": "/hw:start",
       "agent": "hw-build",
       "route": "pipeline",
       "skill": "skills/start/SKILL.md"
     },
     {
       "canonical": "/hw:resume",
-      "opencode": "/hw-resume",
+      "opencode": "/hw:resume",
       "agent": "hw-build",
       "route": "pipeline",
       "skill": "skills/resume/SKILL.md"
     },
     {
       "canonical": "/hw:status",
-      "opencode": "/hw-status",
+      "opencode": "/hw:status",
       "agent": "hw-status",
       "route": "read",
       "skill": "skills/status/SKILL.md"
     },
     {
       "canonical": "/hw:skip",
-      "opencode": "/hw-skip",
+      "opencode": "/hw:skip",
       "agent": "hw-build",
       "route": "pipeline",
       "skill": "skills/skip/SKILL.md"
     },
     {
       "canonical": "/hw:stop",
-      "opencode": "/hw-stop",
+      "opencode": "/hw:stop",
       "agent": "hw-status",
       "route": "pipeline",
       "skill": "skills/stop/SKILL.md"
     },
     {
       "canonical": "/hw:report",
-      "opencode": "/hw-report",
+      "opencode": "/hw:report",
       "agent": "hw-report",
       "route": "read",
       "skill": "skills/report/SKILL.md"
     },
     {
       "canonical": "/hw:chat",
-      "opencode": "/hw-chat",
+      "opencode": "/hw:chat",
       "agent": "hw-build",
       "route": "lifecycle",
       "skill": "skills/chat/SKILL.md"
     },
     {
       "canonical": "/hw:analysis",
-      "opencode": "/hw-analysis",
+      "opencode": "/hw:analysis",
       "agent": "hw-debug",
       "route": "analysis",
       "skill": "skills/analysis/SKILL.md"
     },
     {
       "canonical": "/hw:plan",
-      "opencode": "/hw-plan",
+      "opencode": "/hw:plan",
       "agent": "hw-plan",
       "route": "plan",
       "skill": "skills/plan/SKILL.md"
     },
     {
       "canonical": "/hw:plan:deep",
-      "opencode": "/hw-plan-deep",
+      "opencode": "/hw:plan:deep",
       "agent": "hw-plan",
       "route": "plan",
       "skill": "skills/plan-deep/SKILL.md"
     },
     {
       "canonical": "/hw:plan:discover",
-      "opencode": "/hw-plan-discover",
+      "opencode": "/hw:plan:discover",
       "agent": "hw-plan",
       "route": "plan",
       "skill": "skills/plan-discover/SKILL.md"
     },
     {
       "canonical": "/hw:plan:decompose",
-      "opencode": "/hw-plan-decompose",
+      "opencode": "/hw:plan:decompose",
       "agent": "hw-plan",
       "route": "plan",
       "skill": "skills/plan-decompose/SKILL.md"
     },
     {
       "canonical": "/hw:plan:generate",
-      "opencode": "/hw-plan-generate",
+      "opencode": "/hw:plan:generate",
       "agent": "hw-plan",
       "route": "plan",
       "skill": "skills/plan-generate/SKILL.md"
     },
     {
       "canonical": "/hw:plan:confirm",
-      "opencode": "/hw-plan-confirm",
+      "opencode": "/hw:plan:confirm",
       "agent": "hw-plan",
       "route": "plan",
       "skill": "skills/plan-confirm/SKILL.md"
     },
     {
       "canonical": "/hw:plan:extend",
-      "opencode": "/hw-plan-extend",
+      "opencode": "/hw:plan:extend",
       "agent": "hw-plan",
       "route": "plan",
       "skill": "skills/plan-extend/SKILL.md"
     },
     {
       "canonical": "/hw:plan:review",
-      "opencode": "/hw-plan-review",
+      "opencode": "/hw:plan:review",
       "agent": "hw-review",
       "route": "review",
       "skill": "skills/plan-review/SKILL.md"
     },
     {
       "canonical": "/hw:cycle",
-      "opencode": "/hw-cycle",
+      "opencode": "/hw:cycle",
       "agent": "hw-status",
       "route": "lifecycle",
       "skill": "skills/cycle/SKILL.md"
     },
     {
       "canonical": "/hw:accept",
-      "opencode": "/hw-accept",
+      "opencode": "/hw:accept",
       "agent": "hw-build",
       "route": "lifecycle",
       "skill": "skills/accept/SKILL.md"
     },
     {
       "canonical": "/hw:reject",
-      "opencode": "/hw-reject",
+      "opencode": "/hw:reject",
       "agent": "hw-build",
       "route": "lifecycle",
       "skill": "skills/reject/SKILL.md"
     },
     {
       "canonical": "/hw:explore",
-      "opencode": "/hw-explore",
+      "opencode": "/hw:explore",
       "agent": "hw-explore",
       "route": "explore",
       "skill": "skills/explore/SKILL.md"
     },
     {
       "canonical": "/hw:sync",
-      "opencode": "/hw-sync",
+      "opencode": "/hw:sync",
       "agent": "hw-build",
       "route": "tool",
       "skill": "skills/sync/SKILL.md"
     },
     {
       "canonical": "/hw:maintain",
-      "opencode": "/hw-maintain",
+      "opencode": "/hw:maintain",
       "agent": "hw-build",
       "route": "maintenance",
       "skill": "skills/maintain/SKILL.md"
     },
     {
       "canonical": "/hw:maintain status",
-      "opencode": "/hw-maintain-status",
+      "opencode": "/hw:maintain:status",
       "agent": "hw-build",
       "route": "maintenance",
       "skill": "skills/maintain/SKILL.md"
     },
     {
       "canonical": "/hw:maintain scan",
-      "opencode": "/hw-maintain-scan",
+      "opencode": "/hw:maintain:scan",
       "agent": "hw-build",
       "route": "maintenance",
       "skill": "skills/maintain/SKILL.md"
     },
     {
       "canonical": "/hw:maintain plan",
-      "opencode": "/hw-maintain-plan",
+      "opencode": "/hw:maintain:plan",
       "agent": "hw-build",
       "route": "maintenance",
       "skill": "skills/maintain/SKILL.md"
     },
     {
       "canonical": "/hw:maintain queue",
-      "opencode": "/hw-maintain-queue",
+      "opencode": "/hw:maintain:queue",
       "agent": "hw-build",
       "route": "maintenance",
       "skill": "skills/maintain/SKILL.md"
     },
     {
       "canonical": "/hw:maintain run",
-      "opencode": "/hw-maintain-run",
+      "opencode": "/hw:maintain:run",
       "agent": "hw-build",
       "route": "maintenance",
       "skill": "skills/maintain/SKILL.md"
     },
     {
       "canonical": "/hw:maintain apply",
-      "opencode": "/hw-maintain-apply",
+      "opencode": "/hw:maintain:apply",
       "agent": "hw-build",
       "route": "maintenance",
       "skill": "skills/maintain/SKILL.md"
     },
     {
       "canonical": "/hw:maintain verify",
-      "opencode": "/hw-maintain-verify",
+      "opencode": "/hw:maintain:verify",
       "agent": "hw-build",
       "route": "maintenance",
       "skill": "skills/maintain/SKILL.md"
     },
     {
       "canonical": "/hw:maintain log",
-      "opencode": "/hw-maintain-log",
+      "opencode": "/hw:maintain:log",
       "agent": "hw-build",
       "route": "maintenance",
       "skill": "skills/maintain/SKILL.md"
     },
     {
       "canonical": "/hw:docs",
-      "opencode": "/hw-docs",
+      "opencode": "/hw:docs",
       "agent": "hw-docs",
       "route": "docs",
       "skill": "skills/docs/SKILL.md"
     },
     {
       "canonical": "/hw:patch",
-      "opencode": "/hw-patch",
+      "opencode": "/hw:patch",
       "agent": "hw-build",
       "route": "lifecycle",
       "skill": "skills/patch/SKILL.md"
     },
     {
       "canonical": "/hw:patch fix",
-      "opencode": "/hw-patch-fix",
+      "opencode": "/hw:patch:fix",
       "agent": "hw-build",
       "route": "fix",
       "skill": "skills/patch/SKILL.md"
     },
     {
       "canonical": "/hw:pr",
-      "opencode": "/hw-pr",
+      "opencode": "/hw:pr",
       "agent": "hw-review",
       "route": "change-request",
       "skill": "skills/pr/SKILL.md"
     },
     {
       "canonical": "/hw:pr create",
-      "opencode": "/hw-pr-create",
+      "opencode": "/hw:pr:create",
       "agent": "hw-build",
       "route": "change-request",
       "skill": "skills/pr/SKILL.md"
     },
     {
       "canonical": "/hw:explain",
-      "opencode": "/hw-explain",
+      "opencode": "/hw:explain",
       "agent": "hw-review",
       "route": "explain",
       "skill": "skills/explain/SKILL.md"
     },
     {
       "canonical": "/hw:compact",
-      "opencode": "/hw-compact",
+      "opencode": "/hw:compact",
       "agent": "hw-compact",
       "route": "tool",
       "skill": "skills/compact/SKILL.md"
     },
     {
       "canonical": "/hw:knowledge",
-      "opencode": "/hw-knowledge",
+      "opencode": "/hw:knowledge",
       "agent": "hw-compact",
       "route": "tool",
       "skill": "skills/knowledge/SKILL.md"
     },
     {
       "canonical": "/hw:guide",
-      "opencode": "/hw-guide",
+      "opencode": "/hw:guide",
       "agent": "hw-plan",
       "route": "plan",
       "skill": "skills/guide/SKILL.md"
     },
     {
       "canonical": "/hw:showcase",
-      "opencode": "/hw-showcase",
+      "opencode": "/hw:showcase",
       "agent": "hw-build",
       "route": "artifact",
       "skill": "skills/showcase/SKILL.md"
     },
     {
       "canonical": "/hw:rules",
-      "opencode": "/hw-rules",
+      "opencode": "/hw:rules",
       "agent": "hw-status",
       "route": "rules",
       "skill": "skills/rules/SKILL.md"
     },
     {
       "canonical": "/hw:init",
-      "opencode": "/hw-init",
+      "opencode": "/hw:init",
       "agent": "hw-plan",
       "route": "lifecycle",
       "skill": "skills/init/SKILL.md"
     },
     {
       "canonical": "/hw:check",
-      "opencode": "/hw-check",
+      "opencode": "/hw:check",
       "agent": "hw-status",
       "route": "read",
       "skill": "skills/check/SKILL.md"
     },
     {
       "canonical": "/hw:audit",
-      "opencode": "/hw-audit",
+      "opencode": "/hw:audit",
       "agent": "hw-review",
       "route": "review",
       "skill": "skills/audit/SKILL.md"
     },
     {
+      "canonical": "/hw:quality",
+      "opencode": "/hw:quality",
+      "agent": "hw-review",
+      "route": "review",
+      "skill": "skills/quality/SKILL.md"
+    },
+    {
+      "canonical": "/hw:optimize",
+      "opencode": "/hw:optimize",
+      "agent": "hw-build",
+      "route": "optimize",
+      "skill": "skills/optimize/SKILL.md"
+    },
+    {
       "canonical": "/hw:release",
-      "opencode": "/hw-release",
+      "opencode": "/hw:release",
       "agent": "hw-build",
       "route": "release",
       "skill": "skills/release/SKILL.md"
     },
     {
       "canonical": "/hw:debug",
-      "opencode": "/hw-debug",
+      "opencode": "/hw:debug",
       "agent": "hw-debug",
       "route": "debug",
       "skill": "skills/debug/SKILL.md"
     },
     {
       "canonical": "/hw:help",
-      "opencode": "/hw-help",
+      "opencode": "/hw:help",
       "agent": "hw-status",
       "route": "read",
       "skill": "skills/help/SKILL.md"
     },
     {
       "canonical": "/hw:reset",
-      "opencode": "/hw-reset",
+      "opencode": "/hw:reset",
       "agent": "hw-status",
       "route": "lifecycle",
       "skill": "skills/reset/SKILL.md"
     },
     {
       "canonical": "/hw:log",
-      "opencode": "/hw-log",
+      "opencode": "/hw:log",
       "agent": "hw-status",
       "route": "read",
       "skill": "skills/log/SKILL.md"
     },
     {
       "canonical": "/hw:setup",
-      "opencode": "/hw-setup",
+      "opencode": "/hw:setup",
       "agent": "hw-status",
       "route": "setup",
       "skill": "skills/setup/SKILL.md"

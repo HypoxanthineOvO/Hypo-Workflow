@@ -1,20 +1,24 @@
-schema_version: 1
 category: decisions
 entries:
-  -
+  - created_at: 2026-05-06T22:14:11+08:00
+    items:
+      - rationale: >-
+          The root README should introduce common Hypo-Workflow capabilities and point to platform guides instead of
+          duplicating installation commands that drift.
+        title: README stays platform-neutral
+      - rationale: >-
+          Codex, Claude Code, OpenCode, Cursor, Copilot, and Trae have different install surfaces, supported features,
+          and enforcement limits.
+        title: Platform guides own concrete installation and sync commands
+      - rationale: >-
+          The Hypo-Workflow `hw` plugin exposes `/hw:*`; the official OpenAI Codex plugin is optional delegation
+          infrastructure and must remain a separate confirmed install flow.
+        title: Claude Code has two plugin flows
+      - rationale: >-
+          Cursor, Copilot, and Trae primarily receive generated instruction files; docs must not imply hook or lifecycle
+          enforcement they do not provide.
+        title: Third-party IDE adapters must state their limits
     record_id: C8-DOC-platform-installation-boundary-20260506
-    type: chat
-    source: C8-docs-release-closeout
-    created_at: "2026-05-06T22:14:11+08:00"
-    summary: Documentation policy for platform installation, sync responsibilities, and Claude/Codex plugin boundaries.
-    tags:
-      - c8
-      - docs
-      - install
-      - platform-guides
-      - codex
-      - claude-code
-      - opencode
     refs:
       files:
         - README.md
@@ -27,25 +31,54 @@ entries:
         - docs/platforms/trae.md
         - references/platform-capabilities.md
         - core/src/docs/index.js
-    items:
-      -
-        title: README stays platform-neutral
-        rationale: The root README should introduce common Hypo-Workflow capabilities and point to platform guides instead of duplicating installation commands that drift.
-      -
-        title: Platform guides own concrete installation and sync commands
-        rationale: Codex, Claude Code, OpenCode, Cursor, Copilot, and Trae have different install surfaces, supported features, and enforcement limits.
-      -
-        title: Claude Code has two plugin flows
-        rationale: "The Hypo-Workflow `hw` plugin exposes `/hw:*`; the official OpenAI Codex plugin is optional delegation infrastructure and must remain a separate confirmed install flow."
-      -
-        title: Third-party IDE adapters must state their limits
-        rationale: Cursor, Copilot, and Trae primarily receive generated instruction files; docs must not imply hook or lifecycle enforcement they do not provide.
-  -
-    record_id: C8-PLAN-domain-pack-boundary-and-review-rules-20260506
+    source: C8-docs-release-closeout
+    summary: Documentation policy for platform installation, sync responsibilities, and Claude/Codex plugin boundaries.
+    tags:
+      - c8
+      - docs
+      - install
+      - platform-guides
+      - codex
+      - claude-code
+      - opencode
     type: chat
+  - created_at: 2026-05-06T16:23:43+08:00
+    items:
+      - rationale: >-
+          User preferences and project behavior must survive context loss and be checkable during review; Markdown
+          instructions are generated views.
+        title: Structured Rules/Habits are the authority
+      - rationale: >-
+          Rules are only useful if Skills, hooks, agents, commands, and generated instructions are reviewed against them
+          during plan/test/code gates.
+        title: Review must check Skill and platform adapter surfaces
+      - rationale: >-
+          RTL should be the first reference pack, but the interface must support future local, built-in, and external
+          package sources without hardcoding RTL into core.
+        title: Domain packs must be externalizable
+      - rationale: >-
+          Claude Code plugin installation, user-level config writes, and future external domain pack installs are
+          external side effects.
+        title: Remote or user-level installs require explicit confirmation
+      - rationale: >-
+          When DPSK is the main planning model, a Codex challenger reduces shallow planning risk without always
+          requiring expensive Claude planning.
+        title: Codex is the default stronger reviewer for DPSK-led plans
+    record_id: C8-PLAN-domain-pack-boundary-and-review-rules-20260506
+    refs:
+      files:
+        - .pipeline/design-spec.md
+        - .pipeline/architecture.md
+        - .pipeline/feature-queue.yaml
+        - .pipeline/prompts/06-domain-pack-boundary-protocol-and-knowledge-decision.md
+      urls:
+        - https://github.com/openai/codex-plugin-cc
+        - https://developers.openai.com/codex/subagents
+        - https://code.claude.com/docs/en/plugins
     source: C8-plan-discover
-    created_at: "2026-05-06T16:23:43+08:00"
-    summary: C8 planning decisions for structured Rules/Habits, default Review, externalizable domain packs, and Codex plugin confirmation boundaries.
+    summary: >-
+      C8 planning decisions for structured Rules/Habits, default Review, externalizable domain packs, and Codex plugin
+      confirmation boundaries.
     tags:
       - c8
       - planning
@@ -55,37 +88,31 @@ entries:
       - rtl
       - codex-plugin
       - claude-code
+    type: chat
+  - created_at: 2026-05-05T00:19:25+08:00
+    items:
+      - rationale: keeps follow-up planning fast without duplicating full docs.
+        title: Seed Knowledge with an interface map first
+      - rationale: Claude Code, OpenCode, and Codex expose different extension points and UI affordances.
+        title: Treat UI/status surfaces as adapter-specific rather than core-neutral
+      - rationale: the official docs emphasize composable CLI commands and reusable skills more than a hook-first plugin stack.
+        title: Model Codex as commands and skills plus workflow guidance
+    record_id: C6-SYNC-claude-opencode-codex-interface-map-20260505
     refs:
       files:
-        - .pipeline/design-spec.md
-        - .pipeline/architecture.md
-        - .pipeline/feature-queue.yaml
-        - .pipeline/prompts/06-domain-pack-boundary-protocol-and-knowledge-decision.md
+        - references/knowledge-spec.md
+        - references/opencode-spec.md
+        - references/commands-spec.md
       urls:
-        - "https://github.com/openai/codex-plugin-cc"
-        - "https://developers.openai.com/codex/subagents"
-        - "https://code.claude.com/docs/en/plugins"
-    items:
-      -
-        title: Structured Rules/Habits are the authority
-        rationale: User preferences and project behavior must survive context loss and be checkable during review; Markdown instructions are generated views.
-      -
-        title: Review must check Skill and platform adapter surfaces
-        rationale: Rules are only useful if Skills, hooks, agents, commands, and generated instructions are reviewed against them during plan/test/code gates.
-      -
-        title: Domain packs must be externalizable
-        rationale: RTL should be the first reference pack, but the interface must support future local, built-in, and external package sources without hardcoding RTL into core.
-      -
-        title: Remote or user-level installs require explicit confirmation
-        rationale: Claude Code plugin installation, user-level config writes, and future external domain pack installs are external side effects.
-      -
-        title: Codex is the default stronger reviewer for DPSK-led plans
-        rationale: When DPSK is the main planning model, a Codex challenger reduces shallow planning risk without always requiring expensive Claude planning.
-  -
-    record_id: C6-SYNC-claude-opencode-codex-interface-map-20260505
-    type: sync
+        - https://code.claude.com/docs/en/plugins
+        - https://code.claude.com/docs/en/plugins-reference
+        - https://docs.anthropic.com/en/docs/claude-code/hooks
+        - https://docs.anthropic.com/en/docs/claude-code/hooks-guide
+        - https://opencode.ai/docs/plugins/
+        - https://opencode.ai/docs/commands/
+        - https://opencode.ai/docs/tui/
+        - https://developers.openai.com/codex/use-cases/
     source: C6-claude-opencode-codex-interface-map
-    created_at: "2026-05-05T00:19:25+08:00"
     summary: Claude Code / OpenCode / Codex interface map for adapter planning
     tags:
       - claude-code
@@ -96,41 +123,14 @@ entries:
       - commands
       - ui
       - adapter
-    refs:
-      files:
-        - references/knowledge-spec.md
-        - references/opencode-spec.md
-        - references/commands-spec.md
-      urls:
-        - "https://code.claude.com/docs/en/plugins"
-        - "https://code.claude.com/docs/en/plugins-reference"
-        - "https://docs.anthropic.com/en/docs/claude-code/hooks"
-        - "https://docs.anthropic.com/en/docs/claude-code/hooks-guide"
-        - "https://opencode.ai/docs/plugins/"
-        - "https://opencode.ai/docs/commands/"
-        - "https://opencode.ai/docs/tui/"
-        - "https://developers.openai.com/codex/use-cases/"
+    type: sync
+  - created_at: 2026-05-02T21:52:30+08:00
     items:
-      -
-        title: Seed Knowledge with an interface map first
-        rationale: keeps follow-up planning fast without duplicating full docs.
-      -
-        title: Treat UI/status surfaces as adapter-specific rather than core-neutral
-        rationale: Claude Code, OpenCode, and Codex expose different extension points and UI affordances.
-      -
-        title: Model Codex as commands and skills plus workflow guidance
-        rationale: the official docs emphasize composable CLI commands and reusable skills more than a hook-first plugin stack.
-  -
+      - rationale: F002 should not begin until Knowledge Ledger and OpenCode hook paths are validated together
+        title: Gate records prove reusable project knowledge before leaving F001
+      - rationale: The policy helpers and generated artifacts are deterministic and should not require network or model calls
+        title: Use fixture-backed OpenCode smoke when live OpenCode is unavailable
     record_id: C4-M05-f001-knowledge-and-opencode-integration-gate-18c2eaab
-    type: milestone
-    source: C4/M05
-    created_at: "2026-05-02T21:52:30+08:00"
-    summary: F001 Knowledge and OpenCode integration gate
-    tags:
-      - f001
-      - knowledge
-      - opencode
-      - gate
     refs:
       files:
         - core/src/knowledge/index.js
@@ -138,10 +138,12 @@ entries:
         - hooks/session-start.sh
         - hooks/stop-check.sh
         - .opencode/runtime/hypo-workflow-hooks.js
-    items:
-      -
-        title: Gate records prove reusable project knowledge before leaving F001
-        rationale: F002 should not begin until Knowledge Ledger and OpenCode hook paths are validated together
-      -
-        title: Use fixture-backed OpenCode smoke when live OpenCode is unavailable
-        rationale: The policy helpers and generated artifacts are deterministic and should not require network or model calls
+    source: C4/M05
+    summary: F001 Knowledge and OpenCode integration gate
+    tags:
+      - f001
+      - knowledge
+      - opencode
+      - gate
+    type: milestone
+schema_version: '1'

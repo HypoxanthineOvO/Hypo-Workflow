@@ -1,6 +1,6 @@
 import { access, cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
-import { commandMap } from "../commands/index.js";
+import { commandMap, legacyOpenCodeCommandName } from "../commands/index.js";
 import { loadStructuredRulesAuthority, renderStructuredRulesInstructionBlock } from "../rules/index.js";
 
 export const CURSOR_SKILLS_DIR = ".cursor/skills";
@@ -179,7 +179,7 @@ async function writeCursorSkillFiles(projectRoot, repoRoot) {
   written.push(`${CURSOR_SKILLS_DIR}/hypo-workflow.md`);
 
   for (const command of commandMap("opencode")) {
-    const fileName = `${command.opencode.slice(1)}.md`;
+    const fileName = cursorCommandFileName(command);
     const sourceSkillContent = await readFile(join(repoRoot, command.skill), "utf8");
     const skillContent = adaptSkillContentForCursor(command, sourceSkillContent);
     await writeFile(
@@ -237,7 +237,7 @@ async function writeCursorCommandFiles(projectRoot) {
   await mkdir(commandsDir, { recursive: true });
   await removeGeneratedCursorCommandFiles(commandsDir);
   for (const command of commandMap("opencode")) {
-    const fileName = `${command.opencode.slice(1)}.md`;
+    const fileName = cursorCommandFileName(command);
     await writeFile(join(commandsDir, fileName), renderCursorCommandFile(command), "utf8");
     written.push(`${CURSOR_COMMANDS_DIR}/${fileName}`);
   }
@@ -246,7 +246,7 @@ async function writeCursorCommandFiles(projectRoot) {
 
 function renderCursorRootSkill() {
   const rows = commandMap("opencode").map((command) => (
-    `| \`${command.opencode}\` | \`${command.canonical}\` | \`${CURSOR_SKILLS_DIR}/${command.opencode.slice(1)}.md\` |`
+    `| \`${legacyOpenCodeCommandName(command.canonical)}\` | \`${command.canonical}\` | \`${CURSOR_SKILLS_DIR}/${cursorCommandFileName(command)}\` |`
   ));
   return [
     "---",
@@ -276,17 +276,19 @@ function renderCursorRootSkill() {
 }
 
 function renderCursorCommandSkill(command, skillContent) {
-  const name = command.opencode.slice(1);
+  const cursorCommand = legacyOpenCodeCommandName(command.canonical);
+  const name = cursorCommand.slice(1);
   return [
     "---",
     `name: ${name}`,
-    `description: "Hypo-Workflow Cursor skill for ${command.opencode}; use when the user invokes ${command.opencode} or canonical ${command.canonical}."`,
+    `description: "Hypo-Workflow Cursor skill for ${cursorCommand}; use when the user invokes ${cursorCommand}, ${command.opencode}, or canonical ${command.canonical}."`,
     "---",
     "",
-    `# ${command.opencode}`,
+    `# ${cursorCommand}`,
     "",
     `Canonical command: \`${command.canonical}\``,
-    `Cursor command: \`${command.opencode}\``,
+    `Cursor command: \`${cursorCommand}\``,
+    `Namespace alias: \`${command.opencode}\``,
     `Route: \`${command.route}\``,
     `Embedded authority source: \`${command.skill}\``,
     "",
@@ -313,14 +315,19 @@ function renderCursorCommandSkill(command, skillContent) {
 }
 
 function renderCursorCommandFile(command) {
+  const cursorCommand = legacyOpenCodeCommandName(command.canonical);
   return [
-    `# ${command.opencode}`,
+    `# ${cursorCommand}`,
     "",
-    `Load Cursor Skill \`${CURSOR_SKILLS_DIR}/${command.opencode.slice(1)}.md\`, then execute canonical command \`${command.canonical}\` with any user-provided arguments.`,
+    `Load Cursor Skill \`${CURSOR_SKILLS_DIR}/${cursorCommandFileName(command)}\`, then execute canonical command \`${command.canonical}\` with any user-provided arguments.`,
     "",
     "Arguments: `$ARGUMENTS`",
     "",
   ].join("\n");
+}
+
+function cursorCommandFileName(command) {
+  return `${legacyOpenCodeCommandName(command.canonical).slice(1)}.md`;
 }
 
 async function removeLegacyCursorSkillBundle(projectRoot) {

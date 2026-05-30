@@ -1,44 +1,31 @@
-# C17 P4 Confirm Summary
+# C18 Confirm Summary
 
 ## Cycle
 
-- Cycle：C17
-- 名称：审计修复与架构减债
-- 类型：refactor
-- Preset：tdd
-- 状态：等待确认开始执行
+C18 `指令质量审查与集成同步方案`
 
-## 已确认边界
+## 生成结果
 
-- 全修审计发现：Critical、Warning、Info 均纳入 C17。
-- 根目录 `npm test` 必须直接可运行。
-- 配置 authority 分层读取：项目配置、用户全局配置、安全默认值。
-- 配置迁移通过显式命令触发；`sync/start` 只能提示，不能静默写用户级配置。
-- `workspace/index.js` 一次切干净，不保留兼容 re-export shim。
-- YAML 统一采用 `js-yaml`。
-- ledger 新写入采用 append-only JSONL；旧 YAML ledger 一次性迁移；compact YAML 只做人读摘要。
-- 文档/examples 同步新显式模块 import。
-- barrel export 尽量清理干净。
-- Subagent 已授权，执行采用 recommended worker separation。
+已生成 6 个执行 prompt：
 
-## 执行 Prompt
+1. `00-audit-engineering-method-upgrade.md`
+2. `01-quality-command-and-report-contract.md`
+3. `02-optimize-closed-loop-command.md`
+4. `03-integration-sync-workflow-gate.md`
+5. `04-source-side-closure-and-target-plans.md`
+6. `05-target-repository-adaptation-after-confirmation.md`
 
-| # | Prompt | 主题 |
-|---|---|---|
-| 00 | `.pipeline/prompts/00-audit-baseline-and-root-test-entry.md` | 根目录测试入口与审计基线 |
-| 01 | `.pipeline/prompts/01-shared-utils-layer-extraction.md` | 共享 utils 层 |
-| 02 | `.pipeline/prompts/02-layered-config-and-integration-migration.md` | 分层配置与集成迁移 |
-| 03 | `.pipeline/prompts/03-yaml-parser-unification-with-js-yaml.md` | js-yaml 统一 parser |
-| 04 | `.pipeline/prompts/04-workspace-clean-module-split.md` | workspace clean split |
-| 05 | `.pipeline/prompts/05-ledger-jsonl-migration-and-barrel-export-cleanup.md` | JSONL ledger 与 barrel cleanup |
-| 06 | `.pipeline/prompts/06-full-audit-closure-and-release-readiness.md` | 审计闭环与发布就绪 |
+## 执行策略
 
-## 必须验证
+- Worker separation：recommended，已授权 `/hw:start` 和 `/hw:resume`。
+- 每个 prompt 都包含 `test`、`implement`、`audit` 分工。
+- 每个实现 Milestone 必须保留 P2 技术路线、验证路径和 audit focus。
+- 测试必须覆盖真实命令/adapter/docs/state/report contract，拒绝伪测试。
 
-- 每个 Milestone 至少运行 focused tests、`npm test` 和 `git diff --check`。
-- 最终必须运行 hardcoded path、workspace stale import、parser split、ledger authority 和 export cleanup 扫描。
-- Audit worker 必须拒绝伪测试、静默用户配置写入、workspace shim、长期 YAML/JSONL 双写和 stale docs/examples。
+## 硬门禁
+
+`C18-M6` 不能直接执行目标仓库写入。必须先完成 `C18-M5`，生成 `~/Codex-VSP` 与 `~/VSP-Open-Code` 的目标适配计划、文件清单和验证命令，然后由用户明确确认。
 
 ## 下一步
 
-确认后使用 `/hw:start` 开始 C17-M0。
+用户确认后，可运行 `/hw:start` 开始执行 C18-M1。

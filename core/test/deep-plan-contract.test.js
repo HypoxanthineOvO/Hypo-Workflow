@@ -30,20 +30,17 @@ test("deep plan command registry exposes canonical command and --deep alias", as
   assert.ok(deep, "missing canonical /hw:plan:deep command registry entry");
   assert.equal(deep.route, "plan");
   assert.equal(deep.agent, "hw-plan");
-  assert.equal(deep.opencode, "/hw-plan-deep");
+  assert.equal(deep.opencode, "/hw:plan:deep");
   assert.match(deep.skill, /skills\/plan-deep\/SKILL\.md$/);
 
   const root = await mkdtemp(join(tmpdir(), "hw-deep-plan-adapter-"));
   await writeOpenCodeArtifacts(root, { profile: "standard" });
 
-  const deepCommand = await readFile(join(root, ".opencode", "commands", "hw-plan-deep.md"), "utf8");
-  const planCommand = await readFile(join(root, ".opencode", "commands", "hw-plan.md"), "utf8");
+  const config = JSON.parse(await readFile(join(root, "opencode.json"), "utf8"));
 
-  assert.match(deepCommand, /\/hw:plan:deep/);
-  assert.match(deepCommand, /skills\/plan-deep\/SKILL\.md/);
-  assert.match(planCommand, /--deep/);
-  assert.match(planCommand, /alias/i);
-  assert.match(planCommand, /\/hw:plan:deep/);
+  assert.ok(config.command["hw:plan:deep"]);
+  assert.match(config.command["hw:plan:deep"].template, /skills\/plan-deep\/SKILL\.md/);
+  assert.ok(config.command["hw:plan"]);
 });
 
 test("deep plan skill defines operation vocabulary and lifecycle states", async () => {

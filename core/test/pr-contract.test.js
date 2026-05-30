@@ -13,7 +13,7 @@ import {
 
 test("command map exposes /hw:pr as a manual-gated Change Request flow", () => {
   const command = commandByCanonical("/hw:pr");
-  assert.equal(command.opencode, "/hw-pr");
+  assert.equal(command.opencode, "/hw:pr");
   assert.equal(command.agent, "hw-review");
   assert.equal(command.route, "change-request");
   assert.equal(command.skill, "skills/pr/SKILL.md");

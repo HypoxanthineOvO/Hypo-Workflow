@@ -52,6 +52,8 @@ OpenCode uses dash-style native slash commands. Each command remains traceable t
 | `/hw:init` | `/hw-init` | `hw-plan` | `skills/init/SKILL.md` |
 | `/hw:check` | `/hw-check` | `hw-status` | `skills/check/SKILL.md` |
 | `/hw:audit` | `/hw-audit` | `hw-review` | `skills/audit/SKILL.md` |
+| `/hw:quality` | `/hw-quality` | `hw-review` | `skills/quality/SKILL.md` |
+| `/hw:optimize` | `/hw-optimize` | `hw-build` | `skills/optimize/SKILL.md` |
 | `/hw:release` | `/hw-release` | `hw-build` | `skills/release/SKILL.md` |
 | `/hw:debug` | `/hw-debug` | `hw-debug` | `skills/debug/SKILL.md` |
 | `/hw:help` | `/hw-help` | `hw-status` | `skills/help/SKILL.md` |
@@ -66,7 +68,8 @@ Agent policy:
 - `/hw:analysis` uses `hw-debug` because it is an investigation-first lane with hypothesis tracking, experiments, Ask/question gates, and optional build follow-up proposals.
 - Execution and mutation-heavy commands use `hw-build`.
 - Compact, debug, and report commands use `hw-compact`, `hw-debug`, and `hw-report` so the OpenCode model matrix can tune those roles independently.
-- Audit/review commands use `hw-review`.
+- Audit/review and quality scorecard commands use `hw-review`.
+- `/hw:optimize` uses `hw-build` because it can coordinate bounded implementation after Audit/Quality, backup, correctness, budget, and validation gates are satisfied.
 - `/hw:pr` uses `hw-review` because PR/MR inspection and review are evidence-first and remote writes are manual-gated.
 - `/hw:pr create` uses `hw-build` because the guided flow prepares local commits/branches and only performs remote provider writes after explicit confirmation.
 - `/hw:explain` uses `hw-review` because answers must be grounded in local evidence and unknowns.

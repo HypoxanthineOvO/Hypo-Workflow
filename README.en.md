@@ -6,7 +6,7 @@
 
 Plan -> Execute -> Review -> Report -> Resume
 
-[![Version](https://img.shields.io/badge/version-13.0.0-alpha.1-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-13.1.0-alpha.1-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/en/reference/platforms.md)
 
@@ -62,7 +62,7 @@ Third-party IDE adapters provide repository instruction surfaces; Cursor also re
 - Run pre-delivery checks for formatting, stale derived artifacts, README/docs freshness, secret markers, tests, and report evidence.
 - Automation is governed by `.pipeline/config.yaml`; release, destructive operations, external side effects, and PR/MR remote writes still follow explicit confirmation gates.
 
-Current version exposes **50 user-facing commands** and **1 internal watchdog** skill.
+Current version exposes **52 user-facing commands** and **1 internal watchdog** skill.
 
 ## Common Commands
 
@@ -89,7 +89,7 @@ Current version exposes **50 user-facing commands** and **1 internal watchdog** 
 | [Platforms Reference](docs/en/reference/platforms.md) | Platform capability matrix |
 | [Generated Artifacts](docs/en/reference/generated-artifacts.md) | Generated adapter and docs sources |
 | [Configuration Reference](docs/en/reference/configuration.md) | Automation, gates, profiles, and worker separation |
-| [v13.0.0-alpha.1 Release Notes](docs/en/release/v13.0.0-alpha.1.md) | C16 global maintenance, C17 audit remediation, workspace split, and JSONL ledger alpha |
+| [v13.1.0-alpha.1 Release Notes](docs/en/release/v13.1.0-alpha.1.md) | C18 Audit/Quality/Optimize command upgrade and integration sync gate |
 
 ## License
 

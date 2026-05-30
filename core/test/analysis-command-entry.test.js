@@ -21,11 +21,11 @@ test("analysis command is a first-class canonical and OpenCode entry", async () 
 
   const command = commandByCanonical("/hw:analysis");
   assert.ok(command, "/hw:analysis must be present in the canonical command registry");
-  assert.equal(command.opencode, "/hw-analysis");
+  assert.equal(command.opencode, "/hw:analysis");
   assert.equal(command.skill, ANALYSIS_SKILL);
   assert.ok(command.agent, "analysis command must choose an OpenCode agent");
   assert.match(command.route, /analysis|lifecycle|read|debug/);
-  assert.ok(commandMap("opencode").some((item) => item.opencode === "/hw-analysis"));
+  assert.ok(commandMap("opencode").some((item) => item.opencode === "/hw:analysis"));
   assert.ok(existsSync(ANALYSIS_SKILL), `${ANALYSIS_SKILL} must exist`);
 
   for (const [label, content] of Object.entries({
@@ -105,7 +105,7 @@ test("debug guidance can promote sustained root-cause work into analysis state",
   }
 });
 
-test("OpenCode generated command and metadata include /hw-analysis", async () => {
+test("OpenCode generated command and metadata include /hw:analysis", async () => {
   const root = await mkdtemp(join(tmpdir(), "hw-analysis-command-entry-"));
   await writeOpenCodeArtifacts(root, {
     config: {
@@ -117,14 +117,14 @@ test("OpenCode generated command and metadata include /hw-analysis", async () =>
     },
   });
 
-  const commandFile = await readFile(join(root, ".opencode", "commands", "hw-analysis.md"), "utf8");
+  const commandFile = await readFile(join(root, ".opencode", "commands", "hw:analysis.md"), "utf8");
   const rootConfig = JSON.parse(await readFile(join(root, "opencode.json"), "utf8"));
   const metadata = JSON.parse(await readFile(join(root, ".opencode", "hypo-workflow.json"), "utf8"));
 
-  assert.match(commandFile, /# \/hw-analysis/);
+  assert.match(commandFile, /# \/hw:analysis/);
   assert.match(commandFile, /Canonical command: `\/hw:analysis`/);
   assert.match(commandFile, /Skill: `skills\/analysis\/SKILL\.md`/);
-  assert.ok(rootConfig.command["hw-analysis"], "root opencode.json must expose hw-analysis command metadata");
-  assert.ok(metadata.commandMap.some((item) => item.canonical === "/hw:analysis" && item.opencode === "/hw-analysis"));
+  assert.ok(rootConfig.command["hw:analysis"], "root opencode.json must expose hw:analysis command metadata");
+  assert.ok(metadata.commandMap.some((item) => item.canonical === "/hw:analysis" && item.opencode === "/hw:analysis"));
   assert.equal(metadata.analysis.interaction_mode, "hybrid");
 });

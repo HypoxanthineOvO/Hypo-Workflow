@@ -73,10 +73,10 @@ test("explore command map, skill, OpenCode artifact, and worktree path are expos
   const root = await mkdtemp(join(tmpdir(), "hw-explore-docs-"));
   await writeOpenCodeArtifacts(root, { profile: "standard" });
 
-  assert.equal(commandByCanonical("/hw:explore").opencode, "/hw-explore");
+  assert.equal(commandByCanonical("/hw:explore").opencode, "/hw:explore");
   assert.equal(commandByCanonical("/hw:explore").agent, "hw-explore");
   assert.match(await readFile("skills/explore/SKILL.md", "utf8"), /E001-slug/);
-  assert.match(await readFile(join(root, ".opencode", "commands", "hw-explore.md"), "utf8"), /\/hw:explore/);
+  assert.match(await readFile(join(root, ".opencode", "commands", "hw:explore.md"), "utf8"), /\/hw:explore/);
   assert.match(await readFile(join(root, ".opencode", "runtime", "hypo-workflow-hooks.js"), "utf8"), /\.hypo-workflow\/worktrees/);
 
   const config = await loadConfig(".pipeline/config.yaml");

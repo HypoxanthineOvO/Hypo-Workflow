@@ -11,7 +11,7 @@ import {
 
 test("command map exposes /hw:explain as a read-only evidence command", () => {
   const command = commandByCanonical("/hw:explain");
-  assert.equal(command.opencode, "/hw-explain");
+  assert.equal(command.opencode, "/hw:explain");
   assert.equal(command.agent, "hw-review");
   assert.equal(command.route, "explain");
   assert.equal(command.skill, "skills/explain/SKILL.md");

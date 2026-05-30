@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, readFile } from "node:fs/promises";
+import { mkdtemp, readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { commandByCanonical, commandMap, loadRulesSummary, writeOpenCodeArtifacts } from "../src/index.js";
@@ -17,36 +17,42 @@ const MAINTAIN_SUBCOMMANDS = Object.freeze([
   "log",
 ]);
 
-test("commandMap contains 50 OpenCode mappings including /hw:maintain", () => {
+test("commandMap contains 52 OpenCode mappings including /hw:maintain", () => {
   const commands = commandMap("opencode");
-  assert.equal(commands.length, 50);
-  assert.equal(commandByCanonical("/hw:plan").opencode, "/hw-plan");
-  assert.equal(commandByCanonical("/hw:plan:deep").opencode, "/hw-plan-deep");
+  assert.equal(commands.length, 52);
+  assert.equal(commandByCanonical("/hw:plan").opencode, "/hw:plan");
+  assert.equal(commandByCanonical("/hw:plan:deep").opencode, "/hw:plan:deep");
   assert.equal(commandByCanonical("/hw:report").agent, "hw-report");
   assert.equal(commandByCanonical("/hw:compact").agent, "hw-compact");
   assert.equal(commandByCanonical("/hw:debug").agent, "hw-debug");
-  assert.equal(commandByCanonical("/hw:chat").opencode, "/hw-chat");
-  assert.equal(commandByCanonical("/hw:analysis").opencode, "/hw-analysis");
-  assert.equal(commandByCanonical("/hw:knowledge").opencode, "/hw-knowledge");
-  assert.equal(commandByCanonical("/hw:accept").opencode, "/hw-accept");
-  assert.equal(commandByCanonical("/hw:reject").opencode, "/hw-reject");
-  assert.equal(commandByCanonical("/hw:explore").opencode, "/hw-explore");
-  assert.equal(commandByCanonical("/hw:sync").opencode, "/hw-sync");
-  assert.equal(commandByCanonical("/hw:docs").opencode, "/hw-docs");
-  assert.equal(commandByCanonical("/hw:pr").opencode, "/hw-pr");
+  assert.equal(commandByCanonical("/hw:chat").opencode, "/hw:chat");
+  assert.equal(commandByCanonical("/hw:analysis").opencode, "/hw:analysis");
+  assert.equal(commandByCanonical("/hw:knowledge").opencode, "/hw:knowledge");
+  assert.equal(commandByCanonical("/hw:accept").opencode, "/hw:accept");
+  assert.equal(commandByCanonical("/hw:reject").opencode, "/hw:reject");
+  assert.equal(commandByCanonical("/hw:explore").opencode, "/hw:explore");
+  assert.equal(commandByCanonical("/hw:sync").opencode, "/hw:sync");
+  assert.equal(commandByCanonical("/hw:docs").opencode, "/hw:docs");
+  assert.equal(commandByCanonical("/hw:pr").opencode, "/hw:pr");
   assert.equal(commandByCanonical("/hw:pr").agent, "hw-review");
-  assert.equal(commandByCanonical("/hw:pr create").opencode, "/hw-pr-create");
+  assert.equal(commandByCanonical("/hw:pr create").opencode, "/hw:pr:create");
   assert.equal(commandByCanonical("/hw:pr create").agent, "hw-build");
-  assert.equal(commandByCanonical("/hw:explain").opencode, "/hw-explain");
+  assert.equal(commandByCanonical("/hw:explain").opencode, "/hw:explain");
+  assert.equal(commandByCanonical("/hw:quality").opencode, "/hw:quality");
+  assert.equal(commandByCanonical("/hw:quality").agent, "hw-review");
+  assert.equal(commandByCanonical("/hw:quality").skill, "skills/quality/SKILL.md");
+  assert.equal(commandByCanonical("/hw:optimize").opencode, "/hw:optimize");
+  assert.equal(commandByCanonical("/hw:optimize").agent, "hw-build");
+  assert.equal(commandByCanonical("/hw:optimize").skill, "skills/optimize/SKILL.md");
 
   const maintain = commandByCanonical("/hw:maintain");
-  assert.equal(maintain.opencode, "/hw-maintain");
+  assert.equal(maintain.opencode, "/hw:maintain");
   assert.equal(maintain.agent, "hw-build");
   assert.equal(maintain.route, "maintenance");
   assert.equal(maintain.skill, "skills/maintain/SKILL.md");
   for (const subcommand of MAINTAIN_SUBCOMMANDS) {
     const command = commandByCanonical(`/hw:maintain ${subcommand}`);
-    assert.equal(command.opencode, `/hw-maintain-${subcommand}`);
+    assert.equal(command.opencode, `/hw:maintain:${subcommand}`);
     assert.equal(command.agent, "hw-build");
     assert.equal(command.route, "maintenance");
     assert.equal(command.skill, "skills/maintain/SKILL.md");
@@ -64,49 +70,18 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
   const dir = await mkdtemp(join(tmpdir(), "hw-opencode-"));
   await writeOpenCodeArtifacts(dir, { profile: "standard" });
 
-  const releaseCommand = await readFile(join(dir, ".opencode", "commands", "hw-release.md"), "utf8");
-  const explainCommand = await readFile(join(dir, ".opencode", "commands", "hw-explain.md"), "utf8");
-  const prCreateCommand = await readFile(join(dir, ".opencode", "commands", "hw-pr-create.md"), "utf8");
-  const chatCommand = await readFile(join(dir, ".opencode", "commands", "hw-chat.md"), "utf8");
-  const patchFixCommand = await readFile(join(dir, ".opencode", "commands", "hw-patch-fix.md"), "utf8");
-  const startCommand = await readFile(join(dir, ".opencode", "commands", "hw-start.md"), "utf8");
-  const resumeCommand = await readFile(join(dir, ".opencode", "commands", "hw-resume.md"), "utf8");
-  const debugCommand = await readFile(join(dir, ".opencode", "commands", "hw-debug.md"), "utf8");
-  const command = await readFile(join(dir, ".opencode", "commands", "hw-plan.md"), "utf8");
+  const commandFiles = await readdir(join(dir, ".opencode", "commands"));
   const agent = await readFile(join(dir, ".opencode", "agents", "hw-plan.md"), "utf8");
   const plugin = await readFile(join(dir, ".opencode", "plugins", "hypo-workflow.ts"), "utf8");
   const adapterConfig = JSON.parse(await readFile(join(dir, ".opencode", "opencode.json"), "utf8"));
   const config = JSON.parse(await readFile(join(dir, "opencode.json"), "utf8"));
-  const tuiConfig = JSON.parse(await readFile(join(dir, "tui.json"), "utf8"));
   const metadata = JSON.parse(await readFile(join(dir, ".opencode", "hypo-workflow.json"), "utf8"));
 
-  assert.match(command, /\/hw:plan/);
-  assert.match(command, /not a separate runner/);
-  assert.match(command, /Plan discipline: use `question` \/ Ask/);
-  assert.match(command, /every hard interactive gate/);
-  assert.match(releaseCommand, /update_readme/);
-  assert.match(releaseCommand, /readme-freshness/);
-  assert.match(explainCommand, /evidence-first/);
-  assert.match(explainCommand, /read-only/);
-  assert.match(explainCommand, /--subagent/);
-  assert.match(prCreateCommand, /\/hw:pr create/);
-  assert.match(prCreateCommand, /change-request/);
-  assert.match(chatCommand, /\/hw:chat/);
-  assert.match(chatCommand, /state\.yaml \+ cycle\.yaml \+ PROGRESS\.md \+ recent report/);
-  assert.match(chatCommand, /chat entries instead of Milestone reports/);
-  assert.match(patchFixCommand, /Authorize\/resolve worker separation/);
-  assert.match(patchFixCommand, /Start `test` worker first for reproduction, test design/);
-  assert.match(patchFixCommand, /`implement` must not write tests or spawn validation roles/);
-  assert.match(patchFixCommand, /requested\/started\/completed-or-blocked\/closed-or-close_failed/);
-  assert.match(patchFixCommand, /configured native agents\/subagents without an extra subworker authorization gate/);
-  assert.match(patchFixCommand, /distinct `implement`, `test`, and `audit` worker identities before auto-close/);
-  assert.match(patchFixCommand, /do not leave opened subworkers without wait\/close lifecycle evidence/);
-  assert.match(patchFixCommand, /Step 8: Close or gate pending acceptance/);
-  assert.doesNotMatch(patchFixCommand, /`test_review` worker/);
-  for (const generatedCommand of [startCommand, resumeCommand, debugCommand, patchFixCommand]) {
-    assert.match(generatedCommand, /Load the corresponding Hypo-Workflow skill instructions/);
-    assert.match(generatedCommand, /not a separate runner/);
-  }
+  assert.ok(commandFiles.includes("hw:plan.md"));
+  assert.ok(commandFiles.includes("hw:quality.md"));
+  assert.ok(commandFiles.includes("hw:optimize.md"));
+  assert.equal(commandFiles.includes("hw-plan.md"), false);
+  assert.equal(commandFiles.includes("hw-start.md"), false);
   assert.match(agent, /todowrite/);
   assert.match(agent, /Ask Questions Discipline/);
   assert.match(agent, /Use Ask Questions proactively/);
@@ -117,11 +92,17 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
   assert.doesNotMatch(agent, /^tools:/m);
   assert.match(plugin, /commandMap/);
   assert.equal(config.$schema, "https://opencode.ai/config.json");
+  assert.ok(config.command["hw:plan"]);
+  assert.ok(config.command["hw:plan:deep"]);
+  assert.ok(config.command["hw:patch:fix"]);
+  assert.ok(config.command["hw:pr:create"]);
+  assert.equal(config.command["hw-plan"], undefined);
+  assert.equal(config.command["hw-start"], undefined);
   assert.deepEqual(config.plugin, [
     ".opencode/plugins/hypo-workflow.ts",
   ]);
-  assert.equal(tuiConfig.$schema, "https://opencode.ai/tui.json");
-  assert.deepEqual(tuiConfig.plugin, [".opencode/tui/hypo-workflow-tui.tsx"]);
+  await assert.rejects(readFile(join(dir, "tui.json"), "utf8"));
+  await assert.rejects(readFile(join(dir, ".opencode", "tui", "hypo-workflow-tui.tsx"), "utf8"));
   assert.equal(adapterConfig.$schema, "https://opencode.ai/config.json");
   assert.equal("plugin" in adapterConfig, false);
   assert.equal(config.compaction.auto, true);
@@ -140,6 +121,7 @@ test("writeOpenCodeArtifacts renders commands, agents, and config", async () => 
   assert.equal(config.provider, undefined);
   assert.doesNotMatch(JSON.stringify(config), /bypass/);
   assert.equal(metadata.agents.test.model, "deepseek-v4-pro");
+  assert.equal(metadata.commandMap.find((command) => command.canonical === "/hw:plan:deep")?.opencode, "/hw:plan:deep");
 });
 
 test("writeOpenCodeArtifacts renders explicit provider placeholders when configured", async () => {
@@ -182,7 +164,6 @@ test("OpenCode artifact rendering resolves templates from the installed package,
 
   assert.equal(result.status, 0, result.stderr || result.stdout);
   const agents = await readFile(join(outDir, "AGENTS.md"), "utf8");
-  const tui = await readFile(join(outDir, ".opencode", "tui", "hypo-workflow-tui.tsx"), "utf8");
   assert.match(agents, /Hypo-Workflow managed OpenCode instructions/);
-  assert.match(tui, /export const tui/);
+  await assert.rejects(readFile(join(outDir, ".opencode", "tui", "hypo-workflow-tui.tsx"), "utf8"));
 });

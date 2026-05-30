@@ -1,11 +1,37 @@
-schema_version: 1
 category: dependencies
 entries:
-  -
+  - created_at: 2026-05-05T00:19:25+08:00
+    items:
+      - name: Claude Code hooks
+        reason: >-
+          event-driven shell hooks cover PreToolUse, PostToolUse, UserPromptSubmit, Notification, Stop, SubagentStop,
+          PreCompact, SessionStart, and SessionEnd.
+      - name: Claude Code plugins
+        reason: >-
+          plugins can package skills, agents, hooks, MCP servers, LSP servers, and monitors under a .claude-plugin
+          manifest.
+      - name: OpenCode plugins and commands
+        reason: >-
+          project/global plugins plus TUI command files provide the primary extension surface for behavior, custom
+          tools, and repeatable actions.
+      - name: Codex use cases
+        reason: official guidance emphasizes composable CLI commands and reusable skills as the main repeatable-work surface.
     record_id: C6-SYNC-claude-opencode-codex-interface-map-20260505
-    type: sync
+    refs:
+      files:
+        - references/knowledge-spec.md
+        - references/opencode-spec.md
+        - references/commands-spec.md
+      urls:
+        - https://code.claude.com/docs/en/plugins
+        - https://code.claude.com/docs/en/plugins-reference
+        - https://docs.anthropic.com/en/docs/claude-code/hooks
+        - https://docs.anthropic.com/en/docs/claude-code/hooks-guide
+        - https://opencode.ai/docs/plugins/
+        - https://opencode.ai/docs/commands/
+        - https://opencode.ai/docs/tui/
+        - https://developers.openai.com/codex/use-cases/
     source: C6-claude-opencode-codex-interface-map
-    created_at: "2026-05-05T00:19:25+08:00"
     summary: Claude Code / OpenCode / Codex interface map for adapter planning
     tags:
       - claude-code
@@ -16,44 +42,18 @@ entries:
       - commands
       - ui
       - adapter
-    refs:
-      files:
-        - references/knowledge-spec.md
-        - references/opencode-spec.md
-        - references/commands-spec.md
-      urls:
-        - "https://code.claude.com/docs/en/plugins"
-        - "https://code.claude.com/docs/en/plugins-reference"
-        - "https://docs.anthropic.com/en/docs/claude-code/hooks"
-        - "https://docs.anthropic.com/en/docs/claude-code/hooks-guide"
-        - "https://opencode.ai/docs/plugins/"
-        - "https://opencode.ai/docs/commands/"
-        - "https://opencode.ai/docs/tui/"
-        - "https://developers.openai.com/codex/use-cases/"
+    type: sync
+  - created_at: 2026-05-02T21:52:30+08:00
     items:
-      -
-        name: Claude Code hooks
-        reason: event-driven shell hooks cover PreToolUse, PostToolUse, UserPromptSubmit, Notification, Stop, SubagentStop, PreCompact, SessionStart, and SessionEnd.
-      -
-        name: Claude Code plugins
-        reason: plugins can package skills, agents, hooks, MCP servers, LSP servers, and monitors under a .claude-plugin manifest.
-      -
-        name: OpenCode plugins and commands
-        reason: project/global plugins plus TUI command files provide the primary extension surface for behavior, custom tools, and repeatable actions.
-      -
-        name: Codex use cases
-        reason: official guidance emphasizes composable CLI commands and reusable skills as the main repeatable-work surface.
-  -
+      - name: core/src/knowledge/index.js
+        reason: append and rebuild Knowledge Ledger records, indexes, and compact context
+      - name: core/src/opencode-hooks/index.js
+        reason: OpenCode permission, file guard, auto-continue, and stop-equivalent policy smoke
+      - name: hooks/session-start.sh
+        reason: loads compact Knowledge Ledger context without raw records
+      - name: hooks/stop-check.sh
+        reason: enforces strict Knowledge record self-check when configured
     record_id: C4-M05-f001-knowledge-and-opencode-integration-gate-18c2eaab
-    type: milestone
-    source: C4/M05
-    created_at: "2026-05-02T21:52:30+08:00"
-    summary: F001 Knowledge and OpenCode integration gate
-    tags:
-      - f001
-      - knowledge
-      - opencode
-      - gate
     refs:
       files:
         - core/src/knowledge/index.js
@@ -61,16 +61,12 @@ entries:
         - hooks/session-start.sh
         - hooks/stop-check.sh
         - .opencode/runtime/hypo-workflow-hooks.js
-    items:
-      -
-        name: core/src/knowledge/index.js
-        reason: append and rebuild Knowledge Ledger records, indexes, and compact context
-      -
-        name: core/src/opencode-hooks/index.js
-        reason: OpenCode permission, file guard, auto-continue, and stop-equivalent policy smoke
-      -
-        name: hooks/session-start.sh
-        reason: loads compact Knowledge Ledger context without raw records
-      -
-        name: hooks/stop-check.sh
-        reason: enforces strict Knowledge record self-check when configured
+    source: C4/M05
+    summary: F001 Knowledge and OpenCode integration gate
+    tags:
+      - f001
+      - knowledge
+      - opencode
+      - gate
+    type: milestone
+schema_version: '1'

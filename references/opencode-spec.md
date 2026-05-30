@@ -36,7 +36,7 @@ See also [`external-docs-index.md`](./external-docs-index.md) for the cross-plat
 | Rules and instructions | native | `AGENTS.md`, `opencode.json.instructions` | Export HW rules into native instruction sources. |
 | Model selection | native | provider/model/variant config | Prefer OpenCode config; HW only supplies profile defaults. |
 | MCP servers | native | `mcp` config | Optional setup integration, not required for command parity. |
-| Plugin lifecycle | plugin-assisted | `.opencode/plugins/hypo-workflow.ts`, `.opencode/runtime/hypo-workflow-status.js`, `.opencode/tui/hypo-workflow-tui.tsx`, `tui.json` | Keep event/file-guard logic, read-only status loading, and TUI rendering loosely coupled. |
+| Plugin lifecycle | plugin-assisted | `.opencode/plugins/hypo-workflow.ts`, `.opencode/runtime/hypo-workflow-status.js` | Keep event/file-guard logic and read-only status loading loosely coupled; do not inject legacy TUI slots when VSP OpenCode provides built-in Workflow UI. |
 | Command context capture | plugin-assisted | `command.executed`, `tui.command.execute` | Record invoked command, args, and current project state. |
 | Auto continue | plugin-assisted | `tool.execute.after`, `session.idle`, `session.status` | Apply HW evaluation rules and continue only under safe policy. |
 | File guard | plugin-assisted | `tool.execute.before`, permission config | Protect state/cycle/rules as errors; warn on ordinary `.pipeline` writes. |
@@ -90,7 +90,9 @@ See also [`external-docs-index.md`](./external-docs-index.md) for the cross-plat
 | `/hw:rules` | `/hw-rules` | `hw-status` | Native slash command, rules file management. |
 | `/hw:init` | `/hw-init` | `hw-plan` | Native slash command, project bootstrap/history import. |
 | `/hw:check` | `/hw-check` | `hw-status` | Native slash command, health checks. |
-| `/hw:audit` | `/hw-audit` | `hw-review` | Native slash command, preventive audit. |
+| `/hw:audit` | `/hw-audit` | `hw-review` | Native slash command, Intake-first preventive engineering audit. |
+| `/hw:quality` | `/hw-quality` | `hw-review` | Native slash command, quality scorecard, baseline, compare, review, and action queue. |
+| `/hw:optimize` | `/hw-optimize` | `hw-build` | Native slash command, Audit+Quality guided optimize loop with backup/correctness/budget gates. |
 | `/hw:release` | `/hw-release` | `hw-build` | Native slash command, release automation. |
 | `/hw:debug` | `/hw-debug` | `hw-debug` | Native slash command, symptom-driven debug. |
 | `/hw:help` | `/hw-help` | `hw-status` | Native slash command, generated help. |
@@ -217,7 +219,7 @@ Default auto-continue is on for OpenCode with `safe` policy: continue after gree
 
 ## TUI Status Model
 
-OpenCode exposes a TUI Slot API through `@opencode-ai/plugin` TUI plugins. The relevant host slots for Hypo-Workflow status are:
+OpenCode exposes a TUI Slot API through `@opencode-ai/plugin` TUI plugins. Historical Hypo-Workflow adapters used these slots for status panels:
 
 - `sidebar_content`
 - `sidebar_footer`
@@ -225,17 +227,16 @@ OpenCode exposes a TUI Slot API through `@opencode-ai/plugin` TUI plugins. The r
 - `home_bottom`
 - `session_prompt_right`
 
-M08 implements the read-only status model first. M09 may render that model into sidebar and footer slots, but the model itself must stay platform-neutral and must not mutate `.pipeline/`.
+M08 implements the read-only status model first. VSP OpenCode now renders the Workflow dashboard natively, so generated Hypo-Workflow adapters must not register the old `.opencode/tui/hypo-workflow-tui.tsx` slot plugin or root `tui.json` entry. The status model itself remains platform-neutral and must not mutate `.pipeline/`.
 
 C5 adds a read-only progress dashboard projection over the same canonical status model. It must expose phase, next action, lease status, Recent Events, derived health, and an active config summary. It is explicitly not a workflow action panel: no start/resume/accept/reject/sync/repair dispatch should be attached to this surface.
 
-Recommended M09 layout:
+Recommended OpenCode layout:
 
 - server plugin: `.opencode/plugins/hypo-workflow.ts`
 - shared status module: `.opencode/runtime/hypo-workflow-status.js`
-- TUI plugin: `.opencode/tui/hypo-workflow-tui.tsx`, registered from root `tui.json`
-- project-root `opencode.json.plugin` should load the server and TUI plugins, while `.opencode/opencode.json` must not redeclare those plugin paths
-- the TUI plugin imports the colocated status module instead of referencing Hypo-Workflow source paths outside the generated adapter
+- project-root `opencode.json.plugin` should load only the server plugin, while `.opencode/opencode.json` must not redeclare plugin paths
+- deprecated TUI plugin cleanup should remove `.opencode/tui/hypo-workflow-tui.tsx` and the matching `tui.json` plugin entry during sync
 - do not place helper modules under `.opencode/plugins/` unless they export a real plugin entry, because OpenCode auto-discovers local plugin files from that directory
 
 Status model sources:

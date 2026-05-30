@@ -1,80 +1,52 @@
-# C17 审计修复与架构减债
+# C18 指令质量审查与集成同步方案
+
+> 最后更新：14:11 | 状态：completed / accepted / release prepared | 进度：6/6 Milestone
 
 ## 当前状态
 
-- Cycle：C17
-- 状态：active / planning
+- Cycle：C18
+- 状态：completed / accepted
 - 类型：refactor
 - Preset：tdd
-- 开始时间：2026-05-21T16:32:54+08:00
-- 上下文源：`.pipeline/audits/audit-001.md`
+- 开始时间：2026-05-29T18:05:08+08:00
+- 上下文源：用户待提供文章原文、集成同步研究
 
 ## 目标摘要
 
-本 Cycle 用于修复 2026-05-21 审计发现的结构性问题：硬编码绝对路径、工具函数重复、`workspace` God Module、双 YAML parser、测试入口不可直接运行，以及事件/通知/ledger 的扩展性风险。
+本 Cycle 聚焦四件事：先根据文章原文讨论指令优化方向；增强 `/hw:audit` 的工程审计方法论并决定 `/hw:quality` 边界；制定 Hypo-Workflow 指令功能向 `~/VSP-Open-Code` 和 `~/Codex-VSP` 集成版本同步的明确机制；最后建立从两个集成仓库普通对话/Journal 记录回流到 Workflow 的候选 inbox 机制，并基于确认后的方案优化代码。
 
-## 规划草案
+## 候选工作流
 
-| Milestone | 主题 | 覆盖问题 | 预期边界 |
+| Workstream | 主题 | 当前状态 | 预期产出 |
 |---|---|---|---|
-| C17-M0 | Audit Baseline And Test Entry Stabilization | TEST-01、审计基线 | 固化可重复审计清单与根目录测试入口；不做行为重构 |
-| C17-M1 | Shared Utils Extraction | ARCH-01 | 新增 `core/src/utils/index.js`，迁移低风险重复函数并保持测试绿 |
-| C17-M2 | Configuration-Driven Paths And Integrations | SEC-01、ARCH-03、QUAL-02、QUAL-04 | 将用户环境路径、Hypo-Claw、Hypo-Writer、项目 seed 转为配置驱动 |
-| C17-M3 | YAML Parser Unification | ARCH-04、ARCH-06 | 统一 config/knowledge YAML 行为；补兼容性测试 |
-| C17-M4 | Workspace Module Decomposition | ARCH-02、QUAL-05 | 拆分 workspace authority、project linkage、stop events、codex capture、notification sender |
-| C17-M5 | Ledger Append Strategy And Release Regression | PERF-01、ARCH-05、QUAL-01 | 处理高频 ledger 写入与最终全量回归；评估 barrel export 后续策略 |
+| C18-W1 | Instruction Quality Direction | Audit + Quality + Optimize 方案确认 | 已确认 `/hw:audit` 增强、`/hw:quality` 一等命令和 `/hw:optimize` 自动优化闭环 |
+| C18-W2 | Integration Sync Plan | 方案确认 | 已确认同步不是用户命令，而是功能更新后的集成适配开发流程和 release gate，需要读取目标仓库状态、因地制宜适配并在目标仓库记录 |
+| C18-W3 | Workflow Code Optimization | 待规划 | 根据 W1/W2 修改 Workflow 代码、文档、集成适配器和测试 |
+| C18-W4 | Integration Feedback Import | 草案完成 | 读取两个集成仓库普通对话/Journal 记录机制，回流为候选 inbox，再由用户确认升级为 Knowledge/规则/指令源头 |
 
 ## 时间线
 
-- 2026-05-21T16:32:54+08:00：创建 C17「审计修复与架构减债」；C16 本地运行产物已归档到 `.pipeline/archives/C16-root-project-management-mode/`，新 Cycle 进入规划发现阶段。
-- 2026-05-21T16:32:54+08:00：读取审计报告并形成初始候选 Milestone。优先级按低风险高收益到高耦合重构排序：测试基线 → 共享 utils → 配置驱动路径 → YAML 统一 → workspace 拆分 → ledger/release。
-- 2026-05-21T16:45:00+08:00：用户确认 C17 范围为全修，配置 authority 采用分层读取，`workspace/index.js` 在本 Cycle 完整拆分。P0 复用 C16/C15 决策：执行子工作器已授权、worker separation 为 recommended、验收模式 auto，外部副作用仍需显式确认。
-- 2026-05-21T16:55:00+08:00：用户确认 C17 完成标准必须包含根目录 `npm test` 可直接运行；分层配置迁移需要自动生成用户级配置。`workspace` 拆分后的 export 兼容策略仍待解释和确认。
-- 2026-05-21T17:05:00+08:00：用户确认 `workspace` 拆分采用一次切干净策略，不保留 `workspace/index.js` 旧 re-export 兼容 shim；所有内部调用与测试需要在本 Cycle 一次迁移到新模块边界。
-- 2026-05-21T17:15:00+08:00：用户确认 YAML 统一采用 `js-yaml` 依赖；ledger 性能修复采用 append-only JSONL 事件流 + compact YAML 人读摘要；barrel export 尽量清理干净并纳入 C17。
-- 2026-05-21T17:25:00+08:00：用户确认文档/examples 必须同步新显式模块 import；配置迁移采用显式命令 + sync/start 提示，不允许静默写用户级配置；旧 YAML ledger 一次性迁移到 JSONL。P1 Discover 完成，进入 P2 Decompose。
-- 2026-05-21T17:18:00+08:00：P2 Decompose 生成 proposed 技术路线：7 个 Milestone，从根目录测试入口和审计基线开始，经 shared utils、分层配置、js-yaml、workspace clean split、JSONL ledger/barrel cleanup，最后做全量审计闭环。产物：`.plan-state/c17-decompose.yaml`、`.plan-state/c17-technical-route.md`。
-- 2026-05-21T17:20:00+08:00：用户确认 P2 并授权 Subagent；P3 Generate 完成，生成 7 个执行 prompt 和 `.pipeline/confirm-summary.md`。当前进入 P4 Confirm，等待 `/hw:start` 开始 C17-M0。
-- 2026-05-21T17:21:00+08:00：收到 `/hw:start`，接管 C16 过期执行租约并创建 C17-M0 执行租约；C17-M0 进入 `write_tests`，按 recommended Worker Separation 启动 test worker 负责根目录 `npm test` 与 audit inventory 红测。
-- 2026-05-21T17:23:00+08:00：C17-M0 test worker Dirac 完成 RED：新增 `core/test/audit-baseline.test.js` 与 `.pipeline/reviews/C17/M0/test-evidence.md`；`npm test` 因根目录缺少 `package.json` 失败，focused test 因缺少 `buildAuditInventory()` export 失败。当前进入 implement。
-- 2026-05-21T17:24:00+08:00：C17-M0 implement 完成：新增根目录 `package.json`、`core/src/audit-inventory/index.js`，并从 `core/src/index.js` 导出 `buildAuditInventory()` / `auditInventory()`；focused test、根 `npm test` 和 `git diff --check` 均通过，证据写入 `.pipeline/reviews/C17/M0/implementation-evidence.md`。当前进入 review。
-- 2026-05-21T17:26:00+08:00：主线程复核 GREEN：`node --test core/test/audit-baseline.test.js` 2/2 通过，根目录 `npm test` 633/633 通过，`git diff --check` 通过；启动 audit worker 审查 M0 差异、证据与 worker separation。
-- 2026-05-21T17:30:00+08:00：C17-M0 完成：audit worker Faraday PASS，无 blocker；生成 `.pipeline/reports/00-audit-baseline-and-root-test-entry.report.md`。审计基线计数为 hardcoded_paths=31、duplicate_helpers=14、workspace_imports=9、yaml_parsers=2、ledger_rewrites=137、barrel_exports=55。已自动进入 C17-M1 `write_tests`。
-- 2026-05-21T17:33:00+08:00：C17-M1 test worker Aquinas 完成 RED：新增 `core/test/utils.test.js` 与 `.pipeline/reviews/C17/M1/test-evidence.md`；focused test 0/7 预期失败，失败点是缺少 `core/src/utils/index.js`。当前进入 implement。
-- 2026-05-21T17:36:38+08:00：C17-M1 implement 完成：新增 `core/src/utils/index.js` 并迁移 evidence、reviews、storage-sync、domains、project-events、project-linkage-e2e 的重复 helper；focused utils test 7/7 通过，根目录 `npm test` 640/640 通过，`git diff --check` 通过。实现证据写入 `.pipeline/reviews/C17/M1/implementation-evidence.md`。
-- 2026-05-21T17:40:44+08:00：主线程复核 C17-M1 GREEN：`node --test core/test/utils.test.js` 7/7 通过，根目录 `npm test` 640/640 通过，`git diff --check` 通过；剩余 helper 命中属于后续 M2-M5 范围或 C17-M3 的 YAML 写入统一。当前启动 audit worker 审查 M1 差异、证据与 worker separation。
-- 2026-05-21T17:43:26+08:00：C17-M1 完成：audit worker Arendt PASS，无 blocker；生成 `.pipeline/reports/01-shared-utils-layer-extraction.report.md`。两个 warning 已记录到 M1 报告：`cloneJson` 非 JSON-like 语义边界、barrel export 面后续复核。已自动进入 C17-M2 `write_tests`。
-- 2026-05-21T17:48:46+08:00：C17-M2 test worker James 完成 RED：新增 `core/test/layered-config-integration.test.js` 与 `.pipeline/reviews/C17/M2/test-evidence.md`；focused test 5/5 失败，根 `npm test` 为 640 pass / 5 fail。失败集中在缺少分层配置迁移接口和 runtime/source `/home/heyx` 残留。当前进入 implement。
-- 2026-05-21T18:10:26+08:00：C17-M2 implement worker Ptolemy 完成实现：focused M2 test 5/5 通过，`rg -n '/home/heyx' core/src scripts` 无命中，`git diff --check` 通过；根 `npm test` 剩 1 个旧测试失败，原因是 `project-notifications.test.js` 仍要求脚本包含 `/home/heyx/.volta/bin`，与本 Milestone 的脚本路径清理目标冲突。当前启动 test revision worker 更新过时测试契约。
-- 2026-05-21T18:13:22+08:00：C17-M2 test revision worker Archimedes 完成：`project-notifications.test.js` 已改为断言 `${HOME}` 派生的 local/Volta PATH 与系统 fallback，并显式禁止 `/home/heyx`。focused project-notifications test 6/6 通过；当前准备主线程 GREEN 复核。
-- 2026-05-21T18:14:39+08:00：主线程复核 C17-M2 GREEN：layered-config + project-notifications focused tests 11/11 通过，根目录 `npm test` 645/645 通过，`rg -n '/home/heyx' core/src scripts` 无命中，`git diff --check` 通过。当前启动 audit worker 审查配置迁移、无静默 user write、路径清理和 worker separation。
-- 2026-05-21T18:19:00+08:00：C17-M2 完成：audit worker Hegel PASS，无 blocker；生成 `.pipeline/reports/02-layered-config-and-integration-migration.report.md`。已自动进入 C17-M3 `write_tests`，目标是统一 config/knowledge YAML parser 到 `js-yaml`。
-- 2026-05-21T18:24:04+08:00：C17-M3 test worker Avicenna 完成 RED：新增 `core/test/yaml-parser-unification.test.js` 与 `.pipeline/reviews/C17/M3/test-evidence.md`；focused YAML test 5 项中 4 项失败，覆盖 block scalar、冒号字符串 round-trip、knowledge parser 行为差异和 `js-yaml` manifest 未声明。当前进入 implement。
-- 2026-05-21T18:35:12+08:00：C17-M3 implement worker Banach 完成实现并经主线程复核 GREEN：`js-yaml` 已显式声明，config `parseYaml`/`stringifyYaml` 与 knowledge 读写统一到共享 parser；rules summary 增加 `id/name` 与历史未加引号 rule pack extends 兼容。focused/相关回归 29/29 通过，根目录 `npm test` 650/650 通过，`git diff --check` 通过。当前启动 audit worker。
-- 2026-05-21T18:38:54+08:00：C17-M3 完成：audit worker Pascal PASS，无 blocker；生成 `.pipeline/reports/03-yaml-parser-unification-with-js-yaml.report.md`。已自动进入 C17-M4 `write_tests`，目标是拆分 `workspace/index.js` God Module 且不保留 public re-export shim。
-- 2026-05-21T18:44:13+08:00：C17-M4 test worker Carver 完成 RED：新增 `core/test/workspace-module-split.test.js` 与 `.pipeline/reviews/C17/M4/test-evidence.md`；workspace split focused test 4 fail / 1 pass，既有行为基线 34/34 通过。失败集中在目标模块缺失、root barrel 仍导出旧 workspace、运行时代码仍有旧 workspace import。当前进入 implement。
-- 2026-05-21T18:55:35+08:00：C17-M4 implement worker Turing 完成实现并经主线程复核 GREEN：新增 workspace-authority、project-linkage、project-stop-events、codex-capture、notification-sender 五个 public 模块，删除旧 `core/src/workspace/index.js`，root barrel 改为导出新模块，生产调用点已迁移。focused 39/39 通过，根目录 `npm test` 655/655 通过，`git diff --check` 通过。当前启动 audit worker。
-- 2026-05-21T19:17:24+08:00：C17-M4 完成：audit worker Jason PASS，无 blocker；生成 `.pipeline/reports/04-workspace-clean-module-split.report.md`。已自动进入 C17-M5 `write_tests`，目标是 JSONL ledger 迁移与 public export surface 清理。
-- 2026-05-21T19:26:58+08:00：C17-M5 test worker McClintock 完成 RED：新增 `core/test/ledger-jsonl-migration.test.js` 与 `.pipeline/reviews/C17/M5/test-evidence.md`；focused ledger JSONL test 6/6 失败，既有 ledger 相关基线 26/26 通过。失败集中在 JSONL helper API 缺失、相关子系统仍使用 `ledger.yaml`、root barrel 仍是 broad `export *`。当前进入 implement。
-- 2026-05-21T19:39:13+08:00：C17-M5 implement worker Heisenberg 完成实现：新增 `core/src/ledger/index.js`，相关 ledger 写路径改为 JSONL authority，root `core/src/index.js` 移除 broad `export *`。focused ledger test 6/6 通过，`git diff --check` 通过；根 `npm test` 剩旧测试契约失败，原因是旧测试仍读取 `ledger.yaml` 或要求 root barrel `export *`。当前启动 test revision worker 更新过时断言。
-- 2026-05-21T19:49:12+08:00：C17-M5 test revision worker Plato 完成旧测试契约更新，并经主线程复核 GREEN：ledger/project notification/daily/consolidation/workspace/export focused tests 41/41 通过，根目录 `npm test` 661/661 通过，`git diff --check` 通过；`ledger.yaml|export *` 扫描剩余命中已分类为 analysis lane、migration/self-test、fixture、安全测试或审计扫描规则。当前启动 audit worker。
-- 2026-05-21T19:58:03+08:00：C17-M5 完成：audit worker Helmholtz PASS，无 blocker；生成 `.pipeline/reports/05-ledger-jsonl-migration-and-barrel-export-cleanup.report.md`。已自动进入 C17-M6 `write_tests`，目标是最终回归、审计清单前后对比、stale path/import/parser/export 扫描与 C17 closure report。
-- 2026-05-21T20:03:03+08:00：C17-M6 test worker Hilbert 完成最终回归证据：`npm test` 661/661 通过，`git diff --check` 通过，`/home/heyx` runtime/source 扫描无命中，workspace/parser/export/ledger 扫描为 PASS with classified residual。当前进入 closure report 实现。
-- 2026-05-21T20:09:17+08:00：C17-M6 implement worker Kepler 完成 closure report 与项目摘要更新；修正 Warning 计数口径为审计源文件 6 个可追踪 ID，终端摘要的 7 个记录为来源不一致。当前启动最终 audit worker。
-- 2026-05-21T20:20:11+08:00：C17-M6 完成：audit worker Pauli PASS，独立复跑 `npm test` 661/661、`git diff --check`、硬编码路径扫描、workspace/parser/export/ledger 分类扫描均无 blocker。C17 自动执行完成，进入 pending_acceptance。
-- 2026-05-21T21:31:56+08:00：准备发布 `v13.0.0-alpha.1`：中英文 release notes 与 CHANGELOG 已补充 C17 审计修复范围；发布前回归 `npm test` 661/661 通过，`git diff --check` 通过，`/home/heyx` runtime/source 扫描无命中。
+| 时间 | 类型 | 事件 | 结果 |
+|---|---|---|---|
+| 14:11 | Release Prep | v13.1.0-alpha.1 prepared | Sync/doc repair、版本更新、release notes、docs governance、version consistency、`npm test` 665/665、`sync --check-only` fresh、`git diff --check` 均通过；`git add/commit/tag/push` 仍等待用户显式确认 |
+| 13:38 | Acceptance | C18 accepted | 用户确认进入 Sync Doc Release 准备；C18 已标记为 completed/accepted，后续发布动作按独立门禁处理 |
+| 13:04 | Execution | C18-M6 completed | Codex-VSP 与 VSP-Open-Code 目标适配完成；目标侧记录已写入，源 matrix 已回链；Codex-VSP focused Cargo tests + `git diff --check` 通过，VSP-Open-Code focused Bun tests + `bun typecheck` + `git diff --check` 通过 |
+| 12:38 | Execution | C18-M6 started | 用户已确认两个目标仓库路径、硬边界、文件清单、验证策略、失败处理和记录回链；已重新读取目标 dirty status，开始 scoped adaptation |
+| 01:22 | Gate | C18-M5 completed; stopped before M6 target writes | Source-side closure complete: focused tests、docs governance、`npm test` 665/665、`git diff --check` 均通过；两个目标仓库只读检查均为 dirty，已生成适配计划并停在用户确认 Gate |
+| 01:09 | Execution | C18-M1-M4 source contracts completed | Audit/Quality/Optimize/Integration Sync 源侧命令、Skill、spec、adapter/docs 合同已实现；focused contract tests 已通过，进入 M5 源侧闭合和目标仓库只读适配计划 |
+| 00:55 | Execution | C18-M1 started | 已进入 `/hw:start` 连续执行；启动 test worker 编写 C18 指令质量合同测试，主代理并行处理命令/spec/adapter 实现 |
+| 00:29 | Planning | P3 Generate completed | 已根据确认的 P2 拆解生成 6 个执行 prompt、C18 架构基线、design spec、confirm summary 和 generate 记录；下一步等待确认后 `/hw:start` |
+| 00:15 | Planning | P2 Decompose proposed | 已生成 C18 六个串行 Milestone 拆解和技术路线检查点，见 `.plan-state/c18-decompose.yaml` 与 `.plan-state/c18-technical-route.md`；等待用户确认后进入 P3 |
+| 00:00 | Planning | 集成同步开发流程确认 | 已通过 Request Tool 明确同步不是新增命令，而是本仓库功能更新后的目标仓库适配流程；本轮最小范围包括命令/Skill/Docs、Hooks/Journal、Dashboard/Status、状态读写和目标测试，见 `.plan-state/c18-integration-sync-workflow-decisions.md` |
+| 21:05 | Planning | `/hw:quality` 与 `/hw:optimize` 方案确认 | 已通过 Request Tool 细化 Quality 主任务、rubric、gate、compare 模式和报告结构，并补充 `/hw:optimize` 的 Audit+Quality -> Implement/Test -> Audit+Quality 自动优化闭环，见 `.plan-state/c18-quality-command-decisions.md` |
+| 21:05 | Planning | `/hw:audit` 增强方案确认 | 已通过 Request Tool 细化 Audit 目的、方法论、Intake、报告维度、Critical 阈值和 Action Queue，见 `.plan-state/c18-audit-enhancement-decisions.md` |
+| 21:05 | Planning | C18 Round 2 讨论稿 | 已根据用户新增要求形成 Audit 增强、指令下发同步、记录回流机制草案，见 `.plan-state/c18-round2-audit-sync-discussion.md` |
+| 18:35 | Planning | C18-W2 同步方案草案 | 已形成集成同步方案，明确不复制 `.pipeline` 运行态，先做 staging/dry-run，再确认 apply |
+| 18:25 | Planning | C18-W1 指令方向草案 | 已从 `tmp.md` 提炼九维质量 rubric，并建议新增 `/hw:quality`，草案见 `.plan-state/c18-instruction-quality-direction.md` |
+| 18:15 | Discovery | 集成路径预检 | `~/VSP-OpenCode` 未发现；候选为 `~/VSP-Open-Code`。`~/Codex-VSP` 存在；两个集成仓库均有未提交改动，后续同步必须保护脏工作树 |
+| 18:05 | Cycle | C17 accepted and archived | C17 completed artifacts archived to `.pipeline/archives/C17-audit-remediation-and-architecture-debt-reduction/` |
+| 18:05 | Cycle | C18 created | 等待用户提供文章原文后进入方案整理 |
 
-## P2 检查点
+## Deferred 项
 
-- 状态：confirmed。
-- 分解文件：`.plan-state/c17-decompose.yaml`
-- 技术路线：`.plan-state/c17-technical-route.md`
-
-## 执行状态
-
-- 状态：pending_acceptance
-- 当前 Milestone：C17-M6 Full Audit Closure And Release Readiness
-- 当前步骤：completed
-- 生成文件：`.plan-state/c17-generate.yaml`
-- 确认摘要：`.pipeline/confirm-summary.md`
-- Prompt 数量：7
+- 无。

@@ -1,7 +1,7 @@
 ---
 name: hypo-workflow
 version: 12.5.1
-description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:analysis`, `/hw:plan`, `/hw:plan:deep`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:maintain`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
+description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:analysis`, `/hw:plan`, `/hw:plan:deep`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:maintain`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:quality`, `/hw:optimize`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
 ---
 
 # Hypo-Workflow v12.5.1
@@ -67,7 +67,9 @@ This SKILL.md serves as the **index and routing summary** for Hypo-Workflow. For
 | `/hw:rules` | Manage rule severities, custom natural-language rules, lifecycle hooks, and rule packs |
 | `/hw:init` | Initialize or rescan `.pipeline/` with architecture-aware project discovery |
 | `/hw:check` | Run pipeline health checks for config, state, prompts, Notion, and architecture |
-| `/hw:audit` | Run preventive code audits and emit graded findings with report output |
+| `/hw:audit` | Run Intake-first preventive engineering audits and emit graded findings with report output |
+| `/hw:quality` | Generate evidence-backed quality scorecards, baselines, comparisons, reviews, and action queues |
+| `/hw:optimize` | Run an Audit+Quality guided optimization loop with backup, correctness, budget, and validation gates |
 | `/hw:release` | Run the automated release flow with regression, versioning, changelog, and git steps |
 | `/hw:debug` | Run symptom-driven debugging with hypotheses, validation, and optional auto-fix |
 | `/hw:help` | Show command help, grouped quick reference, or per-command usage |
@@ -261,7 +263,11 @@ Handle these commands directly:
 - `/hw:release`
   Run the seven-step release flow. Support `--dry-run`, `--skip-tests`, and explicit `--patch` / `--minor` / `--major` version overrides.
 - `/hw:audit`
-  Audit the whole project or a narrower scope, grade findings as Critical / Warning / Info, write `.pipeline/audits/audit-NNN.md`, and log the result.
+  Run an Intake-first engineering audit for the whole project or a narrower scope, grade Experience / Engineering / Risk findings as Critical / Warning / Info, write `.pipeline/audits/audit-NNN.md`, and log the result.
+- `/hw:quality`
+  Load [`skills/quality/SKILL.md`](./skills/quality/SKILL.md). Generate evidence-backed quality scorecards, baselines, comparisons, reviews, and quality action queues under `.pipeline/quality/`.
+- `/hw:optimize`
+  Load [`skills/optimize/SKILL.md`](./skills/optimize/SKILL.md). Run `Audit + Quality -> Implement/Test -> Audit + Quality` under correctness, backup, budget, validation, Patch handoff, and Plan handoff gates.
 - `/hw:debug`
   Investigate a concrete symptom, generate ranked root-cause hypotheses, validate them, and optionally apply `--auto-fix` only after verification passes.
 - `/hw:plan`, `/hw:plan:discover`, `/hw:plan:decompose`, `/hw:plan:generate`, `/hw:plan:confirm`, `/hw:plan:extend`, `/hw:plan:review`
@@ -297,7 +303,7 @@ Handle these commands directly:
 
 If a command starts with `/hw:` and is not listed above, return:
 
-`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:maintain, /hw:maintain status, /hw:maintain scan, /hw:maintain plan, /hw:maintain queue, /hw:maintain run, /hw:maintain apply, /hw:maintain verify, /hw:maintain log, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:maintain, /hw:maintain status, /hw:maintain scan, /hw:maintain plan, /hw:maintain queue, /hw:maintain run, /hw:maintain apply, /hw:maintain verify, /hw:maintain log, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:quality, /hw:optimize, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 
 Slash commands are exact and take precedence over fuzzy natural-language matching. Detailed parsing and option semantics live in [`references/commands-spec.md`](./references/commands-spec.md).
 

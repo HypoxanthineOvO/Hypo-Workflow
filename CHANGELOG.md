@@ -1,5 +1,35 @@
 # Changelog
 
+## v13.1.0-alpha.1 - 2026-05-30
+
+### Features
+
+- 新增 `/hw:quality` 一等代码质量评分入口，支持 scorecard、baseline/compare、review notes 和 Action Queue。
+- 新增 `/hw:optimize` 闭环优化入口，按 Audit+Quality -> Implement/Test -> Audit+Quality 运行，并保留 backup、correctness、budget 和 validation gates。
+- 增强 `/hw:audit`：改为 Intake-first 工程审计，覆盖 Experience、Engineering、Risk 三个视角，并用 Critical blocking 与 Action Queue 收束。
+- 新增 integration sync 规范，将跨 `Codex-VSP`、`VSP-Open-Code` 等集成仓库的功能同步定义为开发/发布门禁，而不是用户命令。
+
+### Fixes
+
+- 修正 OpenCode/Cursor/第三方适配器中的命令命名和生成契约，使 `/hw:*` namespace 语义与平台约束一致。
+- 明确 Workflow 中 Codex/OpenCode 集成版本的维护边界：源仓库是指令语义与 Skill/spec authority，目标仓库按实际状态因地制宜适配并写入目标侧记录。
+- 为普通对话/Journal 回流补充 audit、quality、optimize、integration_sync 候选分类路径，避免把集成反馈直接升级为规则或指令。
+
+### Docs
+
+- 更新 Audit、Quality、Optimize 和 Integration Sync 规范、Skill、命令参考、OpenCode/Codex 适配文档和 README 入口。
+- 新增 C18 目标仓库适配计划、矩阵、测试证据、实现证据、审计报告和完成报告。
+- 同步版本源、OpenCode/Claude/Codex package metadata、默认配置版本和 generator `HW_VERSION` 到 13.1.0-alpha.1。
+
+### Tests
+
+- `npm test`: 665/665 passing。
+- `node cli/bin/hypo-workflow sync --platform opencode --project . --check-only`: derived=fresh。
+- `checkDocs('.')` 与 release narrative fact check: passing。
+- Codex-VSP focused validation: `cargo fmt --check`、29 个 focused Rust tests、`git diff --check` passing。
+- VSP-Open-Code focused validation: 34 个 focused Bun tests、`bun typecheck`、`git diff --check` passing。
+- `git diff --check`: passing。
+
 ## v13.0.0-alpha.1 - 2026-05-21
 
 ### Features

@@ -2,10 +2,6 @@
 
 本页是面向用户和 Agent 的配置治理矩阵。配置的解析顺序是 project config > global config > built-in default；project config 通常是 `.pipeline/config.yaml`，global config 通常是 `~/.hypo-workflow/config.yaml`。Hypo-Workflow 不是后台 runner，配置只决定 Agent 如何规划、执行、审查和确认。
 
-`loadLayeredConfig` 会按 project `.pipeline/config.yaml` > user `~/.hypo-workflow/config.yaml` > safe defaults 合并配置，并返回来源追踪。safe defaults 包含 `integrations.hypo_claw`、`integrations.hypo_writer`、`projects`、`output.timezone` 和 `project_linkage.seeds`，路径使用 `~` 或运行时 HOME 派生，不包含本机绝对路径。
-
-用户配置迁移必须显式执行：`hypo-workflow config migrate` 只输出 dry-run 计划和 YAML，`hypo-workflow config migrate --write` 才写入 `~/.hypo-workflow/config.yaml`。`hypo-workflow sync` 在缺少用户配置时只输出迁移提示，不静默写用户级配置。
-
 ## 配置层级
 
 | 层级 | 文件 | 用途 | 写入边界 |
@@ -24,7 +20,6 @@
 | `automation.gates.execution` | `auto` | 普通 Milestone 可自动推进 | strict review 仍可阻塞 | 仅适用于普通本地执行 |
 | `automation.gates.destructive_external` | `confirm` | 破坏性或外部副作用不可自动执行 | 所有 profile 都保持确认 | destructive commands、external side effects |
 | `automation.gates.release_publish` | `confirm` | release publish 不自动执行 | release/tag/push 前确认 | tag、push、publish |
-| `execution.bash.mode` | `allow_local` | 本地 bash 执行默认放行 | 不能写成 OpenCode `bypass` | OpenCode 本地 YOLO 配置下不再拦截 bash |
 | `cycle.lifecycle_policy.gates.high_risk` | `confirm` | 当前 Cycle 的高风险动作 gate | 高风险动作不得因 auto_continue 放开 | PR/MR remote write、plugin install、user-level config write |
 | `cycle.lifecycle_policy.gates.pr_remote_write` | `confirm` | PR/MR 写远端需要确认 | 比普通 execution 更严格 | push、merge、close、reviewer/label/target branch 写入 |
 | `cycle.lifecycle_policy.gates.plugin_install` | `confirm` | 插件安装需要确认 | user-level 或 remote install 不自动 | Claude/Codex/OpenCode plugin install |
@@ -47,8 +42,6 @@
 ## P0 Configure 与 Subagent 授权
 
 `P0 Configure` 是每个新 Cycle 在 `P1 Discover` 前的配置阶段。用户可以重新选择，也可以明确沿用上一轮或项目/全局默认。该阶段覆盖 automation、Subagent authorization、acceptance、PR/MR remote write、full regression、analysis boundaries 和 worker separation，并把来源记录为 `cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config` 或 `built_in_default`。
-
-OpenCode 的本地 YOLO 模式通过 schema 合法的 `allow` 表达，不通过 OpenCode permission 非法值表达。项目使用 `execution.bash.mode: allow_local` 且关闭 confirm flags 后，测试、lint、build、format、sync、docs repair、`git push`、PR/MR 远端写、`curl/wget`、remote clone、publish、`rm -rf`、`git reset --hard`、系统级安装和 release publish 都不再由 OpenCode permission hook 拦截。生成的 `opencode.json` 应显式保留 `*: allow`、`bash: allow`、`edit: allow`、`question: allow`，只能使用 OpenCode 原生 `ask`/`allow`/`deny`，不得写入 `bypass`。
 
 strict worker separation 要求 implementation Subagent 与 test/review/audit 角色隔离。implementation worker 不读取 test source、fixtures、snapshots 或 assertion details；它只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若宿主平台不能提供这种隔离，必须在执行前说明 degraded mode，获得 explicit user confirmation，并记录 role isolation degradation。
 
@@ -100,11 +93,6 @@ automation:
     execution: auto
     destructive_external: confirm
     release_publish: confirm
-evaluation:
-  auto_continue: true
-batch:
-  auto_chain: true
-  default_gate: auto
 execution:
   bash:
     mode: allow_local
@@ -113,6 +101,11 @@ execution:
     confirm_system_install: false
   worker_separation:
     mode: recommended
+evaluation:
+  auto_continue: true
+batch:
+  auto_chain: true
+  default_gate: auto
 cycle:
   lifecycle_policy:
     gates:

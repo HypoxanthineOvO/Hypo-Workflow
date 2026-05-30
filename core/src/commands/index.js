@@ -43,6 +43,8 @@ export const CANONICAL_COMMANDS = Object.freeze([
   { canonical: "/hw:init", opencode: "/hw-init", agent: "hw-plan", route: "lifecycle", skill: "skills/init/SKILL.md" },
   { canonical: "/hw:check", opencode: "/hw-check", agent: "hw-status", route: "read", skill: "skills/check/SKILL.md" },
   { canonical: "/hw:audit", opencode: "/hw-audit", agent: "hw-review", route: "review", skill: "skills/audit/SKILL.md" },
+  { canonical: "/hw:quality", opencode: "/hw-quality", agent: "hw-review", route: "review", skill: "skills/quality/SKILL.md" },
+  { canonical: "/hw:optimize", opencode: "/hw-optimize", agent: "hw-build", route: "optimize", skill: "skills/optimize/SKILL.md" },
   { canonical: "/hw:release", opencode: "/hw-release", agent: "hw-build", route: "release", skill: "skills/release/SKILL.md" },
   { canonical: "/hw:debug", opencode: "/hw-debug", agent: "hw-debug", route: "debug", skill: "skills/debug/SKILL.md" },
   { canonical: "/hw:help", opencode: "/hw-help", agent: "hw-status", route: "read", skill: "skills/help/SKILL.md" },
@@ -55,9 +57,25 @@ export function commandMap(platform = "opencode") {
   if (platform !== "opencode") {
     return CANONICAL_COMMANDS.map((command) => ({ ...command }));
   }
-  return CANONICAL_COMMANDS.map((command) => ({ ...command }));
+  return CANONICAL_COMMANDS.map((command) => ({
+    ...command,
+    opencode: openCodeCommandName(command.canonical),
+  }));
 }
 
 export function commandByCanonical(name) {
-  return CANONICAL_COMMANDS.find((command) => command.canonical === name);
+  const command = CANONICAL_COMMANDS.find((item) => item.canonical === name);
+  if (!command) return undefined;
+  return {
+    ...command,
+    opencode: openCodeCommandName(command.canonical),
+  };
+}
+
+export function openCodeCommandName(canonical) {
+  return `/${canonical.slice(1).replace(/\s+/g, ":")}`;
+}
+
+export function legacyOpenCodeCommandName(canonical) {
+  return `/${canonical.slice(1).replace(/[:\s]+/g, "-")}`;
 }

@@ -565,8 +565,8 @@ test("acceptance blocks worker authorization waiting for start resume scope", as
 });
 
 test("cycle acceptance command map and docs are exposed", async () => {
-  assert.equal(commandByCanonical("/hw:accept").opencode, "/hw-accept");
-  assert.equal(commandByCanonical("/hw:reject").opencode, "/hw-reject");
+  assert.equal(commandByCanonical("/hw:accept").opencode, "/hw:accept");
+  assert.equal(commandByCanonical("/hw:reject").opencode, "/hw:reject");
   assert.equal(commandByCanonical("/hw:accept").agent, "hw-build");
   assert.equal(commandByCanonical("/hw:reject").agent, "hw-build");
 

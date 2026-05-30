@@ -1,0 +1,92 @@
+cycle: C18
+feature: audit-quality-optimize-integration-sync
+updated_at: "2026-05-30T13:04:58+08:00"
+source_summary:
+  - "Enhanced /hw:audit into Intake-first Experience/Engineering/Risk engineering audit."
+  - "Added first-class /hw:quality scorecard/baseline/compare/review/action queue command."
+  - "Added first-class /hw:optimize Audit+Quality -> Implement/Test -> Audit+Quality closed loop command."
+  - "Defined integration sync as a development/release gate, not a user command."
+source_evidence:
+  - core/src/commands/index.js
+  - skills/audit/SKILL.md
+  - references/audit-spec.md
+  - skills/quality/SKILL.md
+  - references/quality-spec.md
+  - skills/optimize/SKILL.md
+  - references/optimize-spec.md
+  - references/integration-sync-spec.md
+  - core/test/c18-instruction-quality-contract.test.js
+targets:
+  - name: Codex-VSP
+    path: ~/Codex-VSP
+    inspected_at: "2026-05-30T01:09:12+08:00"
+    dirty_status: dirty
+    status: adapted
+    plan: .pipeline/integrations/C18-Codex-VSP-adaptation-plan.md
+    applied_at: "2026-05-30T12:50:38+08:00"
+    required_changes:
+      - "Add /hw:quality and /hw:optimize to Workflow slash helper/discoverability surfaces."
+      - "Update injected Hypo-Workflow guidance and docs to describe enhanced Audit, Quality, Optimize, and integration sync boundary."
+      - "Extend ordinary conversation capture/inbox records to classify Audit/Quality/Optimize feedback candidates."
+      - "Add focused Rust tests for workflow routing, command discoverability, and capture classification."
+    validation_commands:
+      - "cd ~/Codex-VSP/codex-rs && cargo fmt --check"
+      - "cd ~/Codex-VSP/codex-rs && cargo test -p codex-tui workflow_slash_routing"
+      - "cd ~/Codex-VSP/codex-rs && cargo test -p codex-core workflow_conversation_capture"
+      - "cd ~/Codex-VSP/codex-rs && cargo test -p codex-core workflow_routing"
+      - "cd ~/Codex-VSP && git diff --check"
+    validation_status:
+      status: passed
+      notes:
+        - "cargo fmt --check passed with existing stable rustfmt imports_granularity warning."
+        - "workflow_slash_routing: 9 passed."
+        - "workflow_conversation_capture: 10 passed."
+        - "workflow_routing: 10 passed."
+        - "git diff --check passed."
+    target_records:
+      - "CHANGELOG.md"
+      - "PROJECT-SUMMARY.md"
+      - ".pipeline/PROGRESS.md"
+      - ".pipeline/log.yaml"
+    source_runtime_state_copied: false
+  - name: VSP-Open-Code
+    path: ~/VSP-Open-Code
+    inspected_at: "2026-05-30T01:09:12+08:00"
+    dirty_status: dirty
+    status: adapted
+    plan: .pipeline/integrations/C18-VSP-Open-Code-adaptation-plan.md
+    applied_at: "2026-05-30T13:02:51+08:00"
+    scope_expansion_confirmed:
+      at: "2026-05-30T12:58:00+08:00"
+      files:
+        - "packages/opencode/src/cli/cmd/workflow/registry.ts"
+        - "packages/opencode/src/session/reminders.ts"
+      reason: "Actual OpenCode command registration and model reminder surfaces live in these files; user confirmed expansion through Request Tool."
+    required_changes:
+      - "Add /hw:quality and /hw:optimize to Workflow command completion/submission surfaces."
+      - "Update Workflow reminder, Dashboard/Status, and WorkflowStore-facing guidance for Audit/Quality/Optimize."
+      - "Extend journal lightweight record classification for quality/optimize feedback candidates."
+      - "Add focused Bun tests under packages/opencode for workflow command, journal, dashboard/status, and WorkflowStore contracts."
+    validation_commands:
+      - "cd ~/VSP-Open-Code/packages/opencode && bun test test/workflow/integration-contract.test.ts test/workflow/yolo-governance-contract.test.ts"
+      - "cd ~/VSP-Open-Code/packages/opencode && bun test src/translation/continue-cache-queue.test.ts"
+      - "cd ~/VSP-Open-Code/packages/opencode && bun test test/workflow/platform-awareness-contract.test.ts test/util/locale.test.ts"
+      - "cd ~/VSP-Open-Code/packages/opencode && bun typecheck"
+      - "cd ~/VSP-Open-Code && git diff --check"
+    validation_status:
+      status: passed
+      notes:
+        - "integration-contract + yolo-governance: 22 passed."
+        - "continue-cache-queue: 7 passed."
+        - "platform-awareness + locale: 5 passed."
+        - "bun typecheck passed."
+        - "git diff --check passed."
+    target_records:
+      - "CHANGELOG.md"
+      - "PROJECT-SUMMARY.md"
+      - ".pipeline/log.yaml"
+      - ".pipeline/state.yaml"
+    source_runtime_state_copied: false
+release_gate:
+  status: target_apply_completed
+  reason: "Both confirmed target adaptations were applied with target-side records and focused validation; source runtime state files were not copied to targets."

@@ -49,6 +49,8 @@ function logFamily(type) {
   const normalized = normalizeLogType(type);
   if (!normalized) return null;
   if (normalized === "plan_review" || normalized.startsWith("plan_")) return "plan";
+  if (normalized.startsWith("planning")) return "plan";
+  if (normalized.startsWith("discovery")) return "plan";
   if (normalized.startsWith("deep_plan")) return "deep_plan";
   if (normalized.startsWith("cycle")) return "cycle";
   if (normalized.startsWith("feature")) return "feature";

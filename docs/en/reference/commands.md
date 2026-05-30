@@ -2,7 +2,7 @@
 
 [中文](../../../reference/commands.md) | English
 
-This page is generated from `core/src/commands/index.js`. Current user-facing command count: 50. Use the Canonical column as the user entrypoint and the OpenCode column as the platform mapping.
+This page is generated from `core/src/commands/index.js`. Current user-facing command count: 52. Use the Canonical column as the user entrypoint and the OpenCode column as the platform mapping.
 
 | Canonical | OpenCode | Agent | Skill |
 |---|---|---|---|
@@ -50,6 +50,8 @@ This page is generated from `core/src/commands/index.js`. Current user-facing co
 | `/hw:init` | `/hw-init` | `hw-plan` | `skills/init/SKILL.md` |
 | `/hw:check` | `/hw-check` | `hw-status` | `skills/check/SKILL.md` |
 | `/hw:audit` | `/hw-audit` | `hw-review` | `skills/audit/SKILL.md` |
+| `/hw:quality` | `/hw-quality` | `hw-review` | `skills/quality/SKILL.md` |
+| `/hw:optimize` | `/hw-optimize` | `hw-build` | `skills/optimize/SKILL.md` |
 | `/hw:release` | `/hw-release` | `hw-build` | `skills/release/SKILL.md` |
 | `/hw:debug` | `/hw-debug` | `hw-debug` | `skills/debug/SKILL.md` |
 | `/hw:help` | `/hw-help` | `hw-status` | `skills/help/SKILL.md` |

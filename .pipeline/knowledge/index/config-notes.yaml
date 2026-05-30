@@ -1,20 +1,8 @@
-schema_version: 1
 category: config-notes
 entries:
-  -
+  - created_at: 2026-05-06T22:14:11+08:00
+    items: []
     record_id: C8-DOC-platform-installation-boundary-20260506
-    type: chat
-    source: C8-docs-release-closeout
-    created_at: "2026-05-06T22:14:11+08:00"
-    summary: Documentation policy for platform installation, sync responsibilities, and Claude/Codex plugin boundaries.
-    tags:
-      - c8
-      - docs
-      - install
-      - platform-guides
-      - codex
-      - claude-code
-      - opencode
     refs:
       files:
         - README.md
@@ -27,13 +15,34 @@ entries:
         - docs/platforms/trae.md
         - references/platform-capabilities.md
         - core/src/docs/index.js
-    items:
-  -
-    record_id: C8-PLAN-domain-pack-boundary-and-review-rules-20260506
+    source: C8-docs-release-closeout
+    summary: Documentation policy for platform installation, sync responsibilities, and Claude/Codex plugin boundaries.
+    tags:
+      - c8
+      - docs
+      - install
+      - platform-guides
+      - codex
+      - claude-code
+      - opencode
     type: chat
+  - created_at: 2026-05-06T16:23:43+08:00
+    items: []
+    record_id: C8-PLAN-domain-pack-boundary-and-review-rules-20260506
+    refs:
+      files:
+        - .pipeline/design-spec.md
+        - .pipeline/architecture.md
+        - .pipeline/feature-queue.yaml
+        - .pipeline/prompts/06-domain-pack-boundary-protocol-and-knowledge-decision.md
+      urls:
+        - https://github.com/openai/codex-plugin-cc
+        - https://developers.openai.com/codex/subagents
+        - https://code.claude.com/docs/en/plugins
     source: C8-plan-discover
-    created_at: "2026-05-06T16:23:43+08:00"
-    summary: C8 planning decisions for structured Rules/Habits, default Review, externalizable domain packs, and Codex plugin confirmation boundaries.
+    summary: >-
+      C8 planning decisions for structured Rules/Habits, default Review, externalizable domain packs, and Codex plugin
+      confirmation boundaries.
     tags:
       - c8
       - planning
@@ -43,22 +52,40 @@ entries:
       - rtl
       - codex-plugin
       - claude-code
+    type: chat
+  - created_at: 2026-05-05T00:19:25+08:00
+    items:
+      - key: claude_code.settings.paths
+        reason: hook registration lives in settings files, not only in plugin manifests.
+        value: ~/.claude/settings.json,.claude/settings.json,.claude/settings.local.json
+      - key: claude_code.hooks.env
+        reason: hooks can reference project scripts portably.
+        value: CLAUDE_PROJECT_DIR
+      - key: opencode.plugin.paths
+        reason: project and global plugins auto-load.
+        value: .opencode/plugins/; ~/.config/opencode/plugins/
+      - key: opencode.command.paths
+        reason: custom commands are file-based and surface in the TUI.
+        value: .opencode/commands/
+      - key: codex.workflow.entrypoints
+        reason: official docs call out composable commands and reusable skills.
+        value: CLI commands; saved skills
+    record_id: C6-SYNC-claude-opencode-codex-interface-map-20260505
     refs:
       files:
-        - .pipeline/design-spec.md
-        - .pipeline/architecture.md
-        - .pipeline/feature-queue.yaml
-        - .pipeline/prompts/06-domain-pack-boundary-protocol-and-knowledge-decision.md
+        - references/knowledge-spec.md
+        - references/opencode-spec.md
+        - references/commands-spec.md
       urls:
-        - "https://github.com/openai/codex-plugin-cc"
-        - "https://developers.openai.com/codex/subagents"
-        - "https://code.claude.com/docs/en/plugins"
-    items:
-  -
-    record_id: C6-SYNC-claude-opencode-codex-interface-map-20260505
-    type: sync
+        - https://code.claude.com/docs/en/plugins
+        - https://code.claude.com/docs/en/plugins-reference
+        - https://docs.anthropic.com/en/docs/claude-code/hooks
+        - https://docs.anthropic.com/en/docs/claude-code/hooks-guide
+        - https://opencode.ai/docs/plugins/
+        - https://opencode.ai/docs/commands/
+        - https://opencode.ai/docs/tui/
+        - https://developers.openai.com/codex/use-cases/
     source: C6-claude-opencode-codex-interface-map
-    created_at: "2026-05-05T00:19:25+08:00"
     summary: Claude Code / OpenCode / Codex interface map for adapter planning
     tags:
       - claude-code
@@ -69,52 +96,16 @@ entries:
       - commands
       - ui
       - adapter
-    refs:
-      files:
-        - references/knowledge-spec.md
-        - references/opencode-spec.md
-        - references/commands-spec.md
-      urls:
-        - "https://code.claude.com/docs/en/plugins"
-        - "https://code.claude.com/docs/en/plugins-reference"
-        - "https://docs.anthropic.com/en/docs/claude-code/hooks"
-        - "https://docs.anthropic.com/en/docs/claude-code/hooks-guide"
-        - "https://opencode.ai/docs/plugins/"
-        - "https://opencode.ai/docs/commands/"
-        - "https://opencode.ai/docs/tui/"
-        - "https://developers.openai.com/codex/use-cases/"
+    type: sync
+  - created_at: 2026-05-02T21:52:30+08:00
     items:
-      -
-        key: claude_code.settings.paths
-        value: ~/.claude/settings.json,.claude/settings.json,.claude/settings.local.json
-        reason: hook registration lives in settings files, not only in plugin manifests.
-      -
-        key: claude_code.hooks.env
-        value: CLAUDE_PROJECT_DIR
-        reason: hooks can reference project scripts portably.
-      -
-        key: opencode.plugin.paths
-        value: .opencode/plugins/; ~/.config/opencode/plugins/
-        reason: project and global plugins auto-load.
-      -
-        key: opencode.command.paths
-        value: .opencode/commands/
-        reason: custom commands are file-based and surface in the TUI.
-      -
-        key: codex.workflow.entrypoints
-        value: CLI commands; saved skills
-        reason: official docs call out composable commands and reusable skills.
-  -
+      - key: knowledge.loading.records
+        reason: SessionStart loads compact and indexes only; raw records stay on-demand
+        value: false
+      - key: opencode.auto_continue.mode
+        reason: F001 gate requires visible conservative auto-continue policy before F002
+        value: safe
     record_id: C4-M05-f001-knowledge-and-opencode-integration-gate-18c2eaab
-    type: milestone
-    source: C4/M05
-    created_at: "2026-05-02T21:52:30+08:00"
-    summary: F001 Knowledge and OpenCode integration gate
-    tags:
-      - f001
-      - knowledge
-      - opencode
-      - gate
     refs:
       files:
         - core/src/knowledge/index.js
@@ -122,12 +113,12 @@ entries:
         - hooks/session-start.sh
         - hooks/stop-check.sh
         - .opencode/runtime/hypo-workflow-hooks.js
-    items:
-      -
-        key: knowledge.loading.records
-        value: false
-        reason: SessionStart loads compact and indexes only; raw records stay on-demand
-      -
-        key: opencode.auto_continue.mode
-        value: safe
-        reason: F001 gate requires visible conservative auto-continue policy before F002
+    source: C4/M05
+    summary: F001 Knowledge and OpenCode integration gate
+    tags:
+      - f001
+      - knowledge
+      - opencode
+      - gate
+    type: milestone
+schema_version: '1'

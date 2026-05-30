@@ -1,60 +1,19 @@
-status: completed
-updated_at: "2026-05-21T20:20:11+08:00"
+status: inactive
+updated_at: "2026-05-30T13:38:30+08:00"
 safe_resume_command: /hw:resume
-next_action: none
-reason: "C17 automated execution completed and is pending acceptance."
+next_action: "Prepare Sync Doc Release with explicit high-impact confirmation gates."
+reason: "C18 has been accepted; release preparation is a separate gated flow."
 context:
-  cycle: C17
-  current_milestone: C17-M6
-  current_step: completed
-  prompt_file: .pipeline/prompts/06-full-audit-closure-and-release-readiness.md
-  report_file: .pipeline/reports/06-full-audit-closure-and-release-readiness.report.md
-  active_workers: []
-  completed_workers:
-    - role: audit
-      id: "019e4a61-f404-7df1-9268-4efaa5902ea9"
-      nickname: Helmholtz
-      lifecycle: closed
-      evidence: .pipeline/reviews/C17/M5/audit.md
-    - role: test
-      id: "019e4a67-e5ca-77b1-bd5f-9a2bbf07f10a"
-      nickname: Hilbert
-      lifecycle: closed
-      evidence: .pipeline/reviews/C17/M6/test-evidence.md
-    - role: implement
-      id: "019e4a6b-4ae5-74e0-95ab-28404995eb1c"
-      nickname: Kepler
-      lifecycle: closed
-      evidence: .pipeline/reviews/C17/M6/implementation-evidence.md
-    - role: audit
-      id: "019e4a72-911d-7b62-948c-5459f509db27"
-      nickname: Pauli
-      lifecycle: closed
-      evidence: .pipeline/reviews/C17/M6/audit.md
-  last_completed_milestone: C17-M6
-  planning_context:
-    source: .pipeline/audits/audit-001.md
-    decompose: .plan-state/c17-decompose.yaml
-    technical_route: .plan-state/c17-technical-route.md
-    generate: .plan-state/c17-generate.yaml
-    confirm_summary: .pipeline/confirm-summary.md
-    confirmed_requirements:
-      scope: all_findings
-      config_authority: layered
-      workspace_decomposition: complete_in_c17
-      root_npm_test: mandatory
-      layered_config_migration: auto_generate_user_config
-      workspace_compatibility_shim: none_cut_clean
-      yaml_unification: js_yaml_dependency
-      ledger_strategy: append_only_jsonl_with_compact_yaml_summary
-      barrel_export_cleanup: broad_cleanup_preferred
-      docs_examples_import_update: required
-      config_migration_trigger: explicit_command_plus_sync_start_prompt
-      config_migration_silent_user_write: forbidden
-      ledger_migration: one_time_yaml_to_jsonl
-  carried_risks:
-    - "ARCH-05 remains a follow-up candidate for broader module boundary refactoring."
-    - "QUAL-06 remains a follow-up candidate for deep-plan subcommand split."
-  next_user_options:
-    - "/hw:accept to accept C17"
-    - "/hw:reject to request revision with feedback"
+  cycle: C18
+  current_prompt: .pipeline/prompts/05-target-repository-adaptation-after-confirmation.md
+  completed_prompt: .pipeline/prompts/05-target-repository-adaptation-after-confirmation.md
+  report: .pipeline/reports/05-target-repository-adaptation-after-confirmation.report.md
+  target_plans:
+    - .pipeline/integrations/C18-Codex-VSP-adaptation-plan.md
+    - .pipeline/integrations/C18-VSP-Open-Code-adaptation-plan.md
+  validation:
+    - "Codex-VSP focused Cargo tests and git diff --check: passing"
+    - "VSP-Open-Code focused Bun tests, typecheck, and git diff --check: passing"
+  target_write_policy:
+    - "Target writes completed after user confirmation."
+    - "Do not copy source .pipeline/state.yaml, .pipeline/cycle.yaml, or .pipeline/log.yaml into target repositories."

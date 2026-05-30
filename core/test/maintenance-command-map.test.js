@@ -26,7 +26,7 @@ test("/hw:maintain command family is exposed as first-class canonical commands",
   }
 
   const maintain = commandByCanonical("/hw:maintain");
-  assert.equal(maintain.opencode, "/hw-maintain");
+  assert.equal(maintain.opencode, "/hw:maintain");
   assert.equal(maintain.agent, "hw-build");
   assert.equal(maintain.route, "maintenance");
   assert.equal(maintain.skill, "skills/maintain/SKILL.md");
@@ -48,6 +48,6 @@ test("/hw:maintain family remains separated from /hw:sync", () => {
     const command = commandByCanonical(`/hw:maintain ${subcommand}`);
     assert.equal(command.route, "maintenance");
     assert.equal(command.skill, "skills/maintain/SKILL.md");
-    assert.match(command.opencode, new RegExp(`^/hw-maintain-${subcommand}$`));
+    assert.match(command.opencode, new RegExp(`^/hw:maintain:${subcommand}$`));
   }
 });

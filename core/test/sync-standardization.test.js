@@ -18,11 +18,12 @@ test("sync command map, skill, and OpenCode artifact are exposed", async () => {
   const root = await fixtureRoot();
   const result = await runProjectSync(root, { mode: "standard" });
 
-  assert.equal(commandMap("opencode").length, 50);
-  assert.equal(commandByCanonical("/hw:sync").opencode, "/hw-sync");
+  assert.equal(commandMap("opencode").length, 52);
+  assert.equal(commandByCanonical("/hw:sync").opencode, "/hw:sync");
   assert.equal(commandByCanonical("/hw:sync").agent, "hw-build");
   assert.match(await readFile("skills/sync/SKILL.md", "utf8"), /--light/);
-  assert.match(await readFile(join(root, ".opencode", "commands", "hw-sync.md"), "utf8"), /\/hw:sync/);
+  const rootConfig = JSON.parse(await readFile(join(root, "opencode.json"), "utf8"));
+  assert.match(rootConfig.command["hw:sync"].template, /skills\/sync\/SKILL\.md/);
   assert.ok(result.operations.includes("opencode_artifacts"));
 });
 
@@ -64,7 +65,7 @@ test("light sync refreshes registry and knowledge indexes without adapter writes
   assert.ok(result.operations.includes("registry_refresh"));
   assert.ok(result.operations.includes("knowledge_refresh"));
   assert.ok(result.operations.includes("external_change_detection"));
-  assert.equal(await exists(join(root, ".opencode", "commands", "hw-sync.md")), false);
+  assert.equal(await exists(join(root, "opencode.json")), false);
   assert.match(await readFile(join(root, ".pipeline", "knowledge", "knowledge.compact.md"), "utf8"), /Sync source changed/);
   assert.match(await readFile(registryFile, "utf8"), /pipeline_status/);
 });
@@ -98,7 +99,7 @@ test("standard and deep sync share core logic with CLI sync", async () => {
     encoding: "utf8",
   });
   assert.match(lightOutput, /mode=light/);
-  assert.equal(await exists(join(cliRoot, ".opencode", "commands", "hw-sync.md")), false);
+  assert.equal(await exists(join(cliRoot, "opencode.json")), false);
 
   const standardOutput = execFileSync(process.execPath, ["cli/bin/hypo-workflow", "sync", "--project", cliRoot], {
     cwd: ".",
@@ -106,7 +107,8 @@ test("standard and deep sync share core logic with CLI sync", async () => {
     encoding: "utf8",
   });
   assert.match(standardOutput, /mode=standard/);
-  assert.equal(await exists(join(cliRoot, ".opencode", "commands", "hw-sync.md")), true);
+  const cliRootConfig = JSON.parse(await readFile(join(cliRoot, "opencode.json"), "utf8"));
+  assert.ok(cliRootConfig.command["hw:sync"]);
 });
 
 test("SessionStart light sync detects drift without writes and TUI exposes explicit sync action", async () => {

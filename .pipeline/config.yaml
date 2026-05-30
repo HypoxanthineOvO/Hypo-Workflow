@@ -1,5 +1,5 @@
 pipeline:
-  name: "C17 审计修复与架构减债"
+  name: "C18 指令质量审查与集成同步方案"
   source: local
   output: local
   prompts_dir: .pipeline/prompts
@@ -16,6 +16,16 @@ plan:
 
 execution:
   mode: self
+  worker_separation:
+    mode: recommended
+    authorization:
+      status: authorized
+      scope:
+        - /hw:start
+        - /hw:resume
+      granted_by: C17 P0 Configure
+      confirmed_by_user: true
+      downgrade_requires_confirmation: true
   bash:
     mode: allow_local
     confirm_external: false
