@@ -1,4 +1,23 @@
 entries:
+  - id: RELEASE-PUBLISHED-v13.1.0-alpha.1-20260530T143140+0800
+    type: release
+    ref: v13.1.0-alpha.1
+    status: partially_published
+    timestamp: 2026-05-30T14:31:40+08:00
+    summary: "Published v13.1.0-alpha.1 to GitHub with commit d1df860, tag v13.1.0-alpha.1, and a prerelease page. GitLab origin push remains blocked by SSH authentication."
+    trigger: user
+    report: docs/release/v13.1.0-alpha.1.md
+    release_url: https://github.com/HypoxanthineOvO/Hypo-Workflow/releases/tag/v13.1.0-alpha.1
+    validations:
+      - "git commit: d1df860 release: v13.1.0-alpha.1"
+      - "git tag: v13.1.0-alpha.1 -> d1df860"
+      - "git push github main: success"
+      - "git push github v13.1.0-alpha.1: success"
+      - "gh release create v13.1.0-alpha.1 --prerelease: success"
+      - "git push origin main/tag: blocked by Permission denied (publickey,password)"
+    evidence_refs:
+      - docs/release/v13.1.0-alpha.1.md
+      - CHANGELOG.md
   - id: RELEASE-PREP-v13.1.0-alpha.1-20260530T141144+0800
     type: release_prepared
     ref: v13.1.0-alpha.1

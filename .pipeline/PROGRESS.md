@@ -1,6 +1,6 @@
 # C18 指令质量审查与集成同步方案
 
-> 最后更新：14:11 | 状态：completed / accepted / release prepared | 进度：6/6 Milestone
+> 最后更新：14:31 | 状态：completed / accepted / release partially published | 进度：6/6 Milestone
 
 ## 当前状态
 
@@ -28,6 +28,7 @@
 
 | 时间 | 类型 | 事件 | 结果 |
 |---|---|---|---|
+| 14:31 | Release | v13.1.0-alpha.1 published to GitHub | Release commit `d1df860` 和 tag `v13.1.0-alpha.1` 已推送到 GitHub，GitHub prerelease 已创建；GitLab `origin` push 因 SSH 鉴权 `Permission denied (publickey,password)` 阻塞，需后续人工处理或切换 GitLab API/凭据路径 |
 | 14:11 | Release Prep | v13.1.0-alpha.1 prepared | Sync/doc repair、版本更新、release notes、docs governance、version consistency、`npm test` 665/665、`sync --check-only` fresh、`git diff --check` 均通过；`git add/commit/tag/push` 仍等待用户显式确认 |
 | 13:38 | Acceptance | C18 accepted | 用户确认进入 Sync Doc Release 准备；C18 已标记为 completed/accepted，后续发布动作按独立门禁处理 |
 | 13:04 | Execution | C18-M6 completed | Codex-VSP 与 VSP-Open-Code 目标适配完成；目标侧记录已写入，源 matrix 已回链；Codex-VSP focused Cargo tests + `git diff --check` 通过，VSP-Open-Code focused Bun tests + `bun typecheck` + `git diff --check` 通过 |
