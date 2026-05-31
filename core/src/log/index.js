@@ -43,6 +43,8 @@ export const LIFECYCLE_LOG_STATUSES = Object.freeze([
   "closed",
   "revised",
   "pending_acceptance",
+  "prepared",
+  "partially_published",
   "waiting_confirmation",
   "confirmed",
   "started",

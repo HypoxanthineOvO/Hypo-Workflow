@@ -21,7 +21,7 @@ entries:
   - id: "M0"
     type: milestone_start | milestone_complete | feature_start | feature_complete | step_complete | cycle_accept | cycle_reject | sync_repair | lease_takeover | handoff | derived_refresh | platform_failure | audit | debug | release | patch | pr | watchdog | chat_entry | chat_session
     ref: "C5/M08"
-    status: active | completed | warning | blocked | failed | proposed | queued | skipped | accepted | rejected | deferred | running | done | closed | revised | pending_acceptance | waiting_confirmation | confirmed | review_ready | remote_review_submitted | rereview_passed | merged
+    status: active | completed | warning | blocked | failed | proposed | queued | skipped | accepted | rejected | deferred | running | done | closed | revised | pending_acceptance | prepared | partially_published | waiting_confirmation | confirmed | review_ready | remote_review_submitted | rereview_passed | merged
     timestamp: "2026-04-24T10:00:00Z"
     summary: "Added unified logging foundation."
     report: ".pipeline/fixes/fix-001.md"
