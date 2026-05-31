@@ -6,7 +6,7 @@
 
 Plan -> Execute -> Review -> Report -> Resume
 
-[![Version](https://img.shields.io/badge/version-13.1.0-alpha.1-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-13.1.0-beta.1-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/en/reference/platforms.md)
 
@@ -89,7 +89,7 @@ Current version exposes **52 user-facing commands** and **1 internal watchdog** 
 | [Platforms Reference](docs/en/reference/platforms.md) | Platform capability matrix |
 | [Generated Artifacts](docs/en/reference/generated-artifacts.md) | Generated adapter and docs sources |
 | [Configuration Reference](docs/en/reference/configuration.md) | Automation, gates, profiles, and worker separation |
-| [v13.1.0-alpha.1 Release Notes](docs/en/release/v13.1.0-alpha.1.md) | C18 Audit/Quality/Optimize command upgrade and integration sync gate |
+| [v13.1.0-beta.1 Release Notes](docs/en/release/v13.1.0-beta.1.md) | C18 Audit/Quality/Optimize command upgrade and integration sync gate |
 
 ## License
 

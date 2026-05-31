@@ -1,15 +1,15 @@
 ---
-description: Hypo-Workflow mapping for /hw:quality
+description: Hypo-Workflow mapping for /hw:maintain verify
 hypo_workflow_managed: true
 ---
 
-# /hw:quality
+# /hw:maintain verify
 
-Canonical command: `/hw:quality`
-Route: `review`
-Skill: `skills/quality/SKILL.md`
+Canonical command: `/hw:maintain verify`
+Route: `maintenance`
+Skill: `skills/maintain/SKILL.md`
 
-Load the corresponding Hypo-Workflow skill instructions from `skills/quality/SKILL.md`, then execute `/hw:quality` semantics with any user-provided arguments.
+Load the corresponding Hypo-Workflow skill instructions from `skills/maintain/SKILL.md`, then execute `/hw:maintain verify` semantics with any user-provided arguments.
 
 
 ## Ask Questions Discipline

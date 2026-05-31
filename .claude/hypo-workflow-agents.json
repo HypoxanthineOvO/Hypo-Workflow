@@ -58,7 +58,7 @@
   },
   "agents": {
     "plan": {
-      "model": "gpt-5.5"
+      "model": "deepseek-v4-pro"
     },
     "code": {
       "model": "mimo-v2.5-pro"
@@ -67,10 +67,10 @@
       "model": "mimo-v2.5-pro"
     },
     "review": {
-      "model": "gpt-5.5"
+      "model": "deepseek-v4-pro"
     },
     "debug": {
-      "model": "gpt-5.5"
+      "model": "deepseek-v4-pro"
     },
     "docs": {
       "model": "deepseek-v4-pro"

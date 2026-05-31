@@ -338,14 +338,24 @@ function pathToFileUrl(file) {
 
 function notificationStdinPayload(payload) {
   const text = JSON.stringify(payload);
-  const value = new String(text);
-  Object.defineProperty(value, "includes", {
-    enumerable: false,
-    value: (needle) => text.includes(needle) || String(payload.message || "").includes(needle),
-  });
-  Object.defineProperty(value, "toJSON", {
-    enumerable: false,
-    value: () => "[stdin omitted from command-shape evidence]",
+  const value = {};
+  Object.defineProperties(value, {
+    includes: {
+      enumerable: false,
+      value: (needle) => text.includes(needle) || String(payload.message || "").includes(needle),
+    },
+    toJSON: {
+      enumerable: false,
+      value: () => "[stdin omitted from command-shape evidence]",
+    },
+    toString: {
+      enumerable: false,
+      value: () => text,
+    },
+    valueOf: {
+      enumerable: false,
+      value: () => text,
+    },
   });
   return value;
 }

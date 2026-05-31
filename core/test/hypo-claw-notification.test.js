@@ -154,6 +154,9 @@ test("notify mode only constructs Hypo-Claw CLI stdin notify invocation with thr
     "https://claw.example.invalid",
   ]);
   assert.equal(calls[0].options?.stdin.includes(FINAL_ASSISTANT_OUTPUT), true);
+  assert.equal(typeof calls[0].options?.stdin, "object");
+  assert.equal(calls[0].options?.stdin instanceof String, false);
+  assert.equal(JSON.parse(String(calls[0].options?.stdin)).message.includes(FINAL_ASSISTANT_OUTPUT), true);
   assert.doesNotMatch(JSON.stringify(calls[0]), /--test|curl|qq_client|sendMessage|token/i);
 });
 

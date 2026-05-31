@@ -7,4 +7,4 @@ This file is a generated Hypo-Workflow project summary. Edit authority files und
 - Current: Target repository adaptation after confirmation
 - Step: cycle_accepted
 - Progress: 6/6
-- Progress note: > 最后更新：13:38 | 状态：completed / accepted | 进度：6/6 Milestone
+- Progress note: > 最后更新：14:31 | 状态：completed / accepted / release partially published | 进度：6/6 Milestone

@@ -78,7 +78,7 @@ export async function runProjectSync(projectRoot = ".", options = {}) {
     operations.push("opencode_artifacts");
   } else if (platform === "claude-code") {
     claudeCodePlugin = await writeClaudeCodePluginArtifacts(root, {
-      version: config.version || DEFAULT_GLOBAL_CONFIG.version,
+      version: DEFAULT_GLOBAL_CONFIG.version,
       model: config.claude_code?.model || DEFAULT_GLOBAL_CONFIG.claude_code.model,
     });
     operations.push("claude_code_plugin");
@@ -200,7 +200,7 @@ export function mergeClaudeCodeSettings(existing = {}, options = {}) {
   next.hypo_workflow = {
     managed_by: MANAGED_BY,
     settings_version: 1,
-    version: config.version || DEFAULT_GLOBAL_CONFIG.version,
+    version: DEFAULT_GLOBAL_CONFIG.version,
     managed_keys: managedClaudeSettingsKeys(desiredEnv),
   };
 

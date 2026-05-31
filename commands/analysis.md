@@ -1,15 +1,15 @@
 ---
-description: Hypo-Workflow mapping for /hw:quality
+description: Hypo-Workflow mapping for /hw:analysis
 hypo_workflow_managed: true
 ---
 
-# /hw:quality
+# /hw:analysis
 
-Canonical command: `/hw:quality`
-Route: `review`
-Skill: `skills/quality/SKILL.md`
+Canonical command: `/hw:analysis`
+Route: `analysis`
+Skill: `skills/analysis/SKILL.md`
 
-Load the corresponding Hypo-Workflow skill instructions from `skills/quality/SKILL.md`, then execute `/hw:quality` semantics with any user-provided arguments.
+Load the corresponding Hypo-Workflow skill instructions from `skills/analysis/SKILL.md`, then execute `/hw:analysis` semantics with any user-provided arguments.
 
 
 ## Ask Questions Discipline

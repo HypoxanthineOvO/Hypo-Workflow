@@ -1,10 +1,10 @@
 ---
 name: hypo-workflow
-version: 13.1.0-alpha.1
+version: 13.1.0-beta.1
 description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:analysis`, `/hw:plan`, `/hw:plan:deep`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:maintain`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:quality`, `/hw:optimize`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
 ---
 
-# Hypo-Workflow v13.1.0-alpha.1
+# Hypo-Workflow v13.1.0-beta.1
 
 > **Claude Code 用户**：安装/启用 `hw` plugin 后使用 `/hw:*` 指令；Claude 原生 `/resume` 不属于 Hypo-Workflow，Hypo 恢复命令始终是 `/hw:resume`。
 >

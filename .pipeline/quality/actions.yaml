@@ -1,0 +1,52 @@
+actions:
+  - id: QACT-001
+    source_report: .pipeline/quality/quality-001.md
+    dimension: Correctness
+    score: 3
+    priority: high
+    route: /hw:patch
+    summary: Align lifecycle log statuses and release records with validator/spec.
+    validation: "node --test core/test/log-evidence.test.js && npm test && git diff --check"
+    status: done
+    completed_at: 2026-05-31T22:53:04+08:00
+    completion: "Added release status support and fixed release log family classification; focused log tests and npm test pass."
+  - id: QACT-002
+    source_report: .pipeline/quality/quality-001.md
+    dimension: Structure/Organization
+    score: 3
+    priority: high
+    route: /hw:patch
+    summary: Add quality lifecycle family/type support or revise Quality persistence contract to an existing log family.
+    validation: "node --test core/test/c18-instruction-quality-contract.test.js core/test/log-evidence.test.js && npm test"
+    status: done
+    completed_at: 2026-05-31T22:53:04+08:00
+    completion: "Added quality lifecycle family support in runtime and log spec; focused C18/log tests and npm test pass."
+  - id: QACT-003
+    source_report: .pipeline/quality/quality-001.md
+    dimension: Test Quality
+    score: 3
+    priority: medium
+    route: /hw:plan
+    summary: Convert Notion script tests into pytest-compatible fixture tests and gate live token tests explicitly.
+    validation: "pytest -q tests && python3 -m compileall -q dashboard scripts tests"
+    status: open
+  - id: QACT-004
+    source_report: .pipeline/quality/quality-001.md
+    dimension: Maintainability
+    score: 3
+    priority: medium
+    route: /hw:patch
+    summary: Replace notificationStdinPayload String wrapper with a plain evidence object or explicit string/metadata model.
+    validation: "node --test core/test/project-notifications.test.js core/test/hypo-claw-notification.test.js && npm test"
+    status: done
+    completed_at: 2026-05-31T22:53:04+08:00
+    completion: "Replaced String wrapper with an explicit plain object carrying includes/toString/valueOf/toJSON behavior; focused notification tests and npm test pass."
+  - id: QACT-005
+    source_report: .pipeline/quality/quality-001.md
+    dimension: Maintainability
+    score: 3
+    priority: low
+    route: /hw:optimize
+    summary: Continue migrating duplicated local helper implementations to core/src/utils/index.js where behavior matches.
+    validation: "node --test core/test/utils.test.js && npm test"
+    status: open

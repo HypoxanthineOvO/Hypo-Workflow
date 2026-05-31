@@ -39,6 +39,20 @@ test("Recent feed sorts by timestamp and filters internal platform noise", () =>
   assert.deepEqual(a.map((entry) => entry.id), ["m2", "m1"]);
 });
 
+test("lifecycle log accepts release and quality command records", () => {
+  const result = validateLifecycleLog({
+    entries: [
+      event("release-prep", "release_prepared", "prepared", "2026-05-30T14:11:44+08:00", "prepared release"),
+      event("release-pub", "release", "partially_published", "2026-05-30T14:31:40+08:00", "published release"),
+      event("quality", "quality", "completed", "2026-05-31T22:28:31+08:00", "quality report"),
+    ],
+  });
+
+  assert.equal(result.ok, true, result.errors.join("\n"));
+  assert.ok(result.families.includes("release"));
+  assert.ok(result.families.includes("quality"));
+});
+
 test("status Recent uses sorted filtered feed with redacted summaries", async () => {
   const root = await fixtureRoot();
   await writeConfig(join(root, ".pipeline", "state.yaml"), {

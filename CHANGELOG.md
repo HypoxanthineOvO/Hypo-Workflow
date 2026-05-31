@@ -1,5 +1,31 @@
 # Changelog
 
+## v13.1.0-beta.1 - 2026-05-31
+
+### Fixes
+
+- 修复 lifecycle log schema 与 runtime：支持 `quality` family，并接受 release 准备/部分发布状态 `prepared` 与 `partially_published`。
+- 修复 `release` 事件因包含 `lease` 子串而被错误归类为 `recovery` 的问题。
+- 替换 `notificationStdinPayload` 的 `new String()` 包装对象，改为显式 plain object，同时保留 `includes()`、`String(stdin)` 和 `toJSON()` 行为。
+
+### Quality
+
+- 新增 `.pipeline/quality/quality-001.md`、`.pipeline/quality/actions.yaml` 和 `.pipeline/quality/state.yaml`，记录首轮 `/hw:quality` scorecard、action queue 和修复状态。
+- 关闭 `QACT-001`、`QACT-002`、`QACT-004`；保留 Python Notion 测试可移植性 `QACT-003` 和 helper 去重 `QACT-005`。
+
+### Docs
+
+- README / README.en 指向 v13.1.0-beta.1 beta 发布说明。
+- Docs governance map、release notes、版本源、OpenCode/Claude/Codex package metadata、默认配置版本和 generator `HW_VERSION` 同步到 13.1.0-beta.1。
+- `references/log-spec.md` 补充 `quality` type 与 release 状态。
+
+### Tests
+
+- `node --test core/test/log-evidence.test.js core/test/c18-instruction-quality-contract.test.js`: 10/10 passing。
+- `node --test core/test/hypo-claw-notification.test.js core/test/project-notifications.test.js`: 15/15 passing。
+- `npm test`: 666/666 passing。
+- `git diff --check`: passing。
+
 ## v13.1.0-alpha.1 - 2026-05-30
 
 ### Features

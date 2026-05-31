@@ -14,6 +14,7 @@ const RECENT_FAMILIES = new Set([
   "handoff",
   "derived_refresh",
   "audit",
+  "quality",
   "debug",
   "release",
   "chat",
@@ -63,13 +64,14 @@ function logFamily(type) {
   if (normalized.startsWith("acceptance") || normalized.startsWith("cycle_accept") || normalized.startsWith("cycle_reject")) return "acceptance";
   if (normalized.startsWith("sync")) return "sync";
   if (normalized.startsWith("external_sync")) return "sync";
+  if (normalized.startsWith("release")) return "release";
   if (normalized.startsWith("recovery") || normalized.includes("lease") || normalized.includes("takeover")) return "recovery";
   if (normalized.startsWith("handoff")) return "handoff";
   if (normalized.startsWith("derived")) return "derived_refresh";
   if (normalized.startsWith("platform")) return "platform";
   if (normalized.startsWith("audit")) return "audit";
+  if (normalized.startsWith("quality")) return "quality";
   if (normalized.startsWith("debug")) return "debug";
-  if (normalized.startsWith("release")) return "release";
   if (normalized.startsWith("watchdog")) return "watchdog";
   if (normalized.startsWith("chat")) return "chat";
   if (normalized.startsWith("pipeline")) return "cycle";

@@ -19,7 +19,7 @@ Use this reference for the V6 lifecycle ledger at `.pipeline/log.yaml`.
 ```yaml
 entries:
   - id: "M0"
-    type: milestone_start | milestone_complete | feature_start | feature_complete | step_complete | cycle_accept | cycle_reject | sync_repair | lease_takeover | handoff | derived_refresh | platform_failure | audit | debug | release | patch | pr | watchdog | chat_entry | chat_session
+    type: milestone_start | milestone_complete | feature_start | feature_complete | step_complete | cycle_accept | cycle_reject | sync_repair | lease_takeover | handoff | derived_refresh | platform_failure | audit | quality | debug | release | patch | pr | watchdog | chat_entry | chat_session
     ref: "C5/M08"
     status: active | completed | warning | blocked | failed | proposed | queued | skipped | accepted | rejected | deferred | running | done | closed | revised | pending_acceptance | prepared | partially_published | waiting_confirmation | confirmed | review_ready | remote_review_submitted | rereview_passed | merged
     timestamp: "2026-04-24T10:00:00Z"
@@ -32,7 +32,7 @@ entries:
 Field rules:
 
 - `id`: stable entry id such as `M0`, `FIX-003`, `AUDIT-002`
-- `type`: belongs to one lifecycle family: cycle, plan, feature, milestone, step, patch, pr, acceptance, sync, recovery, handoff, derived refresh, platform, audit, debug, release, watchdog, or chat
+- `type`: belongs to one lifecycle family: cycle, plan, feature, milestone, step, patch, pr, acceptance, sync, recovery, handoff, derived refresh, platform, audit, quality, debug, release, watchdog, or chat
 - `ref`: human-readable pointer to a prompt, command, report, release tag, or issue
 - `status`: lifecycle result for the entry
 - `timestamp`: ISO-8601 timestamp
