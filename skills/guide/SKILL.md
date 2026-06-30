@@ -17,7 +17,7 @@ description: Interactive onboarding guide that senses the current project state 
 
 Guide 是一个交互式意图路由器，适用于不确定接下来运行哪个 Hypo-Workflow 命令路径的用户。它感知项目状态和用户意图，推荐一个下一步路径，请求确认，然后仅在用户同意时执行第一个推荐的命令。
 
-在为新的或活跃的 Cycle 推荐 `/hw:plan` 之前，当 `P0 Configure` 预发现阶段尚未完成或明确重用时，Guide 应该将其显示出来。`P0 Configure` 在 `cycle new` 之后、`P1 Discover` 之前运行；它确认自动化、Subagent 授权、验收模式、PR/MR 远程写入策略、完整回归、分析边界和 worker separation。用户可以选择重用先前的配置，解析顺序为：`cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config`、`built_in_default`。
+在为新的或活跃的 Cycle 推荐 `/hw:plan` 之前，当 `P0 Configure` 预发现阶段尚未完成或明确重用时，Guide 应该将其显示出来。`P0 Configure` 在 `cycle new` 之后、Discover 之前运行；它确认自动化、Subagent 授权、验收模式、PR/MR 远程写入策略、完整回归、分析边界和 worker separation。用户可以选择重用先前的配置，解析顺序为：`cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config`、`built_in_default`。
 
 ## Step 1: 简短介绍
 
@@ -85,7 +85,7 @@ Guide 是一个交互式意图路由器，适用于不确定接下来运行哪�
 
 `/hw:docs` 是文档工作流路由目标。用于文档检查、修复、生成引用和 README/docs 信息架构工作。
 
-对于进入规划的流程，除非用户明确表示要重用已解析的配置，否则在第一个 `P1 Discover` 问题之前推荐 `P0 Configure`。`P0 Configure` 在 `cycle new` 之后、`P1 Discover` 之前运行，询问自动化、Subagent 授权、验收模式、PR/MR 远程写入确认、完整回归、分析边界和 worker separation，并且可以从 `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default` 重用值。
+对于进入规划的流程，除非用户明确表示要重用已解析的配置，否则在第一个 Discover 问题之前推荐 `P0 Configure`。`P0 Configure` 在 `cycle new` 之后、Discover 之前运行，询问自动化、Subagent 授权、验收模式、PR/MR 远程写入确认、完整回归、分析边界和 worker separation，并且可以从 `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default` 重用值。
 
 ## Step 5: 确认并执行
 

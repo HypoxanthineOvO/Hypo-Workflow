@@ -62,6 +62,14 @@
       "template": "Load the Hypo-Workflow skill instructions from `skills/plan-discover/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
       "description": "Hypo-Workflow /hw:plan:discover"
     },
+    "hw:plan:technical-stack": {
+      "template": "Load the Hypo-Workflow skill instructions from `skills/plan-technical-stack/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
+      "description": "Hypo-Workflow /hw:plan:technical-stack"
+    },
+    "hw:plan:architecture": {
+      "template": "Load the Hypo-Workflow skill instructions from `skills/plan-architecture/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
+      "description": "Hypo-Workflow /hw:plan:architecture"
+    },
     "hw:plan:decompose": {
       "template": "Load the Hypo-Workflow skill instructions from `skills/plan-decompose/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
       "description": "Hypo-Workflow /hw:plan:decompose"
@@ -69,10 +77,6 @@
     "hw:plan:generate": {
       "template": "Load the Hypo-Workflow skill instructions from `skills/plan-generate/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
       "description": "Hypo-Workflow /hw:plan:generate"
-    },
-    "hw:plan:confirm": {
-      "template": "Load the Hypo-Workflow skill instructions from `skills/plan-confirm/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",
-      "description": "Hypo-Workflow /hw:plan:confirm"
     },
     "hw:plan:extend": {
       "template": "Load the Hypo-Workflow skill instructions from `skills/plan-extend/SKILL.md`, then execute the canonical command semantics.\n\nKeep this command as an OpenCode-native slash mapping. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.",

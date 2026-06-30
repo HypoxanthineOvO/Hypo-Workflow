@@ -12,7 +12,7 @@ import {
 
 const metadata = {
   name: "hypo-workflow",
-  version: "13.1.0-beta.1",
+  version: "13.1.0-beta.2",
   commandMap: [
   {
     "canonical": "/hw:start",
@@ -92,6 +92,20 @@ const metadata = {
     "skill": "skills/plan-discover/SKILL.md"
   },
   {
+    "canonical": "/hw:plan:technical-stack",
+    "opencode": "/hw:plan:technical-stack",
+    "agent": "hw-plan",
+    "route": "plan",
+    "skill": "skills/plan-technical-stack/SKILL.md"
+  },
+  {
+    "canonical": "/hw:plan:architecture",
+    "opencode": "/hw:plan:architecture",
+    "agent": "hw-plan",
+    "route": "plan",
+    "skill": "skills/plan-architecture/SKILL.md"
+  },
+  {
     "canonical": "/hw:plan:decompose",
     "opencode": "/hw:plan:decompose",
     "agent": "hw-plan",
@@ -104,13 +118,6 @@ const metadata = {
     "agent": "hw-plan",
     "route": "plan",
     "skill": "skills/plan-generate/SKILL.md"
-  },
-  {
-    "canonical": "/hw:plan:confirm",
-    "opencode": "/hw:plan:confirm",
-    "agent": "hw-plan",
-    "route": "plan",
-    "skill": "skills/plan-confirm/SKILL.md"
   },
   {
     "canonical": "/hw:plan:extend",

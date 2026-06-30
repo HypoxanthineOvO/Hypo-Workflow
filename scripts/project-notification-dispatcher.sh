@@ -7,8 +7,5 @@ export PATH="${HOME}/.local/bin:${HOME}/.volta/bin:/usr/local/bin:/usr/bin:/bin:
 project_root="${1:-${HOME}/Hypo-Workflow}"
 shift || true
 
-node "$project_root/cli/bin/hypo-workflow" project-notifications dispatch \
-  --home "${HOME}" \
-  --confirmed \
-  --server "${HYPO_CLAW_SERVER:-http://localhost:3000}" \
-  "$@"
+echo "Hypo-Workflow project-stop QQ dispatcher is retired; Hermes Codex completion watch owns user-facing completion reports."
+exit 0

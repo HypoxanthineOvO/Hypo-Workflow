@@ -24,9 +24,9 @@ test("skill spec documents required sections and quality contract", async () => 
   }
 
   for (const requiredPhrase of [
-    "43 local Skill files",
-    "42 user-facing Skill paths",
-    "52 user-facing commands",
+    "45 local Skill files",
+    "43 user-facing Skill paths",
+    "53 user-facing commands",
     "watchdog",
     "internal",
     "no merge or delete",
@@ -44,8 +44,8 @@ test("skill spec keeps command map and local skill inventory traceable", async (
   const commands = commandMap("opencode");
   const userSkillPaths = [...new Set(commands.map((command) => command.skill))];
 
-  assert.equal(commands.length, 52);
-  assert.equal(userSkillPaths.length, 42);
+  assert.equal(commands.length, 53);
+  assert.equal(userSkillPaths.length, 43);
 
   for (const skillPath of userSkillPaths) {
     assert.ok(existsSync(skillPath), `command map references missing skill: ${skillPath}`);

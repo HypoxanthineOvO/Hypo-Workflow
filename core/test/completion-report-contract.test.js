@@ -149,6 +149,36 @@ test("milestone, cycle, debug, audit, and patch completion surfaces share the sa
   }
 });
 
+test("completion contract forbids path-only final responses", async () => {
+  const contract = await readFile("references/completion-report-contract.md", "utf8");
+
+  assert.match(contract, /final response must display the report's core content/i);
+  assert.match(contract, /bare sentence[\s\S]{0,120}`\.pipeline\/\.\.\.\/report\.md`[\s\S]{0,120}insufficient/i);
+  assert.match(contract, /explain the substance of the report/i);
+  assert.match(contract, /must not only list `\.pipeline\/\.\.\.` paths/i);
+  assert.match(contract, /worker closures, YAML validity, and test counts/i);
+  assert.match(contract, /for each important report\/review artifact/i);
+  assert.match(contract, /what the user should understand or do next/i);
+});
+
+test("completion contract requires domain explanation for learning and research artifacts", async () => {
+  const contract = await readFile("references/completion-report-contract.md", "utf8");
+
+  for (const expected of [
+    /learning gates/i,
+    /quizzes/i,
+    /research reports/i,
+    /requirement briefs/i,
+    /domain explanation in the chat itself/i,
+    /teach the key concepts/i,
+    /how the report or quiz is structured/i,
+    /intended checkpoint outcome/i,
+    /artifact paths are supporting references after that explanation/i,
+  ]) {
+    assert.match(contract, expected);
+  }
+});
+
 async function readDocs(paths) {
   const entries = await Promise.all(
     paths.map(async (path) => [path, await readFile(path, "utf8")]),

@@ -38,17 +38,9 @@ Stop 会阻止缺失 `state.yaml`、`log.yaml`、`PROGRESS.md`、最终步骤 re
 
 ## Project Stop QQ Notifications
 
-项目停止通知分两段执行：
+旧的 Hypo-Workflow project-stop QQ 通知链路已经退役。此前 Claude Stop hook 和 Codex notify hook 会在终态时写入本地 pending queue，再由 `scripts/project-notification-dispatcher.sh` 每分钟读取队列并通过 Hypo-Claw 发送 QQ。现在用户侧 Codex 完成通知由 Hermes 的 `Codex completion watch` 负责：Hermes 每 2 分钟扫描 `~/.codex/sessions/**/*.jsonl`，发现 `task_complete` / `final_answer` 后通过 Hermes Cron 投递到 QQ。
 
-- Hook-safe enqueue：Claude Stop hook 和 Codex notify hook 在终态时只写本地 pending queue `~/.hypo-workflow/notifications/project-stop-pending.yaml`，不直接发 QQ。
-- Confirmed dispatcher：`scripts/project-notification-dispatcher.sh` 由 cron 每分钟运行，调用 `hypo-workflow project-notifications dispatch --confirmed`，通过 Hypo-Claw private target 发送，并要求 QQ `external_message_id` evidence 才标记为 sent。
-
-手动查看和发送：
-
-```bash
-hypo-workflow project-notifications status
-hypo-workflow project-notifications dispatch --confirmed --server http://localhost:3000
-```
+退役原因：旧队列 `~/.hypo-workflow/notifications/project-stop-pending.yaml` 曾膨胀到约 528 MB，dispatcher 每分钟读取时触发 Node heap out-of-memory，并在系统日志中产生规律性的 `cron:session opened/closed` 噪声。避免重复通知和资源浪费后，Hypo-Workflow hooks 只保留工作流约束、resume/context、progress refresh 等本地安全功能，不再写入 project-stop QQ 通知队列。
 
 ## Chat Recovery
 

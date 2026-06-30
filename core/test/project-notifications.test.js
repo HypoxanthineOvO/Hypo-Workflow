@@ -91,7 +91,7 @@ test("dispatchProjectStopNotifications sends pending entries only with confirmed
   assert.equal(sentEntry.notification_result.external_contacted, true);
 });
 
-test("Claude Stop hook queues terminal project notification without external side effects", async () => {
+test("Claude Stop hook reports retired project notification path without external side effects", async () => {
   const evaluateClaudeHookEvent = requireApi("evaluateClaudeHookEvent");
   const dir = await mkdtemp(join(tmpdir(), "hw-claude-stop-notify-"));
   const home = await mkdtemp(join(tmpdir(), "hw-claude-stop-home-"));
@@ -103,33 +103,32 @@ test("Claude Stop hook queues terminal project notification without external sid
     notification_home_dir: home,
   }, { projectRoot: dir });
 
-  assert.match(output.systemMessage, /project stop notification queued/i);
+  assert.match(output.systemMessage, /notification enqueue is retired/i);
+  assert.equal(output.project_stop_notification.status, "retired");
+  assert.equal(output.project_stop_notification.replacement, "Hermes Codex completion watch");
   assert.equal(output.project_stop_notification.external_contacted, false);
   assert.equal(output.project_stop_notification.qq_contacted, false);
-  assert.match(output.project_stop_notification.queue_path, /\.jsonl$/);
-  const queue = await readJsonlEntries(output.project_stop_notification.queue_path);
-  assert.equal(queue[0].status, "pending");
-  assert.match(queue[0].message, /Final output for queued stop notification/);
 });
 
-test("Codex notify hook uses workflow-root CLI and enqueues terminal state locally", async () => {
+test("Codex notify hook no longer enqueues retired project-stop QQ notifications", async () => {
   const script = await readFile("hooks/codex-notify.sh", "utf8");
 
   assert.match(script, /workflow_root=/);
-  assert.match(script, /project-notifications enqueue/);
-  assert.match(script, /node "\$workflow_root\/cli\/bin\/hypo-workflow"/);
+  assert.match(script, /project-stop QQ enqueue retired/);
+  assert.doesNotMatch(script, /project-notifications enqueue/);
   assert.doesNotMatch(script, /project-notifications dispatch/);
   assert.doesNotMatch(script, /--confirmed/);
 });
 
-test("project notification dispatcher wrapper derives cron PATH from runtime HOME", async () => {
+test("project notification dispatcher wrapper is retired and does not dispatch", async () => {
   const script = await readFile("scripts/project-notification-dispatcher.sh", "utf8");
 
   assert.match(script, /\$\{HOME\}\/\.local\/bin:\$\{HOME\}\/\.volta\/bin/);
   assert.match(script, /\/usr\/local\/bin:\/usr\/bin:\/bin/);
   assert.doesNotMatch(script, /\/home\/heyx/);
-  assert.match(script, /project-notifications dispatch/);
-  assert.match(script, /--confirmed/);
+  assert.match(script, /dispatcher is retired/);
+  assert.doesNotMatch(script, /project-notifications dispatch/);
+  assert.doesNotMatch(script, /--confirmed/);
 });
 
 test("project-notifications CLI exposes status and dispatch commands", () => {

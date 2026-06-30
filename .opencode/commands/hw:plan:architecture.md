@@ -1,15 +1,15 @@
 ---
-agent: hw-build
-description: Hypo-Workflow mapping for /hw:showcase
+agent: hw-plan
+description: Hypo-Workflow mapping for /hw:plan:architecture
 ---
 
-# /hw:showcase
+# /hw:plan:architecture
 
-Canonical command: `/hw:showcase`
-Route: `artifact`
-Skill: `skills/showcase/SKILL.md`
+Canonical command: `/hw:plan:architecture`
+Route: `plan`
+Skill: `skills/plan-architecture/SKILL.md`
 
-Load the corresponding Hypo-Workflow skill instructions from `skills/showcase/SKILL.md`, then execute the canonical command semantics with any user-provided arguments.
+Load the corresponding Hypo-Workflow skill instructions from `skills/plan-architecture/SKILL.md`, then execute the canonical command semantics with any user-provided arguments.
 
 ## Consultation-First Action Boundary / 协商优先
 
@@ -25,7 +25,7 @@ Direct sync scope covers source-owned managed surfaces such as shared guidance, 
 
 Target-owned scope stays separate: Codex-VSP per-model prompts, model selection prompts, and runtime prompt tuning, plus VSP-Open-Code local reminders, runtime prompt details, provider/model behavior, and reminder wording are target-owned scope. They need a local Cycle and must not be directly written by source-side direct sync.
 
-Showcase lane: Agent generates showcase artifacts; the plugin only provides context and file guard support.
+Plan discipline: use `question` / Ask for every hard interactive gate unless automation is explicitly configured, and keep `todowrite` synchronized for Discover / Technical Stack / Architecture / Decompose / Generate checkpoint state. Progressive Discover starts with task category, desired effect, and verification method, then moves through assumptions, ambiguities, tradeoffs, and validation criteria as needed without discussing implementation stack or architecture prematurely. Technical Stack owns implementation substrate and existing stack choices. Architecture owns current architecture reading, diagrams, and integration points. Decompose owns milestone splitting after those phase artifacts exist. Confirmation is an in-phase Ask gate, not a standalone user command. For `/hw:guide`, use the intent router contract and recommend one next path before confirmation. For `/hw:plan --deep`, treat it as an alias and route to `/hw:plan:deep` before ordinary planning; ordinary `/hw:plan` keeps the named phase gates and must not skip them after Deep Plan conversion. For `/hw:plan --batch`, collect multiple Features in one Discover pass, then generate Feature Queue tables and Mermaid diagrams according to `batch.decompose_mode`. For `/hw:plan --insert`, convert the natural-language request into a structured queue operation, summarize the queue diff, and wait for explicit confirmation before writing `.pipeline/feature-queue.yaml`.
 
 ## Four-Rule Discipline
 

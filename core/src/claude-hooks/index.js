@@ -2,7 +2,6 @@ import { access, readFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { DEFAULT_GLOBAL_CONFIG, loadConfig, parseYaml } from "../config/index.js";
 import { buildClaudeStatusSurface } from "../claude-status/index.js";
-import { enqueueProjectStopNotification } from "../project-notifications/index.js";
 
 const PROTECTED_PIPELINE_FILES = Object.freeze([
   ".pipeline/state.yaml",
@@ -120,29 +119,11 @@ async function evaluateStop(root, payload = {}) {
   const context = await loadHookContext(root);
   if (!context.state.pipeline) return {};
   if (context.state.pipeline.status && context.state.pipeline.status !== "running") {
-    const pending = await enqueueStopNotificationFromHook(root, context, payload).catch((error) => ({
-      ok: false,
-      status: "hook_enqueue_failed",
-      errors: [error.message],
-    }));
-    if (pending.enqueued) {
-      return {
-        systemMessage: `Hypo-Workflow project stop notification queued: ${pending.queue_path}. Run: hypo-workflow project-notifications dispatch --confirmed`,
-        project_stop_notification: {
-          status: pending.status,
-          queue_path: pending.queue_path,
-          entry_id: pending.entry?.id || null,
-          external_contacted: false,
-          qq_contacted: false,
-        },
-      };
-    }
-    if (pending.status === "skipped") return {};
     return {
-      systemMessage: `Hypo-Workflow project stop notification enqueue failed: ${(pending.errors || []).join("; ")}`,
+      systemMessage: "Hypo-Workflow project stop QQ notification enqueue is retired; Hermes Codex completion watch now owns user-facing completion reports.",
       project_stop_notification: {
-        status: pending.status,
-        errors: pending.errors || [],
+        status: "retired",
+        replacement: "Hermes Codex completion watch",
         external_contacted: false,
         qq_contacted: false,
       },
@@ -173,36 +154,6 @@ async function evaluateStop(root, payload = {}) {
   return {
     systemMessage: `Hypo-Workflow warnings: ${warnings.join("; ")}`,
   };
-}
-
-async function enqueueStopNotificationFromHook(root, context, payload = {}) {
-  const projectId = projectIdFromContext(root, context);
-  const current = context.state.current || {};
-  const cycle = context.cycle.cycle || {};
-  const progressSummary = {
-    cycle_id: cycle.number ? `C${cycle.number}` : context.acceptance?.cycle_id || null,
-    milestone_id: current.milestone_id || current.prompt_name || null,
-    prompt_name: current.prompt_name || current.prompt_file || null,
-    current_step: current.step || null,
-    summary: `${context.state.pipeline?.name || projectId} stopped with status ${context.state.pipeline?.status || "unknown"}.`,
-  };
-  return enqueueProjectStopNotification({
-    home_dir: payload.notification_home_dir || payload.notificationHomeDir || process.env.HOME,
-    project: {
-      id: projectId,
-      display_name: displayName(projectId, context.state.pipeline?.name),
-      path: root,
-    },
-    source_platform: "claude-code",
-    workflow_state: context.state,
-    status: context.state.pipeline?.status,
-    final_assistant_output: payload.final_assistant_output || payload.finalAssistantOutput || payload.transcript_tail || payload.message,
-    session_path: payload.session_path || payload.sessionPath,
-    session_id: payload.session_id || payload.sessionId,
-    occurred_at: new Date().toISOString(),
-    terminal_at: context.state.pipeline?.finished || new Date().toISOString(),
-    progress_summary: progressSummary,
-  });
 }
 
 async function evaluatePermission(root, payload) {

@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { ASK_QUESTIONS_GUIDANCE } from "../src/artifacts/agent-guidance.js";
 import { commandMap } from "../src/commands/index.js";
 
 const AUDIT_SPEC = "references/audit-spec.md";
@@ -110,6 +111,30 @@ test("integration sync is a release workflow spec and not a user command", async
   const commands = commandMap("opencode").map((command) => command.canonical);
   assert.ok(!commands.includes("/hw:integrations"), "/hw:integrations must not be a user command");
   assert.ok(!commands.includes("/hw:sync integrations"), "/hw:sync integrations must not be a user command");
+});
+
+test("shared Ask guidance requires visible phase artifacts before major Plan confirmation gates", () => {
+  assert.match(ASK_QUESTIONS_GUIDANCE, /actual phase artifacts|phase artifacts/i);
+  assert.match(ASK_QUESTIONS_GUIDANCE, /before (?:Question Tool|`question`|Ask|confirmation)/i);
+  assert.match(ASK_QUESTIONS_GUIDANCE, /explain[\s\S]{0,120}why the decision is needed/i);
+  assert.match(ASK_QUESTIONS_GUIDANCE, /what will change for each answer/i);
+  assert.match(ASK_QUESTIONS_GUIDANCE, /Never open a bare question card/i);
+  for (const gate of ["Discover", "Technical Stack", "Architecture", "Decompose", "Generate"]) {
+    assert.match(ASK_QUESTIONS_GUIDANCE, new RegExp(escapeRegExp(gate), "i"), `missing Plan gate: ${gate}`);
+  }
+});
+
+test("Plan skills require explanation before Question Tool gates and conversation report summaries", async () => {
+  const plan = await readCombined([
+    "skills/plan/SKILL.md",
+    "skills/plan-discover/SKILL.md",
+    "skills/plan-decompose/SKILL.md",
+    "skills/plan-generate/SKILL.md",
+  ]);
+  assert.match(plan, /调用 Question Tool \/ Ask 之前[\s\S]{0,120}解释|Question Tool \/ Ask 之前[\s\S]{0,120}解释/i);
+  assert.match(plan, /为什么.*需要.*决定|为什么.*需要.*确认/);
+  assert.match(plan, /不同选项会改变什么|确认\/要求修改分别会改变什么/);
+  assert.match(plan, /不得只说.*已写入|不得只给 `?\.pipeline\//);
 });
 
 function assertCommand(canonical, expected) {

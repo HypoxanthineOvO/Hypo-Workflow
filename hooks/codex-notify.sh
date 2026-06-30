@@ -4,7 +4,8 @@
 # 触发时机：Codex config.toml 的 notify 配置
 # 这是 Codex 唯一支持的 Hook 事件
 # observability, not a runner: do not resume, advance state, delete locks, or execute workflow commands here.
-# Terminal-state handling is hook-safe: only enqueue local pending QQ evidence; dispatch is a separate confirmed command.
+# Terminal-state QQ notification enqueue is retired. Hermes Codex completion
+# watch owns user-facing completion reports.
 
 set -euo pipefail
 
@@ -27,14 +28,11 @@ fi
 
 status="$(printf '%s\n' "$summary" | sed -n 's/^Status: //p' | head -n1)"
 if [[ "$status" != "running" ]]; then
-  node "$workflow_root/cli/bin/hypo-workflow" project-notifications enqueue \
-    --home "$HOME" \
-    --project-id "$(basename "$cwd" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')" \
-    --project-name "$(basename "$cwd")" \
-    --project-path "$cwd" \
-    --platform codex \
-    --state-file "$state_file" \
-    --status "$status" >/dev/null 2>&1 || true
+  bash "$scripts_dir/log-append.sh" \
+    --pipeline-dir "$pipeline_dir" \
+    --step "hook:codex-notify" \
+    --status "done" \
+    --message "agent-turn-complete; terminal_status=${status}; project-stop QQ enqueue retired; Hermes Codex completion watch handles user-facing QQ reports" >/dev/null 2>&1 || true
   exit 0
 fi
 

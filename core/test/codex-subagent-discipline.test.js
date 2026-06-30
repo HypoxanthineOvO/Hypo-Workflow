@@ -119,9 +119,9 @@ test("role-sensitive commands resolve worker authorization before local fallback
   assert.match(combined, /before role-sensitive reproduction, auto-fix implementation, or validation work starts|在角色敏感的复现、自动修复实现或验证工作开始前/i);
   assert.match(combined, /audit worker must be independent from the worker that implemented|audit worker 必须独立于实现被审计更改的 worker/i);
   assert.match(combined, /Codex.*plan-time authorization.*saved scope explicitly includes|Codex plan-time authorization can carry into execution only when its saved scope explicitly includes|在 Codex 上，计划时授权仅在其保存的范围明确包含/is);
-  assert.match(combined, /P1 Discover has a mandatory execution subworker authorization gate before decomposition|P1 Discover 在分解之前有一个强制的执行子工作器授权门控/is);
+  assert.match(combined, /Discover has a mandatory execution subworker authorization gate before Decompose|Discover 在 Decompose 之前有一个强制的执行子工作器授权门控|Discover 在分解之前有一个强制的执行子工作器授权门控/is);
   assert.match(combined, /\/hw:plan.*authorization before spawning|\/hw:plan.*授权/is);
-  assert.match(combined, /P1.*ask.*execution subworker authorization.*P2|P1.*执行子工作器授权.*P2/is);
+  assert.match(combined, /Discover.*ask.*execution subworker authorization.*Decompose|Discover.*执行子工作器授权.*Decompose/is);
   assert.match(combined, /whenever .*authorization scope.*missing|授权范围.*缺失/is);
   assert.match(combined, /user-confirmed downgrade evidence|用户确认降级证据/i);
   assert.match(combined, /must not default to `recommended`|do not silently downgrade to `off`/i);
@@ -169,7 +169,7 @@ test("plan resume debug and patch share subworker lifecycle contract", async () 
   assert.match(combined, /\/hw:plan.*\/hw:start.*\/hw:resume.*\/hw:debug.*\/hw:patch fix/is);
   assert.match(combined, /requested.*started.*completed\|failed\|blocked.*closed\|close_failed/is);
   assert.match(plan, /Plan-time Subagents, reviewers, challengers, and validators have the same lifecycle contract|计划时的 Subagent、审查者、挑战者和验证者与执行工作器具有相同的生命周期契约/i);
-  assert.match(plan, /P4 Confirm must surface it as a blocking or degraded evidence item|P4 Confirm 必须将其作为阻止或降级证据项呈现/i);
+  assert.match(plan, /final execution confirmation gate must surface it as a blocking or degraded evidence item|最终执行确认门控必须将其作为阻止或降级证据项呈现/i);
   assert.match(start, /when `\/hw:start` stops, blocks, aborts, or completes, close\/release any workers it opened|当 `\/hw:start` 停止、阻塞、中止或完成时，关闭\/释放它打开的任何工作者/i);
   assert.match(start, /incomplete, missing, or `close_failed` worker lifecycle evidence blocks worker-separated completion|不完整、缺失或 `close_failed` 的工作者生命周期证据会阻塞 Worker Separation 完成/i);
   assert.match(resume, /when `\/hw:resume` stops, blocks, aborts, or completes, close\/release any workers it opened|当 `\/hw:resume` 停止、阻塞、中止或完成时，关闭\/释放它打开的任何工作者/i);
@@ -269,7 +269,7 @@ test("setup and help do not route Codex Subagents to external providers", async 
   const setup = await readFile(SETUP_SKILL, "utf8");
   const combined = `${help}\n${setup}`;
 
-  assert.match(help, /52 user-facing Hypo-Workflow commands/i);
+  assert.match(help, /53 user-facing Hypo-Workflow commands/i);
   assert.match(combined, /Codex Subagents are Codex\/GPT runtime workers|Codex Subagents 是 Codex\/GPT 运行时工作者/i);
   assert.doesNotMatch(combined, /Codex can configure Claude as the subagent provider/i);
   assert.doesNotMatch(combined, /configure Claude as a subagent/i);

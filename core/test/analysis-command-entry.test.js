@@ -35,7 +35,7 @@ test("analysis command is a first-class canonical and OpenCode entry", async () 
     skillSpec,
   })) {
     assert.match(content, /\/hw:analysis/, `${label} must document /hw:analysis`);
-    assert.match(content, /\/hw-analysis/, `${label} must document /hw-analysis`);
+    assert.match(content, /\/hw:analysis/, `${label} must document the OpenCode /hw:analysis mapping`);
     assert.match(content, /skills\/analysis\/SKILL\.md/, `${label} must point to the analysis skill`);
   }
 });

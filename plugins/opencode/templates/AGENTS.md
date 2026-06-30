@@ -10,6 +10,12 @@ This file is Hypo-Workflow managed. Edit the source Hypo-Workflow rules/config w
 - Use `question` for required user decisions.
 - Use `todowrite` for visible plan discipline, especially in `/hw-plan*` commands.
 
+## Completion and report surface
+
+When a Workflow writes a report, debug artifact, audit artifact, Patch record, Cycle summary, or Milestone completion, the final chat response must include the core report content: conclusion/change summary, technical approach, modified files/modules, test design, validation results, expected result, problems encountered, and risks/follow-up. A bare path such as "written to `.pipeline/...`" is insufficient.
+
+The final response must also explain the substance of the report in the conversation before or alongside artifact paths. Do not only list `.pipeline/...` files, worker closures, YAML validity, and test counts. For every important report or review artifact, summarize what it contains, the main conclusion, the user-facing interpretation, and what the user should understand or do next. For learning gates, quizzes, research reports, requirement briefs, or design reports, teach the key concepts and intended checkpoint outcome directly in chat; paths are supporting references, not the explanation.
+
 ## Workflow state persistence
 
 When executing inside a Hypo-Workflow Cycle, maintain pipeline state throughout the session:

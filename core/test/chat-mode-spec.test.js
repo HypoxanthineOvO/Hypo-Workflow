@@ -96,6 +96,6 @@ test("OpenCode command map includes /hw:chat mapping", async () => {
   const map = await readFile("references/opencode-command-map.md", "utf8");
   const spec = await readFile("references/opencode-spec.md", "utf8");
 
-  assert.match(map, /`\/hw:chat`\s*\|\s*`\/hw-chat`\s*\|\s*`hw-build`\s*\|\s*`skills\/chat\/SKILL\.md`/);
-  assert.match(spec, /`\/hw:chat`\s*\|\s*`\/hw-chat`\s*\|\s*`hw-build`/);
+  assert.match(map, /`\/hw:chat`\s*\|\s*`\/hw:chat`\s*\|\s*`hw-build`\s*\|\s*`skills\/chat\/SKILL\.md`/);
+  assert.match(spec, /`\/hw:chat`\s*\|\s*`\/hw:chat`\s*\|\s*`hw-build`/);
 });

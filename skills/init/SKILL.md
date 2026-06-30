@@ -15,7 +15,7 @@ description: Initialize or rescan a Hypo-Workflow project when the user wants ar
 
 使用此技能来引导 `.pipeline/` 和架构基线。普通的 `/hw:init` 不需要 git。V8.1 还允许 init 将 Workflow 前的 Git 历史导入到关闭的 Legacy Cycle 中。
 
-交互式 init 应该为 Cycle 级别的 `P0 Configure` 预发现阶段准备项目。`P0 Configure` 在 `cycle new` 之后、`P1 Discover` 之前运行；它可以从 `cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config` 或 `built_in_default` 重用现有设置，并且涵盖自动化、Subagent 授权、验收模式、PR/MR 远程写入策略、完整回归、分析边界和 worker separation。
+交互式 init 应该为 Cycle 级别的 `P0 Configure` 预发现阶段准备项目。`P0 Configure` 在 `cycle new` 之后、Discover 之前运行；它可以从 `cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config` 或 `built_in_default` 重用现有设置，并且涵盖自动化、Subagent 授权、验收模式、PR/MR 远程写入策略、完整回归、分析边界和 worker separation。
 
 ## 前置条件
 
@@ -56,7 +56,7 @@ description: Initialize or rescan a Hypo-Workflow project when the user wants ar
    - `off`
    - `recommended`
    - `strict`
-7. 如果活跃的 Cycle 将进入规划，在 `P1 Discover` 之前移交给 `P0 Configure`；否则记录项目默认值已准备好供以后重用。`P0 Configure` 在 `cycle new` 之后、`P1 Discover` 之前运行，询问自动化、Subagent 授权、验收模式、PR/MR 远程写入确认、完整回归、分析边界和 worker separation，并且可以从 `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default` 重用值。
+7. 如果活跃的 Cycle 将进入规划，在 Discover 之前移交给 `P0 Configure`；否则记录项目默认值已准备好供以后重用。`P0 Configure` 在 `cycle new` 之后、Discover 之前运行，询问自动化、Subagent 授权、验收模式、PR/MR 远程写入确认、完整回归、分析边界和 worker separation，并且可以从 `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default` 重用值。
 8. 除非强制，否则根据项目大小以单文件或文件夹模式生成架构。
 9. 除非用户明确跳过，否则初始化规则配置：
    - 在交互式上下文中显示预设选择：
