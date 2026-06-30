@@ -26,10 +26,10 @@ grep -Fq 'question' "$tmp_project/.opencode/agents/hw-plan.md"
 grep -Fq 'todowrite' "$tmp_project/.opencode/agents/hw-plan.md"
 grep -Fq 'Ask' "$tmp_project/.opencode/agents/hw-plan.md"
 
-grep -Fq 'agent: hw-plan' "$tmp_project/.opencode/commands/hw-plan.md"
-grep -Fq 'agent: hw-plan' "$tmp_project/.opencode/commands/hw-plan-decompose.md"
-grep -Fq 'question' "$tmp_project/.opencode/commands/hw-plan.md"
-grep -Fq 'todowrite' "$tmp_project/.opencode/commands/hw-plan.md"
+grep -Fq 'agent: hw-plan' "$tmp_project/.opencode/commands/hw:plan.md"
+grep -Fq 'agent: hw-plan' "$tmp_project/.opencode/commands/hw:plan:decompose.md"
+grep -Fq 'question' "$tmp_project/.opencode/commands/hw:plan.md"
+grep -Fq 'todowrite' "$tmp_project/.opencode/commands/hw:plan.md"
 
 grep -Fq 'todo.updated' "$tmp_project/.opencode/plugins/hypo-workflow.ts"
 grep -Fq '.plan-state/todo.yaml' "$tmp_project/.opencode/plugins/hypo-workflow.ts"
@@ -41,6 +41,6 @@ grep -Fq 'plan-tool-required: off' rules/presets/minimal.yaml
 
 grep -Fq 'Plan 工具纪律' SKILL.md
 grep -Fq 'plan-tool-required' skills/plan/SKILL.md
-grep -Eq 'P1/P2/P3/P4 checkpoint|P1/P2/P3/P4 检查点' skills/plan/SKILL.md
+grep -Eq '每个 Discover、Technical Stack、Architecture、Decompose 和 Generate 检查点|Discover -> Technical Stack -> Architecture -> Decompose -> Generate -> Implementation' skills/plan/SKILL.md
 
 echo "s56 passed"

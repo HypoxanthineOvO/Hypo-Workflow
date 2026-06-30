@@ -22,11 +22,74 @@ export const DISCOVER_BIG_QUESTIONS = Object.freeze([
   },
 ]);
 
+export const PLAN_PHASE_MODEL = deepFreeze([
+  {
+    id: "discover",
+    label: "Discover",
+    order: 1,
+    gate: "question_tool",
+    scope: "requirements_only",
+    required_outputs: ["stage_summary", "decision_table", "open_questions"],
+  },
+  {
+    id: "technical_stack",
+    label: "Technical Stack",
+    order: 2,
+    gate: "question_tool",
+    scope: "implementation_substrate",
+    required_outputs: ["stage_summary", "decision_table", "open_questions"],
+  },
+  {
+    id: "architecture",
+    label: "Architecture",
+    order: 3,
+    gate: "question_tool",
+    scope: "architecture_and_integration_points",
+    required_outputs: ["stage_summary", "decision_table", "open_questions"],
+  },
+  {
+    id: "decompose",
+    label: "Decompose",
+    order: 4,
+    gate: "question_tool",
+    scope: "milestone_splitting",
+    required_outputs: ["stage_summary", "decision_table", "open_questions"],
+  },
+  {
+    id: "generate",
+    label: "Generate",
+    order: 5,
+    gate: "question_tool",
+    scope: "prompt_and_runtime_artifacts",
+    required_outputs: ["stage_summary", "decision_table", "open_questions"],
+  },
+  {
+    id: "implementation",
+    label: "Implementation",
+    order: 6,
+    gate: "execution",
+    scope: "run_approved_milestones",
+    required_outputs: [],
+  },
+]);
+
+export const DISCOVER_COMPLETION_SIGNALS = Object.freeze([
+  "scope_clarity",
+  "effect_clarity",
+  "acceptance_clarity",
+]);
+
+export const VISIBLE_PHASE_OUTPUTS = Object.freeze([
+  "stage_summary",
+  "decision_table",
+  "open_questions",
+]);
+
 export const P0_CONFIGURE_STAGE = Object.freeze({
   id: "p0_configure",
   label: "P0 Configure",
   trigger: "cycle_new_before_discover",
-  guidance: "在 P1 Discover 前确认自动化程度、Subagent 授权、验收模式、PR/MR 远端写确认策略、完整回归、analysis 边界和 worker separation；用户可以沿用上次配置。",
+  guidance: "在 Discover 前确认自动化程度、Subagent 授权、验收模式、PR/MR 远端写确认策略、完整回归、analysis 边界和 worker separation；用户可以沿用上次配置。",
   questions: [
     "automation_level",
     "subagent_authorization",
@@ -107,6 +170,13 @@ export function buildProgressiveDiscoverPlan(input = {}, options = {}) {
     coverage,
     grill_me: risk,
     min_rounds: minRounds,
+    phase_model: PLAN_PHASE_MODEL.map((phase) => ({ ...phase, required_outputs: [...phase.required_outputs] })),
+    adaptive_discover_gate: {
+      required: true,
+      completion_signals: [...DISCOVER_COMPLETION_SIGNALS],
+      guidance: "Discover completes when scope, desired effect, and acceptance are clear; min_rounds is supporting evidence, not the completion rule.",
+    },
+    visible_phase_outputs: [...VISIBLE_PHASE_OUTPUTS],
     pre_discover_stage: { ...P0_CONFIGURE_STAGE, questions: [...P0_CONFIGURE_STAGE.questions] },
     big_questions: DISCOVER_BIG_QUESTIONS.map((item) => ({ ...item })),
     audit_questions: buildPlanAuditQuestions(input),
@@ -127,6 +197,42 @@ export function buildProgressiveDiscoverPlan(input = {}, options = {}) {
           "Keep the structure strong enough to prevent shallow planning, but still allow the agent to merge related questions.",
           "Batch mode should carry category and verification requirements for each Feature candidate.",
         ],
+  };
+}
+
+export function assessDiscoverCompletionGate(input = {}) {
+  const roundsCompleted = Number(input.rounds_completed ?? input.roundsCompleted ?? 0);
+  const minRounds = Number(input.min_rounds ?? input.minRounds ?? 0);
+  const missingSignals = DISCOVER_COMPLETION_SIGNALS.filter((signal) => !isClearSignal(input[signal]));
+  const roundsSatisfied = minRounds > 0 ? roundsCompleted >= minRounds : true;
+  return {
+    complete: missingSignals.length === 0,
+    rounds_satisfied: roundsSatisfied,
+    rounds_completed: roundsCompleted,
+    min_rounds: minRounds,
+    required_signals: [...DISCOVER_COMPLETION_SIGNALS],
+    missing_signals: missingSignals,
+    reason: missingSignals.length
+      ? "Discover requires scope, effect, and acceptance clarity before advancing; min_rounds alone is not sufficient."
+      : "Discover has scope, effect, and acceptance clarity; min_rounds is not required as a rigid completion gate.",
+  };
+}
+
+export function validateVisiblePhaseGate(input = {}) {
+  const phase = phaseById(input.phase_id || input.phaseId || input.phase);
+  const requiredOutputs = phase.required_outputs?.length ? phase.required_outputs : VISIBLE_PHASE_OUTPUTS;
+  const missingOutputs = requiredOutputs.filter((output) => !hasVisibleOutput(input[output]));
+  const gate = phase.gate || "question_tool";
+  return {
+    ok: missingOutputs.length === 0,
+    phase_id: phase.id,
+    gate,
+    required_outputs: [...requiredOutputs],
+    missing_outputs: missingOutputs,
+    before_gate: input.before_gate !== false,
+    message: missingOutputs.length
+      ? `Show visible phase outputs before Question Tool / Ask gate: ${missingOutputs.join(", ")}.`
+      : "Visible phase outputs are ready before the Question Tool / Ask gate.",
   };
 }
 
@@ -248,4 +354,30 @@ function normalizeEvidence(value) {
     return [];
   }
   return [String(value)];
+}
+
+function phaseById(value) {
+  const normalized = String(value || "discover").trim().toLowerCase().replace(/[-\s]+/g, "_");
+  return PLAN_PHASE_MODEL.find((phase) => phase.id === normalized) || PLAN_PHASE_MODEL[0];
+}
+
+function isClearSignal(value) {
+  if (value === true) return true;
+  const normalized = String(value || "").trim().toLowerCase();
+  return ["clear", "confirmed", "complete", "ready", "yes", "true"].includes(normalized);
+}
+
+function hasVisibleOutput(value) {
+  if (Array.isArray(value)) return value.length > 0;
+  if (value && typeof value === "object") return Object.keys(value).length > 0;
+  return String(value || "").trim().length > 0;
+}
+
+function deepFreeze(value) {
+  if (Array.isArray(value)) {
+    for (const item of value) deepFreeze(item);
+  } else if (value && typeof value === "object") {
+    for (const item of Object.values(value)) deepFreeze(item);
+  }
+  return Object.freeze(value);
 }

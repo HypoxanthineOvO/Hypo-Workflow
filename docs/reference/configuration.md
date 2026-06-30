@@ -16,7 +16,7 @@
 | 字段 | 默认/常见值 | 自动化影响 | 严格度影响 | 人工确认边界 |
 |---|---|---|---|---|
 | `automation.level` | `manual` / `balanced` / `full` | 决定普通执行是否尽量自动推进 | 不得降低 hard gates | 不能跳过 destructive/external、release publish、PR/MR remote write |
-| `automation.gates.planning` | `confirm` | P2/P4 规划确认 | 规划 gate 是 hard gate | P2 milestone split 和 P4 final plan confirmation 需要确认 |
+| `automation.gates.planning` | `confirm` | Plan 阶段确认 | 规划 gate 是 hard gate | Decompose milestone split 和 Generate final confirmation 需要确认 |
 | `automation.gates.execution` | `auto` | 普通 Milestone 可自动推进 | strict review 仍可阻塞 | 仅适用于普通本地执行 |
 | `automation.gates.destructive_external` | `confirm` | 破坏性或外部副作用不可自动执行 | 所有 profile 都保持确认 | destructive commands、external side effects |
 | `automation.gates.release_publish` | `confirm` | release publish 不自动执行 | release/tag/push 前确认 | tag、push、publish |
@@ -29,9 +29,9 @@
 
 | 字段 | 作用 | 常见策略 |
 |---|---|---|
-| `plan.mode` | `interactive` 会进行 P1-P4 gate；`auto` 只在配置允许时自动总结通过 | 用户参与规划时用 `interactive` |
-| `plan.interaction_depth` | `low`/`medium`/`high` 控制 P1 最少追问轮数 | 复杂 Cycle 用 `high` |
-| `plan.interactive.require_explicit_confirm` | 是否要求明确 P4 确认 | 团队或高风险项目设为 `true` |
+| `plan.mode` | `interactive` 会进行 Discover / Technical Stack / Architecture / Decompose / Generate gate；`auto` 只在配置允许时自动总结通过 | 用户参与规划时用 `interactive` |
+| `plan.interaction_depth` | `low`/`medium`/`high` 控制 Discover 最少追问轮数 | 复杂 Cycle 用 `high` |
+| `plan.interactive.require_explicit_confirm` | 是否要求明确 Generate final confirmation | 团队或高风险项目设为 `true` |
 | `execution.mode` | `self`、subagent 或 host-specific execution mode | Codex 默认主 Agent 编排，必要时使用 Subagents |
 | `execution.worker_separation.mode` | `off` / `recommended` / `strict` | `recommended` 尽量分离 implement/test/audit；`strict` 不接受降级为 fully accepted |
 | `execution.step_overrides.review_tests.strict` | 测试审查是否严格阻塞 | release/team 模式可设更严格 |
@@ -41,7 +41,7 @@
 
 ## P0 Configure 与 Subagent 授权
 
-`P0 Configure` 是每个新 Cycle 在 `P1 Discover` 前的配置阶段。用户可以重新选择，也可以明确沿用上一轮或项目/全局默认。该阶段覆盖 automation、Subagent authorization、acceptance、PR/MR remote write、full regression、analysis boundaries 和 worker separation，并把来源记录为 `cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config` 或 `built_in_default`。
+`P0 Configure` 是每个新 Cycle 在 Discover 前的配置阶段。用户可以重新选择，也可以明确沿用上一轮或项目/全局默认。该阶段覆盖 automation、Subagent authorization、acceptance、PR/MR remote write、full regression、analysis boundaries 和 worker separation，并把来源记录为 `cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config` 或 `built_in_default`。
 
 strict worker separation 要求 implementation Subagent 与 test/review/audit 角色隔离。implementation worker 不读取 test source、fixtures、snapshots 或 assertion details；它只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若宿主平台不能提供这种隔离，必须在执行前说明 degraded mode，获得 explicit user confirmation，并记录 role isolation degradation。
 

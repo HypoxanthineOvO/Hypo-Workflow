@@ -27,7 +27,7 @@ test -f "$tmp_project/AGENTS.md"
 test -f "$tmp_project/.opencode/package.json"
 test -f "$tmp_project/.opencode/hypo-workflow.json"
 test -f "$tmp_project/.opencode/plugins/hypo-workflow.ts"
-test -f "$tmp_project/.opencode/commands/hw-plan.md"
+test -f "$tmp_project/.opencode/commands/hw:plan.md"
 test -f "$tmp_project/.opencode/agents/hw-plan.md"
 
 grep -Fq 'Hypo-Workflow managed' "$tmp_project/AGENTS.md"

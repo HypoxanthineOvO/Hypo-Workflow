@@ -14,9 +14,10 @@ Use this sub-skill when the user wants to design or revise a pipeline before imp
 |---------|-------------|
 | `/hw:plan` | Enter the Discover-first planning flow |
 | `/hw:plan:discover` | Collect requirements, constraints, stack, and current repo context |
+| `/hw:plan:technical-stack` | Decide implementation substrate, existing stack fit, validation tooling, and integration mechanisms |
+| `/hw:plan:architecture` | Read the architecture baseline, map components/integration points, and produce Mermaid/table architecture artifacts |
 | `/hw:plan:decompose` | Split the work into milestones with test specs |
 | `/hw:plan:generate` | Generate `.pipeline/` config, prompts, and architecture baseline |
-| `/hw:plan:confirm` | Summarize the plan and wait for explicit execution approval |
 | `/hw:plan:extend` | Append milestones to the active Cycle without closing it |
 | `/hw:plan:review` | Review architecture and downstream prompt impact for the current milestone or all milestones with `--full` |
 
@@ -24,7 +25,7 @@ Use this sub-skill when the user wants to design or revise a pipeline before imp
 
 If the user invokes `/hw:plan:xxx` and `xxx` is not recognized, return:
 
-`Unknown command: /hw:plan:xxx. Available: /hw:plan, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review`
+`Unknown command: /hw:plan:xxx. Available: /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:technical-stack, /hw:plan:architecture, /hw:plan:decompose, /hw:plan:generate, /hw:plan:extend, /hw:plan:review`
 
 ## Progressive Disclosure
 
@@ -52,16 +53,17 @@ Read `plan.mode` from `.pipeline/config.yaml` when present. If it is missing, fa
 - `interactive` is the default:
   - Discover asks targeted questions in rounds
   - the user participates at checkpoints
-  - Confirm must wait for explicit approval
+  - every major phase must show its artifact before moving forward
+  - confirmation is captured through in-phase Question Tool / Ask gates
   - read `plan.interaction_depth`:
     - `low` -> at least 2 question rounds
     - `medium` -> at least 3 question rounds
     - `high` -> at least 5 question rounds
   - `plan.interactive.min_rounds` can raise the floor
-  - P1 may enter P2 only after the user explicitly says「够了」「开始吧」「可以了」or an equivalent end signal
+  - Discover may enter Decompose only after the user explicitly says「够了」「开始吧」「可以了」or an equivalent end signal
 - `auto` is unattended:
-  - Claude completes P1-P4 without pausing unless blocked by missing critical information
-  - Confirm is a summary checkpoint, not a hard gate
+  - Claude completes named Plan phases without pausing unless blocked by missing critical information
+  - confirmation gates become summary checkpoints only when configuration explicitly allows unattended planning
 
 ## Batch Plan Mode
 
@@ -123,8 +125,8 @@ Interactive questioning rules:
 - start with task category, desired effect, and verification method before implementation detail
 - summarize what was learned after each round
 - convert "verification method" into a closed-loop real test contract before leaving Discover: exact command or scenario, observable pass/fail signal, who independently validates it, and whether audit rejects pseudo tests
-- before leaving Discover on Codex, capture execution subworker authorization for `/hw:start` and `/hw:resume` even when `execution.worker_separation.mode` already exists; without one explicit outcome, P1 must not enter P2
-- valid Codex P1 authorization outcomes are `authorized recommended`, `authorized strict`, `start/resume blocked until authorization`, or explicit user-confirmed fastest single-agent `execution.worker_separation.mode=off`
+- before leaving Discover on Codex, capture execution subworker authorization for `/hw:start` and `/hw:resume` even when `execution.worker_separation.mode` already exists; without one explicit outcome, Discover must not enter Decompose
+- valid Codex Discover authorization outcomes are `authorized recommended`, `authorized strict`, `start/resume blocked until authorization`, or explicit user-confirmed fastest single-agent `execution.worker_separation.mode=off`
 - before leaving Discover on Claude Code, choose execution subworker backend `subcodex` or `subclaude`; no separate subworker authorization gate is required
 - before leaving Discover on OpenCode, use configured native agents/subagents; no separate subworker authorization gate is required
 - Generate must pre-assign subworker tasks in each prompt instead of leaving role boundaries for `/hw:start` to invent later. Use a `Subworker Assignment Plan` with exactly three worker roles: `test`, `implement`, and `audit`, concrete scope, non-overlap rules, evidence outputs, and artifact paths. `review_tests` is a TDD step name owned by the `test` role, not a worker role; `review_code` is an audit/review step or artifact stage, not a worker role.
@@ -200,9 +202,9 @@ Decompose output rules:
 - prefer narrower milestones when architecture review is likely to change downstream prompts
 - do not split solely by technical layer unless the milestone is explicitly analysis, docs, setup, or migration-only
 - reject open-loop milestone plans that only say "implement", "add tests", or "verify later" without a credible execution path
-- reject goal-only P2 checkpoints. A P2 checkpoint may not be marked `proposed` if it only contains goals, acceptance criteria, Feature Queue items, or test titles without the implementation milestone fields above.
-- treat unknown tools, external services, third-party libraries, platform capabilities, and user-private schemas as hard `research_required` triggers. P2 can be presented only after each trigger is resolved with evidence, converted into a user-facing blocking question, or explicitly deferred by the user; P2 cannot be confirmed and P3 cannot start while a blocking question remains unanswered.
-- if the user challenges a technical route, move P2 back to `revision` or `in_progress`, record the challenge, perform targeted research, and present a revised checkpoint before Generate.
+- reject goal-only Decompose checkpoints. A Decompose checkpoint may not be marked `proposed` if it only contains goals, acceptance criteria, Feature Queue items, or test titles without the implementation milestone fields above. Legacy `P2 checkpoint` references mean this same Decompose checkpoint.
+- treat unknown tools, external services, third-party libraries, platform capabilities, and user-private schemas as hard `research_required` triggers. Decompose can be presented only after each trigger is resolved with evidence, converted into a user-facing blocking question, or explicitly deferred by the user; Decompose cannot be confirmed and Generate cannot start while a blocking question remains unanswered.
+- if the user challenges a technical route, move Decompose back to `revision` or `in_progress`, record the challenge, perform targeted research, and present a revised checkpoint before Generate.
 
 Persist milestone planning state in `.plan-state/decompose.yaml` when possible, and persist the human technical route checkpoint in `.plan-state/technical-route.md`.
 
@@ -212,14 +214,14 @@ Batch Decompose:
 - just_in_time mode writes Feature scaffolds only
 - both modes generate a Markdown queue table and Mermaid graph
 - single-feature `/hw:plan` behavior is unchanged when `--batch` is absent
-- Feature DAG fields belong only to batch planning. Do not add Feature DAG requirements to ordinary single-feature P2 checkpoints.
+- Feature DAG fields belong only to batch planning. Do not add Feature DAG requirements to ordinary single-feature Decompose checkpoints.
 
-Interactive P2 checkpoint:
+Interactive Decompose checkpoint:
 
 - show the complete milestone split after Decompose
 - show the technical solution, technical route, research status, risks/alternatives, validation path, and audit focus for every implementation milestone
 - ask the user to confirm before entering Generate
-- do not write `.pipeline/` files, prompt files, or architecture files until P3
+- do not write `.pipeline/` files, prompt files, or architecture files until Generate
 
 Append conflict rules:
 
@@ -254,8 +256,8 @@ Preset selection rules:
 - choose `analysis` for root-cause analysis, metric investigation, or repo/system investigation where the primary deliverable is an evidence-backed conclusion
 - choose `custom` only when the user explicitly needs a non-standard sequence
 - for each milestone, write a concrete implementation plan with ordered steps, dependencies, verification points, test spec, and constraints before rendering the prompt file
-- preserve the P2 technical route contract in each generated implementation prompt: `technical_solution`, `technical_route`, `research_required`, `risks_and_alternatives`, `validation_path`, and `audit_focus`
-- stop and return to P2 revision if the approved milestone plan lacks any required P2 technical route field, has unresolved hard `research_required` items, or still has active blocking research questions
+  - preserve the Decompose technical route contract in each generated implementation prompt: `technical_solution`, `technical_route`, `research_required`, `risks_and_alternatives`, `validation_path`, and `audit_focus`; legacy references to the "P2 technical route" mean this same internal compatibility contract
+- stop and return to Decompose revision if the approved milestone plan lacks any required Decompose technical route field, has unresolved hard `research_required` items, or still has active blocking research questions
 - convert that implementation plan into the final prompt file format instead of freehand summary text
 - preserve the validation intent from the milestone plan in the generated prompt's `预期测试` and constraints sections
 - preserve closed-loop validation commands, real test method, scenario, pass/fail signal, evidence expectations, audit pseudo-test rejection rule, and implementation-versus-validation ownership in the generated prompt

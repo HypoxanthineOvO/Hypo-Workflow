@@ -78,18 +78,18 @@ test("deep plan boundary is distinct from guide onboarding and explore worktrees
   assert.doesNotMatch(deepSkill, /worktree_path|git worktree/i);
 });
 
-test("ordinary /hw:plan keeps P1-P4 gates and --deep routes before ordinary decomposition", async () => {
+test("ordinary /hw:plan keeps named phase gates and --deep routes before ordinary planning", async () => {
   const planSkill = await readFile("skills/plan/SKILL.md", "utf8");
   const planCommand = await readFile("commands/plan.md", "utf8");
   const commandsSpec = await readFile("references/commands-spec.md", "utf8");
 
-  assert.match(planSkill, /full P1-P4 planning flow|完整的 P1-P4 规划流程/i);
+  assert.match(planSkill, /Discover -> Technical Stack -> Architecture -> Decompose -> Generate -> Implementation/);
   assert.match(planSkill, /ordinary.*\/hw:plan|\/hw:plan.*ordinary|普通的.*\/hw:plan|\/hw:plan.*普通/is);
   assert.match(planSkill, /--deep/);
-  assert.match(planSkill, /must not.*skip.*P1-P4|P1-P4.*must not.*skip|不得跳过 P1-P4|P1-P4.*不得.*跳过/is);
+  assert.match(planSkill, /must not skip.*Discover.*Technical Stack.*Architecture.*Decompose.*Generate|不得跳过.*Discover.*Technical Stack.*Architecture.*Decompose.*Generate/is);
 
   assert.match(planCommand, /--deep/);
   assert.match(planCommand, /route.*\/hw:plan:deep|\/hw:plan:deep.*route/is);
   assert.match(commandsSpec, /--deep/);
-  assert.match(commandsSpec, /ordinary `\/hw:plan`.*P1-P4|P1-P4.*ordinary `\/hw:plan`/is);
+  assert.match(commandsSpec, /ordinary `\/hw:plan`.*Discover.*Technical Stack.*Architecture.*Decompose.*Generate/is);
 });

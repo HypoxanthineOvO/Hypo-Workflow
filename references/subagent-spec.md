@@ -12,7 +12,7 @@ Documentation and README tasks should prefer docs-specific assistance when avail
 
 ## Implementation and Validation Separation
 
-`P0 Configure` asks for Subagent authorization before P1 Discover. If the user does not authorize delegated workers, substantial work may stay local but must record a non-delegation rationale. If the user authorizes Subagents, the execution plan should record whether implement/test/audit role separation is `off`, `recommended`, or `strict`.
+`P0 Configure` asks for Subagent authorization before Discover. If the user does not authorize delegated workers, substantial work may stay local but must record a non-delegation rationale. If the user authorizes Subagents, the execution plan should record whether implement/test/audit role separation is `off`, `recommended`, or `strict`.
 
 Implementation and validation separation is mandatory for non-trivial delegated work:
 
@@ -42,7 +42,7 @@ Before role-sensitive work starts, resolve whether the independent worker is aut
 2. If authorization is absent but the command requires independent worker evidence, Ask the user for authorization or stop with a clear blocking reason.
 3. If the user declines or the worker is unavailable, continue only in a documented degraded mode that cannot satisfy worker-separation gates, or leave the Patch/Milestone/Review pending.
 
-Codex plan-time authorization can carry into execution only when its saved scope explicitly includes `/hw:start` and `/hw:resume`. `/hw:plan` P1 must ask for execution subworker authorization before P2 whenever that saved scope is missing, even if `execution.worker_separation.mode` already says `recommended` or `strict`. If Plan collected only planning reviewer/challenger authorization, Start and Resume must Ask again. If the user declines execution subworkers during Plan, generated artifacts must either block Start/Resume until authorization is granted or set the fastest single-agent `execution.worker_separation.mode=off` only after explicit user downgrade confirmation; they must not default to `recommended` or silently downgrade to `off`.
+Codex plan-time authorization can carry into execution only when its saved scope explicitly includes `/hw:start` and `/hw:resume`. `/hw:plan` Discover must ask for execution subworker authorization before Decompose whenever that saved scope is missing, even if `execution.worker_separation.mode` already says `recommended` or `strict`. If Plan collected only planning reviewer/challenger authorization, Start and Resume must Ask again. If the user declines execution subworkers during Plan, generated artifacts must either block Start/Resume until authorization is granted or set the fastest single-agent `execution.worker_separation.mode=off` only after explicit user downgrade confirmation; they must not default to `recommended` or silently downgrade to `off`.
 
 Claude Code and OpenCode do not use this extra authorization gate for configured subworkers. Claude Code planning should choose whether execution subworkers use `subcodex` or `subclaude`; OpenCode should use configured native agents/subagents.
 

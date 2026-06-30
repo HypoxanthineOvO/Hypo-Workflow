@@ -24,7 +24,7 @@ Deep Plan 是一个持久化的 pre-plan 讨论生命周期。适用于需求、
 - Deep Plan 不是 `/hw:explore`；`/hw:explore` 仍然是有界的假设验证和代码库探索，而 Deep Plan 捕获需求、架构推理、决策和 readiness。
 - Deep Plan is not `/hw:explore`; `/hw:explore` remains bounded codebase exploration while Deep Plan owns durable discussion packages.
 - Deep Plan 不得直接执行 implementation milestones。
-- Deep Plan 不得绕过普通 `/hw:plan` 的 P1-P4 gates。Conversion 创建 Plan 输入；普通 Plan 仍然控制 decomposition、generation 和 confirmation。
+- Deep Plan 不得绕过普通 `/hw:plan` 的 Discover、Technical Stack、Architecture、Decompose 和 Generate gates。Conversion 创建 Plan 输入；普通 Plan 仍然控制 decomposition、generation 和阶段内 confirmation gate。
 
 ## Durable Discussion Package
 
@@ -106,4 +106,4 @@ Deep Plan 应在分解之前对不明确的需求进行压力测试：
 3. 请求用户确认。
 4. 写入 `plan-context.md` 并将 `deep-plan.yaml` 更新为 `converted`。
 
-转换后，调用或推荐使用生成的上下文运行普通 `/hw:plan`。普通 `/hw:plan` 仍然必须运行 P0/P1/P2/P3/P4 gates，不得仅因为上下文来自 Deep Plan 就跳过 Discover、Decompose、Generate 或 Confirm。
+转换后，调用或推荐使用生成的上下文运行普通 `/hw:plan`。普通 `/hw:plan` 仍然必须运行 Configure、Discover、Technical Stack、Architecture、Decompose 和 Generate gates，不得仅因为上下文来自 Deep Plan 就跳过命名阶段或阶段内 Question Tool / Ask confirmation gate。

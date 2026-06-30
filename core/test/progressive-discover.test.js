@@ -12,6 +12,7 @@ import {
   normalizeDiscoverFeature,
   renderBatchPlanArtifacts,
 } from "../src/index.js";
+import * as coreApi from "../src/index.js";
 
 test("progressive discover spec defines big questions, stages, and command coverage", async () => {
   const spec = await readFile("references/progressive-discover-spec.md", "utf8");
@@ -61,7 +62,7 @@ test("progressive discover spec defines big questions, stages, and command cover
   assert.match(planSkill, /implement\/test\/audit|三权分立/i);
   assert.match(planSkill, /Codex.*authorizes execution subworkers|Codex.*authorize.*\/hw:start.*\/hw:resume/is);
   assert.match(planSkill, /even when.*execution\.worker_separation\.mode.*already.*recommended.*strict|即使.*execution\.worker_separation\.mode=.*recommended.*strict/is);
-  assert.match(planSkill, /P1 must not enter P2.*authorization gate.*unresolved|P1.*不得进入 P2|P1.*不能进入 P2/is);
+  assert.match(planSkill, /Discover must not enter Decompose.*authorization gate.*unresolved|Discover.*不得进入 Decompose|Discover.*不能进入 Decompose|Discover.*不得进入 Decompose/is);
   assert.match(planSkill, /Claude Code.*subcodex.*subclaude/is);
   assert.match(planSkill, /OpenCode.*no extra authorization gate|OpenCode.*不需要额外的授权门控/is);
   assert.match(planSkill, /For Codex only.*missing authorization.*`recommended`|仅限 Codex.*缺失授权.*`recommended`/is);
@@ -70,7 +71,7 @@ test("progressive discover spec defines big questions, stages, and command cover
   assert.match(discoverSkill, /伪测试|pseudo/i);
   assert.match(discoverSkill, /worker separation|三权分立/i);
   assert.match(discoverSkill, /start-blocking gate/i);
-  assert.match(discoverSkill, /P1 must not enter P2.*Codex execution subworker authorization gate is unresolved|Codex.*授权门控未解决.*P1 不得进入 P2/is);
+  assert.match(discoverSkill, /Discover must not enter Decompose.*Codex execution subworker authorization gate is unresolved|Codex.*授权门控未解决.*Discover 不得进入 Decompose|Codex.*授权门控未解决.*Discover 不得进入 Decompose/is);
   assert.match(discoverSkill, /Claude Code.*do not ask for subworker authorization|Claude Code.*不要询问子工作器授权/is);
   assert.match(discoverSkill, /explicit user-confirmed fast\/off single-agent mode|explicitly confirm switching to the fastest single-agent|用户显式确认.*快速.*单代理|显式确认切换到最快的单代理/is);
   assert.match(discoverSkill, /do not silently downgrade to `off`|不要静默降级为 `off`/i);
@@ -79,7 +80,7 @@ test("progressive discover spec defines big questions, stages, and command cover
   assert.match(planReference, /real test contract|真实测试方法/i);
   assert.match(planReference, /Codex.*explicit user-confirmed fastest single-agent/is);
   assert.match(planReference, /before leaving Discover on Codex.*even when `execution\.worker_separation\.mode` already exists/is);
-  assert.match(planReference, /without one explicit outcome, P1 must not enter P2/i);
+  assert.match(planReference, /without one explicit outcome, Discover must not enter Decompose/i);
   assert.match(planReference, /Claude Code.*subcodex.*subclaude/is);
   assert.match(commandsSpec, /task category.*desired effect.*verification method/is);
 });
@@ -245,6 +246,121 @@ test("config defaults expose progressive discover controls", async () => {
   const projectConfig = await loadConfig(".pipeline/config.yaml");
   assert.equal(projectConfig.plan.discover.progressive, true);
   assert.equal(projectConfig.plan.discover.big_questions_first, true);
+});
+
+test("core exports deterministic Plan Phase Model constants", () => {
+  assert.ok(coreApi.PLAN_PHASE_MODEL, "PLAN_PHASE_MODEL must be exported from core");
+  assert.deepEqual(
+    coreApi.PLAN_PHASE_MODEL.map((phase) => ({
+      id: phase.id,
+      label: phase.label,
+      order: phase.order,
+    })),
+    [
+      { id: "discover", label: "Discover", order: 1 },
+      { id: "technical_stack", label: "Technical Stack", order: 2 },
+      { id: "architecture", label: "Architecture", order: 3 },
+      { id: "decompose", label: "Decompose", order: 4 },
+      { id: "generate", label: "Generate", order: 5 },
+      { id: "implementation", label: "Implementation", order: 6 },
+    ],
+  );
+  assert.deepEqual(
+    coreApi.PLAN_PHASE_MODEL.map((phase) => phase.gate),
+    [
+      "question_tool",
+      "question_tool",
+      "question_tool",
+      "question_tool",
+      "question_tool",
+      "execution",
+    ],
+  );
+  assert.ok(Object.isFrozen(coreApi.PLAN_PHASE_MODEL), "phase model must be immutable");
+});
+
+test("Discover completion gate requires scope, effect, and acceptance clarity instead of min_rounds only", () => {
+  assert.equal(
+    typeof coreApi.assessDiscoverCompletionGate,
+    "function",
+    "assessDiscoverCompletionGate must be exported",
+  );
+
+  const shallow = coreApi.assessDiscoverCompletionGate({
+    rounds_completed: 5,
+    min_rounds: 3,
+    scope_clarity: "missing",
+    effect_clarity: "clear",
+    acceptance_clarity: "clear",
+  });
+
+  assert.equal(shallow.complete, false);
+  assert.equal(shallow.rounds_satisfied, true);
+  assert.deepEqual(shallow.missing_signals, ["scope_clarity"]);
+  assert.match(shallow.reason, /scope.*effect.*acceptance/i);
+
+  const complete = coreApi.assessDiscoverCompletionGate({
+    rounds_completed: 1,
+    min_rounds: 3,
+    scope_clarity: "clear",
+    effect_clarity: "clear",
+    acceptance_clarity: "clear",
+  });
+
+  assert.equal(complete.complete, true);
+  assert.equal(complete.rounds_satisfied, false);
+  assert.deepEqual(complete.required_signals, [
+    "scope_clarity",
+    "effect_clarity",
+    "acceptance_clarity",
+  ]);
+});
+
+test("visible phase output contract blocks Question Tool gate until summary, decisions, and questions are rendered", () => {
+  assert.equal(
+    typeof coreApi.validateVisiblePhaseGate,
+    "function",
+    "validateVisiblePhaseGate must be exported",
+  );
+
+  const blocked = coreApi.validateVisiblePhaseGate({
+    phase_id: "architecture",
+    before_gate: true,
+    stage_summary: "Architecture narrows integration to the existing core helpers.",
+    decision_table: [],
+    open_questions: [],
+  });
+
+  assert.equal(blocked.ok, false);
+  assert.equal(blocked.gate, "question_tool");
+  assert.deepEqual(blocked.missing_outputs, ["decision_table", "open_questions"]);
+  assert.match(blocked.message, /before.*Question Tool|before.*Ask/i);
+
+  const ready = coreApi.validateVisiblePhaseGate({
+    phase_id: "architecture",
+    before_gate: true,
+    stage_summary: "Architecture narrows integration to the existing core helpers.",
+    decision_table: [
+      {
+        decision: "Expose core helpers",
+        rationale: "Skills and adapters need deterministic contracts.",
+        status: "proposed",
+      },
+    ],
+    open_questions: [
+      {
+        id: "q1",
+        question: "Confirm whether adapters consume the same helper outputs.",
+      },
+    ],
+  });
+
+  assert.equal(ready.ok, true);
+  assert.deepEqual(ready.required_outputs, [
+    "stage_summary",
+    "decision_table",
+    "open_questions",
+  ]);
 });
 
 function escapeRegExp(value) {

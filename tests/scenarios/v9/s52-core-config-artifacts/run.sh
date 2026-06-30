@@ -28,7 +28,7 @@ node --test core/test/*.test.js
 
 node core/bin/hw-core commands --platform opencode > "$commands_log"
 grep -Fq '"canonical": "/hw:plan"' "$commands_log"
-grep -Fq '"opencode": "/hw-plan"' "$commands_log"
+grep -Fq '"opencode": "/hw:plan"' "$commands_log"
 
 node core/bin/hw-core rules --project . > "$rules_log"
 grep -Fq 'Rules:' "$rules_log"
@@ -38,12 +38,12 @@ bash scripts/rules-summary.sh . > "$shell_rules_log"
 grep -Fq 'Rules:' "$shell_rules_log"
 
 node core/bin/hw-core artifact opencode --out "$artifact_dir"
-test -f "$artifact_dir/.opencode/commands/hw-plan.md"
+test -f "$artifact_dir/.opencode/commands/hw:plan.md"
 test -f "$artifact_dir/.opencode/agents/hw-plan.md"
 test -f "$artifact_dir/opencode.json"
 test -f "$artifact_dir/.opencode/hypo-workflow.json"
 test -f "$artifact_dir/AGENTS.md"
-grep -Fq '/hw:plan' "$artifact_dir/.opencode/commands/hw-plan.md"
+grep -Fq '/hw:plan' "$artifact_dir/.opencode/commands/hw:plan.md"
 grep -Fq 'todowrite' "$artifact_dir/.opencode/agents/hw-plan.md"
 grep -Fq '"compaction"' "$artifact_dir/opencode.json"
 grep -Fq '"auto_continue"' "$artifact_dir/.opencode/hypo-workflow.json"

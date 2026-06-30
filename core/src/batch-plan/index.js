@@ -30,6 +30,60 @@ export function renderBatchPlanArtifacts(input = {}, options = {}) {
   };
 }
 
+export function renderPlanPhaseFlow(phases = []) {
+  const ordered = [...phases].sort((a, b) => Number(a.order || 0) - Number(b.order || 0));
+  const lines = ["graph TD"];
+  for (const phase of ordered) {
+    lines.push(`  ${sanitizeNode(phase.id)}["${escapeLabel(phase.label || phase.id)}"]`);
+  }
+  for (let index = 0; index < ordered.length - 1; index += 1) {
+    lines.push(`  ${sanitizeNode(ordered[index].id)} --> ${sanitizeNode(ordered[index + 1].id)}`);
+  }
+  return `${lines.join("\n")}\n`;
+}
+
+export function renderMilestoneTable(milestones = []) {
+  const lines = [
+    "| Milestone | Phase | Validation |",
+    "|---|---|---|",
+  ];
+  for (const milestone of milestones) {
+    lines.push(`| ${formatMilestoneLabel(milestone)} | ${formatCell(milestone.phase || "n/a")} | ${formatCell(milestone.validation || milestone.validation_command || milestone.validation_commands || "TBD")} |`);
+  }
+  return `${lines.join("\n")}\n`;
+}
+
+export function renderDecisionMatrix(decisions = []) {
+  const lines = [
+    "| Decision | Options | Selected | Rationale | Status |",
+    "|---|---|---|---|---|",
+  ];
+  for (const decision of decisions) {
+    lines.push(`| ${formatCell(decision.decision || decision.title || decision.id || "decision")} | ${formatCell(decision.options || [])} | ${formatCell(decision.selected || decision.choice || "TBD")} | ${formatCell(decision.rationale || decision.reason || "")} | ${formatCell(decision.status || "proposed")} |`);
+  }
+  return `${lines.join("\n")}\n`;
+}
+
+export function renderDependencyMap(items = []) {
+  const features = normalizeDagFeatures(items);
+  const dag = resolveFeatureDagBoard({ features });
+  const lines = ["graph TD"];
+  for (const feature of dag.features) {
+    lines.push(`  ${sanitizeNode(feature.id)}["${feature.id}: ${escapeLabel(feature.title)}"]`);
+  }
+  for (const feature of dag.features) {
+    for (const dependency of feature.depends_on) {
+      lines.push(`  ${sanitizeNode(dependency)} --> ${sanitizeNode(feature.id)}`);
+    }
+  }
+  if (!dag.visible && dag.features.length > 1) {
+    for (let index = 0; index < dag.features.length - 1; index += 1) {
+      lines.push(`  ${sanitizeNode(dag.features[index].id)} -. next .-> ${sanitizeNode(dag.features[index + 1].id)}`);
+    }
+  }
+  return `${lines.join("\n")}\n`;
+}
+
 export function assessRunnableVerticalSlice(milestone = {}) {
   const text = collectMilestoneText(milestone);
   const layers = detectSliceLayers(text);
@@ -578,6 +632,18 @@ function renderFeatureTable(features, mode, dag = resolveFeatureDagBoard({ featu
     }
   }
   return `${lines.join("\n")}\n`;
+}
+
+function formatMilestoneLabel(milestone = {}) {
+  const id = milestone.id || milestone.name || "M";
+  const title = milestone.title || milestone.summary || "";
+  return formatCell(title ? `${id} ${title}` : id);
+}
+
+function formatCell(value) {
+  if (Array.isArray(value)) return value.map((item) => String(item)).join("<br>");
+  if (value && typeof value === "object") return Object.values(value).map((item) => String(item)).join("<br>");
+  return String(value ?? "").replace(/\|/g, "\\|").trim();
 }
 
 function formatVerification(verification = {}) {

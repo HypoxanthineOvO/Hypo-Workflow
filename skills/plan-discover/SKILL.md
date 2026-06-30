@@ -13,13 +13,13 @@ description: Run the discovery phase of Hypo-Workflow planning when the user nee
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-仅将此 skill 用于 P1 Discover。
+仅将此 skill 用于 Discover。
 
-`P1 Discover` 仅在 `P0 Configure` 已运行或已为当前 Cycle 显式重用后开始。`P0 Configure` 在 `cycle new` 之后、`P1 Discover` 之前运行；它询问自动化、Subagent 授权、验收模式、PR/MR 远程写入确认、完整回归、分析边界和 Worker Separation。重用遵循 `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default` 且必须可审计。
+Discover 仅在 `P0 Configure` 已运行或已为当前 Cycle 显式重用后开始。`P0 Configure` 在 `cycle new` 之后、Discover 之前运行；它询问自动化、Subagent 授权、验收模式、PR/MR 远程写入确认、完整回归、分析边界和 Worker Separation。重用遵循 `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default` 且必须可审计。
 
 对于 `/hw:plan --batch`，此阶段变为 Batch Discover。Batch Discover 在一次访谈中覆盖多个 Feature 候选项，但保持与普通 Discover 相同的交互硬门控。
 
-`P0 Configure` 是新 Cycle 规划的必需前置阶段。它在 `cycle new` 之后、`P1 Discover` 之前运行；可以通过询问用户或显式重用决策来完成。该阶段涵盖自动化、Subagent 授权、验收模式、PR/MR 远程写入策略、完整回归、分析边界和 Worker Separation。重用源按以下顺序解析：`cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config`、`built_in_default`。
+`P0 Configure` 是新 Cycle 规划的必需前置阶段。它在 `cycle new` 之后、Discover 之前运行；可以通过询问用户或显式重用决策来完成。该阶段涵盖自动化、Subagent 授权、验收模式、PR/MR 远程写入策略、完整回归、分析边界和 Worker Separation。重用源按以下顺序解析：`cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config`、`built_in_default`。
 
 ## 先问关键问题
 
@@ -41,7 +41,7 @@ Discover 还必须在分解之前询问 Worker Separation / 三权分立策略�
 - Claude Code：不要询问子工作器授权；询问执行子工作器应该使用 `subcodex` 还是 `subclaude`，然后询问 `recommended`、`strict` 或显式 `off`
 - OpenCode：不要询问子工作器授权；使用配置的原生代理/子代理，然后询问 `recommended`、`strict` 或显式 `off`
 
-仅限 Codex：不要将缺失授权默认为 `recommended`，也不要静默降级为 `off`。缺失授权必须在分解前产生一个显式 P1 结果：`authorized recommended`、`authorized strict`、`start-blocking gate` 或用户显式确认的快速/关闭单代理模式。当 Codex 执行子工作器授权门控未解决时，P1 不得进入 P2。
+仅限 Codex：不要将缺失授权默认为 `recommended`，也不要静默降级为 `off`。缺失授权必须在分解前产生一个显式 Discover 结果：`authorized recommended`、`authorized strict`、`start-blocking gate` 或用户显式确认的快速/关闭单代理模式。当 Codex 执行子工作器授权门控未解决时，Discover 不得进入 Decompose。
 
 还要在结构化笔记中对工作流通道进行分类：
 
@@ -78,7 +78,7 @@ Discover 还必须在分解之前询问 Worker Separation / 三权分立策略�
 - 长期运行、批量、DAG、AFK 或 HITL 协调
 - 讨论、决策、词汇表、架构、提示和 Knowledge Ledger 层之间所有权不明确
 
-深度 Grill-Me 应在 P2 分解前对齐概念。它应该询问以下重点问题：
+深度 Grill-Me 应在 Decompose 前对齐概念。它应该询问以下重点问题：
 
 1. 稳定术语及其含义
 2. 示例和非示例
@@ -139,7 +139,7 @@ Knowledge Ledger 索引设计决策和参考；它不得将完整的设计概念
 ❌ 绝对禁止：
 1. 用户只说了一句话就直接开始拆 Milestone
 2. 自己填补用户没说过的需求细节
-3. 在用户没说「够了」「开始吧」「可以了」之前进入 P2
+3. 在用户没说「够了」「开始吧」「可以了」之前进入 Decompose
 4. 一次性列出 10 个问题然后自己回答
 5. 把「确认一下」当作「够了」的信号
 
@@ -150,7 +150,7 @@ Knowledge Ledger 索引设计决策和参考；它不得将完整的设计概念
 4. 主动发现用户没想到的维度并提出
 5. 像资深 PM 做需求访谈，循序渐进
 
-🚨 进入 P2 的唯一条件：
+🚨 进入 Decompose 的唯一条件：
 用户明确表示「够了」「开始吧」「可以了」等结束信号。
 如果用户只是回答了你的问题，你应该继续提问，不应该理解为「可以开始了」。
 
@@ -164,15 +164,16 @@ Knowledge Ledger 索引设计决策和参考；它不得将完整的设计概念
 6. 拒绝开环答案，如"我们将添加测试"，除非用户还定义了如何运行测试以及什么证据闭环。
 7. 每轮结束后总结已学到的内容。
 8. 在工作笔记中明确计算已完成的问题轮次。
-9. 直到两个条件都为真才进入 P2：
+9. 直到两个条件都为真才进入 Decompose：
    - 已满足配置的最小轮次计数
    - 用户明确表示「够了」「开始吧」「可以了」或等效的结束信号
 10. 如果用户输入模糊，询问后续问题而不是静默填补空白。
 11. 如果用户说"确认一下"或仅回答了前面的问题，总结并继续提问。
+12. 在每次 Question Tool / Ask 或普通对话提问之前，先说明为什么这些问题会改变后续计划、用户的回答会影响哪些范围/验证/授权决策，以及当前已确认的信息。
 
 ## 上下文注入
 
-`/hw:plan --context <sources>` 和 `cycle.yaml` 的 `context_sources` 可以用现有证据预加载 P1。支持的来源：
+`/hw:plan --context <sources>` 和 `cycle.yaml` 的 `context_sources` 可以用现有证据预加载 Discover。支持的来源：
 
 - `audit`：读取 `.pipeline/audits/` 下的最新报告
 - `patches`：读取 `.pipeline/patches/` 下的所有打开的 Patch 文件
@@ -211,7 +212,7 @@ Knowledge Ledger 索引设计决策和参考；它不得将完整的设计概念
    - 首选 `decompose_mode`：`upfront` 或 `just_in_time`
    - 验收边界
 3. 询问统一的后续问题，使用户不必为每个 Feature 重复一个完整的规划循环。
-4. 在 P2 之前呈现 Feature Queue 预览表。
+4. 在 Decompose 之前呈现 Feature Queue 预览表。
 5. 直到队列确认才生成 `.pipeline/feature-queue.yaml`。
 
 必需的 Batch Discover 输出：

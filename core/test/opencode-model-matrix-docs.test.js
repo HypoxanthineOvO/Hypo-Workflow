@@ -6,12 +6,12 @@ test("OpenCode command and parity docs use matrix role agents", async () => {
   const commandMap = await readFile("references/opencode-command-map.md", "utf8");
   const parity = await readFile("references/opencode-parity.md", "utf8");
 
-  assert.match(commandMap, /\| `\/hw:report` \| `\/hw-report` \| `hw-report` \|/);
-  assert.match(commandMap, /\| `\/hw:compact` \| `\/hw-compact` \| `hw-compact` \|/);
-  assert.match(commandMap, /\| `\/hw:debug` \| `\/hw-debug` \| `hw-debug` \|/);
-  assert.match(parity, /\| Report \| `\/hw-report` \| `hw-report` \|/);
-  assert.match(parity, /\| Compact \| `\/hw-compact` \| `hw-compact` \|/);
-  assert.match(parity, /\| Debug \| `\/hw-debug` \| `hw-debug` \|/);
+  assert.match(commandMap, /\| `\/hw:report` \| `\/hw:report` \| `hw-report` \|/);
+  assert.match(commandMap, /\| `\/hw:compact` \| `\/hw:compact` \| `hw-compact` \|/);
+  assert.match(commandMap, /\| `\/hw:debug` \| `\/hw:debug` \| `hw-debug` \|/);
+  assert.match(parity, /\| Report \| `\/hw:report` \| `hw-report` \|/);
+  assert.match(parity, /\| Compact \| `\/hw:compact` \| `hw-compact` \|/);
+  assert.match(parity, /\| Debug \| `\/hw:debug` \| `hw-debug` \|/);
 });
 
 test("OpenCode guide documents model matrix defaults and boundaries", async () => {

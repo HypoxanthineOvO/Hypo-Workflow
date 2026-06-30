@@ -59,7 +59,7 @@ test("P0 Configure policy resolves inheritance sources and records reused decisi
   assert.equal(policy.audit.created_at, "2026-05-08T23:59:00+08:00");
 });
 
-test("Progressive Discover plan includes P0 Configure before P1 questions", () => {
+test("Progressive Discover plan includes P0 Configure before Discover questions", () => {
   const plan = buildProgressiveDiscoverPlan({
     mode: "single",
     intent: "plan cycle setup and workflow lifecycle",
@@ -83,7 +83,7 @@ test("Guide, Init, Plan, and config docs describe P0 Configure coverage", async 
   const combined = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
 
   assert.match(combined, /P0 Configure/);
-  assert.match(combined, /cycle new.*P1 Discover/is);
+  assert.match(combined, /cycle new.*Discover/is);
   assert.match(combined, /automation.*Subagent.*acceptance.*PR\/MR remote write.*full regression.*analysis.*worker separation/is);
   assert.match(combined, /cycle_explicit.*previous_cycle_snapshot.*project_config.*global_config.*built_in_default/is);
   assert.match(combined, /沿用|reuse/i);

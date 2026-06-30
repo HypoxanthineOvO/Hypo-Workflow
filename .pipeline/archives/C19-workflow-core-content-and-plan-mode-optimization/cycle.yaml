@@ -1,0 +1,12 @@
+cycle:
+  number: 19
+  name: "Workflow 核心内容与 Plan 模式优化"
+  type: refactor
+  status: completed
+  started: "2026-06-08T15:31:09+08:00"
+  completed: "2026-06-08T23:23:16+08:00"
+  preset: tdd
+  context_sources: []
+  previous_cycle: 18
+  summary: "C19 completed the Workflow core prompt and Plan mode redesign: named Plan phases, visible Question Tool gates, DeepSeek-oriented AGENTS guidance projection, source regression closure, target repository adaptation, and target releases for Codex-VSP and VSP-Open-Code."
+  lessons: "Major Workflow gates must show concrete phase artifacts before Ask/Question confirmation; target repository release work needs explicit version/tag strategy and local/remote state checks before push."

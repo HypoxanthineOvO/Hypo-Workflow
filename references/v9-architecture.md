@@ -48,7 +48,7 @@ User invokes platform command
   -> adapter hooks record context, heartbeat, guard results, and optional auto-continue
 ```
 
-On OpenCode this means `/hw-plan`, `/hw-start`, and other `/hw-*` commands are native slash commands. The OpenCode plugin assists with events and context, but the Agent still reads the command prompt and performs the work.
+On OpenCode this means `/hw:plan`, `/hw:start`, and other `/hw:*` commands are native slash commands. The OpenCode plugin assists with events and context, but the Agent still reads the command prompt and performs the work.
 
 ## Global Setup CLI
 

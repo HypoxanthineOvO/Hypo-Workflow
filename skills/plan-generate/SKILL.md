@@ -13,18 +13,18 @@ description: Generate Hypo-Workflow artifacts from the approved milestone plan w
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-仅将此 skill 用于 P3 Generate。
+仅将此 skill 用于 Generate。
 
 ## 前置条件
 
 - Milestone 已定义得足够好以产生 `.pipeline/` 产物
-- P2 已被用户确认，且每个实现 Milestone 都包含 `technical_solution`、`technical_route`、`research_required`、`risks_and_alternatives`、`validation_path` 和 `audit_focus`
-- 所有硬性 `research_required` 项已解决，或已有用户明确接受的延后记录；仍处于 `blocking_question` 的调研项必须返回 P2 等待用户答复，不得进入 P3
+- Decompose 已被用户确认，且每个实现 Milestone 都包含 `technical_solution`、`technical_route`、`research_required`、`risks_and_alternatives`、`validation_path` 和 `audit_focus`
+- 所有硬性 `research_required` 项已解决，或已有用户明确接受的延后记录；仍处于 `blocking_question` 的调研项必须返回 Decompose 等待用户答复，不得进入 Generate
 
 ## 执行流程
 
 1. 读取 `~/.hypo-workflow/config.yaml`（如果存在）。
-2. 读取已确认的 `.plan-state/decompose.yaml` 和 `.plan-state/technical-route.md`（如果存在），以 P2 技术路线字段作为生成提示的权威输入。
+2. 读取已确认的 `.plan-state/decompose.yaml` 和 `.plan-state/technical-route.md`（如果存在），以 Decompose 技术路线字段作为生成提示的权威输入。
 3. 生成 `.pipeline/config.yaml`，包含项目特定值和仅应覆盖全局默认值的覆盖项，包括 `output.*`、`plan.interactive.*` 和 `watchdog.*`（仅当项目需要显式覆盖时）。
 4. 生成 `.pipeline/prompts/*.md`。
 5. 生成架构基线文件。
@@ -35,12 +35,12 @@ description: Generate Hypo-Workflow artifacts from the approved milestone plan w
    - `lifecycle_policy.accept.next`，当存在计划的后续时使用 `follow_up_plan`
    - 计划后续节点的 `continuations[]`
 7. 在写入每个提示之前，创建一个详细的实现计划，包含：
-   - P2 的 `technical_solution`
-   - P2 的 `technical_route`
-   - P2 的 `research_required` 状态、证据、阻塞问题或用户延后记录
-   - P2 的 `risks_and_alternatives`
-   - P2 的 `validation_path`
-   - P2 的 `audit_focus`
+   - Decompose 的 `technical_solution`
+   - Decompose 的 `technical_route`
+   - Decompose 的 `research_required` 状态、证据、阻塞问题或用户延后记录
+   - Decompose 的 `risks_and_alternatives`
+   - Decompose 的 `validation_path`
+   - Decompose 的 `audit_focus`
    - 有序步骤
    - 依赖项
    - 验证点
@@ -53,7 +53,7 @@ description: Generate Hypo-Workflow artifacts from the approved milestone plan w
 9. 检测附加模式并保留已执行的编号。
 10. 对于任何触及受保护生命周期状态的项目周期写入，使用工作流提交助手，以便权威事实在派生刷新之前原子提交。
 
-P3 Generate 必须保留 P2 技术路线字段，不能把它们折叠成目标摘要或普通验收清单。生成的每个实现提示必须让 worker 能看到：
+Generate 必须保留 Decompose 技术路线字段，不能把它们折叠成目标摘要或普通验收清单。生成的每个实现提示必须让 worker 能看到：
 
 - 采用的技术方案和被拒绝的替代方案
 - 具体技术路线、触达模块、边界和非目标
@@ -61,7 +61,7 @@ P3 Generate 必须保留 P2 技术路线字段，不能把它们折叠成目标�
 - 风险和审计重点
 - 闭环验证路径、真实测试方法和伪测试拒绝规则
 
-如果 P2 产物只有目标、验收标准、Feature Queue 或测试标题，缺少任一必填技术路线字段，或仍有 active blocking research question，停止 Generate 并返回 P2 revision。不要在 P3 中自行补全未确认的技术方案。
+如果 Decompose 产物只有目标、验收标准、Feature Queue 或测试标题，缺少任一必填技术路线字段，或仍有 active blocking research question，停止 Generate 并返回 Decompose revision。不要在 Generate 中自行补全未确认的技术方案。
 
 当 Cycle 或 Feature 具有 `workflow_kind: analysis` 时，生成的提示应包括分析步骤链，生成的配置/周期元数据应使用 `analysis` preset：
 
@@ -92,6 +92,8 @@ P3 Generate 必须保留 P2 技术路线字段，不能把它们折叠成目标�
 ## 交互行为
 
 - 在交互模式下，在最终确定之前呈现任何主要的附加模式冲突或架构不确定性
+- Generate 完成后必须在对话中展示生成结果摘要：项目/周期、Milestone 数、测试点或验证路径、生成/更新的关键文件、执行前门控和主要风险；不得只给 `.pipeline/` 路径。
+- 最终执行确认必须先解释用户在确认什么、确认后 `/hw:start` 会进入什么状态、拒绝或修改会回到哪个 Plan 阶段，然后使用 Question Tool / Ask 等待明确确认。
 - 在自动模式下，除非被将重写历史的结构冲突阻止，否则继续
 
 ## 参考文件

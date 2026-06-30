@@ -32,7 +32,7 @@ grep -Fq 'Codex:' "$tmp_home/doctor.txt"
 grep -Fq 'Claude Code:' "$tmp_home/doctor.txt"
 
 HOME="$tmp_home" node cli/bin/hypo-workflow sync --platform opencode --project "$tmp_project"
-test -f "$tmp_project/.opencode/commands/hw-plan.md"
+test -f "$tmp_project/.opencode/commands/hw:plan.md"
 test -f "$tmp_project/.opencode/agents/hw-plan.md"
 test -f "$tmp_project/.opencode/opencode.json"
 test ! -f "$tmp_project/tui.json"
@@ -40,7 +40,7 @@ test ! -f "$tmp_project/.opencode/tui/hypo-workflow-tui.tsx"
 
 HOME="$tmp_home" node cli/bin/hypo-workflow init-project --platform opencode --project "$tmp_project"
 test -f "$tmp_project/.pipeline/config.yaml"
-test -f "$tmp_project/.opencode/commands/hw-start.md"
+test -f "$tmp_project/.opencode/commands/hw:start.md"
 
 node cli/bin/hypo-workflow --help > "$tmp_home/help.txt"
 grep -Fq 'setup utility, not a runner' "$tmp_home/help.txt"

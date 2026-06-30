@@ -1,6 +1,6 @@
 ---
 name: plan-confirm
-description: Confirm the generated Hypo-Workflow plan when the user wants a final milestone summary before execution starts.
+description: Legacy compatibility gate for existing generated artifacts; new planning uses in-phase Question Tool / Ask confirmation instead of a standalone user command.
 ---
 
 # /hypo-workflow:plan-confirm
@@ -13,7 +13,7 @@ description: Confirm the generated Hypo-Workflow plan when the user wants a fina
 - auto：跟随用户对话语言
 内部日志（log.yaml、state.yaml）始终英文。
 
-仅在 P4 Confirm 阶段使用此 skill。
+仅当旧生成产物仍显式引用 Confirm gate 时作为兼容说明使用。新 Plan 命令面不再暴露 `/hw:plan:confirm`；确认行为必须作为各阶段内 Question Tool / Ask gate 处理。
 
 ## 前置条件
 

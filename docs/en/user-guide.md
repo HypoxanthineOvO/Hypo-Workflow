@@ -19,7 +19,7 @@ Start from the platform guide for your host Agent. The README stays as a compact
 
 ## Common Workflows
 
-- After `/hw:cycle new`, complete or explicitly reuse `P0 Configure` before `P1 Discover`; it covers automation level, Subagent authorization, acceptance mode, PR/MR remote-write policy, full regression, analysis boundaries, and worker separation.
+- After `/hw:cycle new`, complete or explicitly reuse `P0 Configure` before Discover; it covers automation level, Subagent authorization, acceptance mode, PR/MR remote-write policy, full regression, analysis boundaries, and worker separation.
 - Use `/hw:plan` to plan work, then `/hw:start` or `/hw:resume` to execute.
 - Use `/hw:status` for progress and `/hw:report` for reports.
 - Use `/hw:explain [question]` for evidence-first answers about code, config, commands, or recent changes.

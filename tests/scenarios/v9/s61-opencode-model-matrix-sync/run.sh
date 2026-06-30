@@ -39,9 +39,9 @@ grep -Fq "model: scenario-code-b" "$project/.opencode/agents/hw-code-b.md"
 grep -Fq "model: scenario-debug" "$project/.opencode/agents/hw-debug.md"
 grep -Fq "model: scenario-report" "$project/.opencode/agents/hw-report.md"
 
-grep -Fq "agent: hw-compact" "$project/.opencode/commands/hw-compact.md"
-grep -Fq "agent: hw-debug" "$project/.opencode/commands/hw-debug.md"
-grep -Fq "agent: hw-report" "$project/.opencode/commands/hw-report.md"
+grep -Fq "agent: hw-compact" "$project/.opencode/commands/hw:compact.md"
+grep -Fq "agent: hw-debug" "$project/.opencode/commands/hw:debug.md"
+grep -Fq "agent: hw-report" "$project/.opencode/commands/hw:report.md"
 
 node - "$project" <<'NODE'
 const fs = require("fs");
@@ -89,7 +89,7 @@ if (metadata.providers !== undefined) {
 }
 NODE
 
-grep -Fq "| \`/hw:compact\` | \`/hw-compact\` | \`hw-compact\` |" references/opencode-command-map.md
-grep -Fq "| Compact | \`/hw-compact\` | \`hw-compact\` |" references/opencode-parity.md
+grep -Fq "| \`/hw:compact\` | \`/hw:compact\` | \`hw-compact\` |" references/opencode-command-map.md
+grep -Fq "| Compact | \`/hw:compact\` | \`hw-compact\` |" references/opencode-parity.md
 
 echo "s61 passed"

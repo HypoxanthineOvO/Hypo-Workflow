@@ -75,7 +75,7 @@ Automation levels are stable internal keys with Chinese UI labels:
 
 Hard gates are never downgraded by automation level:
 
-- `automation.gates.planning=confirm` is mandatory for P2 milestone split and P4 final plan confirmation.
+- `automation.gates.planning=confirm` is mandatory for the Decompose milestone split and Generate final confirmation.
 - `automation.gates.destructive_external=confirm` is mandatory for destructive or external side effects.
 - `automation.gates.release_publish=confirm` is the default for tag/push/publish operations unless a command receives explicit user confirmation.
 
@@ -117,7 +117,7 @@ Codex delegation policy under `automation.codex` is instruction-level and runtim
 
 ## P0 Configure
 
-`P0 Configure` is the Cycle-scoped setup stage that runs after `cycle new` and before `P1 Discover`. `/hw:guide`, `/hw:init`, and `/hw:plan` should route users through this stage before planning when the current Cycle has not yet recorded an explicit configure decision.
+`P0 Configure` is the Cycle-scoped setup stage that runs after `cycle new` and before Discover. `/hw:guide`, `/hw:init`, and `/hw:plan` should route users through this stage before planning when the current Cycle has not yet recorded an explicit configure decision.
 
 The stage asks about automation, Subagent authorization, acceptance mode, PR/MR remote write confirmation, full regression, analysis boundaries, and worker separation. Users may choose to reuse prior decisions, but the reuse must be auditable.
 
@@ -131,7 +131,7 @@ Worker separation policy is project-local execution policy:
 
 Plan-time authorization is separate from the mode and is Codex-specific:
 
-- On Codex, `/hw:plan` P1 Discover must ask for execution subworker authorization before P2 whenever persisted authorization scope for `/hw:start` and `/hw:resume` is missing, even if `execution.worker_separation.mode` is already `recommended` or `strict`.
+- On Codex, `/hw:plan` Discover must ask for execution subworker authorization before Decompose whenever persisted authorization scope for `/hw:start` and `/hw:resume` is missing, even if `execution.worker_separation.mode` is already `recommended` or `strict`.
 - On Codex, `recommended` and `strict` require explicit execution subworker authorization for `/hw:start` and `/hw:resume`, or a persisted blocking gate that prevents execution before role-sensitive work.
 - On Codex, if the user declines execution subworkers and explicitly confirms the fastest path, persist `execution.worker_separation.mode=off`; do not silently keep `recommended` or silently downgrade.
 - On Codex, if authorization is missing, `/hw:start` and `/hw:resume` must stop and ask instead of degrading in place; downgrade to fast/off always requires explicit user confirmation.
@@ -186,7 +186,7 @@ Execution guidance:
 
 ## P0 Configure
 
-`P0 Configure` is the Cycle-scoped setup gate that runs after `cycle new` and before `P1 Discover`. It exists so users can confirm the practical operating mode for the Cycle before requirement discovery starts.
+`P0 Configure` is the Cycle-scoped setup gate that runs after `cycle new` and before Discover. It exists so users can confirm the practical operating mode for the Cycle before requirement discovery starts.
 
 The stage asks about automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation.
 

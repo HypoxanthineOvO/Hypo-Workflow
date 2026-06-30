@@ -4,7 +4,7 @@ Use this reference when planning needs stronger structure than “ask a few roun
 
 ## Big Questions First
 
-Before the first P1 question, a new Cycle should pass through `P0 Configure` when no current-Cycle configure decision exists. `P0 Configure` runs after `cycle new` and before `P1 Discover`; it asks about automation, Subagent authorization, acceptance mode, PR/MR remote write confirmation, full regression, analysis boundaries, and worker separation. Users may reuse previous settings. Reuse follows `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default` and must leave an auditable `.plan-state/p0-configure.yaml` or equivalent report note.
+Before the first Discover question, a new Cycle should pass through `P0 Configure` when no current-Cycle configure decision exists. `P0 Configure` runs after `cycle new` and before Discover; it asks about automation, Subagent authorization, acceptance mode, PR/MR remote write confirmation, full regression, analysis boundaries, and worker separation. Users may reuse previous settings. Reuse follows `cycle_explicit -> previous_cycle_snapshot -> project_config -> global_config -> built_in_default` and must leave an auditable `.plan-state/p0-configure.yaml` or equivalent report note.
 
 Progressive Discover starts from three big questions before deeper drilling:
 
@@ -14,7 +14,7 @@ Progressive Discover starts from three big questions before deeper drilling:
 
 The Agent should ask these early for both ordinary `/hw:plan` and `/hw:plan --batch`. This keeps later Milestone decomposition tied to the right task class and test surface.
 
-Every Plan must also ask substantive audit and verification questions before P2. Do not treat audit as a vague final review. Capture these fields in planning notes and generated prompts:
+Every Plan must also ask substantive audit and verification questions before Decompose. Do not treat audit as a vague final review. Capture these fields in planning notes and generated prompts:
 
 - `audit_target`
 - `risk_hypotheses`
@@ -28,7 +28,7 @@ When the user gives an example, treat it as an example first. The Agent must ide
 
 ## P0 Configure
 
-Before those P1 questions, a new Cycle should run or explicitly reuse `P0 Configure`. The stage runs after `cycle new` and before `P1 Discover`; it confirms automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation. Reuse must preserve its source order: `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, `built_in_default`.
+Before those Discover questions, a new Cycle should run or explicitly reuse `P0 Configure`. The stage runs after `cycle new` and before Discover; it confirms automation, Subagent authorization, acceptance mode, PR/MR remote write policy, full regression, analysis boundaries, and worker separation. Reuse must preserve its source order: `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, `built_in_default`.
 
 The verification answer must become a real test contract, not a vague testing note. Ask for the 真实测试方法 / real test method, the exact scenario or command, the observable pass/fail signal, and the independent validator. For example, an agent-service project may require "use NapCat to simulate the main account sending a message to the agent"; unit mocks or pseudo tests do not satisfy that contract unless the user explicitly defined them as the real acceptance method.
 

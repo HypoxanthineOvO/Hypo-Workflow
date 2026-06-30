@@ -11,7 +11,7 @@ V8.4 parity is tracked in [`opencode-parity.md`](./opencode-parity.md).
 | Config and schema | https://opencode.ai/docs/config/ and https://opencode.ai/config.json | Root `opencode.json` must stay OpenCode-schema-compatible; HW-private matrix, guard, and auto-continue metadata belongs in `.opencode/hypo-workflow.json`. |
 | Plugins and events | https://opencode.ai/docs/plugins/ | Native extension point for file guards, event listeners, context injection, auto-continue, and custom tools. |
 | TUI plugins | https://opencode.ai/docs/tui/ | Native TUI extension surface for sidebar/footer/home/session prompt status panels. |
-| Slash commands | https://opencode.ai/docs/commands/ | Native command surface for `/hw-*` files. |
+| Slash commands | https://opencode.ai/docs/commands/ | Native command surface for `/hw:*` files. |
 | Agents and subagents | https://opencode.ai/docs/agents/ | Native primary agents and subagents replace HW-owned delegation prompts on OpenCode. |
 | Tools | https://opencode.ai/docs/tools/ | Native `question` and `todowrite` tools are required for Plan and execution discipline. |
 | Permissions | https://opencode.ai/docs/permissions | Native allow/ask/deny permission model backs file guard and setup defaults. |
@@ -43,8 +43,8 @@ See also [`external-docs-index.md`](./external-docs-index.md) for the cross-plat
 | Context compaction | plugin-assisted | `opencode.json.compaction`, `session.compacted`, plugin compaction hooks | Inject compact HW state into compaction summaries. |
 | Context loading | plugin-assisted | session events plus generated instructions | Load current prompt/state/report without flooding context. |
 | TUI status model | TUI Slot API | `sidebar_content`, `sidebar_footer`, `home_footer` | Build a read-only status model from `.pipeline/` before rendering UI slots. |
-| Interactive guide | agent-prompt | `/hw-guide` command template + `question` | Keep intent matching in prompt policy. |
-| Plan interview flow | agent-prompt | `/hw-plan*` commands on plan agent | Enforce explicit confirmation and targeted follow-up. |
+| Interactive guide | agent-prompt | `/hw:guide` command template + `question` | Keep intent matching in prompt policy. |
+| Plan interview flow | agent-prompt | `/hw:plan*` commands on plan agent | Enforce explicit confirmation and targeted follow-up. |
 | Report prose | agent-prompt | generated command prompt and templates | Preserve HW report structure and language policy. |
 | Cycle model | HW-specific | files under `.pipeline/` | Own `cycle.yaml`, archives, deferred items, summaries. |
 | Patch track | HW-specific | files under `.pipeline/patches/` | Own patch numbering, lifecycle, and fix lane. |
@@ -56,49 +56,59 @@ See also [`external-docs-index.md`](./external-docs-index.md) for the cross-plat
 
 | HW command | OpenCode command | Agent | Route |
 |---|---|---|---|
-| `/hw:start` | `/hw-start` | `hw-build` | Native slash command, plugin-assisted state/context. |
-| `/hw:resume` | `/hw-resume` | `hw-build` | Native slash command, plugin-assisted recovery. |
-| `/hw:status` | `/hw-status` | `hw-status` | Native slash command, reads compact state. |
-| `/hw:skip` | `/hw-skip` | `hw-build` | Native slash command, HW-specific state mutation. |
-| `/hw:stop` | `/hw-stop` | `hw-status` | Native slash command, HW-specific state mutation. |
-| `/hw:report` | `/hw-report` | `hw-report` | Native slash command, HW-specific report contract. |
-| `/hw:chat` | `/hw-chat` | `hw-build` | Native slash command, lightweight append conversation lane. |
-| `/hw:analysis` | `/hw-analysis` | `hw-debug` | Native slash command, interactive Analysis investigation lane with compact state summary and external ledger evidence. |
-| `/hw:plan` | `/hw-plan` | `hw-plan` | Native slash command, OpenCode question/todowrite required. |
-| `/hw:plan:deep` | `/hw-plan-deep` | `hw-plan` | Native slash command, durable Deep Plan discussion package before ordinary Plan. |
-| `/hw:plan:discover` | `/hw-plan-discover` | `hw-plan` | Native slash command, Ask-gated discovery. |
-| `/hw:plan:decompose` | `/hw-plan-decompose` | `hw-plan` | Native slash command, todowrite mirrors milestone draft. |
-| `/hw:plan:generate` | `/hw-plan-generate` | `hw-plan` | Native slash command, core artifact generation. |
-| `/hw:plan:confirm` | `/hw-plan-confirm` | `hw-plan` | Native slash command, explicit confirmation gate. |
-| `/hw:plan:extend` | `/hw-plan-extend` | `hw-plan` | Native slash command, active Cycle extension. |
-| `/hw:plan:review` | `/hw-plan-review` | `hw-review` | Native slash command, architecture drift review. |
-| `/hw:cycle` | `/hw-cycle` | `hw-status` | Native slash command group; subcommands remain prompt arguments. |
-| `/hw:accept` | `/hw-accept` | `hw-build` | Native slash command, Cycle acceptance gate. |
-| `/hw:reject` | `/hw-reject` | `hw-build` | Native slash command, Cycle rejection feedback. |
-| `/hw:explore` | `/hw-explore` | `hw-explore` | Native slash command, isolated global worktree exploration. |
-| `/hw:sync` | `/hw-sync` | `hw-build` | Native slash command, adapter and derived-context synchronization. |
-| `/hw:docs` | `/hw-docs` | `hw-docs` | Native slash command, generated documentation governance. |
-| `/hw:patch` | `/hw-patch` | `hw-build` | Native slash command group; file lifecycle stays HW-specific. |
-| `/hw:patch fix` | `/hw-patch-fix` | `hw-build` | Native slash command, lightweight Patch repair lane with native `test`, `implement`, and `audit` worker evidence plus lifecycle closure before auto-close. |
-| `/hw:pr` | `/hw-pr` | `hw-review` | Native slash command, manual-gated PR/MR Change Request flow. |
-| `/hw:pr create` | `/hw-pr-create` | `hw-build` | Native slash command, guided GitHub PR / GitLab MR creation flow. |
-| `/hw:explain` | `/hw-explain` | `hw-review` | Native slash command, evidence-first explanation with unknowns. |
-| `/hw:compact` | `/hw-compact` | `hw-compact` | Native slash command, compact generator. |
-| `/hw:knowledge` | `/hw-knowledge` | `hw-compact` | Native slash command, Knowledge Ledger compact/index inspection. |
-| `/hw:guide` | `/hw-guide` | `hw-plan` | Native slash command, question-driven onboarding. |
-| `/hw:showcase` | `/hw-showcase` | `hw-build` | Native slash command, showcase preset. |
-| `/hw:rules` | `/hw-rules` | `hw-status` | Native slash command, rules file management. |
-| `/hw:init` | `/hw-init` | `hw-plan` | Native slash command, project bootstrap/history import. |
-| `/hw:check` | `/hw-check` | `hw-status` | Native slash command, health checks. |
-| `/hw:audit` | `/hw-audit` | `hw-review` | Native slash command, Intake-first preventive engineering audit. |
-| `/hw:quality` | `/hw-quality` | `hw-review` | Native slash command, quality scorecard, baseline, compare, review, and action queue. |
-| `/hw:optimize` | `/hw-optimize` | `hw-build` | Native slash command, Audit+Quality guided optimize loop with backup/correctness/budget gates. |
-| `/hw:release` | `/hw-release` | `hw-build` | Native slash command, release automation. |
-| `/hw:debug` | `/hw-debug` | `hw-debug` | Native slash command, symptom-driven debug. |
-| `/hw:help` | `/hw-help` | `hw-status` | Native slash command, generated help. |
-| `/hw:reset` | `/hw-reset` | `hw-status` | Native slash command, guarded reset. |
-| `/hw:log` | `/hw-log` | `hw-status` | Native slash command, lifecycle log view. |
-| `/hw:setup` | `/hw-setup` | `hw-status` | Native slash command, delegates to global setup profile guidance. |
+| `/hw:start` | `/hw:start` | `hw-build` | Native slash command, pipeline state operation. |
+| `/hw:resume` | `/hw:resume` | `hw-build` | Native slash command, pipeline state operation. |
+| `/hw:status` | `/hw:status` | `hw-status` | Native slash command, read-only status/reference surface. |
+| `/hw:skip` | `/hw:skip` | `hw-build` | Native slash command, pipeline state operation. |
+| `/hw:stop` | `/hw:stop` | `hw-status` | Native slash command, pipeline state operation. |
+| `/hw:report` | `/hw:report` | `hw-report` | Native slash command, read-only status/reference surface. |
+| `/hw:chat` | `/hw:chat` | `hw-build` | Native slash command, lifecycle operation. |
+| `/hw:analysis` | `/hw:analysis` | `hw-debug` | Native slash command, analysis operation. |
+| `/hw:plan` | `/hw:plan` | `hw-plan` | Native slash command, OpenCode question/todowrite required. |
+| `/hw:plan:deep` | `/hw:plan:deep` | `hw-plan` | Native slash command, Plan phase or planning utility. |
+| `/hw:plan:discover` | `/hw:plan:discover` | `hw-plan` | Native slash command, Plan phase or planning utility. |
+| `/hw:plan:technical-stack` | `/hw:plan:technical-stack` | `hw-plan` | Native slash command, Ask-gated technical stack phase. |
+| `/hw:plan:architecture` | `/hw:plan:architecture` | `hw-plan` | Native slash command, Ask-gated architecture phase. |
+| `/hw:plan:decompose` | `/hw:plan:decompose` | `hw-plan` | Native slash command, Plan phase or planning utility. |
+| `/hw:plan:generate` | `/hw:plan:generate` | `hw-plan` | Native slash command, Plan phase or planning utility. |
+| `/hw:plan:extend` | `/hw:plan:extend` | `hw-plan` | Native slash command, Plan phase or planning utility. |
+| `/hw:plan:review` | `/hw:plan:review` | `hw-review` | Native slash command, review or scorecard surface. |
+| `/hw:cycle` | `/hw:cycle` | `hw-status` | Native slash command, lifecycle operation. |
+| `/hw:accept` | `/hw:accept` | `hw-build` | Native slash command, lifecycle operation. |
+| `/hw:reject` | `/hw:reject` | `hw-build` | Native slash command, lifecycle operation. |
+| `/hw:explore` | `/hw:explore` | `hw-explore` | Native slash command, explore operation. |
+| `/hw:sync` | `/hw:sync` | `hw-build` | Native slash command, tool operation. |
+| `/hw:maintain` | `/hw:maintain` | `hw-build` | Native slash command, maintenance queue operation. |
+| `/hw:maintain status` | `/hw:maintain:status` | `hw-build` | Native slash command, maintenance queue operation. |
+| `/hw:maintain scan` | `/hw:maintain:scan` | `hw-build` | Native slash command, maintenance queue operation. |
+| `/hw:maintain plan` | `/hw:maintain:plan` | `hw-build` | Native slash command, maintenance queue operation. |
+| `/hw:maintain queue` | `/hw:maintain:queue` | `hw-build` | Native slash command, maintenance queue operation. |
+| `/hw:maintain run` | `/hw:maintain:run` | `hw-build` | Native slash command, maintenance queue operation. |
+| `/hw:maintain apply` | `/hw:maintain:apply` | `hw-build` | Native slash command, maintenance queue operation. |
+| `/hw:maintain verify` | `/hw:maintain:verify` | `hw-build` | Native slash command, maintenance queue operation. |
+| `/hw:maintain log` | `/hw:maintain:log` | `hw-build` | Native slash command, maintenance queue operation. |
+| `/hw:docs` | `/hw:docs` | `hw-docs` | Native slash command, docs operation. |
+| `/hw:patch` | `/hw:patch` | `hw-build` | Native slash command, lifecycle operation. |
+| `/hw:patch fix` | `/hw:patch:fix` | `hw-build` | Native slash command, fix operation. |
+| `/hw:pr` | `/hw:pr` | `hw-review` | Native slash command, change-request operation. |
+| `/hw:pr create` | `/hw:pr:create` | `hw-build` | Native slash command, change-request operation. |
+| `/hw:explain` | `/hw:explain` | `hw-review` | Native slash command, explain operation. |
+| `/hw:compact` | `/hw:compact` | `hw-compact` | Native slash command, tool operation. |
+| `/hw:knowledge` | `/hw:knowledge` | `hw-compact` | Native slash command, tool operation. |
+| `/hw:guide` | `/hw:guide` | `hw-plan` | Native slash command, Plan phase or planning utility. |
+| `/hw:showcase` | `/hw:showcase` | `hw-build` | Native slash command, artifact operation. |
+| `/hw:rules` | `/hw:rules` | `hw-status` | Native slash command, rules operation. |
+| `/hw:init` | `/hw:init` | `hw-plan` | Native slash command, lifecycle operation. |
+| `/hw:check` | `/hw:check` | `hw-status` | Native slash command, read-only status/reference surface. |
+| `/hw:audit` | `/hw:audit` | `hw-review` | Native slash command, review or scorecard surface. |
+| `/hw:quality` | `/hw:quality` | `hw-review` | Native slash command, review or scorecard surface. |
+| `/hw:optimize` | `/hw:optimize` | `hw-build` | Native slash command, optimize operation. |
+| `/hw:release` | `/hw:release` | `hw-build` | Native slash command, release operation. |
+| `/hw:debug` | `/hw:debug` | `hw-debug` | Native slash command, debug operation. |
+| `/hw:help` | `/hw:help` | `hw-status` | Native slash command, read-only status/reference surface. |
+| `/hw:reset` | `/hw:reset` | `hw-status` | Native slash command, lifecycle operation. |
+| `/hw:log` | `/hw:log` | `hw-status` | Native slash command, read-only status/reference surface. |
+| `/hw:setup` | `/hw:setup` | `hw-status` | Native slash command, setup operation. |
 
 ## OpenCode Agent Plan
 

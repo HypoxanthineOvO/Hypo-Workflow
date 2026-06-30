@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { assessRunnableVerticalSlice, renderBatchPlanArtifacts } from "../src/index.js";
+import * as coreApi from "../src/index.js";
 
 test("plan docs keep single-feature plan behavior and add --batch semantics", async () => {
   const planSkill = await readFile("skills/plan/SKILL.md", "utf8");
@@ -10,8 +11,8 @@ test("plan docs keep single-feature plan behavior and add --batch semantics", as
   const planReference = await readFile("plan/PLAN-SKILL.md", "utf8");
   const commandsSpec = await readFile("references/commands-spec.md", "utf8");
 
-  assert.match(planSkill, /Use this skill for the full P1-P4 planning flow\.|将此 skill 用于完整的 P1-P4 规划流程/);
-  assert.match(planSkill, /without `--batch`, preserve the existing single-feature P1-P4 flow|没有 `--batch` 时，保留现有的单 Feature P1-P4 流程/i);
+  assert.match(planSkill, /Discover -> Technical Stack -> Architecture -> Decompose -> Generate -> Implementation/);
+  assert.match(planSkill, /without `--batch`, preserve the existing single-feature named phase flow|没有 `--batch` 时，保留单 Feature 流程/i);
   assert.match(planSkill, /\/hw:plan --batch/);
   assert.match(planSkill, /Feature Queue/);
   assert.match(planSkill, /batch\.decompose_mode/);
@@ -24,7 +25,7 @@ test("plan docs keep single-feature plan behavior and add --batch semantics", as
   assert.match(commandsSpec, /--batch/);
   assert.match(commandsSpec, /### `\/hw:plan`\n\nSupported flags:\n\n- none\n- `--batch`/);
   assert.match(commandsSpec, /### `\/hw:status`\n\nSupported flags:\n\n- none\n- `--full`/);
-  assert.match(commandsSpec, /single-feature \/hw:plan behavior is unchanged/i);
+  assert.match(commandsSpec, /single-feature `\/hw:plan` runs Discover, Technical Stack, Architecture, Decompose, and Generate/i);
 });
 
 test("renderBatchPlanArtifacts creates upfront queue, markdown, and Mermaid outputs", () => {
@@ -220,6 +221,55 @@ test("decompose assessment flags open-loop validation without observable closure
   assert.equal(assessment.status, "needs_evidence");
   assert.ok(assessment.flags.includes("missing_closed_loop_validation"));
   assert.equal(assessment.closed_loop_validation, false);
+});
+
+test("core exports reusable renderers for phase flow, milestones, decisions, and dependencies", () => {
+  for (const name of [
+    "renderPlanPhaseFlow",
+    "renderMilestoneTable",
+    "renderDecisionMatrix",
+    "renderDependencyMap",
+  ]) {
+    assert.equal(typeof coreApi[name], "function", `${name} must be exported`);
+  }
+
+  const phaseFlow = coreApi.renderPlanPhaseFlow(coreApi.PLAN_PHASE_MODEL);
+  assert.match(phaseFlow, /Discover/);
+  assert.match(phaseFlow, /Technical Stack/);
+  assert.match(phaseFlow, /Architecture/);
+  assert.match(phaseFlow, /Decompose/);
+  assert.match(phaseFlow, /Generate/);
+  assert.match(phaseFlow, /Implementation/);
+
+  const milestoneTable = coreApi.renderMilestoneTable([
+    {
+      id: "M2",
+      title: "Structured artifacts",
+      phase: "generate",
+      validation: "node --test core/test/batch-plan.test.js",
+    },
+  ]);
+  assert.match(milestoneTable, /\| Milestone \| Phase \| Validation \|/);
+  assert.match(milestoneTable, /M2/);
+
+  const decisionMatrix = coreApi.renderDecisionMatrix([
+    {
+      decision: "Use deterministic core helpers",
+      options: ["Skill-only", "Core helper"],
+      selected: "Core helper",
+      rationale: "Adapters need a shared contract.",
+      status: "proposed",
+    },
+  ]);
+  assert.match(decisionMatrix, /\| Decision \| Options \| Selected \| Rationale \| Status \|/);
+  assert.match(decisionMatrix, /Core helper/);
+
+  const dependencyMap = coreApi.renderDependencyMap([
+    { id: "F401", title: "Foundation", status: "done" },
+    { id: "F402", title: "Dashboard", depends_on: ["F401"] },
+  ]);
+  assert.match(dependencyMap, /graph TD/);
+  assert.match(dependencyMap, /F401\s*-->\s*F402/);
 });
 
 function escapeRegExp(value) {

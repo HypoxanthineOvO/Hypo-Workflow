@@ -18,7 +18,7 @@ test("Deep Plan is first-class in canonical command maps for OpenCode and Claude
     const commands = commandMap(platform);
     const deepPlanCommands = commands.filter((command) => command.canonical === DEEP_PLAN_CANONICAL);
 
-    assert.equal(commands.length, 52, `${platform} command count should include Deep Plan, Analysis, Maintain, Quality, and Optimize`);
+    assert.equal(commands.length, 53, `${platform} command count should include Deep Plan, Plan phases, Analysis, Maintain, Quality, and Optimize`);
     assert.equal(deepPlanCommands.length, 1, `${platform} should expose Deep Plan exactly once`);
     assert.equal(deepPlanCommands[0].agent, "hw-plan");
     assert.equal(deepPlanCommands[0].route, "plan");
@@ -50,7 +50,7 @@ test("Claude Code generated commands include Deep Plan as a namespaced slash com
   const dir = await mkdtemp(join(tmpdir(), "hw-deep-plan-claude-"));
   const result = await writeClaudeCodePluginArtifacts(dir);
 
-  assert.equal(result.command_count, 52);
+  assert.equal(result.command_count, 53);
   assert.equal(result.written_commands.filter((file) => file === "commands/plan/deep.md").length, 1);
 
   const command = await readFile(join(dir, "commands", "plan", "deep.md"), "utf8");
@@ -66,9 +66,9 @@ test("Help, docs, and references present Deep Plan as integrated operations with
   const deepPlanSkill = await readFile("skills/plan-deep/SKILL.md", "utf8");
   const generatedCommand = await readFile("commands/plan/deep.md", "utf8");
 
-  assert.match(help, /52 user-facing Hypo-Workflow commands/i);
+  assert.match(help, /53 user-facing Hypo-Workflow commands/i);
   assert.match(help, /\/hw:plan:deep/);
-  assert.match(skillSpec, /52 user-facing commands/i);
+  assert.match(skillSpec, /53 user-facing commands/i);
   assert.doesNotMatch(skillSpec, /plan:deep[\s\S]{0,120}(deferred|outside the legacy OpenCode `commandMap\(\)` count)/i);
   assert.doesNotMatch(skillSpec, /deferred to M6/i);
 
@@ -78,8 +78,8 @@ test("Help, docs, and references present Deep Plan as integrated operations with
   assert.match(combined, /must not directly execute implementation milestones/i);
   assert.match(combined, /analysis boundaries|boundaries/i);
   assert.match(combined, /not `\/hw:explore`|distinct from `\/hw:explore`|\/hw:explore` remains bounded/i);
-  assert.match(combined, /ordinary `\/hw:plan`.*P1-P4/is);
-  assert.match(combined, /must not skip.*P1-P4/is);
+  assert.match(combined, /ordinary `\/hw:plan`.*Discover.*Technical Stack.*Architecture.*Decompose.*Generate/is);
+  assert.match(combined, /must not skip.*Discover.*Technical Stack.*Architecture.*Decompose.*Generate/is);
 });
 
 function countOccurrences(source, needle) {

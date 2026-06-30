@@ -42,7 +42,7 @@ V9 must not degrade Codex or Claude Code.
 | Command rendering | Keep root `SKILL.md` and child skills. | Generate plugin-root `commands/*.md` and keep child Skills authoritative. | Generate `.opencode/commands/*.md`. |
 | Context bootstrap | Read compact/runtime files through skill policy. | SessionStart hook loads runtime files. | Plugin injects compact runtime files and current command context. |
 | Interactive gates | Ask user in chat and wait. | Ask user in chat/tool flow and wait. | Use `question` tool whenever interaction is required. |
-| Plan discipline | Strengthen prompt instructions to use the available plan tool. | Strengthen prompt instructions and checkpoints. | Bind `/hw-plan*` to `hw-plan` and require `todowrite`. |
+| Plan discipline | Strengthen prompt instructions to use the available plan tool. | Strengthen prompt instructions and checkpoints. | Bind `/hw:plan*` to `hw-plan` and require `todowrite`. |
 | Auto continue | Respect `evaluation.auto_continue`; limited by host support. | Respect existing hooks and watchdog. | Use OpenCode events with safe default enabled. |
 
 ## Installation and Sync Responsibilities

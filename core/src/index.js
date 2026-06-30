@@ -148,6 +148,10 @@ export {
 } from "./skills/index.js";
 export {
   renderBatchPlanArtifacts,
+  renderPlanPhaseFlow,
+  renderMilestoneTable,
+  renderDecisionMatrix,
+  renderDependencyMap,
   assessRunnableVerticalSlice,
   resolveFeatureDagBoard,
   applyFeatureQueueOperation,
@@ -164,8 +168,13 @@ export {
 export {
   buildProgressiveDiscoverPlan,
   buildPlanAuditQuestions,
+  assessDiscoverCompletionGate,
+  validateVisiblePhaseGate,
   extractExampleAbstraction,
   normalizeDiscoverFeature,
+  PLAN_PHASE_MODEL,
+  DISCOVER_COMPLETION_SIGNALS,
+  VISIBLE_PHASE_OUTPUTS,
   DISCOVER_BIG_QUESTIONS,
   P0_CONFIGURE_STAGE,
   PLAN_AUDIT_FIELDS,

@@ -17,7 +17,7 @@ Hypo-Workflow 围绕 `.pipeline/` 的状态、提示、报告、日志和恢复�
 
 ## 常用流程
 
-- 用 `/hw:cycle new` 开始新 Cycle 后，先完成或明确沿用 `P0 Configure`；它在 `P1 Discover` 前确认自动化程度、Subagent 授权、验收方式、PR/MR 远端写确认、完整回归、analysis 边界和 worker separation。
+- 用 `/hw:cycle new` 开始新 Cycle 后，先完成或明确沿用 `P0 Configure`；它在 Discover 前确认自动化程度、Subagent 授权、验收方式、PR/MR 远端写确认、完整回归、analysis 边界和 worker separation。
 - 用 `/hw:plan` 规划工作，再用 `/hw:start` 或 `/hw:resume` 执行。
 - 用 `/hw:status` 查看进度，用 `/hw:report` 查看报告。
 - 用 `/hw:explain [question]` 提问代码、配置、命令或近期改动原因；回答必须引用本地文件证据，证据不足时要明确 unknowns。

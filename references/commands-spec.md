@@ -12,7 +12,7 @@ Use this reference when the user's message starts with `/hw:` or when exact comm
 - Claude Code exposes canonical commands through plugin-root `commands/` files under a plugin whose namespace is `hw`; those slash-command files must load the existing Hypo-Workflow skill files instead of duplicating a second implementation
 - Claude Code `/hw:*` entries are plugin slash-command mappings backed by the existing `skills/*/SKILL.md` authority
 - Claude Code native `/resume` remains owned by Claude Code; Hypo-Workflow must never register or document bare `/resume` as an alias for `/hw:resume`
-- V13 canonical namespace contains 52 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Maintenance, Docs, Review, Quality, Optimize, Explain, and Utility groups, plus an internal cron-only watchdog skill
+- V13 canonical namespace contains 53 user-facing commands across Setup, Pipeline, Plan, Lifecycle, Maintenance, Docs, Review, Quality, Optimize, Explain, and Utility groups, plus an internal cron-only watchdog skill
 - slash commands are exact and namespace-scoped
 - slash commands take precedence over fuzzy natural-language matching
 - natural-language commands remain valid for backward compatibility
@@ -47,12 +47,13 @@ For the user-facing command map, see `SKILL.md`.
 - `/hw:debug`
 - `/hw:chat`
 - `/hw:analysis`
-- `/hw:plan`
+   - `/hw:plan`
    - `/hw:plan:deep`
    - `/hw:plan:discover`
+   - `/hw:plan:technical-stack`
+   - `/hw:plan:architecture`
    - `/hw:plan:decompose`
    - `/hw:plan:generate`
-   - `/hw:plan:confirm`
    - `/hw:plan:extend`
    - `/hw:plan:review`
    - `/hw:cycle`
@@ -76,12 +77,12 @@ For the user-facing command map, see `SKILL.md`.
 3. parse remaining tokens as command arguments
 4. flags are order-independent
 5. if a command is unknown, return exactly:
-   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:maintain, /hw:maintain status, /hw:maintain scan, /hw:maintain plan, /hw:maintain queue, /hw:maintain run, /hw:maintain apply, /hw:maintain verify, /hw:maintain log, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:quality, /hw:optimize, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+   `Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:technical-stack, /hw:plan:architecture, /hw:plan:decompose, /hw:plan:generate, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:maintain, /hw:maintain status, /hw:maintain scan, /hw:maintain plan, /hw:maintain queue, /hw:maintain run, /hw:maintain apply, /hw:maintain verify, /hw:maintain log, /hw:docs, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:quality, /hw:optimize, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 6. if a known command receives an unsupported flag, stop and report the unsupported flag explicitly instead of guessing
 7. if a prompt selector is ambiguous, list the candidates and stop
 8. plan and review commands load `plan/PLAN-SKILL.md` before execution
 9. if a command starts with `/hw:plan:` and is unknown, return exactly:
-   `Unknown command: /hw:plan:xxx. Available: /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review`
+   `Unknown command: /hw:plan:xxx. Available: /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:technical-stack, /hw:plan:architecture, /hw:plan:decompose, /hw:plan:generate, /hw:plan:extend, /hw:plan:review`
 10. append-mode conflicts must never silently renumber executed prompts
 11. `/hw:review` is a compatibility alias that prints a migration warning instead of running the review directly
 
@@ -96,6 +97,10 @@ User-visible command responses must not collapse into "done" plus a file path. U
 - next steps: what the user should do next
 
 Milestone, Cycle, Debug, Audit, Patch, report, status, explain, research, and link-analysis completions must additionally follow `references/completion-report-contract.md` when they synthesize a completion narrative. At minimum, they must explain what changed, the technical approach, modified files/modules, test design, validation results, expected result, encountered problems, and risks or follow-up.
+
+When a command is about to use Question Tool / Ask, it must first render a short conversational explanation of why the decision is needed, what answer choices change, and which visible artifact or evidence the user is confirming. The Question Tool / Ask card is the gate after that explanation; it must not be the first explanation the user sees.
+
+When a command writes a report, summary, debug artifact, audit artifact, or Patch completion record, the final user response must show the core report content in conversation. It may link the durable path, but it must not only say that the content was written to a path.
 
 The command should prepare authoritative writes first, prevalidate invariants, commit authority with temp-file atomic replacement, then refresh derived views such as `.pipeline/log.yaml`, `.pipeline/PROGRESS.md`, metrics mirrors, compact views, `PROJECT-SUMMARY.md`, and OpenCode status inputs. If a derived refresh fails after authority commits, do not roll back authority; report the warning, write `.pipeline/derived-refresh.yaml`, and recommend `/hw:sync --light` or rerunning the lifecycle command after repair.
 
@@ -265,7 +270,7 @@ Supported forms:
 Behavior:
 
 - read `SKILL.md` command tables as the source of truth
-- `/hw:help` lists all 52 user-facing commands grouped under Setup, Pipeline, Plan, Analysis, Lifecycle, Maintenance, Docs, Review, Quality, Optimize, Explain, and Utility
+- `/hw:help` lists all 53 user-facing commands grouped under Setup, Pipeline, Plan, Analysis, Lifecycle, Maintenance, Docs, Review, Quality, Optimize, Explain, and Utility
 - `/hw:help --quick` returns a compact cheat sheet
 - `/hw:help <cmd>` returns detailed usage, flags, and examples for the requested command
 
@@ -541,14 +546,14 @@ Behavior:
 
 - load `plan/PLAN-SKILL.md`
 - enter Plan Mode using the Discover-first flow
-- with `--deep`, route to `/hw:plan:deep` before ordinary decomposition; `/hw:plan --deep` is an alias for the Deep Plan discussion package lifecycle
+- with `--deep`, route to `/hw:plan:deep` before ordinary planning; `/hw:plan --deep` is an alias for the Deep Plan discussion package lifecycle
 - honor `--template <name>` as an initial template hint when present
-- honor `--context` as comma-separated P1 context sources, including `explore:E001` refs created by `/hw:explore upgrade plan E001`
-- single-feature /hw:plan behavior is unchanged when `--batch` is absent
-- ordinary `/hw:plan` keeps P1-P4 gates; Deep Plan context, `--deep`, or converted discussion output must not skip P1-P4
-- ordinary single-feature planning must remain simple. Feature DAG fields and queue dependency semantics are only for `--batch`; do not add DAG requirements to a normal P2 checkpoint.
+- honor `--context` as comma-separated Discover context sources, including `explore:E001` refs created by `/hw:explore upgrade plan E001`
+- single-feature `/hw:plan` runs Discover, Technical Stack, Architecture, Decompose, and Generate when `--batch` is absent
+- ordinary `/hw:plan` keeps named phase gates; Deep Plan context, `--deep`, or converted discussion output must not skip Discover, Technical Stack, Architecture, Decompose, or Generate
+- ordinary single-feature planning must remain simple. Feature DAG fields and queue dependency semantics are only for `--batch`; do not add DAG requirements to a normal Decompose checkpoint.
 - with `--batch`, Discover covers multiple Features in one interview and generates a Feature Queue after confirmation
-- Progressive Discover starts by asking task category, desired effect, and verification method before deeper implementation detail
+- Progressive Discover starts by asking task category, desired effect, and verification method before deeper implementation detail; Technical Stack and Architecture discussion must wait for their named phases unless the user explicitly changes scope
 - map task category to Test Profile expectations when applicable; webapp, agent-service, and research each require different validation evidence
 - with `--insert <natural language>`, interpret the natural-language request as a structured queue operation, summarize the queue diff, and wait for explicit confirmation before writing `.pipeline/feature-queue.yaml`
 - supported insert operations include append, insert before/after, reprioritize, pause with `gate: confirm`, move queued Features, and update queued Feature title/summary/decompose mode
@@ -584,7 +589,7 @@ Behavior:
 - honor analysis boundaries and protected file boundaries when reading, researching, or updating package artifacts
 - must not directly execute implementation milestones
 - require `readiness` and explicit `convert` before using the package as ordinary Plan context
-- after conversion, ordinary `/hw:plan` still runs P1-P4 and must not skip P1-P4 gates
+- after conversion, ordinary `/hw:plan` still runs named Plan phases and must not skip their gates
 - for external code research, remote clone/download requires a concrete action authorization: either per-run `confirmed_remote_actions` from the user or trusted local config `local_config_trusted_remote_actions`; portable project defaults must continue to ask the user
 - even when locally trusted, remote code research still requires bounded `.pipeline/deep-plans/.../research-cache/...` storage and implementation-code `evidence_refs`; README-only evidence remains insufficient
 
@@ -598,7 +603,7 @@ Behavior:
 
 - load `plan/PLAN-SKILL.md`
 - inspect the current repository when applicable
-- gather goals, constraints, and stack assumptions
+- gather goals, constraints, and validation expectations without prematurely deciding implementation stack or architecture
 - ask task category, desired effect, and verification method before narrower follow-up questions
 - if the category is `research`, ask baseline, expected direction, and validation script before leaving Discover
 - write or update `.pipeline/design-spec.md`
@@ -606,9 +611,42 @@ Behavior:
 - in interactive mode, ask targeted follow-up questions in rounds
 - use assumption statement, ambiguity resolution, tradeoff review, and validation criteria as the default Progressive Discover structure
 - in interactive mode, enforce minimum rounds from `plan.interaction_depth`: low=2, medium=3, high=5
-- in interactive mode, do not enter P2 until the user explicitly says「够了」「开始吧」「可以了」or equivalent
+- in interactive mode, do not enter Technical Stack until the user explicitly says「够了」「开始吧」「可以了」or equivalent
 - if context is injected, present it before the first question round but do not skip Discover
 - in auto mode, continue without pausing unless blocked by missing critical information
+
+### `/hw:plan:technical-stack`
+
+Supported flags:
+
+- none
+
+Behavior:
+
+- load `skills/plan-technical-stack/SKILL.md`
+- run after Discover has shown visible requirement outputs and passed an Ask / Question Tool gate
+- inspect repository stack, package/tooling files, adapter generation surfaces, test tooling, platform capabilities, and relevant `.pipeline/architecture.md` facts
+- identify implementation substrate, existing stack fit, integration mechanisms, compatibility constraints, non-goals, and validation tooling
+- record hard `research_required` items for unknown third-party libraries, platform capabilities, external services, private schemas, or unverified CLIs/APIs
+- write or update `.plan-state/technical-stack.yaml` and a human-readable technical stack summary when planning state is available
+- show the phase summary, decision table, and open questions before continuing
+- use Question Tool / Ask as the gate before `/hw:plan:architecture`
+
+### `/hw:plan:architecture`
+
+Supported flags:
+
+- none
+
+Behavior:
+
+- load `skills/plan-architecture/SKILL.md`
+- run after Technical Stack has shown visible outputs and passed an Ask / Question Tool gate
+- read `.pipeline/architecture.md` and relevant source/adapter/reference files before making architecture claims
+- produce current architecture observations, target integration points, affected modules, risks, non-goals, and at least one Mermaid diagram or phase-flow artifact plus a Markdown decision/impact table
+- if `.pipeline/architecture.md` needs changes, show the proposed content and ask before writing
+- write or update `.plan-state/architecture.yaml` and a human-readable architecture summary when planning state is available
+- use Question Tool / Ask as the gate before `/hw:plan:decompose`
 
 ### `/hw:plan:decompose`
 
@@ -622,12 +660,12 @@ Behavior:
 - split the project into milestones
 - include test specs and boundary coverage expectations per milestone
 - for every implementation milestone, require `technical_solution`, `technical_route`, `research_required`, `risks_and_alternatives`, `validation_path`, and `audit_focus`
-- do not mark P2 as `proposed` when the checkpoint only contains goals, acceptance criteria, Feature Queue items, test titles, or other goal-only planning text
+- do not mark Decompose as `proposed` when the checkpoint only contains goals, acceptance criteria, Feature Queue items, test titles, or other goal-only planning text
 - treat unknown tools, external services, third-party libraries, platform capabilities, and user-private schemas as hard `research_required` triggers
-- before P2 confirmation/P3, each hard research trigger must be resolved with evidence, converted into a user-facing blocking question, or explicitly deferred by the user; active blocking questions keep P2 waiting and must not advance to P3
-- if the user challenges a technical route, return P2 to `revision` or `in_progress`, record the challenge, perform targeted research, and present a revised checkpoint before Generate
-- persist structured P2 state in `.plan-state/decompose.yaml` and the human technical route checkpoint in `.plan-state/technical-route.md` when planning state is available
-- in interactive mode, show the proposed milestone split and wait for confirmation before P3 Generate
+- before Decompose confirmation/Generate, each hard research trigger must be resolved with evidence, converted into a user-facing blocking question, or explicitly deferred by the user; active blocking questions keep Decompose waiting and must not advance to Generate
+- if the user challenges a technical route, return Decompose to `revision` or `in_progress`, record the challenge, perform targeted research, and present a revised checkpoint before Generate
+- persist structured Decompose state in `.plan-state/decompose.yaml` and the human technical route checkpoint in `.plan-state/technical-route.md` when planning state is available
+- in interactive mode, show the proposed milestone split and wait for Question Tool / Ask confirmation before Generate
 
 ### `/hw:plan:generate`
 
@@ -644,23 +682,11 @@ Behavior:
 - detect append mode when an existing `.pipeline/` workspace is present
 - choose `implement-only` for planning-heavy or document-heavy build plans unless the project clearly requires executable TDD
 - choose `analysis` for root-cause, metric, or repo/system investigations whose primary deliverable is a conclusion and evidence chain
-- preserve each milestone's P2 technical route fields in generated prompts: `technical_solution`, `technical_route`, `research_required`, `risks_and_alternatives`, `validation_path`, and `audit_focus`
-- stop and return to P2 revision instead of generating prompts if any implementation milestone lacks those fields, has unresolved hard `research_required` items, or still has active blocking research questions
+- preserve each milestone's Decompose technical route fields in generated prompts: `technical_solution`, `technical_route`, `research_required`, `risks_and_alternatives`, `validation_path`, and `audit_focus`; legacy `P2 technical route` means this same compatibility contract
+- stop and return to Decompose revision instead of generating prompts if any implementation milestone lacks those fields, has unresolved hard `research_required` items, or still has active blocking research questions
 - on prompt-number conflicts, preserve executed prompts and append new prompt numbers after the highest existing number unless explicit resequencing is approved
 
-### `/hw:plan:confirm`
-
-Supported flags:
-
-- none
-
-Behavior:
-
-- load `plan/PLAN-SKILL.md`
-- summarize generated artifacts
-- include project name, stack, preset, milestone count, test point count, and generated files
-- in interactive mode, treat Confirm as a hard gate and wait for explicit `确认` or equivalent before `/hw:start`
-- in auto mode, treat confirm as a summary checkpoint only when `automation.gates.planning=auto`; the default `confirm` gate remains mandatory and waits for explicit approval
+Confirmation is no longer a standalone user-facing `/hw:plan:*` command. Existing generated artifacts that mention a confirm step should migrate it to an in-phase Question Tool / Ask gate that summarizes generated artifacts, including project name, stack, preset, milestone count, test point count, and generated files, before `/hw:start`.
 
 ### `/hw:plan:extend`
 

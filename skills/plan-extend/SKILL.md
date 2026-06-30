@@ -108,7 +108,7 @@ description: Append new milestones to an active Cycle without closing or reopeni
 ## 参考文件
 
 - `skills/plan/SKILL.md` — M0 交互规则
-- `skills/plan-decompose/SKILL.md` — P2 检查点行为
+- `skills/plan-decompose/SKILL.md` — Decompose 检查点行为
 - `plan/assets/prompt-template.md` — 提示形状
 - `references/state-contract.md` — Milestone 字段
 - `SKILL.md` — 命令路由

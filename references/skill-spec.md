@@ -12,7 +12,7 @@ This document is the canonical contract for Hypo-Workflow Skill assets. It recor
 
 ## Inventory
 
-The repository currently has 43 local Skill files under `skills/*/SKILL.md`:
+The repository currently has 45 local Skill files under `skills/*/SKILL.md`:
 
 | Path | Role |
 |---|---|
@@ -37,13 +37,15 @@ The repository currently has 43 local Skill files under `skills/*/SKILL.md`:
 | `skills/patch/SKILL.md` | User-facing Patch command shared by `/hw:patch` and `/hw:patch fix` |
 | `skills/pr/SKILL.md` | User-facing PR/MR Change Request command |
 | `skills/quality/SKILL.md` | User-facing quality scorecard, baseline, compare, review, and action queue command |
-| `skills/plan-confirm/SKILL.md` | User-facing planning command |
+| `skills/plan-architecture/SKILL.md` | User-facing Architecture planning phase command |
+| `skills/plan-confirm/SKILL.md` | Compatibility planning gate skill for existing generated artifacts; confirmation is no longer a standalone user command |
 | `skills/plan-decompose/SKILL.md` | User-facing planning command |
 | `skills/plan-deep/SKILL.md` | User-facing deep planning discussion command |
 | `skills/plan-discover/SKILL.md` | User-facing planning command |
 | `skills/plan-extend/SKILL.md` | User-facing planning command |
 | `skills/plan-generate/SKILL.md` | User-facing planning command |
 | `skills/plan-review/SKILL.md` | User-facing planning review command |
+| `skills/plan-technical-stack/SKILL.md` | User-facing Technical Stack planning phase command |
 | `skills/plan/SKILL.md` | User-facing planning entrypoint |
 | `skills/reject/SKILL.md` | User-facing Cycle rejection command |
 | `skills/release/SKILL.md` | User-facing release command |
@@ -62,8 +64,8 @@ The repository currently has 43 local Skill files under `skills/*/SKILL.md`:
 
 Additional inventory notes:
 
-- Root `SKILL.md` is the aggregate Hypo-Workflow router and system reference. It is not counted as a child Skill in the 43 local Skill files.
-- The OpenCode command map exposes 52 user-facing commands and 42 user-facing Skill paths. `/hw:patch` and `/hw:patch fix` share `skills/patch/SKILL.md`, `/hw:pr` plus `/hw:pr create` share `skills/pr/SKILL.md`, and `/hw:maintain` plus its eight subcommands share `skills/maintain/SKILL.md`.
+- Root `SKILL.md` is the aggregate Hypo-Workflow router and system reference. It is not counted as a child Skill in the 45 local Skill files.
+- The OpenCode command map exposes 53 user-facing commands and 43 user-facing Skill paths. `/hw:patch` and `/hw:patch fix` share `skills/patch/SKILL.md`, `/hw:pr` plus `/hw:pr create` share `skills/pr/SKILL.md`, and `/hw:maintain` plus its eight subcommands share `skills/maintain/SKILL.md`.
 - `/hw:analysis` is a first-class user-facing command backed by `skills/analysis/SKILL.md`; it owns enter/continue/end/report semantics for interactive investigation lanes and keeps full evidence in an Analysis ledger.
 - `/hw:plan:deep` is a first-class user-facing command backed by `skills/plan-deep/SKILL.md`; it owns Deep Plan operations for durable discussion packages before ordinary Plan conversion.
 - `/hw:maintain` is a first-class user-facing command backed by `skills/maintain/SKILL.md`; it owns maintenance queue, ledger, evidence, backup, side-effect gate, and zh-CN rendering semantics under `~/.hypo-workflow/maintenance/`. It is not `/hw:sync` and is not a runner.
@@ -148,63 +150,66 @@ Hypo-Workflow maps one canonical command set into platform surfaces with differe
 |---|---|---|---|
 | Codex | `$CODEX_HOME/skills/hypo-workflow` | root `SKILL.md` and `skills/*/SKILL.md` | Uses progressive Skill loading from the installed Skill bundle. |
 | Claude Code | `.claude/commands/*`, `.claude/agents/*`, plugin files | generated adapters from `hypo-workflow sync --platform claude` | Command files should route to the same canonical Skill/reference contracts. |
-| OpenCode | `.opencode/commands/*`, `.opencode/agents/*`, `.opencode/hypo-workflow.json` | generated adapters from `hypo-workflow sync --platform opencode` | OpenCode command names use dash-style slash commands and route through agent roles. |
+| OpenCode | `.opencode/commands/*`, `.opencode/agents/*`, `.opencode/hypo-workflow.json` | generated adapters from `hypo-workflow sync --platform opencode` | OpenCode command names use canonical colon-form slash commands and route through agent roles. |
 | Cursor | `.cursor/rules/hypo-workflow.mdc`, `.cursor/skills/hw-*.md`, `.cursor/commands/hw-*.md` | generated adapters from `hypo-workflow sync --platform cursor` | The adapter writes one flat Skill file and one slash command file per `/hw-*` entry. Command authority is embedded in flat Skills; only compact shared references/assets/scripts/adapters are mirrored under `.cursor/hypo-workflow/`. Cursor model selection remains owned by the active UI/session. |
 
 Canonical user-facing command map:
 
 | Canonical command | OpenCode command | Agent | Skill path |
 |---|---|---|---|
-| `/hw:start` | `/hw-start` | `hw-build` | `skills/start/SKILL.md` |
-| `/hw:resume` | `/hw-resume` | `hw-build` | `skills/resume/SKILL.md` |
-| `/hw:status` | `/hw-status` | `hw-status` | `skills/status/SKILL.md` |
-| `/hw:skip` | `/hw-skip` | `hw-build` | `skills/skip/SKILL.md` |
-| `/hw:stop` | `/hw-stop` | `hw-status` | `skills/stop/SKILL.md` |
-| `/hw:report` | `/hw-report` | `hw-report` | `skills/report/SKILL.md` |
-| `/hw:chat` | `/hw-chat` | `hw-build` | `skills/chat/SKILL.md` |
-| `/hw:analysis` | `/hw-analysis` | `hw-debug` | `skills/analysis/SKILL.md` |
-| `/hw:plan` | `/hw-plan` | `hw-plan` | `skills/plan/SKILL.md` |
-| `/hw:plan:deep` | `/hw-plan-deep` | `hw-plan` | `skills/plan-deep/SKILL.md` |
-| `/hw:plan:discover` | `/hw-plan-discover` | `hw-plan` | `skills/plan-discover/SKILL.md` |
-| `/hw:plan:decompose` | `/hw-plan-decompose` | `hw-plan` | `skills/plan-decompose/SKILL.md` |
-| `/hw:plan:generate` | `/hw-plan-generate` | `hw-plan` | `skills/plan-generate/SKILL.md` |
-| `/hw:plan:confirm` | `/hw-plan-confirm` | `hw-plan` | `skills/plan-confirm/SKILL.md` |
-| `/hw:plan:extend` | `/hw-plan-extend` | `hw-plan` | `skills/plan-extend/SKILL.md` |
-| `/hw:plan:review` | `/hw-plan-review` | `hw-review` | `skills/plan-review/SKILL.md` |
-| `/hw:cycle` | `/hw-cycle` | `hw-status` | `skills/cycle/SKILL.md` |
-| `/hw:explore` | `/hw-explore` | `hw-explore` | `skills/explore/SKILL.md` |
-| `/hw:sync` | `/hw-sync` | `hw-build` | `skills/sync/SKILL.md` |
-| `/hw:maintain` | `/hw-maintain` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain status` | `/hw-maintain-status` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain scan` | `/hw-maintain-scan` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain plan` | `/hw-maintain-plan` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain queue` | `/hw-maintain-queue` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain run` | `/hw-maintain-run` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain apply` | `/hw-maintain-apply` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain verify` | `/hw-maintain-verify` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain log` | `/hw-maintain-log` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:docs` | `/hw-docs` | `hw-docs` | `skills/docs/SKILL.md` |
-| `/hw:patch` | `/hw-patch` | `hw-build` | `skills/patch/SKILL.md` |
-| `/hw:patch fix` | `/hw-patch-fix` | `hw-build` | `skills/patch/SKILL.md` |
-| `/hw:pr` | `/hw-pr` | `hw-review` | `skills/pr/SKILL.md` |
-| `/hw:pr create` | `/hw-pr-create` | `hw-build` | `skills/pr/SKILL.md` |
-| `/hw:explain` | `/hw-explain` | `hw-review` | `skills/explain/SKILL.md` |
-| `/hw:compact` | `/hw-compact` | `hw-compact` | `skills/compact/SKILL.md` |
-| `/hw:knowledge` | `/hw-knowledge` | `hw-compact` | `skills/knowledge/SKILL.md` |
-| `/hw:guide` | `/hw-guide` | `hw-plan` | `skills/guide/SKILL.md` |
-| `/hw:showcase` | `/hw-showcase` | `hw-build` | `skills/showcase/SKILL.md` |
-| `/hw:rules` | `/hw-rules` | `hw-status` | `skills/rules/SKILL.md` |
-| `/hw:init` | `/hw-init` | `hw-plan` | `skills/init/SKILL.md` |
-| `/hw:check` | `/hw-check` | `hw-status` | `skills/check/SKILL.md` |
-| `/hw:audit` | `/hw-audit` | `hw-review` | `skills/audit/SKILL.md` |
-| `/hw:quality` | `/hw-quality` | `hw-review` | `skills/quality/SKILL.md` |
-| `/hw:optimize` | `/hw-optimize` | `hw-build` | `skills/optimize/SKILL.md` |
-| `/hw:release` | `/hw-release` | `hw-build` | `skills/release/SKILL.md` |
-| `/hw:debug` | `/hw-debug` | `hw-debug` | `skills/debug/SKILL.md` |
-| `/hw:help` | `/hw-help` | `hw-status` | `skills/help/SKILL.md` |
-| `/hw:reset` | `/hw-reset` | `hw-status` | `skills/reset/SKILL.md` |
-| `/hw:log` | `/hw-log` | `hw-status` | `skills/log/SKILL.md` |
-| `/hw:setup` | `/hw-setup` | `hw-status` | `skills/setup/SKILL.md` |
+| `/hw:start` | `/hw:start` | `hw-build` | `skills/start/SKILL.md` |
+| `/hw:resume` | `/hw:resume` | `hw-build` | `skills/resume/SKILL.md` |
+| `/hw:status` | `/hw:status` | `hw-status` | `skills/status/SKILL.md` |
+| `/hw:skip` | `/hw:skip` | `hw-build` | `skills/skip/SKILL.md` |
+| `/hw:stop` | `/hw:stop` | `hw-status` | `skills/stop/SKILL.md` |
+| `/hw:report` | `/hw:report` | `hw-report` | `skills/report/SKILL.md` |
+| `/hw:chat` | `/hw:chat` | `hw-build` | `skills/chat/SKILL.md` |
+| `/hw:analysis` | `/hw:analysis` | `hw-debug` | `skills/analysis/SKILL.md` |
+| `/hw:plan` | `/hw:plan` | `hw-plan` | `skills/plan/SKILL.md` |
+| `/hw:plan:deep` | `/hw:plan:deep` | `hw-plan` | `skills/plan-deep/SKILL.md` |
+| `/hw:plan:discover` | `/hw:plan:discover` | `hw-plan` | `skills/plan-discover/SKILL.md` |
+| `/hw:plan:technical-stack` | `/hw:plan:technical-stack` | `hw-plan` | `skills/plan-technical-stack/SKILL.md` |
+| `/hw:plan:architecture` | `/hw:plan:architecture` | `hw-plan` | `skills/plan-architecture/SKILL.md` |
+| `/hw:plan:decompose` | `/hw:plan:decompose` | `hw-plan` | `skills/plan-decompose/SKILL.md` |
+| `/hw:plan:generate` | `/hw:plan:generate` | `hw-plan` | `skills/plan-generate/SKILL.md` |
+| `/hw:plan:extend` | `/hw:plan:extend` | `hw-plan` | `skills/plan-extend/SKILL.md` |
+| `/hw:plan:review` | `/hw:plan:review` | `hw-review` | `skills/plan-review/SKILL.md` |
+| `/hw:cycle` | `/hw:cycle` | `hw-status` | `skills/cycle/SKILL.md` |
+| `/hw:accept` | `/hw:accept` | `hw-build` | `skills/accept/SKILL.md` |
+| `/hw:reject` | `/hw:reject` | `hw-build` | `skills/reject/SKILL.md` |
+| `/hw:explore` | `/hw:explore` | `hw-explore` | `skills/explore/SKILL.md` |
+| `/hw:sync` | `/hw:sync` | `hw-build` | `skills/sync/SKILL.md` |
+| `/hw:maintain` | `/hw:maintain` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain status` | `/hw:maintain:status` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain scan` | `/hw:maintain:scan` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain plan` | `/hw:maintain:plan` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain queue` | `/hw:maintain:queue` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain run` | `/hw:maintain:run` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain apply` | `/hw:maintain:apply` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain verify` | `/hw:maintain:verify` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:maintain log` | `/hw:maintain:log` | `hw-build` | `skills/maintain/SKILL.md` |
+| `/hw:docs` | `/hw:docs` | `hw-docs` | `skills/docs/SKILL.md` |
+| `/hw:patch` | `/hw:patch` | `hw-build` | `skills/patch/SKILL.md` |
+| `/hw:patch fix` | `/hw:patch:fix` | `hw-build` | `skills/patch/SKILL.md` |
+| `/hw:pr` | `/hw:pr` | `hw-review` | `skills/pr/SKILL.md` |
+| `/hw:pr create` | `/hw:pr:create` | `hw-build` | `skills/pr/SKILL.md` |
+| `/hw:explain` | `/hw:explain` | `hw-review` | `skills/explain/SKILL.md` |
+| `/hw:compact` | `/hw:compact` | `hw-compact` | `skills/compact/SKILL.md` |
+| `/hw:knowledge` | `/hw:knowledge` | `hw-compact` | `skills/knowledge/SKILL.md` |
+| `/hw:guide` | `/hw:guide` | `hw-plan` | `skills/guide/SKILL.md` |
+| `/hw:showcase` | `/hw:showcase` | `hw-build` | `skills/showcase/SKILL.md` |
+| `/hw:rules` | `/hw:rules` | `hw-status` | `skills/rules/SKILL.md` |
+| `/hw:init` | `/hw:init` | `hw-plan` | `skills/init/SKILL.md` |
+| `/hw:check` | `/hw:check` | `hw-status` | `skills/check/SKILL.md` |
+| `/hw:audit` | `/hw:audit` | `hw-review` | `skills/audit/SKILL.md` |
+| `/hw:quality` | `/hw:quality` | `hw-review` | `skills/quality/SKILL.md` |
+| `/hw:optimize` | `/hw:optimize` | `hw-build` | `skills/optimize/SKILL.md` |
+| `/hw:release` | `/hw:release` | `hw-build` | `skills/release/SKILL.md` |
+| `/hw:debug` | `/hw:debug` | `hw-debug` | `skills/debug/SKILL.md` |
+| `/hw:help` | `/hw:help` | `hw-status` | `skills/help/SKILL.md` |
+| `/hw:reset` | `/hw:reset` | `hw-status` | `skills/reset/SKILL.md` |
+| `/hw:log` | `/hw:log` | `hw-status` | `skills/log/SKILL.md` |
+| `/hw:setup` | `/hw:setup` | `hw-status` | `skills/setup/SKILL.md` |
 
 Traceability rules:
 
