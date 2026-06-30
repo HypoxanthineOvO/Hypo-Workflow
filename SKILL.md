@@ -1,10 +1,10 @@
 ---
 name: hypo-workflow
-version: 13.1.0-beta.1
-description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:analysis`, `/hw:plan`, `/hw:plan:deep`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:maintain`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:quality`, `/hw:optimize`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
+version: 13.1.0-beta.2
+description: Run a serialized prompt execution pipeline from a local `.pipeline/` workspace. Use this skill whenever the user says "开始执行", "继续 pipeline", "执行下一步", "pipeline status", "跳过当前步骤", "skip step", "中止", "abort", or invokes `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:analysis`, `/hw:plan`, `/hw:plan:deep`, `/hw:plan:technical-stack`, `/hw:plan:architecture`, `/hw:plan:extend`, `/hw:plan:review`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:explore`, `/hw:sync`, `/hw:maintain`, `/hw:docs`, `/hw:patch`, `/hw:pr`, `/hw:pr create`, `/hw:explain`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:init`, `/hw:check`, `/hw:audit`, `/hw:quality`, `/hw:optimize`, `/hw:release`, `/hw:debug`, `/hw:help`, `/hw:reset`, or `/hw:log`.
 ---
 
-# Hypo-Workflow v13.1.0-beta.1
+# Hypo-Workflow v13.1.0-beta.2
 
 > **Claude Code 用户**：安装/启用 `hw` plugin 后使用 `/hw:*` 指令；Claude 原生 `/resume` 不属于 Hypo-Workflow，Hypo 恢复命令始终是 `/hw:resume`。
 >
@@ -35,9 +35,10 @@ This SKILL.md serves as the **index and routing summary** for Hypo-Workflow. For
 | `/hw:plan` | Enter Plan Mode through `plan/PLAN-SKILL.md` |
 | `/hw:plan:deep` | Maintain Deep Plan discussion packages before ordinary Plan conversion |
 | `/hw:plan:discover` | Run the Discover phase of Plan Mode |
+| `/hw:plan:technical-stack` | Run the Technical Stack phase of Plan Mode |
+| `/hw:plan:architecture` | Run the Architecture phase of Plan Mode |
 | `/hw:plan:decompose` | Run the Decompose phase of Plan Mode |
 | `/hw:plan:generate` | Run the Generate phase of Plan Mode |
-| `/hw:plan:confirm` | Run the Confirm phase of Plan Mode |
 | `/hw:plan:extend` | Append milestones to an active Cycle |
 | `/hw:plan:review` | Run Plan Review for the current or all milestones |
 | `/hw:cycle` | Create, list, view, close, and archive delivery Cycles |
@@ -106,7 +107,7 @@ The `plan-tool-required` rule applies to complex tasks and planning work:
 - OpenCode: use native `todowrite` for visible plan state and `question` / Ask for required user decisions.
 - Codex: use the available plan/update tool when present; otherwise keep an explicit checklist in the conversation.
 - Claude Code: keep an explicit plan/checkpoint list in the conversation or configured planning surface.
-- P1/P2/P3/P4 checkpoints must update the visible plan before moving to the next phase.
+- Discover、Technical Stack、Architecture、Decompose 和 Generate checkpoints must update the visible plan before moving to the next phase.
 
 # Prompt Pipeline 执行骨架
 
@@ -270,7 +271,7 @@ Handle these commands directly:
   Load [`skills/optimize/SKILL.md`](./skills/optimize/SKILL.md). Run `Audit + Quality -> Implement/Test -> Audit + Quality` under correctness, backup, budget, validation, Patch handoff, and Plan handoff gates.
 - `/hw:debug`
   Investigate a concrete symptom, generate ranked root-cause hypotheses, validate them, and optionally apply `--auto-fix` only after verification passes.
-- `/hw:plan`, `/hw:plan:discover`, `/hw:plan:decompose`, `/hw:plan:generate`, `/hw:plan:confirm`, `/hw:plan:extend`, `/hw:plan:review`
+- `/hw:plan`, `/hw:plan:discover`, `/hw:plan:technical-stack`, `/hw:plan:architecture`, `/hw:plan:decompose`, `/hw:plan:generate`, `/hw:plan:extend`, `/hw:plan:review`
   Load [`plan/PLAN-SKILL.md`](./plan/PLAN-SKILL.md) and route execution to the corresponding Plan Mode phase.
 - `/hw:plan:deep`
   Load [`skills/plan-deep/SKILL.md`](./skills/plan-deep/SKILL.md). Maintain a durable Deep Plan discussion package with `new`, `ask`, `research`, `map`, `drill`, `readiness`, and `convert`; it is not an execution runner.
@@ -303,7 +304,7 @@ Handle these commands directly:
 
 If a command starts with `/hw:` and is not listed above, return:
 
-`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:decompose, /hw:plan:generate, /hw:plan:confirm, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:maintain, /hw:maintain status, /hw:maintain scan, /hw:maintain plan, /hw:maintain queue, /hw:maintain run, /hw:maintain apply, /hw:maintain verify, /hw:maintain log, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:quality, /hw:optimize, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
+`Unknown command: /hw:xxx. Available: /hw:start, /hw:resume, /hw:status, /hw:skip, /hw:stop, /hw:report, /hw:chat, /hw:analysis, /hw:plan, /hw:plan:deep, /hw:plan:discover, /hw:plan:technical-stack, /hw:plan:architecture, /hw:plan:decompose, /hw:plan:generate, /hw:plan:extend, /hw:plan:review, /hw:cycle, /hw:accept, /hw:reject, /hw:explore, /hw:sync, /hw:maintain, /hw:maintain status, /hw:maintain scan, /hw:maintain plan, /hw:maintain queue, /hw:maintain run, /hw:maintain apply, /hw:maintain verify, /hw:maintain log, /hw:patch, /hw:pr, /hw:explain, /hw:compact, /hw:knowledge, /hw:guide, /hw:showcase, /hw:rules, /hw:init, /hw:check, /hw:audit, /hw:quality, /hw:optimize, /hw:release, /hw:debug, /hw:help, /hw:reset, /hw:log, /hw:setup`
 
 Slash commands are exact and take precedence over fuzzy natural-language matching. Detailed parsing and option semantics live in [`references/commands-spec.md`](./references/commands-spec.md).
 
@@ -434,22 +435,23 @@ If headings differ slightly but meaning is clear, infer by meaning. If critical 
 
 ## Plan 模式
 
-Planning now supports two modes through `plan.mode`:
+Planning now follows `Discover -> Technical Stack -> Architecture -> Decompose -> Generate -> Implementation` and supports two modes through `plan.mode`:
 
 - `interactive`
   - default mode
   - Discover asks targeted questions in rounds
-  - Confirm waits for explicit user approval
-  - `interaction_depth` controls the minimum P1 question rounds: low=2, medium=3, high=5
-  - P1 may enter P2 only after the minimum rounds and an explicit user signal such as「够了」「开始吧」「可以了」
-  - P2 must show the milestone split and wait for confirmation before P3
+  - every major phase shows its artifact before moving forward
+  - confirmation uses Question Tool / Ask gates inside phases
+  - `interaction_depth` controls the minimum Discover question rounds: low=2, medium=3, high=5
+  - Discover may enter Decompose only after the minimum rounds and an explicit user signal such as「够了」「开始吧」「可以了」
+  - Decompose must show the milestone split and wait for confirmation before Generate
   - hooks should allow turn end during planning checkpoints
 - `auto`
-  - Claude completes P1-P4 without pausing for user feedback unless blocked by missing critical information
-  - Confirm becomes a summary checkpoint instead of a hard gate
+  - Claude completes named phases without pausing for user feedback unless blocked by missing critical information
+  - confirmation checkpoints become summary gates only when configuration explicitly allows auto planning
   - hooks should block premature turn end so planning continues automatically
 
-`/hw:plan --context audit,patches,deferred,debug` injects existing evidence into P1 Discover. Context sharpens the interview; it does not skip Discover.
+`/hw:plan --context audit,patches,deferred,debug` injects existing evidence into Discover. Context sharpens the interview; it does not skip Discover.
 
 ## Cycle 与 Patch
 
@@ -469,7 +471,7 @@ Patch rules:
 
 - Patch numbering is global, `P001`, `P002`, and so on
 - Patches are never archived with a Cycle
-- `/hw:plan --context patches` can inject open Patches into P1 Discover
+- `/hw:plan --context patches` can inject open Patches into Discover
 
 ## 规则
 

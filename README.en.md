@@ -6,7 +6,7 @@
 
 Plan -> Execute -> Review -> Report -> Resume
 
-[![Version](https://img.shields.io/badge/version-13.1.0-beta.1-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-13.1.0-beta.2-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/en/reference/platforms.md)
 
@@ -35,7 +35,7 @@ Check status and continue:
 ## Shared Capabilities
 
 - **Cycle / Plan / Start / Resume**: split long tasks into resumable Features, Milestones, Prompts, and Reports.
-- **P0 Configure**: before `P1 Discover`, confirm or reuse automation level, Subagent authorization, acceptance, PR/MR remote-write confirmation, full regression, and worker separation.
+- **P0 Configure**: before Discover, confirm or reuse automation level, Subagent authorization, acceptance, PR/MR remote-write confirmation, full regression, and worker separation.
 - **Rules / Habits**: store user habits and project rules as structured authority, then render platform-readable instruction views.
 - **Agent Review**: record review artifacts during planning, tests, implementation, and final checks.
 - **PR/MR Create**: `/hw:pr create` guides GitHub PR and GitLab MR creation from existing local changes or a plan-first work item, with remote writes gated by explicit confirmation.
@@ -62,7 +62,7 @@ Third-party IDE adapters provide repository instruction surfaces; Cursor also re
 - Run pre-delivery checks for formatting, stale derived artifacts, README/docs freshness, secret markers, tests, and report evidence.
 - Automation is governed by `.pipeline/config.yaml`; release, destructive operations, external side effects, and PR/MR remote writes still follow explicit confirmation gates.
 
-Current version exposes **52 user-facing commands** and **1 internal watchdog** skill.
+Current version exposes **53 user-facing commands** and **1 internal watchdog** skill.
 
 ## Common Commands
 
@@ -89,7 +89,7 @@ Current version exposes **52 user-facing commands** and **1 internal watchdog** 
 | [Platforms Reference](docs/en/reference/platforms.md) | Platform capability matrix |
 | [Generated Artifacts](docs/en/reference/generated-artifacts.md) | Generated adapter and docs sources |
 | [Configuration Reference](docs/en/reference/configuration.md) | Automation, gates, profiles, and worker separation |
-| [v13.1.0-beta.1 Release Notes](docs/en/release/v13.1.0-beta.1.md) | C18 Audit/Quality/Optimize command upgrade and integration sync gate |
+| [v13.1.0-beta.2 Release Notes](docs/en/release/v13.1.0-beta.2.md) | C19 named Plan phases and C20 consultation-first action boundary |
 
 ## License
 

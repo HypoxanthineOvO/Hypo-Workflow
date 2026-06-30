@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { CANONICAL_COMMANDS } from "../commands/index.js";
+import { commandMap } from "../commands/index.js";
 import { PLATFORM_CAPABILITIES } from "../platform/index.js";
 
 const DEFAULT_README_CONFIG = Object.freeze({
@@ -8,7 +8,7 @@ const DEFAULT_README_CONFIG = Object.freeze({
   full_regen: "auto",
 });
 
-const USER_COMMANDS = CANONICAL_COMMANDS;
+const USER_COMMANDS = commandMap("opencode");
 const ALLOWED_README_TERMS = Object.freeze([
   "Hypo-Workflow",
   "AI",

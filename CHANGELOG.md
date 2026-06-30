@@ -1,5 +1,34 @@
 # Changelog
 
+## v13.1.0-beta.2 - 2026-06-30
+
+### Features
+
+- 新增 C19 命名 Plan 阶段模型：`Discover -> Technical Stack -> Architecture -> Decompose -> Generate`，并新增 `/hw:plan:technical-stack` 与 `/hw:plan:architecture` 入口。
+- 新增 C20 协商优先修改启动边界：讨论、背景、想法、抱怨、问题和方案讨论先输出 Mini-contract，再等待执行授权。
+- 将 C20 共享指导投影到 OpenCode、Claude、根 `AGENTS.md`、命令和 agent managed surfaces，同时保留明确具体任务的 direct execution。
+- 新增 C20 目标仓 handoff 包：`Codex-VSP` 与 `VSP-Open-Code` 后续必须在目标仓本地 Cycle 中验证和适配。
+
+### Fixes
+
+- 移除用户态 `/hw:plan:confirm` 暴露面，确认改为阶段内 Question Tool / Ask gate。
+- 修复 lifecycle log 对 visible gate feedback family/status 的校验缺口，避免真实 gate 记录阻塞全量回归。
+- 修复文档、命令参考和 progressive discover 中旧 P1/P2/P3/P4 用户面阶段残留。
+
+### Docs
+
+- README / README.en 指向 v13.1.0-beta.2 release notes。
+- Docs governance map 更新到 v13.1.0-beta.2，并记录 C19/C20 source evidence。
+- 版本源同步到 13.1.0-beta.2：`.claude-plugin/plugin.json`、`.claude-plugin/marketplace.json`、`.codex-plugin/plugin.json`、`.opencode/package.json`、`cli/package.json`、`cli/package-lock.json`、`core/package.json`、默认配置版本和 generator `HW_VERSION`。
+
+### Tests
+
+- `npm test`: 687/687 passing。
+- `scripts/validate-config.sh`: passing。
+- `checkDocs('.')`、release narrative fact check、docs language check 和 README freshness: passing。
+- `node --test core/test/c20-consultation-boundary.test.js core/test/commands-rules-artifacts.test.js core/test/c18-instruction-quality-contract.test.js`: 23/23 passing after C20 projection。
+- `git diff --check`: passing。
+
 ## v13.1.0-beta.1 - 2026-05-31
 
 ### Fixes

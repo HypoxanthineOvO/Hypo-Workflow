@@ -30,8 +30,8 @@ test("docs map defines ownership, generated references, and narrative policy", (
   const userGuide = map.documents.find((doc) => doc.path === "docs/user-guide.md");
   const englishUserGuide = map.documents.find((doc) => doc.path === "docs/en/user-guide.md");
   const configuration = map.documents.find((doc) => doc.path === "docs/reference/configuration.md");
-  const releaseNote = map.documents.find((doc) => doc.path === "docs/release/v13.1.0-beta.1.md");
-  const englishReleaseNote = map.documents.find((doc) => doc.path === "docs/en/release/v13.1.0-beta.1.md");
+  const releaseNote = map.documents.find((doc) => doc.path === "docs/release/v13.1.0-beta.2.md");
+  const englishReleaseNote = map.documents.find((doc) => doc.path === "docs/en/release/v13.1.0-beta.2.md");
 
   assert.equal(readme.role, "concise_user_entrypoint");
   assert.equal(readme.narrative_update_policy, "explicit_repair");
@@ -99,6 +99,14 @@ test("docs repair writes docs IA and generated references without silently rewri
   assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:pr/);
   assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:pr create/);
   assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:explain/);
+  const commandsReference = await readFile(join(root, "docs/reference/commands.md"), "utf8");
+  const englishCommandsReference = await readFile(join(root, "docs/en/reference/commands.md"), "utf8");
+  assert.match(commandsReference, /\/hw:plan:technical-stack/);
+  assert.match(commandsReference, /\/hw:plan:architecture/);
+  assert.doesNotMatch(commandsReference, /\/hw:plan:confirm/);
+  assert.match(englishCommandsReference, /\/hw:plan:technical-stack/);
+  assert.match(englishCommandsReference, /\/hw:plan:architecture/);
+  assert.doesNotMatch(englishCommandsReference, /\/hw:plan:confirm/);
   const userGuide = await readFile(join(root, "docs/user-guide.md"), "utf8");
   const englishUserGuide = await readFile(join(root, "docs/en/user-guide.md"), "utf8");
   const opencodeGuide = await readFile(join(root, "docs/platforms/opencode.md"), "utf8");
@@ -162,13 +170,13 @@ test("human-facing docs and key references stay Chinese-body", async () => {
   assert.ok(result.checked.some((item) => item.path === "references/commands-spec.md"));
 });
 
-test("v13.1.0-beta.1 release coverage is Chinese-first and linked from entrypoints", async () => {
-  const chineseRelease = await readFile("docs/release/v13.1.0-beta.1.md", "utf8");
-  const englishRelease = await readFile("docs/en/release/v13.1.0-beta.1.md", "utf8");
+test("v13.1.0-beta.2 release coverage is Chinese-first and linked from entrypoints", async () => {
+  const chineseRelease = await readFile("docs/release/v13.1.0-beta.2.md", "utf8");
+  const englishRelease = await readFile("docs/en/release/v13.1.0-beta.2.md", "utf8");
   const readme = await readFile("README.md", "utf8");
   const englishReadme = await readFile("README.en.md", "utf8");
 
-  for (const item of ["/hw:quality", "/hw:optimize", "integration sync", "Codex-VSP", "666/666"]) {
+  for (const item of ["Technical Stack", "Architecture", "Mini-contract", "Codex-VSP", "VSP-Open-Code", "687/687"]) {
     assert.match(chineseRelease, new RegExp(escapeRegExp(item)), `Chinese release note missing ${item}`);
     assert.match(englishRelease, new RegExp(escapeRegExp(item)), `mirror release note missing ${item}`);
   }

@@ -6,7 +6,7 @@
 
 规划 -> 执行 -> 审查 -> 报告 -> 恢复
 
-[![Version](https://img.shields.io/badge/version-13.1.0-beta.1-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-13.1.0-beta.2-blue)](.claude-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/reference/platforms.md)
 
@@ -23,7 +23,7 @@ Hypo-Workflow 把长周期 AI 编程工作组织成可规划、可恢复、可�
 Hypo-Workflow 在所有平台上共享同一套 `.pipeline/` 协议：
 
 - **Cycle / Plan / Start / Resume**：把长任务拆成可恢复的 Feature、Milestone、Prompt 和 Report。
-- **P0 Configure**：每个新 Cycle 在 `P1 Discover` 前确认或沿用自动化程度、Subagent 授权、验收、PR/MR 远端写确认、完整回归和 worker separation。
+- **P0 Configure**：每个新 Cycle 在 Discover 前确认或沿用自动化程度、Subagent 授权、验收、PR/MR 远端写确认、完整回归和 worker separation。
 - **Rules / Habits**：把用户习惯和项目规则保存成结构化 authority，再生成各平台可读的指令视图。
 - **Agent Review**：在计划、测试、实现和收口阶段记录 review artifact，支持多轮 `needs_changes -> repair -> review`。
 - **PR/MR Create**：`/hw:pr create` 支持 GitHub PR 与 GitLab MR 的问答式创建，已有本地改动和 plan-first 工作分开处理，远端写一次性确认。
@@ -65,7 +65,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 - 完成前做交付前检查：格式、派生产物、README/文档新鲜度、secret marker、测试证据和报告证据。
 - 自动化等级由 `.pipeline/config.yaml` 的 `automation.level` 决定；发布、破坏性操作和外部副作用仍按配置确认点执行。
 
-当前版本提供 **52 个用户指令**，另有 **1 个内部 watchdog** skill。
+当前版本提供 **53 个用户指令**，另有 **1 个内部 watchdog** skill。
 
 ## 常用命令
 
@@ -97,7 +97,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | 类别 | 命令 |
 |---|---|
 | Pipeline | `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:analysis` |
-| Plan | `/hw:plan`, `/hw:plan:discover`, `/hw:plan:decompose`, `/hw:plan:generate`, `/hw:plan:confirm`, `/hw:plan:extend`, `/hw:plan:review` |
+| Plan | `/hw:plan`, `/hw:plan:deep`, `/hw:plan:discover`, `/hw:plan:technical-stack`, `/hw:plan:architecture`, `/hw:plan:decompose`, `/hw:plan:generate`, `/hw:plan:extend`, `/hw:plan:review` |
 | Lifecycle | `/hw:init`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:patch`, `/hw:patch fix`, `/hw:release` |
 | Analysis/Review | `/hw:analysis`, `/hw:check`, `/hw:audit`, `/hw:quality`, `/hw:debug`, `/hw:pr`, `/hw:pr create`, `/hw:explain` |
 | Optimize | `/hw:optimize` |
@@ -116,7 +116,7 @@ README 只列通用入口。每个平台的安装命令、支持能力和限制�
 | [Platforms Reference](docs/reference/platforms.md) | 六个平台能力表 |
 | [Generated Artifacts](docs/reference/generated-artifacts.md) | OpenCode、第三方适配、压缩视图和文档引用的生成来源 |
 | [OpenCode Guide](docs/platforms/opencode.md) | OpenCode 指令、智能体角色、模型矩阵和边界 |
-| [v13.1.0-beta.1 发布说明](docs/release/v13.1.0-beta.1.md) | C18 Audit/Quality/Optimize 指令升级与集成同步门禁 |
+| [v13.1.0-beta.2 发布说明](docs/release/v13.1.0-beta.2.md) | C19 命名 Plan 阶段与 C20 协商优先修改边界 |
 | [Cursor Guide](docs/platforms/cursor.md) | Cursor 仓库规则 |
 | [GitHub Copilot Guide](docs/platforms/copilot.md) | GitHub Copilot 仓库指令 |
 | [Trae Guide](docs/platforms/trae.md) | Trae 项目规则 |

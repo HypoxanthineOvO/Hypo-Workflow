@@ -28,10 +28,10 @@ test("renderReadmeBlock derives command and platform content from assets", async
 
   const commandReference = renderReadmeBlock("command-reference");
   assert.match(commandReference, /\/hw:release/);
-  assert.match(commandReference, /\/hw-release/);
+  assert.match(commandReference, /\/hw:release/);
   assert.match(commandReference, /skills\/release\/SKILL\.md/);
   assert.match(commandReference, /\/hw:chat/);
-  assert.match(commandReference, /\/hw-chat/);
+  assert.match(commandReference, /\/hw:chat/);
   assert.match(commandReference, /skills\/chat\/SKILL\.md/);
 
   const platformMatrix = renderReadmeBlock("platform-matrix");

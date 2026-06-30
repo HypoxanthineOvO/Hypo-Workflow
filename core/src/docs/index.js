@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { CANONICAL_COMMANDS } from "../commands/index.js";
+import { commandMap } from "../commands/index.js";
 import { PLATFORM_CAPABILITIES } from "../platform/index.js";
 import { listConfigurationProfiles } from "../profile/index.js";
 import {
@@ -159,19 +159,19 @@ export function docsMap() {
         must_not_include: [],
       },
       {
-        path: "docs/release/v13.1.0-beta.1.md",
+        path: "docs/release/v13.1.0-beta.2.md",
         role: "release_note",
         update_class: "release_note",
-        sources: ["CHANGELOG.md", ".pipeline/reports/04-source-side-closure-and-target-plans.report.md", ".pipeline/reports/05-target-repository-adaptation-after-confirmation.report.md", ".pipeline/integrations/matrix.yaml", ".pipeline/reviews/C18/M6/audit.md"],
+        sources: ["CHANGELOG.md", ".pipeline/archives/C19-workflow-core-content-and-plan-mode-optimization/summary.md", ".pipeline/reports/03-target-cycle-input-and-distribution-boundary-package.report.md", ".pipeline/integrations/C20-target-cycle-input.md", "references/consultation-first-action-boundary.md"],
         managed_blocks: [],
         narrative_update_policy: "release_flow",
         must_not_include: [],
       },
       {
-        path: "docs/en/release/v13.1.0-beta.1.md",
+        path: "docs/en/release/v13.1.0-beta.2.md",
         role: "english_release_note",
         update_class: "release_note_translation",
-        sources: ["docs/release/v13.1.0-beta.1.md", "CHANGELOG.md"],
+        sources: ["docs/release/v13.1.0-beta.2.md", "CHANGELOG.md"],
         managed_blocks: [],
         narrative_update_policy: "release_flow",
         must_not_include: [],
@@ -373,7 +373,7 @@ function renderEnglishReadme() {
     "",
     "Plan -> Execute -> Review -> Report -> Resume",
     "",
-    `[![Version](https://img.shields.io/badge/version-13.1.0-beta.1-blue)](.claude-plugin/plugin.json)`,
+    `[![Version](https://img.shields.io/badge/version-13.1.0-beta.2-blue)](.claude-plugin/plugin.json)`,
     "[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)",
     "[![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/en/reference/platforms.md)",
     "",
@@ -402,7 +402,7 @@ function renderEnglishReadme() {
     "## Shared Capabilities",
     "",
     "- **Cycle / Plan / Start / Resume**: split long tasks into resumable Features, Milestones, Prompts, and Reports.",
-    "- **P0 Configure**: before `P1 Discover`, confirm or reuse automation level, Subagent authorization, acceptance, PR/MR remote-write confirmation, full regression, and worker separation.",
+    "- **P0 Configure**: before Discover, confirm or reuse automation level, Subagent authorization, acceptance, PR/MR remote-write confirmation, full regression, and worker separation.",
     "- **Rules / Habits**: store user habits and project rules as structured authority, then render platform-readable instruction views.",
     "- **Agent Review**: record review artifacts during planning, tests, implementation, and final checks.",
     "- **PR/MR Create**: `/hw:pr create` guides GitHub PR and GitLab MR creation from existing local changes or a plan-first work item, with remote writes gated by explicit confirmation.",
@@ -456,7 +456,7 @@ function renderEnglishReadme() {
     "| [Platforms Reference](docs/en/reference/platforms.md) | Platform capability matrix |",
     "| [Generated Artifacts](docs/en/reference/generated-artifacts.md) | Generated adapter and docs sources |",
     "| [Configuration Reference](docs/en/reference/configuration.md) | Automation, gates, profiles, and worker separation |",
-    "| [v13.1.0-beta.1 Release Notes](docs/en/release/v13.1.0-beta.1.md) | C18 Audit/Quality/Optimize command upgrade and integration sync gate |",
+    "| [v13.1.0-beta.2 Release Notes](docs/en/release/v13.1.0-beta.2.md) | C19 named Plan phases and C20 consultation-first action boundary |",
     "",
     "## License",
     "",
@@ -485,7 +485,7 @@ function renderUserGuide() {
     "",
     "## 常用流程",
     "",
-    "- 用 `/hw:cycle new` 开始新 Cycle 后，先完成或明确沿用 `P0 Configure`；它在 `P1 Discover` 前确认自动化程度、Subagent 授权、验收方式、PR/MR 远端写确认、完整回归、analysis 边界和 worker separation。",
+    "- 用 `/hw:cycle new` 开始新 Cycle 后，先完成或明确沿用 `P0 Configure`；它在 Discover 前确认自动化程度、Subagent 授权、验收方式、PR/MR 远端写确认、完整回归、analysis 边界和 worker separation。",
     "- 用 `/hw:plan` 规划工作，再用 `/hw:start` 或 `/hw:resume` 执行。",
     "- 用 `/hw:status` 查看进度，用 `/hw:report` 查看报告。",
     "- 用 `/hw:explain [question]` 提问代码、配置、命令或近期改动原因；回答必须引用本地文件证据，证据不足时要明确 unknowns。",
@@ -565,7 +565,7 @@ function renderEnglishUserGuide() {
     "",
     "## Common Workflows",
     "",
-    "- After `/hw:cycle new`, complete or explicitly reuse `P0 Configure` before `P1 Discover`; it covers automation level, Subagent authorization, acceptance mode, PR/MR remote-write policy, full regression, analysis boundaries, and worker separation.",
+    "- After `/hw:cycle new`, complete or explicitly reuse `P0 Configure` before Discover; it covers automation level, Subagent authorization, acceptance mode, PR/MR remote-write policy, full regression, analysis boundaries, and worker separation.",
     "- Use `/hw:plan` to plan work, then `/hw:start` or `/hw:resume` to execute.",
     "- Use `/hw:status` for progress and `/hw:report` for reports.",
     "- Use `/hw:explain [question]` for evidence-first answers about code, config, commands, or recent changes.",
@@ -1174,7 +1174,7 @@ function platformTitle(platform) {
 }
 
 function renderCommandsReference() {
-  const rows = CANONICAL_COMMANDS.map((command) => (
+  const rows = commandMap("opencode").map((command) => (
     `| \`${command.canonical}\` | \`${command.opencode}\` | \`${command.agent}\` | \`${command.skill}\` |`
   ));
   return [
@@ -1230,7 +1230,7 @@ function renderGeneratedArtifactsReference() {
 }
 
 function renderEnglishCommandsReference() {
-  const rows = CANONICAL_COMMANDS.map((command) => (
+  const rows = commandMap("opencode").map((command) => (
     `| \`${command.canonical}\` | \`${command.opencode}\` | \`${command.agent}\` | \`${command.skill}\` |`
   ));
   return [
@@ -1314,7 +1314,7 @@ function renderEnglishConfigurationReference() {
     "| Field | Common values | Effect | Confirmation boundary |",
     "|---|---|---|---|",
     "| `automation.level` | `manual` / `balanced` / `full` | Controls ordinary execution automation | Cannot skip destructive/external, release publish, or PR/MR remote write gates |",
-    "| `automation.gates.planning` | `confirm` | Planning confirmation | P2 split and P4 final plan confirmation |",
+    "| `automation.gates.planning` | `confirm` | Planning confirmation | Decompose milestone split and Generate final confirmation |",
     "| `automation.gates.execution` | `auto` | Ordinary Milestones may continue | Strict review can still block |",
     "| `automation.gates.destructive_external` | `confirm` | Destructive or external side effects stay gated | Destructive commands and external side effects |",
     "| `automation.gates.release_publish` | `confirm` | Release publish stays gated | tag, push, publish |",
@@ -1324,15 +1324,15 @@ function renderEnglishConfigurationReference() {
     "",
     "| Field | Purpose | Typical policy |",
     "|---|---|---|",
-    "| `plan.mode` | `interactive` runs P1-P4 gates; `auto` summarizes only when config allows | Use `interactive` when the user participates in planning |",
-    "| `plan.interaction_depth` | Controls minimum P1 question rounds | Use `high` for complex Cycles |",
+    "| `plan.mode` | `interactive` runs Discover / Technical Stack / Architecture / Decompose / Generate gates; `auto` summarizes only when config allows | Use `interactive` when the user participates in planning |",
+    "| `plan.interaction_depth` | Controls minimum Discover question rounds | Use `high` for complex Cycles |",
     "| `execution.mode` | `self`, `subagent`, or host-specific execution mode | Codex defaults to main Agent orchestration with optional Subagents |",
     "| `execution.worker_separation.mode` | `off` / `recommended` / `strict` | `recommended` separates implement/test/audit when practical; `strict` does not fully accept degraded execution |",
     "| `acceptance.mode` | `auto`, `manual`, `timeout`, or legacy `confirm` | Use `manual`/`confirm` for team workflows |",
     "",
     "## P0 Configure And Subagent Authorization",
     "",
-    "`P0 Configure` runs after `cycle new` and before `P1 Discover`. It lets the user select or reuse automation, Subagent authorization, acceptance, PR/MR remote-write policy, full regression, analysis boundaries, and worker separation. Reuse sources are recorded as `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, or `built_in_default`.",
+    "`P0 Configure` runs after `cycle new` and before Discover. It lets the user select or reuse automation, Subagent authorization, acceptance, PR/MR remote-write policy, full regression, analysis boundaries, and worker separation. Reuse sources are recorded as `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, or `built_in_default`.",
     "",
     "Strict worker separation requires implementation Subagents to stay isolated from test/review/audit roles. Implementation workers do not read test source, fixtures, snapshots, or assertion details; they may receive requirements, public interfaces, allowed edit scope, test command, pass/fail status, and sanitized failure summaries. If the host cannot preserve isolation, the run must explain degraded mode, obtain explicit user confirmation, and record role isolation degradation.",
     "",
@@ -1387,7 +1387,7 @@ function renderConfigurationReference() {
     "| 字段 | 默认/常见值 | 自动化影响 | 严格度影响 | 人工确认边界 |",
     "|---|---|---|---|---|",
     "| `automation.level` | `manual` / `balanced` / `full` | 决定普通执行是否尽量自动推进 | 不得降低 hard gates | 不能跳过 destructive/external、release publish、PR/MR remote write |",
-    "| `automation.gates.planning` | `confirm` | P2/P4 规划确认 | 规划 gate 是 hard gate | P2 milestone split 和 P4 final plan confirmation 需要确认 |",
+    "| `automation.gates.planning` | `confirm` | Plan 阶段确认 | 规划 gate 是 hard gate | Decompose milestone split 和 Generate final confirmation 需要确认 |",
     "| `automation.gates.execution` | `auto` | 普通 Milestone 可自动推进 | strict review 仍可阻塞 | 仅适用于普通本地执行 |",
     "| `automation.gates.destructive_external` | `confirm` | 破坏性或外部副作用不可自动执行 | 所有 profile 都保持确认 | destructive commands、external side effects |",
     "| `automation.gates.release_publish` | `confirm` | release publish 不自动执行 | release/tag/push 前确认 | tag、push、publish |",
@@ -1400,9 +1400,9 @@ function renderConfigurationReference() {
     "",
     "| 字段 | 作用 | 常见策略 |",
     "|---|---|---|",
-    "| `plan.mode` | `interactive` 会进行 P1-P4 gate；`auto` 只在配置允许时自动总结通过 | 用户参与规划时用 `interactive` |",
-    "| `plan.interaction_depth` | `low`/`medium`/`high` 控制 P1 最少追问轮数 | 复杂 Cycle 用 `high` |",
-    "| `plan.interactive.require_explicit_confirm` | 是否要求明确 P4 确认 | 团队或高风险项目设为 `true` |",
+    "| `plan.mode` | `interactive` 会进行 Discover / Technical Stack / Architecture / Decompose / Generate gate；`auto` 只在配置允许时自动总结通过 | 用户参与规划时用 `interactive` |",
+    "| `plan.interaction_depth` | `low`/`medium`/`high` 控制 Discover 最少追问轮数 | 复杂 Cycle 用 `high` |",
+    "| `plan.interactive.require_explicit_confirm` | 是否要求明确 Generate final confirmation | 团队或高风险项目设为 `true` |",
     "| `execution.mode` | `self`、subagent 或 host-specific execution mode | Codex 默认主 Agent 编排，必要时使用 Subagents |",
     "| `execution.worker_separation.mode` | `off` / `recommended` / `strict` | `recommended` 尽量分离 implement/test/audit；`strict` 不接受降级为 fully accepted |",
     "| `execution.step_overrides.review_tests.strict` | 测试审查是否严格阻塞 | release/team 模式可设更严格 |",
@@ -1412,7 +1412,7 @@ function renderConfigurationReference() {
     "",
     "## P0 Configure 与 Subagent 授权",
     "",
-    "`P0 Configure` 是每个新 Cycle 在 `P1 Discover` 前的配置阶段。用户可以重新选择，也可以明确沿用上一轮或项目/全局默认。该阶段覆盖 automation、Subagent authorization、acceptance、PR/MR remote write、full regression、analysis boundaries 和 worker separation，并把来源记录为 `cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config` 或 `built_in_default`。",
+    "`P0 Configure` 是每个新 Cycle 在 Discover 前的配置阶段。用户可以重新选择，也可以明确沿用上一轮或项目/全局默认。该阶段覆盖 automation、Subagent authorization、acceptance、PR/MR remote write、full regression、analysis boundaries 和 worker separation，并把来源记录为 `cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config` 或 `built_in_default`。",
     "",
     "strict worker separation 要求 implementation Subagent 与 test/review/audit 角色隔离。implementation worker 不读取 test source、fixtures、snapshots 或 assertion details；它只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若宿主平台不能提供这种隔离，必须在执行前说明 degraded mode，获得 explicit user confirmation，并记录 role isolation degradation。",
     "",
@@ -1484,7 +1484,7 @@ function renderDefaultConfigurationProfiles() {
 }
 
 function userCommandCount() {
-  return CANONICAL_COMMANDS.length;
+  return commandMap("opencode").length;
 }
 
 async function writeGenerated(projectRoot, relativePath, content) {
