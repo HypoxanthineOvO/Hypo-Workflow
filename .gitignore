@@ -2,9 +2,17 @@
 .pipeline/state.yaml
 .pipeline/.lock
 .pipeline/reports/
+.pipeline/chat/
+.pipeline/chats/
+.pipeline/inbox/
+.pipeline/derived-health.yaml
 .pipeline/log.md
 *.compact.*
 .plan-state/
+
+# 本地临时材料
+tmp/
+tmp.md
 
 # 测试产物
 tests/scenarios/**/results/
