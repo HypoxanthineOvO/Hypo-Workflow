@@ -1,104 +1,1785 @@
 entries:
-  - id: RELEASE-PUBLISHED-v13.1.0-alpha.1-20260530T143140+0800
-    type: release
-    ref: v13.1.0-alpha.1
-    status: partially_published
-    timestamp: 2026-05-30T14:31:40+08:00
-    summary: "Published v13.1.0-alpha.1 to GitHub with commit d1df860, tag v13.1.0-alpha.1, and a prerelease page. GitLab origin push remains blocked by SSH authentication."
-    trigger: user
-    report: docs/release/v13.1.0-alpha.1.md
-    release_url: https://github.com/HypoxanthineOvO/Hypo-Workflow/releases/tag/v13.1.0-alpha.1
+  - id: CYCLE-ACCEPTED-C20-20260630T214336+0800
+    ref: C20
+    status: completed
+    summary: Cycle C20 accepted.
+    timestamp: 2026-06-30T21:43:36+08:00
+    trigger: manual
+    type: cycle_accept
+  - evidence_refs:
+      - .pipeline/reports/00-source-behavior-contract-and-scenario-fixtures.report.md
+      - .pipeline/reports/01-shared-guidance-projection-across-managed-instruction-surfaces.report.md
+      - .pipeline/reports/02-source-regression-and-managed-artifact-closure.report.md
+      - .pipeline/reports/03-target-cycle-input-and-distribution-boundary-package.report.md
+      - .pipeline/integrations/C20-target-cycle-input.md
+    id: CYCLE-PENDING-ACCEPTANCE-C20-20260630T210750+0800
+    ref: C20
+    report: .pipeline/reports/C20-consultation-first-action-boundary.report.md
+    status: pending_acceptance
+    summary: C20 consultation-first action boundary completed and is waiting for user acceptance or rejection.
+    timestamp: 2026-06-30T21:07:50+08:00
+    trigger: assistant
+    type: cycle_pending_acceptance
     validations:
-      - "git commit: d1df860 release: v13.1.0-alpha.1"
-      - "git tag: v13.1.0-alpha.1 -> d1df860"
-      - "git push github main: success"
-      - "git push github v13.1.0-alpha.1: success"
-      - "gh release create v13.1.0-alpha.1 --prerelease: success"
-      - "git push origin main/tag: blocked by Permission denied (publickey,password)"
-    evidence_refs:
+      - 'C20 source focused suite: 30/30 passing'
+      - 'npm test: 687/687 passing'
+      - 'git diff --check: passing'
+      - 'M4 audit: PASS_WITH_WARNINGS, no blockers'
+  - evidence_refs:
+      - .pipeline/integrations/C20-target-cycle-input.md
+      - .pipeline/integrations/matrix.yaml
+      - .pipeline/reviews/C20/M4/test-evidence.md
+      - .pipeline/reviews/C20/M4/implementation-evidence.md
+      - .pipeline/reviews/C20/M4/audit.md
+    id: C20-M4-COMPLETE-20260630T210750+0800
+    ref: C20-M4
+    report: .pipeline/reports/03-target-cycle-input-and-distribution-boundary-package.report.md
+    status: completed
+    summary: >-
+      Completed C20-M4: target Cycle input package and C20 integration matrix are ready, with target repositories left
+      untouched.
+    timestamp: 2026-06-30T21:07:50+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - 'package existence check: passing'
+      - 'matrix YAML parse: passing'
+      - 'anchor scans: passing'
+      - 'git diff --check: passing'
+      - 'audit verdict: PASS_WITH_WARNINGS, no blockers'
+  - evidence_refs:
+      - .pipeline/reviews/C20/M4/audit.md
+    id: C20-M4-REVIEW-CODE-COMPLETE-20260630T210750+0800
+    ref: C20-M4/review_code
+    status: completed
+    summary: Audit worker passed C20-M4 target handoff with warnings limited to dirty baseline and validation-scope caveats.
+    timestamp: 2026-06-30T21:07:50+08:00
+    trigger: subagent
+    type: step_complete
+    worker:
+      id: 019f18a0-ec4a-7b22-a83a-0de0d7bac851
+      lifecycle: completed
+      nickname: 娄鑫 the 7th
+      role: audit
+  - evidence_refs:
+      - .pipeline/integrations/C20-target-cycle-input.md
+      - .pipeline/integrations/matrix.yaml
+      - .pipeline/reviews/C20/M4/test-evidence.md
+      - .pipeline/reviews/C20/M4/implementation-evidence.md
+    id: C20-M4-REVIEW-CODE-START-20260630T210318+0800
+    ref: C20-M4/review_code
+    status: in_progress
+    summary: >-
+      Started C20-M4 audit for target handoff package semantics, integration matrix, no-target-write boundary, and
+      validation evidence.
+    timestamp: 2026-06-30T21:03:18+08:00
+    trigger: assistant
+    type: step_start
+  - id: C20-M4-RUN-TESTS-GREEN-COMPLETE-20260630T210318+0800
+    ref: C20-M4/run_tests_green
+    status: completed
+    summary: Main-agent GREEN validation passed for C20-M4 target handoff package and no-write evidence.
+    timestamp: 2026-06-30T21:03:18+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - 'package existence check: passing'
+      - 'matrix YAML parse: passing'
+      - 'C20/source evidence/no-write anchor scan: passing'
+      - 'target-local scope anchor scan: passing'
+      - 'git diff --check: passing'
+      - 'target status commands: read-only dirty baselines recorded'
+  - evidence_refs:
+      - .pipeline/integrations/C20-target-cycle-input.md
+      - .pipeline/integrations/matrix.yaml
+      - .pipeline/reviews/C20/M4/implementation-evidence.md
+    id: C20-M4-RUN-TESTS-GREEN-START-20260630T210227+0800
+    ref: C20-M4/run_tests_green
+    status: in_progress
+    summary: >-
+      Started main-agent GREEN validation for C20 target handoff package, integration matrix, whitespace, and target
+      no-write status.
+    timestamp: 2026-06-30T21:02:27+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - .pipeline/reviews/C20/M4/implementation-evidence.md
+      - .pipeline/integrations/C20-target-cycle-input.md
+      - .pipeline/integrations/matrix.yaml
+    id: C20-M4-IMPLEMENT-COMPLETE-20260630T210227+0800
+    ref: C20-M4/implement
+    status: completed
+    summary: >-
+      Implement worker created the C20 target Cycle input package and updated integration matrix without target
+      repository writes.
+    timestamp: 2026-06-30T21:02:27+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'package existence check: passing'
+      - 'matrix YAML parse: passing'
+      - 'anchor scans: passing'
+      - 'git diff --check: passing'
+    worker:
+      id: 019f189a-8f62-7cf1-a244-9f62778b1370
+      lifecycle: completed
+      nickname: 李萌 the 6th
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C20/M4/test-evidence.md
+    id: C20-M4-IMPLEMENT-START-20260630T205537+0800
+    ref: C20-M4/implement
+    status: in_progress
+    summary: >-
+      Started C20-M4 implementation to create target Cycle input package and update the integration matrix without
+      target repository writes.
+    timestamp: 2026-06-30T20:55:37+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - .pipeline/reviews/C20/M4/test-evidence.md
+    id: C20-M4-RUN-TESTS-RED-20260630T205537+0800
+    ref: C20-M4/run_tests_red
+    status: completed
+    summary: >-
+      Accepted M4 expected pre-implementation gap: C20 target package is missing and integration matrix still records
+      C19 applied target state.
+    timestamp: 2026-06-30T20:55:37+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - 'package existence check: expected fail before implementation'
+      - 'git diff --check: passing'
+      - 'target status commands: dirty baseline recorded read-only'
+  - evidence_refs:
+      - .pipeline/reviews/C20/M4/test-evidence.md
+    id: C20-M4-WRITE-TESTS-COMPLETE-20260630T205537+0800
+    ref: C20-M4/write_tests
+    status: completed
+    summary: Test worker recorded M4 distribution baseline, target dirty status, candidate surfaces, and validation checklist.
+    timestamp: 2026-06-30T20:55:37+08:00
+    trigger: subagent
+    type: step_complete
+    worker:
+      id: 019f1896-1647-74f0-886f-8f27ed6aab75
+      lifecycle: completed
+      nickname: 娄鑫 the 6th
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/03-target-cycle-input-and-distribution-boundary-package.md
+    id: C20-M4-WRITE-TESTS-START-20260630T205035+0800
+    ref: C20-M4/write_tests
+    status: in_progress
+    summary: Started C20-M4 write_tests for target Cycle input package validation and no-target-write evidence.
+    timestamp: 2026-06-30T20:50:35+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - .pipeline/reviews/C20/M3/test-evidence.md
+      - .pipeline/reviews/C20/M3/implementation-evidence.md
+      - .pipeline/reviews/C20/M3/audit.md
+    id: C20-M3-COMPLETE-20260630T205035+0800
+    ref: C20-M3
+    report: .pipeline/reports/02-source-regression-and-managed-artifact-closure.report.md
+    status: completed
+    summary: >-
+      Completed C20-M3 source closure: managed artifacts refreshed, lifecycle gate log validator fixed, full regression
+      passed, and audit returned PASS_WITH_WARNINGS without blockers.
+    timestamp: 2026-06-30T20:50:35+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - 'focused C20/C18/artifact/log suite: 30/30 passing'
+      - 'npm test: 687/687 passing'
+      - 'git diff --check: passing'
+      - 'audit verdict: PASS_WITH_WARNINGS, no blockers'
+  - evidence_refs:
+      - .pipeline/reviews/C20/M3/audit.md
+    id: C20-M3-REVIEW-CODE-COMPLETE-20260630T205035+0800
+    ref: C20-M3/review_code
+    status: completed
+    summary: Audit worker passed C20-M3 with warnings limited to dirty source and target worktree caveats.
+    timestamp: 2026-06-30T20:50:35+08:00
+    trigger: subagent
+    type: step_complete
+    worker:
+      id: 019f1891-a7fe-7dd1-8e95-ccee18eb8b1d
+      lifecycle: completed
+      nickname: 李萌 the 5th
+      role: audit
+  - evidence_refs:
+      - .pipeline/reviews/C20/M3/test-evidence.md
+      - .pipeline/reviews/C20/M3/implementation-evidence.md
+    id: C20-M3-REVIEW-CODE-START-20260630T204640+0800
+    ref: C20-M3/review_code
+    status: in_progress
+    summary: >-
+      Started C20-M3 audit for generated consultation-first guidance, stale wording classification, target no-write
+      boundary, and validation evidence.
+    timestamp: 2026-06-30T20:46:40+08:00
+    trigger: assistant
+    type: step_start
+  - id: C20-M3-RUN-TESTS-GREEN-COMPLETE-20260630T204640+0800
+    ref: C20-M3/run_tests_green
+    status: completed
+    summary: Main-agent GREEN validation passed for C20-M3 source closure.
+    timestamp: 2026-06-30T20:46:40+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - >-
+        node --test core/test/log-evidence.test.js core/test/c20-consultation-boundary.test.js
+        core/test/commands-rules-artifacts.test.js core/test/c18-instruction-quality-contract.test.js: 30/30 passing
+      - 'npm test: 687/687 passing'
+      - 'git diff --check: passing'
+  - evidence_refs:
+      - .pipeline/reviews/C20/M3/implementation-evidence.md
+    id: C20-M3-RUN-TESTS-GREEN-START-20260630T204542+0800
+    ref: C20-M3/run_tests_green
+    status: in_progress
+    summary: >-
+      Started main-agent GREEN validation for C20-M3 after managed artifact refresh and lifecycle gate log validator
+      support.
+    timestamp: 2026-06-30T20:45:42+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - .pipeline/reviews/C20/M3/implementation-evidence.md
+    id: C20-M3-IMPLEMENT-COMPLETE-20260630T204542+0800
+    ref: C20-M3/implement
+    status: completed
+    summary: >-
+      Implement worker refreshed source managed artifacts, added lifecycle gate family/status validation, and closed M3
+      source closure blockers.
+    timestamp: 2026-06-30T20:45:42+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'focused lifecycle test: 7/7 passing'
+      - 'focused C20/C18/artifact suite: 30/30 passing'
+      - 'npm test: 687/687 passing'
+      - 'git diff --check: passing'
+    worker:
+      id: 019f188b-06c8-7b53-87c2-508d3d138167
+      lifecycle: completed
+      nickname: 娄鑫 the 5th
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C20/M3/test-evidence.md
+    id: C20-M3-IMPLEMENT-START-20260630T203917+0800
+    ref: C20-M3/implement
+    status: in_progress
+    summary: >-
+      Started C20-M3 implementation to refresh source managed artifacts and resolve lifecycle log validation drift for
+      gate feedback records.
+    timestamp: 2026-06-30T20:39:17+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - .pipeline/reviews/C20/M3/test-evidence.md
+    id: C20-M3-RUN-TESTS-RED-20260630T203917+0800
+    ref: C20-M3/run_tests_red
+    status: completed
+    summary: >-
+      Accepted C20-M3 blocker evidence: focused tests pass, git diff check passes, npm test fails on lifecycle log
+      validation drift, and checked-in managed artifacts are stale.
+    timestamp: 2026-06-30T20:39:17+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - 'focused tests: 23/23 passing'
+      - 'npm test: 685/686 passing, blocked by lifecycle log schema/status drift'
+      - 'git diff --check: passing'
+  - evidence_refs:
+      - .pipeline/reviews/C20/M3/test-evidence.md
+    id: C20-M3-WRITE-TESTS-COMPLETE-20260630T203917+0800
+    ref: C20-M3/write_tests
+    status: completed
+    summary: >-
+      Original C20-M3 test worker completed evidence after restore; replacement worker was closed without accepted
+      output.
+    timestamp: 2026-06-30T20:39:17+08:00
+    trigger: subagent
+    type: step_complete
+    worker:
+      id: 019f1886-1028-7501-a150-c2df31db9696
+      lifecycle: completed
+      nickname: 娄鑫 the 4th
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C20/M3/test-evidence.md
+    id: C20-M3-WRITE-TESTS-REPLACEMENT-20260630T203755+0800
+    ref: C20-M3/write_tests
+    status: in_progress
+    summary: >-
+      Restored session could not recover the original C20-M3 test worker artifact; replacement test worker requested
+      with the same evidence-only scope.
+    timestamp: 2026-06-30T20:37:55+08:00
+    trigger: assistant
+    type: step_update
+  - evidence_refs:
+      - .pipeline/prompts/02-source-regression-and-managed-artifact-closure.md
+    id: C20-M3-WRITE-TESTS-START-20260630T203256+0800
+    ref: C20-M3/write_tests
+    status: in_progress
+    summary: >-
+      Started C20-M3 write_tests for source regression, managed artifact closure, and generated surface freshness
+      evidence.
+    timestamp: 2026-06-30T20:32:56+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - core/src/artifacts/agent-guidance.js
+      - core/src/artifacts/opencode.js
+      - core/src/artifacts/claude.js
+      - core/test/c20-consultation-boundary.test.js
+      - .pipeline/reviews/C20/M2/test-evidence.md
+      - .pipeline/reviews/C20/M2/implementation-evidence.md
+      - .pipeline/reviews/C20/M2/audit.md
+      - .pipeline/reviews/C20/M2/diff-ownership-note.md
+    id: C20-M2-COMPLETE-20260630T203256+0800
+    ref: C20-M2
+    report: .pipeline/reports/01-shared-guidance-projection-across-managed-instruction-surfaces.report.md
+    status: completed
+    summary: >-
+      Completed C20-M2: consultation-first shared guidance is projected into OpenCode/Claude/root managed instruction
+      renderers; attribution warning recorded as non-blocking dirty-worktree context.
+    timestamp: 2026-06-30T20:32:56+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - >-
+        node --test core/test/c20-consultation-boundary.test.js core/test/commands-rules-artifacts.test.js
+        core/test/c18-instruction-quality-contract.test.js: 23/23 passing
+      - 'audit verdict: PASS_WITH_WARNINGS, no functional blockers'
+  - evidence_refs:
+      - core/src/artifacts/agent-guidance.js
+      - core/src/artifacts/opencode.js
+      - core/src/artifacts/claude.js
+      - core/test/c20-consultation-boundary.test.js
+      - .pipeline/reviews/C20/M2/test-evidence.md
+      - .pipeline/reviews/C20/M2/implementation-evidence.md
+      - .pipeline/reviews/C20/M2/audit.md
+    id: C20-M2-REVIEW-CODE-START-20260630T202727+0800
+    ref: C20-M2/review_code
+    status: in_progress
+    summary: >-
+      Started C20-M2 audit worker for shared guidance projection, root renderer behavior, test evidence, and
+      target-owned boundary.
+    timestamp: 2026-06-30T20:27:27+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - core/src/artifacts/agent-guidance.js
+      - core/src/artifacts/opencode.js
+      - core/src/artifacts/claude.js
+      - core/test/c20-consultation-boundary.test.js
+    id: C20-M2-GREEN-VALIDATION-20260630T202727+0800
+    ref: C20-M2/run_tests_green
+    status: completed
+    summary: 'Main thread verified C20-M2 GREEN: shared guidance projection focused suite passes 23/23.'
+    timestamp: 2026-06-30T20:27:27+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - >-
+        node --test core/test/c20-consultation-boundary.test.js core/test/commands-rules-artifacts.test.js
+        core/test/c18-instruction-quality-contract.test.js: 23/23 passing
+  - evidence_refs:
+      - core/src/artifacts/agent-guidance.js
+      - core/src/artifacts/opencode.js
+      - core/src/artifacts/claude.js
+      - .pipeline/reviews/C20/M2/implementation-evidence.md
+    id: C20-M2-IMPLEMENT-COMPLETE-20260630T202727+0800
+    ref: C20-M2/implement
+    status: completed
+    summary: >-
+      Implement worker completed consultation-first shared guidance and projected it into OpenCode command/agent/root
+      and Claude command/agent surfaces.
+    timestamp: 2026-06-30T20:27:27+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'focused M2 command: 23/23 passing'
+    worker:
+      id: 019f187b-ea74-7252-acfe-f457247ec3fa
+      lifecycle: completed
+      nickname: 娄鑫 the 3rd
+      role: implement
+  - evidence_refs:
+      - core/src/artifacts/agent-guidance.js
+      - core/src/artifacts/opencode.js
+      - core/src/artifacts/claude.js
+      - plugins/opencode/templates/AGENTS.md
+      - .pipeline/reviews/C20/M2/implementation-evidence.md
+    id: C20-M2-IMPLEMENT-START-20260630T202237+0800
+    ref: C20-M2/implement
+    status: in_progress
+    summary: >-
+      Started C20-M2 implement worker for consultation-first shared guidance, OpenCode/Claude projection, and root
+      managed instruction projection.
+    timestamp: 2026-06-30T20:22:37+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - core/test/c20-consultation-boundary.test.js
+      - core/test/commands-rules-artifacts.test.js
+      - core/test/c18-instruction-quality-contract.test.js
+      - .pipeline/reviews/C20/M2/test-evidence.md
+    id: C20-M2-RUN-TESTS-RED-COMPLETE-20260630T202237+0800
+    ref: C20-M2/run_tests_red
+    status: completed
+    summary: >-
+      Confirmed C20-M2 RED: focused projection command fails because shared consultation-first guidance and managed root
+      projection are missing.
+    timestamp: 2026-06-30T20:22:37+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - >-
+        node --test core/test/c20-consultation-boundary.test.js core/test/commands-rules-artifacts.test.js
+        core/test/c18-instruction-quality-contract.test.js: RED exit 1, 19/23 passing, 4 failing
+  - evidence_refs:
+      - core/test/c20-consultation-boundary.test.js
+      - .pipeline/reviews/C20/M2/test-evidence.md
+    id: C20-M2-WRITE-TESTS-COMPLETE-20260630T202237+0800
+    ref: C20-M2/write_tests
+    status: completed
+    summary: >-
+      Test worker completed M2 projection tests covering shared guidance export, OpenCode surfaces, Claude surfaces,
+      root AGENTS projection, direct-execution carve-out, and target-owned boundaries.
+    timestamp: 2026-06-30T20:22:37+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'focused M2 command: RED exit 1, 19/23 passing, 4 failing'
+    worker:
+      id: 019f1874-d56c-70a2-97a0-942f61216dfc
+      lifecycle: completed
+      nickname: 娄鑫 the 2nd
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/01-shared-guidance-projection-across-managed-instruction-surfaces.md
+      - core/test/c20-consultation-boundary.test.js
+      - core/test/commands-rules-artifacts.test.js
+      - core/test/c18-instruction-quality-contract.test.js
+    id: C20-M2-WRITE-TESTS-START-20260630T201414+0800
+    ref: C20-M2/write_tests
+    status: in_progress
+    summary: Started C20-M2 write_tests for shared guidance projection across managed instruction surfaces.
+    timestamp: 2026-06-30T20:14:14+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - references/consultation-first-action-boundary.md
+      - core/test/c20-consultation-boundary.test.js
+      - .pipeline/reviews/C20/M1/test-evidence.md
+      - .pipeline/reviews/C20/M1/implementation-evidence.md
+      - .pipeline/reviews/C20/M1/audit.md
+    id: C20-M1-COMPLETE-20260630T201414+0800
+    ref: C20-M1
+    report: .pipeline/reports/00-source-behavior-contract-and-scenario-fixtures.report.md
+    status: completed
+    summary: 'Completed C20-M1: source consultation-first action boundary contract and focused scenario fixtures are in place.'
+    timestamp: 2026-06-30T20:14:14+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - 'node --test core/test/c20-consultation-boundary.test.js: 6/6 passing'
+      - 'audit verdict: PASS_WITH_WARNINGS, no blockers'
+  - evidence_refs:
+      - .pipeline/reviews/C20/M1/audit.md
+    id: C20-M1-AUDIT-COMPLETE-20260630T201414+0800
+    ref: C20-M1/review_code
+    status: completed
+    summary: Audit worker passed C20-M1 with non-blocking follow-up risks for M2/M3/M4.
+    timestamp: 2026-06-30T20:14:14+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'node --test core/test/c20-consultation-boundary.test.js: 6/6 passing'
+    worker:
+      id: 019f186f-68c7-72c2-963f-242d77ee6c3d
+      lifecycle: completed
+      nickname: 李萌 the 2nd
+      role: audit
+  - evidence_refs:
+      - references/consultation-first-action-boundary.md
+      - core/test/c20-consultation-boundary.test.js
+      - .pipeline/reviews/C20/M1/test-evidence.md
+      - .pipeline/reviews/C20/M1/implementation-evidence.md
+      - .pipeline/reviews/C20/M1/audit.md
+    id: C20-M1-REVIEW-CODE-START-20260630T200853+0800
+    ref: C20-M1/review_code
+    status: in_progress
+    summary: >-
+      Started C20-M1 audit worker for source contract quality, test evidence, worker separation, and no-target-write
+      boundary.
+    timestamp: 2026-06-30T20:08:53+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - references/consultation-first-action-boundary.md
+      - core/test/c20-consultation-boundary.test.js
+    id: C20-M1-GREEN-VALIDATION-20260630T200853+0800
+    ref: C20-M1/run_tests_green
+    status: completed
+    summary: 'Main thread verified C20-M1 GREEN: focused consultation boundary contract test passes 6/6.'
+    timestamp: 2026-06-30T20:08:53+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - 'node --test core/test/c20-consultation-boundary.test.js: 6/6 passing'
+  - evidence_refs:
+      - references/consultation-first-action-boundary.md
+      - .pipeline/reviews/C20/M1/implementation-evidence.md
+    id: C20-M1-IMPLEMENT-COMPLETE-20260630T200853+0800
+    ref: C20-M1/implement
+    status: completed
+    summary: Implement worker completed the source consultation-first action boundary contract and reported focused GREEN.
+    timestamp: 2026-06-30T20:08:53+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'node --test core/test/c20-consultation-boundary.test.js: 6/6 passing'
+    worker:
+      id: 019f186c-4ae0-73a0-9094-018b558e9289
+      lifecycle: completed
+      nickname: 李萌
+      role: implement
+  - evidence_refs:
+      - references/consultation-first-action-boundary.md
+      - .pipeline/reviews/C20/M1/implementation-evidence.md
+    id: C20-M1-IMPLEMENT-START-20260630T200500+0800
+    ref: C20-M1/implement
+    status: in_progress
+    summary: >-
+      Started C20-M1 implement worker to add the source consultation-first action boundary contract without editing
+      tests.
+    timestamp: 2026-06-30T20:05:00+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - core/test/c20-consultation-boundary.test.js
+      - .pipeline/reviews/C20/M1/test-evidence.md
+    id: C20-M1-RUN-TESTS-RED-COMPLETE-20260630T200500+0800
+    ref: C20-M1/run_tests_red
+    status: completed
+    summary: 'Confirmed C20-M1 RED: focused contract tests fail because the source contract file does not exist yet.'
+    timestamp: 2026-06-30T20:05:00+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - >-
+        node --test core/test/c20-consultation-boundary.test.js: RED exit 1, 0/6 passing, missing
+        references/consultation-first-action-boundary.md
+  - evidence_refs:
+      - core/test/c20-consultation-boundary.test.js
+      - .pipeline/reviews/C20/M1/test-evidence.md
+    id: C20-M1-RUN-TESTS-RED-START-20260630T200421+0800
+    ref: C20-M1/run_tests_red
+    status: in_progress
+    summary: Started C20-M1 run_tests_red to confirm the focused contract test fails before the source contract exists.
+    timestamp: 2026-06-30T20:04:21+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - core/test/c20-consultation-boundary.test.js
+      - .pipeline/reviews/C20/M1/test-evidence.md
+    id: C20-M1-WRITE-TESTS-COMPLETE-20260630T200421+0800
+    ref: C20-M1/write_tests
+    status: completed
+    summary: >-
+      Test worker completed C20-M1 focused contract tests and evidence; red result is missing source contract file as
+      expected.
+    timestamp: 2026-06-30T20:04:21+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - >-
+        node --test core/test/c20-consultation-boundary.test.js: RED exit 1, 0/6 passing, missing
+        references/consultation-first-action-boundary.md
+    worker:
+      id: 019f1867-18b5-70a1-86fa-f657eb5ad468
+      lifecycle: completed
+      nickname: 娄鑫
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/00-source-behavior-contract-and-scenario-fixtures.md
+      - core/test/c20-consultation-boundary.test.js
+      - .pipeline/reviews/C20/M1/test-evidence.md
+      - .pipeline/state.yaml
+      - .pipeline/.lock
+    id: C20-M1-WRITE-TESTS-START-20260630T200047+0800
+    ref: C20-M1/write_tests
+    status: in_progress
+    summary: Started C20-M1 write_tests with test worker for consultation-first action boundary contract fixtures.
+    timestamp: 2026-06-30T20:00:47+08:00
+    trigger: assistant
+    type: step_start
+    worker:
+      id: 019f1867-18b5-70a1-86fa-f657eb5ad468
+      lifecycle: started
+      nickname: 娄鑫
+      role: test
+  - evidence_refs:
+      - .plan-state/c20-generate.yaml
+      - .pipeline/config.yaml
+      - .pipeline/cycle.yaml
+      - .pipeline/prompts/00-source-behavior-contract-and-scenario-fixtures.md
+      - .pipeline/prompts/01-shared-guidance-projection-across-managed-instruction-surfaces.md
+      - .pipeline/prompts/02-source-regression-and-managed-artifact-closure.md
+      - .pipeline/prompts/03-target-cycle-input-and-distribution-boundary-package.md
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C20-GENERATE-COMPLETE-20260630T195102+0800
+    ref: C20/Generate
+    status: completed
+    summary: >-
+      Generated C20 pipeline artifacts: four TDD prompts, updated project config/cycle metadata, preserved architecture
+      baseline, and recorded execution confirmation as the next gate.
+    timestamp: 2026-06-30T19:51:02+08:00
+    trigger: assistant
+    type: step_complete
+  - evidence_refs:
+      - .plan-state/c20-decompose.yaml
+      - .plan-state/c20-technical-route.md
+      - .plan-state/c20-generate.yaml
+      - .pipeline/state.yaml
+    id: C20-DECOMPOSE-CONFIRMED-GENERATE-START-20260630T195102+0800
+    ref: C20/Decompose
+    status: completed
+    summary: >-
+      User confirmed the four-milestone C20 Decompose checkpoint and authorized Generate only; implementation remains
+      gated behind explicit start confirmation.
+    timestamp: 2026-06-30T19:51:02+08:00
+    trigger: user
+    type: step_complete
+  - evidence_refs:
+      - .plan-state/c20-decompose.yaml
+      - .plan-state/c20-technical-route.md
+      - .plan-state/c20-architecture.yaml
+      - .plan-state/c20-technical-stack.yaml
+      - .pipeline/PROGRESS.md
+      - .pipeline/state.yaml
+    id: C20-DECOMPOSE-SUMMARY-20260630T193401+0800
+    ref: C20/Decompose
+    status: proposed
+    summary: >-
+      Generated C20 Decompose with four milestones: source behavior contract, shared guidance projection, source
+      regression closure, and target Cycle input package with direct sync versus target-owned boundaries.
+    timestamp: 2026-06-30T19:34:01+08:00
+    trigger: assistant
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c20-architecture-summary.md
+      - .plan-state/c20-architecture.yaml
+      - .plan-state/c20-decompose.yaml
+      - .pipeline/PROGRESS.md
+      - .pipeline/state.yaml
+    id: C20-ARCHITECTURE-CONFIRMED-DECOMPOSE-START-20260630T193401+0800
+    ref: C20/Architecture
+    status: completed
+    summary: >-
+      User restored the pending Ask answer and confirmed Architecture decisions: shared default boundary,
+      discussion-signal-only strictness, and source-first distribution with target-local follow-up. Decompose started.
+    timestamp: 2026-06-30T19:34:01+08:00
+    trigger: user
+    type: step_complete
+  - evidence_refs:
+      - .plan-state/c20-architecture-summary.md
+      - .plan-state/c20-architecture.yaml
+      - .plan-state/c20-technical-stack.yaml
+      - .pipeline/architecture.md
+      - references/integration-sync-spec.md
+      - core/src/artifacts/agent-guidance.js
+      - core/src/artifacts/opencode.js
+      - core/src/artifacts/claude.js
+      - .pipeline/PROGRESS.md
+      - .pipeline/state.yaml
+    id: C20-ARCHITECTURE-SUMMARY-20260630T192312+0800
+    ref: C20/Architecture
+    status: proposed
+    summary: >-
+      Generated C20 Architecture summary with source modification spec, shared guidance projection, direct sync versus
+      target-owned scope, target-local Cycle input, validation, and backlink architecture.
+    timestamp: 2026-06-30T19:23:12+08:00
+    trigger: assistant
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c20-technical-stack-summary.md
+      - .plan-state/c20-technical-stack.yaml
+      - .pipeline/PROGRESS.md
+      - .pipeline/state.yaml
+    id: C20-TECH-STACK-CONFIRMED-ARCH-START-20260630T192227+0800
+    ref: C20/Technical Stack
+    status: completed
+    summary: >-
+      User confirmed revised Technical Stack and added distribution boundary: source-owned changed prompt surfaces sync
+      directly, while target-owned prompt optimization and repairs stay in target-local Cycles. Architecture phase
+      started.
+    timestamp: 2026-06-30T19:22:27+08:00
+    trigger: user
+    type: step_complete
+  - evidence_refs:
+      - .plan-state/c20-technical-stack-summary.md
+      - .plan-state/c20-technical-stack.yaml
+      - /home/heyx/Codex-VSP/codex-rs/core/src/session/mod.rs
+      - /home/heyx/Codex-VSP/codex-rs/models-manager/models.json
+      - .pipeline/PROGRESS.md
+      - .pipeline/state.yaml
+    id: C20-TECHNICAL-STACK-REVISION-20260630T190325+0800
+    ref: C20/Technical Stack
+    status: revision
+    summary: >-
+      Revised C20 Technical Stack: clarified Codex-VSP per-model prompts as target-side base-instructions surfaces and
+      refined distribution to source modification spec followed by target-local Cycles.
+    timestamp: 2026-06-30T19:03:25+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c20-technical-stack-summary.md
+      - .plan-state/c20-technical-stack.yaml
+      - .pipeline/PROGRESS.md
+      - .pipeline/state.yaml
+    id: C20-TECHNICAL-STACK-SUMMARY-20260630T185349+0800
+    ref: C20/Technical Stack
+    status: proposed
+    summary: >-
+      Generated C20 Technical Stack summary: add a shared consultation-first guidance source, project it through
+      OpenCode/Claude/root AGENTS artifacts, validate with scenario fixture tests, then adapt Codex-VSP and
+      VSP-Open-Code only after target plan confirmation.
+    timestamp: 2026-06-30T18:53:49+08:00
+    trigger: assistant
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c20-discover-summary.md
+      - .plan-state/c20-discover-prompt-comparison.md
+      - .plan-state/c20-loops-agentmd-detailed-comparison.md
+      - .pipeline/PROGRESS.md
+      - .pipeline/state.yaml
+    id: C20-DISCOVER-COMPLETE-TECH-STACK-START-20260630T185004+0800
+    ref: C20/Discover
+    status: completed
+    summary: >-
+      Completed C20 Discover and started Technical Stack: LOOPS remains validation context, while implementation scope
+      focuses on consultation-first action boundary and first-use concept explanation across shared prompt surfaces.
+    timestamp: 2026-06-30T18:50:04+08:00
+    trigger: user
+    type: step_complete
+  - evidence_refs:
+      - .plan-state/c20-discover-prompt-comparison.md
+      - .plan-state/c20-loops-agentmd-detailed-comparison.md
+      - .pipeline/PROGRESS.md
+      - .pipeline/state.yaml
+    id: C20-DISCOVER-ROUND5-LOOPS-COMPARISON-20260630T184436+0800
+    ref: C20/Discover
+    status: in_progress
+    summary: >-
+      Recorded C20 Discover round 5 decisions and correction: use classification before automation, explain new concepts
+      on first use, and add a detailed LOOPS-to-AGENTS comparison before Technical Stack.
+    timestamp: 2026-06-30T18:44:36+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c20-discover-prompt-comparison.md
+      - .pipeline/PROGRESS.md
+      - .pipeline/state.yaml
+    id: C20-DISCOVER-ROUND4-DECISIONS-20260630T184156+0800
+    ref: C20/Discover
+    status: in_progress
+    summary: >-
+      Recorded C20 Discover round 4 decisions: source surfaces include AGENTS plus command/agent guidance, target sync
+      requires generated files plus smoke checks, automation conflict remains pending clarification, and new concepts
+      introduced by the agent need inline explanation.
+    timestamp: 2026-06-30T18:41:56+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c20-discover-prompt-comparison.md
+      - .pipeline/PROGRESS.md
+      - .pipeline/state.yaml
+    id: C20-DISCOVER-ROUND3-DECISIONS-20260630T183614+0800
+    ref: C20/Discover
+    status: in_progress
+    summary: >-
+      Recorded C20 Discover round 3 decisions: clear imperative concrete targets may execute directly, post-plan
+      affirmative replies authorize execution, and scenario fixture tests are required.
+    timestamp: 2026-06-30T18:36:14+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c20-discover-prompt-comparison.md
+      - .pipeline/PROGRESS.md
+      - .pipeline/state.yaml
+    id: C20-DISCOVER-ROUND2-DECISIONS-20260630T183310+0800
+    ref: C20/Discover
+    status: in_progress
+    summary: >-
+      Recorded C20 Discover round 2 decisions: broad discussion-signal interception, Mini-contract response shape, cause
+      section placement, and execution authorization language.
+    timestamp: 2026-06-30T18:33:10+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c20-discover-prompt-comparison.md
+      - .pipeline/PROGRESS.md
+      - .pipeline/state.yaml
+    id: C20-DISCOVER-ROUND1-DECISIONS-20260630T183000+0800
+    ref: C20/Discover
+    status: in_progress
+    summary: >-
+      Recorded C20 Discover round 1 decisions: discussion-signal-only action boundary, source-first target distribution,
+      and shared default prompt integration.
+    timestamp: 2026-06-30T18:30:00+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c20-discover-prompt-comparison.md
+      - tmp/1fc365456dbb59c1f548b008aa37ddee_720.jpg
+      - AGENTS.md
+      - core/src/artifacts/agent-guidance.js
+      - /home/heyx/Codex-VSP/AGENTS.md
+      - /home/heyx/VSP-Open-Code/AGENTS.md
+    id: C20-DISCOVER-PROMPT-COMPARISON-20260630T181847+0800
+    ref: C20/Discover
+    status: in_progress
+    summary: >-
+      Captured C20 Discover prompt comparison: LOOPS-style loop principles, current
+      Hypo-Workflow/Codex-VSP/VSP-Open-Code prompt surfaces, and the missing consultation-first action boundary.
+    timestamp: 2026-06-30T18:18:47+08:00
+    trigger: assistant
+    type: step_progress
+  - evidence_refs:
+      - .pipeline/cycle.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: CYCLE-NEW-C20-20260630T180235+0800
+    ref: C20
+    status: active
+    summary: >-
+      Created C20 for a consultation-first modification-start style: propose and confirm plans before editing unless the
+      user explicitly asks to proceed.
+    timestamp: 2026-06-30T18:02:35+08:00
+    trigger: user
+    type: cycle_new
+  - evidence_refs:
+      - /home/heyx/Codex-VSP
+      - /home/heyx/VSP-Open-Code
+      - https://gitlab.vsplab.cn/heyx/Codex/-/releases/v0.134.0-vsp.7.2
+      - https://gitlab.vsplab.cn/heyx/VSP-Open-Code/-/releases/v1.15.10-vsp.2.4
+    id: C19-TARGET-RELEASES-PUBLISHED-20260608T223513+0800
+    publications:
+      codex_vsp:
+        assets:
+          - vsp-codex-preview-linux-x64-gnu.tar.gz
+          - vsp-codex-preview-linux-x64-gnu.tar.gz.sha256
+        branch: main
+        commit: af11d8a308
+        release_url: https://gitlab.vsplab.cn/heyx/Codex/-/releases/v0.134.0-vsp.7.2
+        remote: origin
+        tag: v0.134.0-vsp.7.2
+      vsp_open_code:
+        assets_count: 12
+        branch: dev
+        commit: 4dc194e9639d0451885e16e2c7ec4548d299c865
+        release_url: https://gitlab.vsplab.cn/heyx/VSP-Open-Code/-/releases/v1.15.10-vsp.2.4
+        remote: origin
+        tag: v1.15.10-vsp.2.4
+    ref: C19/target-repositories
+    report: .pipeline/reports/C19-target-release-publication.report.md
+    status: completed
+    summary: >-
+      Published C19 target repository updates for Codex-VSP and VSP-Open-Code with new tags, GitLab Releases, release
+      assets, and Workflow records.
+    timestamp: 2026-06-08T22:35:13+08:00
+    trigger: user
+    type: release
+    validations:
+      - >-
+        Codex-VSP: JSON parse, stale scan, git diff --check, cargo release build, version check, release package
+        generation, sha256 check, and extracted package smoke passed
+      - >-
+        Codex-VSP: pnpm prettier --check was not run because the target environment lacks prettier and Node >=22; the
+        validation gap was accepted at Gate
+      - >-
+        VSP-Open-Code: focused Bun tests passed 11/11, bun typecheck passed, git diff --check passed, build passed,
+        release packaging passed, push hooks passed, and publish passed
+      - Runtime .pipeline chat/inbox/knowledge files were excluded from target release commits as confirmed
+  - evidence_refs:
+      - .pipeline/integrations/C19-target-adaptation-plan.md
+      - .pipeline/integrations/matrix.yaml
+      - /home/heyx/Codex-VSP/AGENTS.md
+      - /home/heyx/VSP-Open-Code/AGENTS.md
+    id: C19-M5-TARGET-ADAPTATION-COMPLETE-20260608T212231+0800
+    ref: C19-M5
+    status: completed
+    summary: >-
+      Completed C19-M5 target repository adaptation for Codex-VSP and VSP-Open-Code after visible Gate confirmation and
+      full DeepSeek-oriented prompt source capture.
+    timestamp: 2026-06-08T21:22:31+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - 'Codex-VSP: opencode.json and .opencode/hypo-workflow.json JSON parse passed'
+      - 'Codex-VSP: .opencode/plugins/hypo-workflow.ts import passed'
+      - 'Codex-VSP: stale scan for plan:confirm and P1/P2/P3/P4 in target adapter surfaces returned no matches'
+      - 'Codex-VSP: git diff --check passed'
+      - >-
+        Codex-VSP: pnpm prettier --check not run because target pnpm environment has no prettier command and node v20
+        does not satisfy >=22 engine
+      - >-
+        VSP-Open-Code: bun test test/workflow/platform-awareness-contract.test.ts
+        test/workflow/yolo-governance-contract.test.ts passed 11/11
+      - 'VSP-Open-Code: bun typecheck passed'
+      - 'VSP-Open-Code: git diff --check passed'
+  - evidence_refs:
+      - .pipeline/integrations/C19-target-adaptation-plan.md
+      - .pipeline/integrations/matrix.yaml
+    id: C19-M5-REVISED-TARGET-PLAN-20260608T205237+0800
+    ref: C19-M5/target_plan
+    status: ready_for_visible_gate
+    summary: >-
+      Revised the target adaptation plan and matrix: Codex-VSP remains ready for adapter refresh after confirmation;
+      VSP-OpenCode is gated on the full Zhihu/DeepSeek prompt source before writes.
+    timestamp: 2026-06-08T20:52:37+08:00
+    trigger: assistant
+    type: step_progress
+    validations:
+      - '.pipeline/state.yaml YAML parse: ok'
+      - '.pipeline/log.yaml YAML parse: ok'
+      - '.pipeline/integrations/matrix.yaml YAML parse: ok'
+      - 'git diff --check scoped to revised Workflow state files: passing'
+  - evidence_refs:
+      - .pipeline/integrations/C19-target-adaptation-plan.md
+      - .pipeline/integrations/matrix.yaml
+    id: C19-M5-VSP-OPENCODE-SCOPE-REVISION-20260608T204953+0800
+    notes:
+      - Local Workflow artifacts contain only the prompt themes/excerpt, not the full article prompt text.
+      - >-
+        Target repository writes remain gated until the revised plan is shown and the prompt source is provided or
+        confirmed.
+    ref: C19-M5/target_write_confirmation
+    status: needs_prompt_source_before_vsp_opencode_write
+    summary: >-
+      User revised VSP-OpenCode target scope: integrate the full referenced Zhihu/DeepSeek AGENTS.md prompt because the
+      target mainly uses DeepSeek and similar domestic Chinese models.
+    timestamp: 2026-06-08T20:49:53+08:00
+    trigger: user
+    type: gate_feedback
+  - evidence_refs:
+      - .pipeline/integrations/C19-target-adaptation-plan.md
+    id: C19-M5-GATE-FEEDBACK-20260608T201521+0800
+    ref: C19-M5/target_write_confirmation
+    status: needs_plan_visible_summary
+    summary: >-
+      User rejected target write confirmation because the target adaptation plan was not shown in conversation before
+      the Gate card.
+    timestamp: 2026-06-08T20:15:21+08:00
+    trigger: user
+    type: gate_feedback
+  - evidence_refs:
+      - .pipeline/integrations/C19-target-adaptation-plan.md
+      - .pipeline/integrations/matrix.yaml
+    id: C19-M5-TARGET-PLAN-GATE-20260608T201521+0800
+    ref: C19-M5/target_plan
+    status: waiting_confirmation
+    summary: >-
+      Completed read-only target inspection for Codex-VSP and VSP-Open-Code; wrote source-side target adaptation plan
+      and integration matrix, with target writes still blocked.
+    timestamp: 2026-06-08T20:15:21+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - '.pipeline/integrations/matrix.yaml YAML parse: ok'
+      - 'git diff --check: passing'
+      - no target repository writes performed
+  - evidence_refs:
+      - .pipeline/reviews/C19/M4/test-evidence.md
+      - .pipeline/reviews/C19/M4/audit.md
+      - .pipeline/reports/C19-M4-source-closure.report.md
+    id: C19-M4-COMPLETE-20260608T193240+0800
+    ref: C19-M4
+    status: completed
+    summary: >-
+      Completed C19-M4: source-side Plan Skills, docs, references, root Skill, core Discover guidance, and tests are
+      synchronized to named Plan phases; target repository writes remain gated.
+    timestamp: 2026-06-08T19:32:40+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - 'focused M4 tests: 55/55 passing'
+      - 'npm test: 674/674 passing'
+      - 'git diff --check: passing'
+      - 'stale Plan wording scan: only legacy/compatibility residuals'
+      - '/hw:plan:confirm scan: compatibility notes and negative tests only'
+  - evidence_refs:
+      - .pipeline/reviews/C19/M4/audit.md
+    id: C19-M4-AUDIT-COMPLETE-20260608T193240+0800
+    ref: C19-M4/audit
+    status: completed
+    summary: >-
+      M4 audit passed: source-side docs/skills/tests are consistent with named Plan phases and target writes are still
+      blocked behind M5 Gate.
+    timestamp: 2026-06-08T19:32:40+08:00
+    trigger: assistant
+    type: step_complete
+    worker:
+      id: codex-audit-c19-m4-20260608T193240+0800
+      lifecycle: completed
+      nickname: Codex
+      role: audit
+  - evidence_refs:
+      - .pipeline/reports/C19-M4-source-closure.report.md
+    id: C19-M4-IMPLEMENT-COMPLETE-20260608T193240+0800
+    ref: C19-M4/implement
+    status: completed
+    summary: >-
+      Synchronized source-side Plan terminology and generated docs to Discover / Technical Stack / Architecture /
+      Decompose / Generate, while keeping P2 technical route as a compatibility alias.
+    timestamp: 2026-06-08T19:32:40+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - 'uv run -- node --test focused M4 suite: 55/55 passing'
+      - 'npm test: 674/674 passing'
+      - 'git diff --check: passing'
+    worker:
+      id: codex-implement-c19-m4-20260608T193240+0800
+      lifecycle: completed
+      nickname: Codex
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C19/M4/test-evidence.md
+    id: C19-M4-WRITE-TESTS-COMPLETE-20260608T192526+0800
+    ref: C19-M4/write_tests
+    status: completed
+    summary: >-
+      Test worker completed M4 source-side regression evidence; stale Plan wording scan initially failed and was
+      resolved by implementation follow-up.
+    timestamp: 2026-06-08T19:25:26+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'focused tests: 41/41 passing before follow-up'
+      - 'npm test: 674/674 passing before follow-up'
+      - 'git diff --check: passing before follow-up'
+    worker:
+      id: 019ea6f8-f3dd-7eb0-b144-326110ef13cf
+      lifecycle: completed
+      nickname: 娄鑫 the 2nd
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C19/M4/test-evidence.md
+    id: C19-M4-WRITE-TESTS-START-20260608T192133+0800
+    ref: C19-M4/write_tests
+    status: in_progress
+    summary: >-
+      Started C19-M4 source-side closure with test worker responsible for focused/full regression and stale reference
+      scans.
+    timestamp: 2026-06-08T19:21:33+08:00
+    trigger: assistant
+    type: step_start
+    worker:
+      id: 019ea6f8-f3dd-7eb0-b144-326110ef13cf
+      lifecycle: started
+      nickname: 娄鑫 the 2nd
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C19/M3/test-evidence.md
+      - .pipeline/reviews/C19/M3/audit.md
+      - core/src/artifacts/agent-guidance.js
+      - core/src/artifacts/opencode.js
+      - core/src/artifacts/claude.js
+      - plugins/opencode/templates/AGENTS.md
+    id: C19-M3-COMPLETE-20260608T192133+0800
+    ref: C19-M3
+    status: completed
+    summary: >-
+      Completed C19-M3: four-rule discipline and Plan gate visibility guidance are projected into shared guidance,
+      OpenCode artifacts, Claude artifacts, and active OpenCode generated files.
+    timestamp: 2026-06-08T19:21:33+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - 'focused M3 tests: 13/13 passing'
+      - 'related regression suite: 37/37 passing'
+      - 's55/s56/s58: passing'
+      - 'git diff --check: passing'
+  - evidence_refs:
+      - .pipeline/reviews/C19/M3/audit.md
+    id: C19-M3-AUDIT-COMPLETE-20260608T192133+0800
+    ref: C19-M3/audit
+    status: completed
+    summary: >-
+      M3 audit passed: no default severity flip, DeepSeek guidance preserved, and adapter output remains
+      schema-compatible.
+    timestamp: 2026-06-08T19:21:33+08:00
+    trigger: assistant
+    type: step_complete
+    worker:
+      id: codex-audit-c19-m3-20260608T192133+0800
+      lifecycle: completed
+      nickname: Codex
+      role: audit
+  - evidence_refs:
+      - core/src/artifacts/agent-guidance.js
+      - core/src/artifacts/opencode.js
+      - core/src/artifacts/claude.js
+      - plugins/opencode/templates/AGENTS.md
+    id: C19-M3-IMPLEMENT-COMPLETE-20260608T192133+0800
+    ref: C19-M3/implement
+    status: completed
+    summary: >-
+      Implemented M3 guidance projection via shared agent guidance, OpenCode/Claude renderers, OpenCode AGENTS template,
+      and active OpenCode artifact refresh.
+    timestamp: 2026-06-08T19:21:33+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - >-
+        uv run -- node --test core/test/commands-rules-artifacts.test.js
+        core/test/c18-instruction-quality-contract.test.js: 13/13 passing
+    worker:
+      id: codex-implement-c19-m3-20260608T192133+0800
+      lifecycle: completed
+      nickname: Codex
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C19/M3/test-evidence.md
+    id: C19-M3-WRITE-TESTS-COMPLETE-20260608T192133+0800
+    ref: C19-M3/write_tests
+    status: completed
+    summary: >-
+      Test worker completed M3 contract tests; focused command failed red as expected before implementation and passed
+      after projection changes.
+    timestamp: 2026-06-08T19:21:33+08:00
+    trigger: subagent
+    type: step_complete
+    worker:
+      id: 019ea6df-b9ae-7541-934e-9b77769f92ac
+      lifecycle: completed
+      nickname: 李萌 the 2nd
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/02-prompt-rule-projection-and-platform-adapters.md
+      - core/test/commands-rules-artifacts.test.js
+      - core/test/c18-instruction-quality-contract.test.js
+    id: C19-M3-WRITE-TESTS-START-20260608T185554+0800
+    ref: C19-M3/write_tests
+    status: in_progress
+    summary: Started C19-M3 write_tests with test worker for prompt rule projection and platform adapter guidance.
+    timestamp: 2026-06-08T18:55:54+08:00
+    trigger: assistant
+    type: step_start
+    worker:
+      id: 019ea6df-b9ae-7541-934e-9b77769f92ac
+      lifecycle: started
+      nickname: 李萌 the 2nd
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C19/M2/test-evidence.md
+      - .pipeline/reviews/C19/M2/audit.md
+      - core/src/progressive-discover/index.js
+      - core/src/batch-plan/index.js
+      - core/src/index.js
+    id: C19-M2-COMPLETE-20260608T184938+0800
+    ref: C19-M2
+    status: completed
+    summary: >-
+      Completed C19-M2: deterministic phase model, adaptive Discover completion gate, visible phase output gate, and
+      reusable plan artifact renderers are implemented and validated.
+    timestamp: 2026-06-08T18:49:38+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - 'uv run -- node --test core/test/progressive-discover.test.js core/test/batch-plan.test.js: 20/20 passing'
+      - 'related regression suite: 49/49 passing'
+      - 'YAML parse: state/log/cycle ok'
+      - 'git diff --check: passing'
+  - evidence_refs:
+      - .pipeline/reviews/C19/M2/audit.md
+    id: C19-M2-AUDIT-COMPLETE-20260608T184938+0800
+    ref: C19-M2/audit
+    status: completed
+    summary: Audit worker passed M2 with no blockers; helpers remain deterministic and do not become a runner.
+    timestamp: 2026-06-08T18:49:38+08:00
+    trigger: subagent
+    type: step_complete
+    worker:
+      id: 019ea6da-7a4b-7922-abea-4791bc854434
+      lifecycle: completed
+      nickname: 李萌
+      role: audit
+  - evidence_refs:
+      - core/src/progressive-discover/index.js
+      - core/src/batch-plan/index.js
+      - core/src/index.js
+    id: C19-M2-IMPLEMENT-COMPLETE-20260608T184938+0800
+    ref: C19-M2/implement
+    status: completed
+    summary: >-
+      Implemented M2 core helpers: PLAN_PHASE_MODEL, Discover completion gate, visible phase gate, and reusable
+      phase/milestone/decision/dependency renderers.
+    timestamp: 2026-06-08T18:49:38+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - 'uv run -- node --test core/test/progressive-discover.test.js core/test/batch-plan.test.js: 20/20 passing'
+    worker:
+      id: codex-implement-c19-m2-20260608T184912+0800
+      lifecycle: completed
+      nickname: Codex
+      role: implement
+  - evidence_refs:
+      - core/src/progressive-discover/index.js
+      - core/src/batch-plan/index.js
+      - core/src/index.js
+    id: C19-M2-IMPLEMENT-START-20260608T184912+0800
+    ref: C19-M2/implement
+    status: in_progress
+    summary: >-
+      Started C19-M2 implementation for deterministic phase model, adaptive Discover gate, visible output gate, and
+      artifact renderers.
+    timestamp: 2026-06-08T18:49:12+08:00
+    trigger: assistant
+    type: step_start
+    worker:
+      id: codex-implement-c19-m2-20260608T184912+0800
+      lifecycle: started
+      nickname: Codex
+      role: implement
+  - evidence_refs:
+      - core/test/progressive-discover.test.js
+      - core/test/batch-plan.test.js
+      - .pipeline/reviews/C19/M2/test-evidence.md
+    id: C19-M2-WRITE-TESTS-COMPLETE-20260608T184912+0800
+    ref: C19-M2/write_tests
+    status: completed
+    summary: Test worker completed M2 contract tests; focused command fails red as expected before implementation.
+    timestamp: 2026-06-08T18:49:12+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - >-
+        uv run -- node --test core/test/progressive-discover.test.js core/test/batch-plan.test.js: 16/20 passing,
+        expected red
+    worker:
+      id: 019ea6d5-469f-79e3-9854-bf7c80f58c42
+      lifecycle: completed
+      nickname: 娄鑫
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/01-structured-phase-artifacts-and-adaptive-gates.md
+      - core/test/progressive-discover.test.js
+      - core/test/batch-plan.test.js
+    id: C19-M2-WRITE-TESTS-START-20260608T184427+0800
+    ref: C19-M2/write_tests
+    status: in_progress
+    summary: Started C19-M2 write_tests with test worker for structured phase artifacts and adaptive gates.
+    timestamp: 2026-06-08T18:44:27+08:00
+    trigger: assistant
+    type: step_start
+    worker:
+      id: 019ea6d5-469f-79e3-9854-bf7c80f58c42
+      lifecycle: started
+      nickname: 娄鑫
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C19/M1/test-evidence.md
+      - .pipeline/reviews/C19/M1/audit.md
+      - core/src/commands/index.js
+      - core/src/artifacts/opencode.js
+      - references/opencode-command-map.md
+    id: C19-M1-COMPLETE-20260608T181458+0800
+    ref: C19-M1
+    status: completed
+    summary: >-
+      Completed C19-M1: Plan command surface now exposes technical-stack and architecture phases, removes user-facing
+      plan confirm, and keeps OpenCode colon command artifacts synchronized.
+    timestamp: 2026-06-08T18:14:58+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - 'node --test selected suite: 83/83 passing'
+      - 'v9 scenarios s51, s55, s56, s58, s61: passing'
+      - 'git diff --check: passing'
+      - 'plan confirm scan: only negative tests, legacy cleanup, and compatibility notes remain'
+      - 'dash-style scan: only Cursor docs/tests, OpenCode agent filenames, and legacy cleanup wording remain'
+  - evidence_refs:
+      - .pipeline/reviews/C19/M1/audit.md
+    id: C19-M1-AUDIT-COMPLETE-20260608T181458+0800
+    ref: C19-M1/audit
+    status: completed
+    summary: >-
+      M1 audit passed after full validation and static command-surface scans; no blocking stale user-facing confirm or
+      OpenCode dash command exposure found.
+    timestamp: 2026-06-08T18:14:58+08:00
+    trigger: assistant
+    type: step_complete
+    worker:
+      id: codex-audit-c19-m1-20260608T181458+0800
+      lifecycle: completed
+      nickname: Codex
+      role: audit
+  - evidence_refs:
+      - core/src/commands/index.js
+      - core/src/artifacts/opencode.js
+      - core/src/artifacts/claude.js
+      - commands/plan/technical-stack.md
+      - commands/plan/architecture.md
+      - skills/plan-technical-stack/SKILL.md
+      - skills/plan-architecture/SKILL.md
+      - skills/plan-confirm/SKILL.md
+      - references/commands-spec.md
+      - references/opencode-command-map.md
+      - references/opencode-spec.md
+      - references/skill-spec.md
+      - SKILL.md
+      - plan/PLAN-SKILL.md
+      - skills/help/SKILL.md
+      - skills/plan/SKILL.md
+    id: C19-M1-IMPLEMENT-COMPLETE-20260608T164921+0800
+    ref: C19-M1/implement
+    status: completed
+    summary: >-
+      Implemented M1 Plan command contract: added technical-stack and architecture Plan commands, removed user-facing
+      plan confirm, and synchronized production/docs/adapter command surfaces.
+    timestamp: 2026-06-08T16:49:21+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - >-
+        uv run -- node --test core/test/commands-rules-artifacts.test.js core/test/docs-governance.test.js: 13/13
+        passing
+    worker:
+      id: codex-implement-c19-m1-20260608T164921+0800
+      lifecycle: completed
+      nickname: Codex
+      role: implement
+  - evidence_refs:
+      - core/test/commands-rules-artifacts.test.js
+      - core/test/docs-governance.test.js
+      - .pipeline/reviews/C19/M1/test-evidence.md
+    id: C19-M1-WRITE-TESTS-COMPLETE-20260608T163324+0800
+    ref: C19-M1/write_tests
+    status: completed
+    summary: Test worker completed M1 command contract tests; focused tests fail red as expected before implementation.
+    timestamp: 2026-06-08T16:33:24+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'uv run -- node --test core/test/commands-rules-artifacts.test.js core/test/docs-governance.test.js: expected red'
+    worker:
+      id: 019ea65b-2cb5-7353-820b-1d97843e5b5d
+      lifecycle: completed
+      nickname: 娄鑫
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/00-plan-phase-command-contract.md
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-M1-WRITE-TESTS-START-20260608T163102+0800
+    ref: C19-M1/write_tests
+    status: in_progress
+    summary: Started C19-M1 write_tests with test worker for Plan command contract.
+    timestamp: 2026-06-08T16:31:02+08:00
+    trigger: assistant
+    type: step_start
+    worker:
+      id: 019ea65b-2cb5-7353-820b-1d97843e5b5d
+      lifecycle: started
+      nickname: 娄鑫
+      role: test
+  - evidence_refs:
+      - .plan-state/c19-generate.yaml
+      - .pipeline/confirm-summary.md
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-PLAN-CONFIRMED-20260608T162924+0800
+    ref: C19/Plan
+    status: completed
+    summary: User confirmed generated C19 plan and authorized transition to /hw:start.
+    timestamp: 2026-06-08T16:29:24+08:00
+    trigger: user
+    type: step_complete
+  - evidence_refs:
+      - .plan-state/c19-generate.yaml
+      - .pipeline/confirm-summary.md
+      - .pipeline/prompts/00-plan-phase-command-contract.md
+      - .pipeline/prompts/01-structured-phase-artifacts-and-adaptive-gates.md
+      - .pipeline/prompts/02-prompt-rule-projection-and-platform-adapters.md
+      - .pipeline/prompts/03-plan-skills-docs-and-source-regression-closure.md
+      - .pipeline/prompts/04-target-repository-adaptation-after-confirmation.md
+    id: C19-GENERATE-COMPLETE-20260608T162448+0800
+    ref: C19/Generate
+    status: completed
+    summary: Generated C19 prompts, confirm summary, and state milestone list; waiting for final confirmation before start.
+    timestamp: 2026-06-08T16:24:48+08:00
+    trigger: assistant
+    type: step_complete
+  - evidence_refs:
+      - .plan-state/c19-decompose.yaml
+      - .plan-state/c19-technical-route.md
+      - .plan-state/c19-generate.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-DECOMPOSE-COMPLETE-GENERATE-START-20260608T162448+0800
+    ref: C19/Decompose
+    status: completed
+    summary: >-
+      Completed Decompose and started Generate; M5 gate revised to require a dedicated post-M4 discussion, especially
+      for VSP-OpenCode tuning.
+    timestamp: 2026-06-08T16:24:48+08:00
+    trigger: user
+    type: step_complete
+  - evidence_refs:
+      - .plan-state/c19-decompose.yaml
+      - .plan-state/c19-technical-route.md
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-DECOMPOSE-PROPOSED-20260608T162040+0800
+    ref: C19/Decompose
+    status: proposed
+    summary: Proposed C19 five-milestone decomposition with technical route fields and target adaptation research gate.
+    timestamp: 2026-06-08T16:20:40+08:00
+    trigger: assistant
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c19-architecture.yaml
+      - .plan-state/c19-architecture-summary.md
+      - .pipeline/architecture.md
+      - .plan-state/c19-decompose.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-ARCH-COMPLETE-DECOMPOSE-START-20260608T161927+0800
+    ref: C19/Architecture
+    status: completed
+    summary: >-
+      Completed Architecture and started Decompose with final command decisions: /hw:plan:technical-stack,
+      /hw:plan:architecture, and no user-facing confirm command.
+    timestamp: 2026-06-08T16:19:27+08:00
+    trigger: user
+    type: step_complete
+  - evidence_refs:
+      - .pipeline/architecture.md
+      - .plan-state/c19-architecture.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-ARCH-BASELINE-UPDATED-20260608T161537+0800
+    ref: C19/Architecture
+    status: in_progress
+    summary: Updated .pipeline/architecture.md to the C19 architecture baseline during Architecture phase.
+    timestamp: 2026-06-08T16:15:37+08:00
+    trigger: assistant
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c19-architecture.yaml
+      - .plan-state/c19-architecture-summary.md
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-ARCH-R1-REVISED-20260608T161406+0800
+    ref: C19/Architecture
+    status: in_progress
+    summary: >-
+      Captured Architecture decision to add named tech/arch Plan subcommands, reconsider standalone confirm, use
+      Mermaid/Markdown diagrams, and update architecture baseline during Architecture.
+    timestamp: 2026-06-08T16:14:06+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c19-architecture-summary.md
+      - .plan-state/c19-architecture.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-ARCH-SUMMARY-20260608T161109+0800
+    ref: C19/Architecture
+    status: in_progress
+    summary: >-
+      Generated Architecture stage summary with current and target diagrams, attachment points, decision table, and open
+      questions.
+    timestamp: 2026-06-08T16:11:09+08:00
+    trigger: assistant
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c19-technical-stack.yaml
+      - .plan-state/c19-technical-stack-summary.md
+      - .plan-state/c19-architecture.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-TECH-STACK-COMPLETE-ARCH-START-20260608T160937+0800
+    ref: C19/TechnicalStack
+    status: completed
+    summary: Completed Technical Stack after visible summary and Question Tool confirmation; started Architecture phase.
+    timestamp: 2026-06-08T16:09:37+08:00
+    trigger: user
+    type: step_complete
+  - evidence_refs:
+      - .plan-state/c19-technical-stack.yaml
+      - .plan-state/c19-technical-stack-summary.md
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-TECH-STACK-R2-20260608T160605+0800
+    ref: C19/TechnicalStack
+    status: in_progress
+    summary: >-
+      Captured Technical Stack round 2 decisions and revised summary to clarify that guidelines means the existing
+      AGENTS.md four-rule behavior guidance pack.
+    timestamp: 2026-06-08T16:06:05+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c19-technical-stack-summary.md
+      - .plan-state/c19-technical-stack.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-TECH-STACK-SUMMARY-20260608T160254+0800
+    ref: C19/TechnicalStack
+    status: in_progress
+    summary: >-
+      Generated Technical Stack stage summary after focused trace of Plan skills, core helpers, adapter guidance, rules,
+      sync, and tests.
+    timestamp: 2026-06-08T16:02:54+08:00
+    trigger: assistant
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c19-technical-stack.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-TECH-STACK-R1-20260608T160050+0800
+    ref: C19/TechnicalStack
+    status: in_progress
+    summary: 'Captured Technical Stack round 1: full scope, structured refactor preference, and focused code trace depth.'
+    timestamp: 2026-06-08T16:00:50+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c19-discover-summary.md
+      - .plan-state/c19-discover.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-P1-COMPLETE-TECH-STACK-START-20260608T155819+0800
+    ref: C19/P1
+    status: completed
+    summary: >-
+      Completed P1 Discover after showing the visible summary and receiving Question Tool confirmation; started
+      Technical Stack phase.
+    timestamp: 2026-06-08T15:58:19+08:00
+    trigger: user
+    type: step_complete
+  - evidence_refs:
+      - .plan-state/c19-discover.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-P1-GATE-FEEDBACK-20260608T155449+0800
+    ref: C19/P1
+    status: in_progress
+    summary: >-
+      Captured user feedback that the confirmation card did not visibly show the actual P1 Discover output being
+      confirmed; phase gates must present visible output before asking for confirmation.
+    timestamp: 2026-06-08T15:54:49+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c19-discover-summary.md
+      - .plan-state/c19-discover.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-P1-DISCOVER-SUMMARY-20260608T155302+0800
+    ref: C19/P1
+    status: in_progress
+    summary: >-
+      Generated visible P1 Discover summary with stage summary, decision table, open questions, acceptance signals, and
+      next gate.
+    timestamp: 2026-06-08T15:53:02+08:00
+    trigger: assistant
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c19-discover.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-P1-DISCOVER-R5-20260608T155210+0800
+    ref: C19/P1
+    status: in_progress
+    summary: 'Captured P1 Discover round 5: required visible stage outputs, diagram/table requirements, and auto-advance rules.'
+    timestamp: 2026-06-08T15:52:10+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c19-discover.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-P1-DISCOVER-R4-20260608T155018+0800
+    ref: C19/P1
+    status: in_progress
+    summary: >-
+      Captured P1 Discover round 4: expected behavior changes, acceptance signals, visible phase output pain point,
+      Question Tool proactive-use pain point, and user request for one more targeted round.
+    timestamp: 2026-06-08T15:50:18+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c19-discover.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-P1-DISCOVER-R3-20260608T154710+0800
+    ref: C19/P1
+    status: in_progress
+    summary: >-
+      Captured P1 Discover round 3: full prompt surface scope, Question Tool-first checkpoint style, user skippable
+      phases, and adaptive Discover completion gates replacing rigid fixed rounds.
+    timestamp: 2026-06-08T15:47:10+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c19-discover.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-P1-DISCOVER-R2-20260608T154451+0800
+    ref: C19/P1
+    status: in_progress
+    summary: >-
+      Captured P1 Discover round 2 via Question Tool: DeepSeek AGENTS.md excerpt, prompt optimization goals, Discover
+      output shape, diagrams/tables, and active tool-use expectations.
+    timestamp: 2026-06-08T15:44:51+08:00
+    trigger: user
+    type: step_progress
+  - evidence_refs:
+      - .plan-state/c19-p0-configure.yaml
+      - .plan-state/c19-discover.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C19-P0-P1-DISCOVER-START-20260608T153713+0800
+    ref: C19/P1
+    status: in_progress
+    summary: Reused C19 P0 configuration and started P1 Discover for Workflow core prompt and Plan mode redesign.
+    timestamp: 2026-06-08T15:37:13+08:00
+    trigger: user
+    type: step_start
+  - evidence_refs:
+      - .pipeline/archives/C18-instruction-quality-review-and-integration-sync-plan/cycle.yaml
+      - .pipeline/archives/C18-instruction-quality-review-and-integration-sync-plan/state.yaml
+      - .pipeline/archives/C18-instruction-quality-review-and-integration-sync-plan/PROGRESS.md
+      - .pipeline/archives/C18-instruction-quality-review-and-integration-sync-plan/summary.md
+    id: CYCLE-ARCHIVED-C18-20260608T153109+0800
+    ref: C18
+    status: completed
+    summary: Archived C18 local runtime artifacts before creating C19.
+    timestamp: 2026-06-08T15:31:09+08:00
+    trigger: user
+    type: cycle_archived
+  - evidence_refs:
+      - .pipeline/cycle.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: CYCLE-CREATED-C19-20260608T153109+0800
+    ref: C19
+    status: active
+    summary: Created C19 for Workflow core content and Plan mode optimization.
+    timestamp: 2026-06-08T15:31:09+08:00
+    trigger: user
+    type: cycle_created
+  - evidence_refs:
       - docs/release/v13.1.0-alpha.1.md
       - CHANGELOG.md
-  - id: RELEASE-PREP-v13.1.0-alpha.1-20260530T141144+0800
-    type: release_prepared
+    id: RELEASE-PUBLISHED-v13.1.0-alpha.1-20260530T143140+0800
     ref: v13.1.0-alpha.1
-    status: prepared
-    timestamp: 2026-05-30T14:11:44+08:00
-    summary: "Prepared v13.1.0-alpha.1 release files after C18 acceptance, sync/doc repair, version updates, release notes, and final validation. Git add/commit/tag/push remain gated by explicit user confirmation."
-    trigger: assistant
+    release_url: https://github.com/HypoxanthineOvO/Hypo-Workflow/releases/tag/v13.1.0-alpha.1
     report: docs/release/v13.1.0-alpha.1.md
+    status: partially_published
+    summary: >-
+      Published v13.1.0-alpha.1 to GitHub with commit d1df860, tag v13.1.0-alpha.1, and a prerelease page. GitLab origin
+      push remains blocked by SSH authentication.
+    timestamp: 2026-05-30T14:31:40+08:00
+    trigger: user
+    type: release
     validations:
-      - "node cli/bin/hypo-workflow sync --platform opencode --project . --check-only: derived=fresh"
-      - "checkDocs('.') and checkNarrativeDocsForRelease('.'): passing"
-      - "node --test core/test/docs-governance.test.js core/test/readme-spec.test.js: 11/11 passing"
-      - "npm test: 665/665 passing"
-      - "version consistency probe: 18 version entrypoints checked"
-      - "git diff --check: passing"
-    evidence_refs:
+      - 'git commit: d1df860 release: v13.1.0-alpha.1'
+      - 'git tag: v13.1.0-alpha.1 -> d1df860'
+      - 'git push github main: success'
+      - 'git push github v13.1.0-alpha.1: success'
+      - 'gh release create v13.1.0-alpha.1 --prerelease: success'
+      - 'git push origin main/tag: blocked by Permission denied (publickey,password)'
+  - evidence_refs:
       - CHANGELOG.md
       - docs/release/v13.1.0-alpha.1.md
       - docs/en/release/v13.1.0-alpha.1.md
       - .pipeline/integrations/matrix.yaml
       - .pipeline/reviews/C18/M6/audit.md
-  - id: C18-ACCEPTED-20260530T133830+0800
-    type: cycle_accept
-    ref: C18
-    status: accepted
-    timestamp: 2026-05-30T13:38:30+08:00
-    summary: "Accepted C18 after Audit/Quality/Optimize source implementation, target repository adaptations, target validation, and source records completed."
-    trigger: user
-    evidence_refs:
+    id: RELEASE-PREP-v13.1.0-alpha.1-20260530T141144+0800
+    ref: v13.1.0-alpha.1
+    report: docs/release/v13.1.0-alpha.1.md
+    status: prepared
+    summary: >-
+      Prepared v13.1.0-alpha.1 release files after C18 acceptance, sync/doc repair, version updates, release notes, and
+      final validation. Git add/commit/tag/push remain gated by explicit user confirmation.
+    timestamp: 2026-05-30T14:11:44+08:00
+    trigger: assistant
+    type: release_prepared
+    validations:
+      - 'node cli/bin/hypo-workflow sync --platform opencode --project . --check-only: derived=fresh'
+      - 'checkDocs(''.'') and checkNarrativeDocsForRelease(''.''): passing'
+      - 'node --test core/test/docs-governance.test.js core/test/readme-spec.test.js: 11/11 passing'
+      - 'npm test: 665/665 passing'
+      - 'version consistency probe: 18 version entrypoints checked'
+      - 'git diff --check: passing'
+  - evidence_refs:
       - .pipeline/reports/05-target-repository-adaptation-after-confirmation.report.md
       - .pipeline/integrations/matrix.yaml
       - .pipeline/reviews/C18/M6/audit.md
-  - id: C18-M6-COMPLETE-20260530T130458+0800
-    type: milestone_complete
-    ref: C18-M6
-    status: completed
-    timestamp: 2026-05-30T13:04:58+08:00
-    summary: "Completed confirmed target repository adaptation for Codex-VSP and VSP-Open-Code. Both targets have target-side records, focused validation passed, and source integration matrix was updated."
-    trigger: assistant
-    validations:
-      - "Codex-VSP: cargo fmt --check, 29 focused Rust tests, git diff --check passed."
-      - "VSP-Open-Code: 34 focused Bun tests, bun typecheck, git diff --check passed."
-    evidence_refs:
+    id: C18-ACCEPTED-20260530T133830+0800
+    ref: C18
+    status: accepted
+    summary: >-
+      Accepted C18 after Audit/Quality/Optimize source implementation, target repository adaptations, target validation,
+      and source records completed.
+    timestamp: 2026-05-30T13:38:30+08:00
+    trigger: user
+    type: cycle_accept
+  - evidence_refs:
       - .pipeline/reviews/C18/M6/test-evidence.md
       - .pipeline/reviews/C18/M6/implementation-evidence.md
       - .pipeline/reviews/C18/M6/audit.md
       - .pipeline/reports/05-target-repository-adaptation-after-confirmation.report.md
       - .pipeline/integrations/matrix.yaml
-  - id: C18-M6-START-20260530T123816+0800
-    type: milestone_start
+    id: C18-M6-COMPLETE-20260530T130458+0800
     ref: C18-M6
-    status: in_progress
-    timestamp: 2026-05-30T12:38:16+08:00
-    summary: "Started target repository adaptation after user confirmed paths, boundaries, target file lists, validation strategy, failure policy, and target/source record policy."
-    trigger: user
-    evidence_refs:
+    status: completed
+    summary: >-
+      Completed confirmed target repository adaptation for Codex-VSP and VSP-Open-Code. Both targets have target-side
+      records, focused validation passed, and source integration matrix was updated.
+    timestamp: 2026-05-30T13:04:58+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - 'Codex-VSP: cargo fmt --check, 29 focused Rust tests, git diff --check passed.'
+      - 'VSP-Open-Code: 34 focused Bun tests, bun typecheck, git diff --check passed.'
+  - evidence_refs:
       - .pipeline/prompts/05-target-repository-adaptation-after-confirmation.md
       - .pipeline/integrations/C18-Codex-VSP-adaptation-plan.md
       - .pipeline/integrations/C18-VSP-Open-Code-adaptation-plan.md
-  - id: C18-M6-TARGET-STATUS-20260530T123816+0800
-    type: step_complete
-    ref: C18-M6/preflight
-    status: completed
+    id: C18-M6-START-20260530T123816+0800
+    ref: C18-M6
+    status: in_progress
+    summary: >-
+      Started target repository adaptation after user confirmed paths, boundaries, target file lists, validation
+      strategy, failure policy, and target/source record policy.
     timestamp: 2026-05-30T12:38:16+08:00
-    summary: "Re-read target dirty status before writes: both ~/Codex-VSP and ~/VSP-Open-Code remain dirty; edits remain limited to the confirmed file lists."
-    trigger: assistant
-    evidence_refs:
+    trigger: user
+    type: milestone_start
+  - evidence_refs:
       - ~/Codex-VSP
       - ~/VSP-Open-Code
-  - id: C18-M5-COMPLETE-20260530T012242+0800
-    type: milestone_complete
-    ref: C18-M5
+    id: C18-M6-TARGET-STATUS-20260530T123816+0800
+    ref: C18-M6/preflight
     status: completed
-    timestamp: 2026-05-30T01:22:42+08:00
-    summary: "Completed source-side closure: focused tests, docs governance tests, npm test, git diff --check, read-only target inspection, audit evidence, report, and target adaptation plans are ready."
+    summary: >-
+      Re-read target dirty status before writes: both ~/Codex-VSP and ~/VSP-Open-Code remain dirty; edits remain limited
+      to the confirmed file lists.
+    timestamp: 2026-05-30T12:38:16+08:00
     trigger: assistant
-    validations:
-      - "npm test: 665/665 passing"
-      - "git diff --check: passing"
-      - "focused C18 command/docs/adapter tests: passing"
-    evidence_refs:
+    type: step_complete
+  - evidence_refs:
       - .pipeline/reviews/C18/M5/test-evidence.md
       - .pipeline/reviews/C18/M5/implementation-evidence.md
       - .pipeline/reviews/C18/M5/audit.md
@@ -106,28 +1787,33 @@ entries:
       - .pipeline/integrations/matrix.yaml
       - .pipeline/integrations/C18-Codex-VSP-adaptation-plan.md
       - .pipeline/integrations/C18-VSP-Open-Code-adaptation-plan.md
-  - id: C18-M6-GATE-20260530T012242+0800
-    type: milestone_start
-    ref: C18-M6
-    status: waiting_confirmation
+    id: C18-M5-COMPLETE-20260530T012242+0800
+    ref: C18-M5
+    status: completed
+    summary: >-
+      Completed source-side closure: focused tests, docs governance tests, npm test, git diff --check, read-only target
+      inspection, audit evidence, report, and target adaptation plans are ready.
     timestamp: 2026-05-30T01:22:42+08:00
-    summary: "Stopped at C18-M6 confirmation gate before target repository writes. User must confirm the Codex-VSP and VSP-Open-Code adaptation plans and exact file lists."
     trigger: assistant
-    evidence_refs:
+    type: milestone_complete
+    validations:
+      - 'npm test: 665/665 passing'
+      - 'git diff --check: passing'
+      - 'focused C18 command/docs/adapter tests: passing'
+  - evidence_refs:
       - .pipeline/prompts/05-target-repository-adaptation-after-confirmation.md
       - .pipeline/integrations/C18-Codex-VSP-adaptation-plan.md
       - .pipeline/integrations/C18-VSP-Open-Code-adaptation-plan.md
-  - id: C18-M1-M4-SOURCE-CONTRACTS-COMPLETE-20260530T010912+0800
-    type: milestone_complete
-    ref: C18-M1..C18-M4
-    status: completed
-    timestamp: 2026-05-30T01:09:12+08:00
-    summary: "Completed source-side Audit, Quality, Optimize, and integration sync command/spec contracts; focused C18 contract and command/docs tests pass."
+    id: C18-M6-GATE-20260530T012242+0800
+    ref: C18-M6
+    status: waiting_confirmation
+    summary: >-
+      Stopped at C18-M6 confirmation gate before target repository writes. User must confirm the Codex-VSP and
+      VSP-Open-Code adaptation plans and exact file lists.
+    timestamp: 2026-05-30T01:22:42+08:00
     trigger: assistant
-    validations:
-      - "node --test core/test/c18-instruction-quality-contract.test.js: passing"
-      - "node --test focused command/docs/skill/sync tests: passing after command-count and OpenCode command injection updates"
-    evidence_refs:
+    type: milestone_start
+  - evidence_refs:
       - skills/audit/SKILL.md
       - references/audit-spec.md
       - skills/quality/SKILL.md
@@ -136,47 +1822,58 @@ entries:
       - references/optimize-spec.md
       - references/integration-sync-spec.md
       - core/test/c18-instruction-quality-contract.test.js
-  - id: C18-M5-START-20260530T010912+0800
-    type: milestone_start
+    id: C18-M1-M4-SOURCE-CONTRACTS-COMPLETE-20260530T010912+0800
+    ref: C18-M1..C18-M4
+    status: completed
+    summary: >-
+      Completed source-side Audit, Quality, Optimize, and integration sync command/spec contracts; focused C18 contract
+      and command/docs tests pass.
+    timestamp: 2026-05-30T01:09:12+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - 'node --test core/test/c18-instruction-quality-contract.test.js: passing'
+      - >-
+        node --test focused command/docs/skill/sync tests: passing after command-count and OpenCode command injection
+        updates
+  - evidence_refs:
+      - .pipeline/prompts/04-source-side-closure-and-target-plans.md
+    id: C18-M5-START-20260530T010912+0800
     ref: C18-M5
     status: in_progress
+    summary: >-
+      Started source-side docs/status/full regression closure and read-only target adaptation planning for Codex-VSP and
+      VSP-Open-Code.
     timestamp: 2026-05-30T01:09:12+08:00
-    summary: "Started source-side docs/status/full regression closure and read-only target adaptation planning for Codex-VSP and VSP-Open-Code."
     trigger: assistant
-    evidence_refs:
-      - .pipeline/prompts/04-source-side-closure-and-target-plans.md
-  - id: C18-M1-START-20260530T005541+0800
     type: milestone_start
-    ref: C18-M1
-    status: in_progress
-    timestamp: 2026-05-30T00:55:41+08:00
-    summary: "Started C18-M1 execution and assigned focused contract-test work for Audit, Quality, Optimize, and integration sync command contracts."
-    trigger: user
-    evidence_refs:
+  - evidence_refs:
       - .pipeline/prompts/00-audit-engineering-method-upgrade.md
       - core/test/c18-instruction-quality-contract.test.js
-  - id: C18-M1-WRITE-TESTS-START-20260530T005541+0800
-    type: step_complete
+    id: C18-M1-START-20260530T005541+0800
+    ref: C18-M1
+    status: in_progress
+    summary: >-
+      Started C18-M1 execution and assigned focused contract-test work for Audit, Quality, Optimize, and integration
+      sync command contracts.
+    timestamp: 2026-05-30T00:55:41+08:00
+    trigger: user
+    type: milestone_start
+  - evidence_refs:
+      - core/test/c18-instruction-quality-contract.test.js
+    id: C18-M1-WRITE-TESTS-START-20260530T005541+0800
     ref: C18-M1/write_tests
     status: in_progress
+    summary: Test worker started focused C18 instruction quality contract tests before implementation.
     timestamp: 2026-05-30T00:55:41+08:00
-    summary: "Test worker started focused C18 instruction quality contract tests before implementation."
     trigger: subagent
+    type: step_complete
     worker:
       id: 019e74a9-a08f-7751-ab0b-0c654258d2cd
       lifecycle: started
       nickname: 孟轲
       role: test
-    evidence_refs:
-      - core/test/c18-instruction-quality-contract.test.js
-  - id: C18-P3-GENERATE-COMPLETE-20260530T002958+0800
-    type: planning_update
-    ref: C18/P3
-    status: completed
-    timestamp: 2026-05-30T00:29:58+08:00
-    summary: "Generated C18 execution prompts, architecture baseline, design spec, confirm summary, and generate metadata from the confirmed P2 decomposition."
-    trigger: user
-    evidence_refs:
+  - evidence_refs:
       - .plan-state/c18-generate.yaml
       - .pipeline/confirm-summary.md
       - .pipeline/architecture.md
@@ -187,105 +1884,134 @@ entries:
       - .pipeline/prompts/03-integration-sync-workflow-gate.md
       - .pipeline/prompts/04-source-side-closure-and-target-plans.md
       - .pipeline/prompts/05-target-repository-adaptation-after-confirmation.md
-  - id: C18-P2-DECOMPOSE-PROPOSED-20260530T001545+0800
-    type: planning_update
-    ref: C18/P2
-    status: proposed
-    timestamp: 2026-05-30T00:15:45+08:00
-    summary: "Proposed P2 milestone decomposition for C18: Audit upgrade, Quality command, Optimize command, integration sync workflow, source-side closure/target plans, and gated target repository adaptation."
+    id: C18-P3-GENERATE-COMPLETE-20260530T002958+0800
+    ref: C18/P3
+    status: completed
+    summary: >-
+      Generated C18 execution prompts, architecture baseline, design spec, confirm summary, and generate metadata from
+      the confirmed P2 decomposition.
+    timestamp: 2026-05-30T00:29:58+08:00
     trigger: user
-    evidence_refs:
+    type: planning_update
+  - evidence_refs:
       - .plan-state/c18-decompose.yaml
       - .plan-state/c18-technical-route.md
       - .plan-state/c18-audit-enhancement-decisions.md
       - .plan-state/c18-quality-command-decisions.md
       - .plan-state/c18-integration-sync-workflow-decisions.md
-  - id: C18-INTEGRATION-SYNC-WORKFLOW-DECISIONS-20260530T000000+0800
-    type: planning_update
-    ref: C18-W2
-    status: decided
-    timestamp: 2026-05-30T00:00:00+08:00
-    summary: "Settled integration sync as a development workflow and release gate rather than a user command: source changes must be adapted per target repository state, validated in each target, recorded in target repositories, and backlinked in Hypo-Workflow."
+    id: C18-P2-DECOMPOSE-PROPOSED-20260530T001545+0800
+    ref: C18/P2
+    status: proposed
+    summary: >-
+      Proposed P2 milestone decomposition for C18: Audit upgrade, Quality command, Optimize command, integration sync
+      workflow, source-side closure/target plans, and gated target repository adaptation.
+    timestamp: 2026-05-30T00:15:45+08:00
     trigger: user
-    evidence_refs:
+    type: planning_update
+  - evidence_refs:
       - .plan-state/c18-integration-sync-workflow-decisions.md
       - ~/Codex-VSP
       - ~/VSP-Open-Code
-  - id: C18-QUALITY-COMMAND-DECISIONS-20260529T210536+0800
-    type: planning_update
-    ref: C18-W1/quality
+    id: C18-INTEGRATION-SYNC-WORKFLOW-DECISIONS-20260530T000000+0800
+    ref: C18-W2
     status: decided
-    timestamp: 2026-05-29T21:05:36+08:00
-    summary: "Settled /hw:quality design as a first-class scorecard/report command and added /hw:optimize as the Auto Optimize flow that loops Audit+Quality, Implement/Test, and recheck under backup, correctness, and budget constraints."
+    summary: >-
+      Settled integration sync as a development workflow and release gate rather than a user command: source changes
+      must be adapted per target repository state, validated in each target, recorded in target repositories, and
+      backlinked in Hypo-Workflow.
+    timestamp: 2026-05-30T00:00:00+08:00
     trigger: user
-    evidence_refs:
+    type: planning_update
+  - evidence_refs:
       - .plan-state/c18-quality-command-decisions.md
       - tmp.md
-  - id: C18-AUDIT-ENHANCEMENT-DECISIONS-20260529T210536+0800
-    type: planning_update
-    ref: C18-W1/audit
+    id: C18-QUALITY-COMMAND-DECISIONS-20260529T210536+0800
+    ref: C18-W1/quality
     status: decided
+    summary: >-
+      Settled /hw:quality design as a first-class scorecard/report command and added /hw:optimize as the Auto Optimize
+      flow that loops Audit+Quality, Implement/Test, and recheck under backup, correctness, and budget constraints.
     timestamp: 2026-05-29T21:05:36+08:00
-    summary: "Settled enhanced /hw:audit design: always run Intake, use GQM + ISO 25010 + ATAM-lite + SWEBOK, replace the old six top-level dimensions with an Experience/Engineering/Risk model, and route findings through an Action Queue."
     trigger: user
-    evidence_refs:
+    type: planning_update
+  - evidence_refs:
       - .plan-state/c18-audit-enhancement-decisions.md
       - https://www.iso.org/standard/78176.html
       - https://www.sei.cmu.edu/library/architecture-tradeoff-analysis-method-collection/
       - https://www.computer.org/education/bodies-of-knowledge/software-engineering
-  - id: C18-ROUND2-AUDIT-SYNC-DISCUSSION-20260529T210536+0800
-    type: planning_update
-    ref: C18/round2
-    status: drafted
+    id: C18-AUDIT-ENHANCEMENT-DECISIONS-20260529T210536+0800
+    ref: C18-W1/audit
+    status: decided
+    summary: >-
+      Settled enhanced /hw:audit design: always run Intake, use GQM + ISO 25010 + ATAM-lite + SWEBOK, replace the old
+      six top-level dimensions with an Experience/Engineering/Risk model, and route findings through an Action Queue.
     timestamp: 2026-05-29T21:05:36+08:00
-    summary: "Expanded C18 discussion: strengthen /hw:audit with intake, engineering standards, and problem-discovery methodology; keep /hw:quality as a quality-profile command; require bidirectional integration sync with push staging and pull/import candidate inbox."
     trigger: user
-    evidence_refs:
+    type: planning_update
+  - evidence_refs:
       - .plan-state/c18-round2-audit-sync-discussion.md
       - ~/Codex-VSP/codex-rs/core/src/workflow_conversation_capture.rs
       - ~/VSP-Open-Code/packages/opencode/src/cli/cmd/workflow/journal.ts
       - ~/Codex-VSP/README.md
       - ~/VSP-Open-Code/README.md
-  - id: C18-W2-SYNC-PLAN-DRAFT-20260529T183500+0800
-    type: planning_update
-    ref: C18-W2
+    id: C18-ROUND2-AUDIT-SYNC-DISCUSSION-20260529T210536+0800
+    ref: C18/round2
     status: drafted
-    timestamp: 2026-05-29T18:35:00+08:00
-    summary: "Drafted integration sync plan: keep Hypo-Workflow as command/skill source of truth, protect target dirty worktrees, avoid copying .pipeline runtime state, and sync via staging/dry-run before apply."
-    trigger: assistant
-    evidence_refs:
+    summary: >-
+      Expanded C18 discussion: strengthen /hw:audit with intake, engineering standards, and problem-discovery
+      methodology; keep /hw:quality as a quality-profile command; require bidirectional integration sync with push
+      staging and pull/import candidate inbox.
+    timestamp: 2026-05-29T21:05:36+08:00
+    trigger: user
+    type: planning_update
+  - evidence_refs:
       - .plan-state/c18-integration-sync-plan.md
       - ~/Codex-VSP
       - ~/VSP-Open-Code
-  - id: C18-W1-DIRECTION-DRAFT-20260529T182500+0800
-    type: planning_update
-    ref: C18-W1
+    id: C18-W2-SYNC-PLAN-DRAFT-20260529T183500+0800
+    ref: C18-W2
     status: drafted
-    timestamp: 2026-05-29T18:25:00+08:00
-    summary: "Drafted instruction-quality direction from tmp.md: add /hw:quality for rubric-based quality review and keep /hw:audit as governance risk audit."
+    summary: >-
+      Drafted integration sync plan: keep Hypo-Workflow as command/skill source of truth, protect target dirty
+      worktrees, avoid copying .pipeline runtime state, and sync via staging/dry-run before apply.
+    timestamp: 2026-05-29T18:35:00+08:00
     trigger: assistant
-    evidence_refs:
+    type: planning_update
+  - evidence_refs:
       - tmp.md
       - .plan-state/c18-instruction-quality-direction.md
-  - id: C18-INTEGRATION-PREFLIGHT-20260529T181500+0800
-    type: discovery
-    ref: C18/integration-sync
-    status: completed
-    timestamp: 2026-05-29T18:15:00+08:00
-    summary: "Preflight found ~/Codex-VSP present, exact ~/VSP-OpenCode missing, and ~/VSP-Open-Code as the likely OpenCode integration repository; both integration worktrees have existing uncommitted changes."
+    id: C18-W1-DIRECTION-DRAFT-20260529T182500+0800
+    ref: C18-W1
+    status: drafted
+    summary: >-
+      Drafted instruction-quality direction from tmp.md: add /hw:quality for rubric-based quality review and keep
+      /hw:audit as governance risk audit.
+    timestamp: 2026-05-29T18:25:00+08:00
     trigger: assistant
-    evidence_refs:
+    type: planning_update
+  - evidence_refs:
       - ~/Codex-VSP
       - ~/VSP-Open-Code
-  - id: CYCLE-CREATE-C18-20260529T180508+0800
-    type: cycle_create
+    id: C18-INTEGRATION-PREFLIGHT-20260529T181500+0800
+    ref: C18/integration-sync
+    status: completed
+    summary: >-
+      Preflight found ~/Codex-VSP present, exact ~/VSP-OpenCode missing, and ~/VSP-Open-Code as the likely OpenCode
+      integration repository; both integration worktrees have existing uncommitted changes.
+    timestamp: 2026-05-29T18:15:00+08:00
+    trigger: assistant
+    type: discovery
+  - archive: .pipeline/archives/C17-audit-remediation-and-architecture-debt-reduction
+    id: CYCLE-CREATE-C18-20260529T180508+0800
+    previous_cycle: C17
     ref: C18
     status: active
+    summary: >-
+      Created C18 for instruction quality review direction, integration sync planning, and Workflow optimization after
+      accepting and archiving C17.
     timestamp: 2026-05-29T18:05:08+08:00
-    summary: Created C18 for instruction quality review direction, integration sync planning, and Workflow optimization after accepting and archiving C17.
     trigger: user
-    previous_cycle: C17
-    archive: .pipeline/archives/C17-audit-remediation-and-architecture-debt-reduction
+    type: cycle_create
   - id: CYCLE-ACCEPTED-C17-20260529T180508+0800
     ref: C17
     status: completed

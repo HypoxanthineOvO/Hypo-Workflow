@@ -22,6 +22,48 @@ test("current lifecycle log validates real event families and statuses", async (
   assert.ok(result.families.includes("feature"));
 });
 
+test("lifecycle log accepts visible gate feedback statuses", () => {
+  const log = {
+    entries: [
+      event(
+        "visible-gate",
+        "step_progress",
+        "ready_for_visible_gate",
+        "2026-06-08T20:52:37+08:00",
+        "revised plan is ready for visible gate",
+      ),
+      event(
+        "prompt-source-needed",
+        "gate_feedback",
+        "needs_prompt_source_before_vsp_opencode_write",
+        "2026-06-08T20:49:53+08:00",
+        "user requested prompt source before target write",
+      ),
+      event(
+        "plan-summary-needed",
+        "gate_feedback",
+        "needs_plan_visible_summary",
+        "2026-06-08T20:15:21+08:00",
+        "user requested visible plan summary before confirmation",
+      ),
+    ],
+  };
+
+  const result = validateLifecycleLog(log);
+  const recent = buildRecentEvents(log);
+
+  assert.equal(result.ok, true, result.errors.join("\n"));
+  assert.ok(result.families.includes("step"));
+  assert.ok(result.families.includes("gate"));
+  assert.deepEqual(
+    recent.map((entry) => [entry.family, entry.status]),
+    [
+      ["gate", "needs_prompt_source_before_vsp_opencode_write"],
+      ["gate", "needs_plan_visible_summary"],
+    ],
+  );
+});
+
 test("Recent feed sorts by timestamp and filters internal platform noise", () => {
   const newestFirst = {
     entries: [

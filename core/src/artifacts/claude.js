@@ -4,9 +4,14 @@ import { renderClaudeStatusMonitorManifest } from "../claude-status/index.js";
 import { planClaudeCodexDelegation } from "../claude-codex/index.js";
 import { commandMap } from "../commands/index.js";
 import { buildModelPoolClaudeAgents, loadConfig } from "../config/index.js";
-import { ASK_QUESTIONS_GUIDANCE, renderDeepSeekToolCallingRules } from "./agent-guidance.js";
+import {
+  ASK_QUESTIONS_GUIDANCE,
+  CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE,
+  FOUR_RULE_DISCIPLINE_GUIDANCE,
+  renderDeepSeekToolCallingRules,
+} from "./agent-guidance.js";
 
-const HW_VERSION = "13.1.0-beta.1";
+const HW_VERSION = "13.1.0-beta.2";
 
 export async function writeClaudeCodePluginArtifacts(outDir = ".", options = {}) {
   const pluginDir = join(outDir, ".claude-plugin");
@@ -86,7 +91,12 @@ export function renderClaudeCodeSlashCommand(command = {}, options = {}) {
     `Skill: \`${command.skill}\``,
     "",
     `Load the corresponding Hypo-Workflow skill instructions from \`${command.skill}\`, then execute \`${command.canonical}\` semantics with any user-provided arguments.`,
+    "",
+    CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE,
+    "",
     routeGuidance.trimEnd(),
+    "",
+    FOUR_RULE_DISCIPLINE_GUIDANCE,
     "",
     ASK_QUESTIONS_GUIDANCE,
     "",
@@ -108,10 +118,16 @@ export function renderClaudeCodeSlashCommand(command = {}, options = {}) {
 
 function claudeCommandSpecificGuidance(command) {
   if (command.canonical === "/hw:plan") {
-    return "If the user provides `--deep`, route to `/hw:plan:deep` as an alias before ordinary decomposition. Ordinary `/hw:plan` keeps the full P1-P4 gates and must not skip P1-P4 because of Deep Plan context or conversion output.";
+    return "If the user provides `--deep`, route to `/hw:plan:deep` as an alias before ordinary planning. Ordinary `/hw:plan` keeps the Discover, Technical Stack, Architecture, Decompose, and Generate gates; Deep Plan context or conversion output must not skip them. Confirmation is handled by in-phase Question Tool / Ask gates.";
   }
   if (command.canonical === "/hw:plan:deep") {
-    return "This is also the target for the `/hw:plan --deep` alias. It creates or updates a durable discussion package before ordinary `/hw:plan` decomposition. It must not skip the ordinary `/hw:plan` P1-P4 gates after `convert`.";
+    return "This is also the target for the `/hw:plan --deep` alias. It creates or updates a durable discussion package before ordinary `/hw:plan`. It must not skip ordinary named Plan phase gates after `convert`.";
+  }
+  if (command.canonical === "/hw:plan:technical-stack") {
+    return "Run the Technical Stack phase after Discover has produced visible requirements. Discuss implementation substrate, existing stack, integration mechanisms, constraints, and validation tooling; then show the phase artifact and use a Question Tool / Ask gate before Architecture.";
+  }
+  if (command.canonical === "/hw:plan:architecture") {
+    return "Run the Architecture phase after Technical Stack is confirmed. Read the current architecture baseline, produce architecture diagrams and integration points, show the phase artifact, and use a Question Tool / Ask gate before Decompose.";
   }
   if (command.canonical === "/hw:patch fix") {
     return "Patch Fix lane: read the Patch first, preserve distinct `test`, `implement`, and `audit` worker identities for code/test changes, and do not close the Patch until worker lifecycle evidence is recorded.";
@@ -262,7 +278,7 @@ export function renderClaudeCodeAgent(role, agent = {}) {
   const name = `hw-${role}`;
   const model = agent.model || "default";
   const deepSeekRules = renderDeepSeekToolCallingRules(model, "Claude Code");
-  return `---\nname: ${name}\ndescription: Hypo-Workflow Claude Code ${role} subagent.\nmodel: ${model}\nhypo_workflow_managed: true\n---\n\n# ${name}\n\nRole: \`${role}\`\nModel: \`${model}\`\n\nUse this Claude Code subagent for Hypo-Workflow ${role} work. The model is generated from the shared \`model_pool.roles\` contract, refined by \`claude_code.agents.${role}.model\` when explicitly configured.\n\n${ASK_QUESTIONS_GUIDANCE}\n\n${deepSeekRules ? `${deepSeekRules}\n\n` : ""}Do not call models directly from Hypo-Workflow core. Claude Code remains responsible for actual model invocation; this file only declares routing intent.\n`;
+  return `---\nname: ${name}\ndescription: Hypo-Workflow Claude Code ${role} subagent.\nmodel: ${model}\nhypo_workflow_managed: true\n---\n\n# ${name}\n\nRole: \`${role}\`\nModel: \`${model}\`\n\nUse this Claude Code subagent for Hypo-Workflow ${role} work. The model is generated from the shared \`model_pool.roles\` contract, refined by \`claude_code.agents.${role}.model\` when explicitly configured.\n\n${CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE}\n\n${FOUR_RULE_DISCIPLINE_GUIDANCE}\n\n${ASK_QUESTIONS_GUIDANCE}\n\n${deepSeekRules ? `${deepSeekRules}\n\n` : ""}Do not call models directly from Hypo-Workflow core. Claude Code remains responsible for actual model invocation; this file only declares routing intent.\n`;
 }
 
 export function selectClaudeAgentRole(context = {}) {

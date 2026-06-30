@@ -1,5 +1,5 @@
 pipeline:
-  name: "C18 指令质量审查与集成同步方案"
+  name: "C20 协商优先的修改启动风格"
   source: local
   output: local
   prompts_dir: .pipeline/prompts

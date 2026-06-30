@@ -15,6 +15,7 @@ export const LIFECYCLE_LOG_FAMILIES = Object.freeze([
   "sync",
   "recovery",
   "handoff",
+  "gate",
   "derived_refresh",
   "platform",
   "audit",
@@ -64,6 +65,9 @@ export const LIFECYCLE_LOG_STATUSES = Object.freeze([
   "revision",
   "in_progress",
   "decided",
+  "ready_for_visible_gate",
+  "needs_prompt_source_before_vsp_opencode_write",
+  "needs_plan_visible_summary",
 ]);
 
 const RECENT_FAMILIES = new Set([
@@ -77,6 +81,7 @@ const RECENT_FAMILIES = new Set([
   "sync",
   "recovery",
   "handoff",
+  "gate",
   "derived_refresh",
   "audit",
   "quality",
@@ -218,6 +223,7 @@ export function logFamily(type) {
   if (normalized.startsWith("release")) return "release";
   if (normalized.startsWith("recovery") || normalized.includes("lease") || normalized.includes("takeover")) return "recovery";
   if (normalized.startsWith("handoff")) return "handoff";
+  if (normalized === "gate" || normalized.startsWith("gate_")) return "gate";
   if (normalized.startsWith("derived")) return "derived_refresh";
   if (normalized.startsWith("platform")) return "platform";
   if (normalized.startsWith("audit")) return "audit";

@@ -1,27 +1,46 @@
 cycle:
-  number: 18
-  name: "指令质量审查与集成同步方案"
-  type: refactor
-  status: completed
-  started: "2026-05-29T18:05:08+08:00"
-  completed_at: "2026-05-30T13:38:30+08:00"
-  preset: tdd
-  workflow_kind: build
+  acceptance:
+    accepted_at: 2026-06-30T21:43:36+08:00
+    mode: manual
+    requested_at: 2026-06-30T21:07:50+08:00
+    state: accepted
+  context_sources: []
+  continuations:
+    - id: C20-target-codex-vsp
+      kind: target_local_cycle
+      status: planned_after_source_closure
+      summary: >-
+        Use the C20 source contract to decide and validate Codex-VSP managed AGENTS/direct-sync updates and target-owned
+        per-model prompt work.
+      target: Codex-VSP
+    - id: C20-target-vsp-open-code
+      kind: target_local_cycle
+      status: planned_after_source_closure
+      summary: >-
+        Use the C20 source contract to decide and validate VSP-Open-Code managed AGENTS/direct-sync updates and
+        target-owned reminder/runtime prompt work.
+      target: VSP-Open-Code
+  finished: 2026-06-30T21:43:36+08:00
+  lessons: null
   lifecycle_policy:
+    accept:
+      next: follow_up_plan
+    auto_continue: true
+    gates:
+      acceptance: confirm
     reject:
       default_action: needs_revision
-    accept:
-      next: complete
-  continuations: []
-  context_sources:
-    - tmp_md_article
-    - integration_sync
-  previous_cycle: 17
-  summary: "C18 upgrades Audit, adds Quality and Optimize commands, defines integration sync as a development/release gate, then closes source-side validation and gated target adaptation."
-  lessons: null
-  acceptance:
-    state: accepted
-    accepted_at: "2026-05-30T13:38:30+08:00"
-    scope: cycle
-    cycle_id: C18
-    summary: "Accepted after C18-M6 completed target adaptations for Codex-VSP and VSP-Open-Code with focused validation and target-side records."
+    resume:
+      default_action: continue_current
+  name: 协商优先的修改启动风格
+  number: 20
+  preset: tdd
+  previous_cycle: 19
+  started: 2026-06-30T18:02:35+08:00
+  status: completed
+  summary: >-
+    C20 delivered the consultation-first action boundary in source-owned contracts, shared OpenCode/Claude guidance,
+    refreshed managed artifacts, full source regression, and a target-local Cycle handoff package; target repositories
+    were not written.
+  type: feature
+  workflow_kind: build
