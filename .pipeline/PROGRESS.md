@@ -1,7 +1,8 @@
-> 最后更新：21:43 | 状态：running | 进度：0/0 Milestone
+> 最后更新：22:38 | 状态：released | 版本：v13.1.0-beta.2
 
 ## 时间线
 
+- 2026-06-30T22:38:00+08:00 — v13.1.0-beta.2 已发布：提交序列已拆为 runtime hygiene、C18 archive、C19 Plan、C20 consultation boundary、managed sync 和 release commit；GitHub/GitLab `main` 与 tag 已推送，GitHub prerelease 和 GitLab release 已创建；验证为 config/docs/sync/diff/npm test 全部通过。
 - 2026-06-30T21:07:50+08:00 — C20 已完成并进入 pending_acceptance：4 个 Milestone 全部完成，source behavior contract、managed artifact projection、source regression closure 和 target handoff package 均通过审计；等待用户 `/hw:accept` 或 `/hw:reject`。
 - 2026-06-30T21:07:50+08:00 — C20-M4 已完成：target package 与 matrix 审计 PASS_WITH_WARNINGS，无 blocker；warning 仅为 source/target dirty baseline 与只读审计范围 caveat。
 - 2026-06-30T21:03:18+08:00 — C20-M4 GREEN 验证通过并进入审计：target package 存在、matrix YAML 可解析、C20/no-write/target-local anchors 命中、`git diff --check` 通过，两个目标仓只读 status 仍为既有 dirty baseline。

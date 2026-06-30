@@ -1,4 +1,20 @@
 entries:
+  - id: RELEASE-v13.1.0-beta.2-20260630T223800+0800
+    ref: v13.1.0-beta.2
+    report: .pipeline/release/v13.1.0-beta.2.md
+    status: completed
+    summary: >-
+      Published v13.1.0-beta.2 with C19 named Plan phases, C20 consultation-first action boundary, managed surface sync,
+      release notes, GitHub prerelease, and GitLab release.
+    timestamp: 2026-06-30T22:38:00+08:00
+    trigger: user
+    type: release
+    validations:
+      - 'scripts/validate-config.sh: passing'
+      - 'docs checks and README freshness: passing'
+      - 'sync --check-only: derived fresh'
+      - 'git diff --check: passing'
+      - 'npm test: 687/687 passing'
   - id: CYCLE-ACCEPTED-C20-20260630T214336+0800
     ref: C20
     status: completed
