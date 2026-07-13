@@ -12,7 +12,7 @@ import {
   renderDeepSeekToolCallingRules,
 } from "./agent-guidance.js";
 
-const HW_VERSION = "13.1.0-beta.2";
+const HW_VERSION = "13.1.0-beta.3";
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(MODULE_DIR, "..", "..", "..");
 const DEPRECATED_TUI_PLUGIN_REF = ".opencode/tui/hypo-workflow-tui.tsx";

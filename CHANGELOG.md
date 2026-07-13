@@ -1,5 +1,26 @@
 # Changelog
 
+## v13.1.0-beta.3 - 2026-07-13
+
+### Features
+
+- 发布 manifest-based Workflow Core：Runtime、Records、Receipts、Recovery Journal、Goal/Cycle、Maintain 与 Bootstrap 采用单一写入权威。
+- 新增 Host Contract v1、严格只读 Host Status projection、九命令公共表面，以及可复现的 Codex plugin / portable bundle。
+- Codex 与 OpenCode 宿主改为消费经过 checksum 校验的已安装发行版；OpenCode portable ZIP 支持原子激活与一次 rollback。
+
+### Fixes
+
+- 移除旧 Workflow runner、legacy writer、conversation capture 和退役命令路径，避免宿主与 Skill 双重拥有生命周期状态。
+- 修复发行来源绑定、递归 schema 校验、Bootstrap projection 原子失效和 ZIP mtime 不稳定问题。
+- 破坏性清理改为精确 manifest、单次 Receipt 与执行报告门禁。
+
+### Tests
+
+- Hypo maintained Core `486/486`、scenarios `8/8`、Bootstrap `67/67`。
+- Codex Host/routing/TUI/palette `5/5 + 4/4 + 8/8 + 1/1`，`cargo check` 通过。
+- OpenCode Host/真实 ZIP `7/7`、相关 broad `26/26`，typecheck 通过。
+- 两次构建 checksum 一致，真实 portable ZIP 已通过临时 active-root 完整安装链。
+
 ## v13.1.0-beta.2 - 2026-06-30
 
 ### Features

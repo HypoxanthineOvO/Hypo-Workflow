@@ -11,7 +11,7 @@ import {
   renderDeepSeekToolCallingRules,
 } from "./agent-guidance.js";
 
-const HW_VERSION = "13.1.0-beta.2";
+const HW_VERSION = "13.1.0-beta.3";
 
 export async function writeClaudeCodePluginArtifacts(outDir = ".", options = {}) {
   void outDir;
