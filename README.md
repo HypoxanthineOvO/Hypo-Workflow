@@ -6,7 +6,7 @@
 
 规划 -> 执行 -> 独立验证 -> 人工验收 -> 可恢复继续
 
-[![Version](https://img.shields.io/badge/version-13.1.0--beta.3-blue)](.codex-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-14.0.0--alpha.1-blue)](.codex-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Official%20Codex-black)](docs/reference/platforms.md)
 
@@ -16,7 +16,7 @@
 
 Hypo-Workflow 是 Skill 协议，不是 runner 或后台服务。宿主 Agent 负责实现、测试和审查；`.pipeline/` 负责保存可验证、可恢复的项目事实。
 
-[v13.1.0-beta.3 发布说明](docs/release/v13.1.0-beta.3.md)
+[v14.0.0-alpha.1 发布说明](docs/release/v14.0.0-alpha.1.md)
 
 当前版本以 **Official Codex** 为唯一当前适配平台。OpenCode、Claude Code、Cursor、GitHub Copilot、Trae 和自定义 Codex fork 的适配器均延后，仓库中残留的旧平台产物不代表当前支持。
 

@@ -30,8 +30,8 @@ test("docs map defines ownership, generated references, and narrative policy", (
   const userGuide = map.documents.find((doc) => doc.path === "docs/user-guide.md");
   const englishUserGuide = map.documents.find((doc) => doc.path === "docs/en/user-guide.md");
   const configuration = map.documents.find((doc) => doc.path === "docs/reference/configuration.md");
-  const releaseNote = map.documents.find((doc) => doc.path === "docs/release/v13.1.0-beta.3.md");
-  const englishReleaseNote = map.documents.find((doc) => doc.path === "docs/en/release/v13.1.0-beta.3.md");
+  const releaseNote = map.documents.find((doc) => doc.path === "docs/release/v14.0.0-alpha.1.md");
+  const englishReleaseNote = map.documents.find((doc) => doc.path === "docs/en/release/v14.0.0-alpha.1.md");
 
   assert.equal(readme.role, "concise_user_entrypoint");
   assert.equal(readme.narrative_update_policy, "explicit_repair");
@@ -170,9 +170,9 @@ test("human-facing docs and key references stay Chinese-body", async () => {
   assert.ok(result.checked.some((item) => item.path === "references/commands-spec.md"));
 });
 
-test("v13.1.0-beta.3 release coverage is Chinese-first and linked from entrypoints", async () => {
-  const chineseRelease = await readFile("docs/release/v13.1.0-beta.3.md", "utf8");
-  const englishRelease = await readFile("docs/en/release/v13.1.0-beta.3.md", "utf8");
+test("v14.0.0-alpha.1 release coverage is Chinese-first and linked from entrypoints", async () => {
+  const chineseRelease = await readFile("docs/release/v14.0.0-alpha.1.md", "utf8");
+  const englishRelease = await readFile("docs/en/release/v14.0.0-alpha.1.md", "utf8");
   const readme = await readFile("README.md", "utf8");
   const englishReadme = await readFile("README.en.md", "utf8");
 

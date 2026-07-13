@@ -1,5 +1,25 @@
 # Changelog
 
+## v14.0.0-alpha.1 - 2026-07-13
+
+### Versioning
+
+- 将 manifest-based Workflow Core 正确归入 14.0 主版本：Runtime、Host Contract、命令表面和宿主权威边界均包含破坏性变化。
+- 当前仍允许 Schema、安装协议和平台适配发生破坏性调整，因此使用 `alpha.1`，而不是延续 13.1 beta 序列。
+- `v13.1.0-beta.3` 保留为已发布历史版本，但由本版本取代。
+
+### Features and Fixes
+
+- 继承 beta.3 已验证的 manifest Core、Records、Receipts、Recovery Journal、Goal/Cycle、Maintain、Bootstrap 和九命令公共表面。
+- 继承 Host Contract v1、严格只读 projection、可复现 Codex plugin / portable bundle，以及 OpenCode 原子安装与 rollback。
+- 保留精确删除 manifest、单次 Receipt 和独立 test/implement/audit 验收闭环。
+
+### Tests
+
+- Hypo maintained Core `486/486`、scenarios `8/8`、Bootstrap `67/67`。
+- Codex Host/routing/TUI/palette 与 OpenCode 真实 portable ZIP 安装链均已在 G22 验证通过。
+- Alpha 发行物执行连续双构建 checksum 一致性验证。
+
 ## v13.1.0-beta.3 - 2026-07-13
 
 ### Features

@@ -1,6 +1,6 @@
 {
   "name": "hypo-workflow",
-  "version": "13.1.0-beta.3",
+  "version": "14.0.0-alpha.1",
   "description": "Manifest-based Goal and Cycle delivery, durable project memory, restart-safe recovery, and Receipt-controlled actions for Codex.",
   "author": {
     "name": "Hypoxanthine",

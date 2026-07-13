@@ -1,6 +1,6 @@
 {
   "name": "hypoxanthine-hypo-workflow",
-  "version": "13.1.0-beta.3",
+  "version": "14.0.0-alpha.1",
   "interface": {
     "displayName": "Hypo-Workflow Plugins"
   },
@@ -8,7 +8,7 @@
     {
       "name": "hypo-workflow",
       "source": "./",
-      "version": "13.1.0-beta.3",
+      "version": "14.0.0-alpha.1",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
