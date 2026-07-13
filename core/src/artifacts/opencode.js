@@ -6,11 +6,6 @@ import { commandMap, legacyOpenCodeCommandName } from "../commands/index.js";
 import { DEFAULT_GLOBAL_CONFIG, buildModelPoolOpenCodeAgents, mergeConfig, normalizeExecutionBashPolicy } from "../config/index.js";
 import { normalizeProfile, selectProfile } from "../profile/index.js";
 import {
-  loadStructuredRulesAuthority,
-  renderStructuredRulesInstructionBlock,
-  writeStructuredHabitsDocument,
-} from "../rules/index.js";
-import {
   ASK_QUESTIONS_GUIDANCE,
   CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE,
   FOUR_RULE_DISCIPLINE_GUIDANCE,
@@ -111,58 +106,9 @@ export const OPENCODE_AGENTS = Object.freeze([
 ]);
 
 export async function writeOpenCodeArtifacts(outDir, options = {}) {
-  const profile = normalizeArtifactProfile(options);
-  const adapterDir = outDir.endsWith(".opencode") ? outDir : join(outDir, ".opencode");
-  const projectRoot = dirname(adapterDir);
-  const rootConfig = renderOpenCodeConfig(profile, { includePlugins: true });
-  const adapterConfig = renderOpenCodeConfig(profile, { includePlugins: false });
-  await mkdir(join(adapterDir, "commands"), { recursive: true });
-  await mkdir(join(adapterDir, "agents"), { recursive: true });
-  await mkdir(join(adapterDir, "plugins"), { recursive: true });
-  await mkdir(join(adapterDir, "runtime"), { recursive: true });
-  await rm(join(adapterDir, "plugins", "hypo-workflow.js"), { force: true });
-  await rm(join(adapterDir, "plugins", "hypo-workflow-status.js"), { force: true });
-  await rm(join(adapterDir, "plugins", "hypo-workflow-tui.tsx"), { force: true });
-  await rm(join(adapterDir, "commands", "hw-dashboard.md"), { force: true });
-  for (const file of DEPRECATED_COMMAND_FILES) {
-    await rm(join(adapterDir, "commands", file), { force: true });
-  }
-  await removeDeprecatedOpenCodeTuiArtifacts(projectRoot, adapterDir);
-
-  for (const command of commandMap("opencode")) {
-    await rm(join(adapterDir, "commands", `${legacyOpenCodeCommandName(command.canonical).slice(1)}.md`), { force: true });
-    await rm(join(adapterDir, "commands", `${command.opencode.slice(1)}.md`), { force: true });
-    await writeFile(join(adapterDir, "commands", `${command.opencode.slice(1)}.md`), renderCommand(command), "utf8");
-  }
-
-  for (const agent of renderableOpenCodeAgents(profile)) {
-    await writeFile(join(adapterDir, "agents", `${agent.name}.md`), renderAgent(agent, profile), "utf8");
-  }
-
-  await writeFile(join(adapterDir, "opencode.json"), `${JSON.stringify(adapterConfig, null, 2)}\n`, "utf8");
-  await writeFile(join(adapterDir, "hypo-workflow.json"), `${JSON.stringify(renderHypoWorkflowMetadata(profile), null, 2)}\n`, "utf8");
-  await writeFile(join(projectRoot, "opencode.json"), `${JSON.stringify(injectCommands(rootConfig), null, 2)}\n`, "utf8");
-  const rulesAuthority = await loadArtifactRulesAuthority(projectRoot, options);
-  if (rulesAuthority) {
-    await writeStructuredHabitsDocument(projectRoot, REPO_ROOT, {
-      ...options,
-      authority: rulesAuthority,
-      title: "Hypo-Workflow Habits",
-    });
-  }
-  await writeFile(join(projectRoot, "AGENTS.md"), await renderAgentsInstruction(projectRoot, { ...options, rulesAuthority }), "utf8");
-  await writeFile(join(adapterDir, "package.json"), await renderTemplate("package.json"), "utf8");
-  await writeFile(join(adapterDir, "plugins", "hypo-workflow.ts"), await renderPluginTemplate(profile), "utf8");
-  await writeFile(
-    join(adapterDir, "runtime", "hypo-workflow-status.js"),
-    await renderOpenCodeStatusModule(),
-    "utf8",
-  );
-  await writeFile(
-    join(adapterDir, "runtime", "hypo-workflow-hooks.js"),
-    await renderOpenCodeHookPolicyModule(),
-    "utf8",
-  );
+  void outDir;
+  void options;
+  throw deferredAdapterError("OpenCode");
 }
 
 export function renderCommand(command) {
@@ -362,34 +308,6 @@ function renderableOpenCodeAgents(profile) {
   });
 }
 
-async function renderAgentsInstruction(projectRoot, options = {}) {
-  const template = await renderTemplate("AGENTS.md");
-  const sharedGuidance = [
-    CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE,
-    FOUR_RULE_DISCIPLINE_GUIDANCE,
-    ASK_QUESTIONS_GUIDANCE,
-  ].join("\n\n");
-  const guidedTemplate = template.includes("\n## Runtime contract")
-    ? template.replace("\n## Runtime contract", `\n\n${sharedGuidance}\n\n## Runtime contract`)
-    : `${sharedGuidance}\n\n${template}`;
-  const ruleBlock = await renderProjectRulesInstructionBlock(projectRoot, options);
-  return ruleBlock ? `${guidedTemplate.trimEnd()}\n\n${ruleBlock}` : guidedTemplate;
-}
-
-async function renderProjectRulesInstructionBlock(projectRoot, options = {}) {
-  const authority = options.rulesAuthority || await loadArtifactRulesAuthority(projectRoot, options);
-  if (!authority) return "";
-  return renderStructuredRulesInstructionBlock(authority);
-}
-
-async function loadArtifactRulesAuthority(projectRoot, options = {}) {
-  try {
-    return options.rulesAuthority || await loadStructuredRulesAuthority(projectRoot, REPO_ROOT, options);
-  } catch {
-    return null;
-  }
-}
-
 async function renderPluginTemplate(profile = {}) {
   const template = await renderTemplate("plugin.ts");
   return template
@@ -502,4 +420,12 @@ function functionBodyStart(source, start) {
     }
   }
   return source.indexOf("{", start);
+}
+
+function deferredAdapterError(platform) {
+  const error = new Error(`${platform} adapter generation is deferred; this writer is retired and performed no writes.`);
+  error.code = "ERR_HYPO_WORKFLOW_ADAPTER_DEFERRED";
+  error.status = "deferred";
+  error.writes = [];
+  return error;
 }

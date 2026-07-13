@@ -19,6 +19,7 @@
 
 set -euo pipefail
 
+script_dir="$(cd "$(dirname "$0")" && pwd)"
 pipeline_dir=".pipeline"
 step=""
 status=""
@@ -58,6 +59,16 @@ if [[ -z "$status" ]]; then
   echo "--status is required" >&2
   exit 1
 fi
+
+project_root="$(cd "$(dirname "$pipeline_dir")" && pwd)"
+writer_id="${HYPO_WORKFLOW_LEGACY_WRITER_ID:-legacy.log}"
+node --input-type=module - "$script_dir/../core/src/workspace-format/index.js" "$project_root" "$writer_id" <<'NODE'
+import { pathToFileURL } from "node:url";
+
+const [modulePath, projectRoot, writerId] = process.argv.slice(2);
+const { assertLegacyWorkspaceWritable } = await import(pathToFileURL(modulePath));
+await assertLegacyWorkspaceWritable(projectRoot, writerId);
+NODE
 
 log_file="$pipeline_dir/log.md"
 mkdir -p "$pipeline_dir"

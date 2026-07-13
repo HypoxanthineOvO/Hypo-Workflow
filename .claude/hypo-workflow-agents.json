@@ -58,28 +58,28 @@
   },
   "agents": {
     "plan": {
-      "model": "deepseek-v4-pro"
+      "model": "claude-opus-4-6"
     },
     "code": {
-      "model": "mimo-v2.5-pro"
+      "model": "claude-sonnet-4-6"
     },
     "test": {
-      "model": "mimo-v2.5-pro"
+      "model": "claude-sonnet-4-6"
     },
     "review": {
-      "model": "deepseek-v4-pro"
+      "model": "claude-opus-4-6"
     },
     "debug": {
-      "model": "deepseek-v4-pro"
+      "model": "claude-opus-4-6"
     },
     "docs": {
-      "model": "deepseek-v4-pro"
+      "model": "claude-sonnet-4-6"
     },
     "report": {
-      "model": "deepseek-v4-flash"
+      "model": "claude-haiku-4-5-20251001"
     },
     "compact": {
-      "model": "deepseek-v4-flash"
+      "model": "claude-haiku-4-5-20251001"
     }
   },
   "conflicts": []

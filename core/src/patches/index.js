@@ -3,6 +3,7 @@ import { basename, join } from "node:path";
 import { parseYaml, writeConfig } from "../config/index.js";
 import { createRejectionFeedbackTemplate } from "../acceptance/index.js";
 import { appendProgressEvent } from "../progress/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 
 export async function readPatch(projectRoot = ".", patchId) {
   const file = await findPatchFile(projectRoot, patchId);
@@ -11,6 +12,7 @@ export async function readPatch(projectRoot = ".", patchId) {
 }
 
 export async function requestPatchAcceptance(projectRoot = ".", patchId, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.patches");
   const patch = await readPatch(projectRoot, patchId);
   const now = options.now || new Date().toISOString();
   const metadata = {
@@ -34,6 +36,7 @@ export async function requestPatchAcceptance(projectRoot = ".", patchId, options
 }
 
 export async function acceptPatch(projectRoot = ".", patchId, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.patches");
   const patch = await readPatch(projectRoot, patchId);
   const now = options.now || new Date().toISOString();
   const metadata = {
@@ -56,6 +59,7 @@ export async function acceptPatch(projectRoot = ".", patchId, options = {}) {
 }
 
 export async function rejectPatch(projectRoot = ".", patchId, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.patches");
   const patch = await readPatch(projectRoot, patchId);
   const now = options.now || new Date().toISOString();
   const feedbackRef = options.feedback_ref || `.pipeline/patches/feedback/${patch.id}-rejection-${compactTimestamp(now)}.yaml`;

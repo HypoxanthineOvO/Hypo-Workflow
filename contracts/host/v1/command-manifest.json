@@ -1,0 +1,20 @@
+{
+  "schema_version": "1",
+  "contract_version": "1",
+  "root": {
+    "name": "hypo-workflow",
+    "skill": "hypo-workflow:hypo-workflow",
+    "path": "SKILL.md"
+  },
+  "commands": [
+    { "name": "hw:guide", "slash": "/hw:guide", "skill": "hypo-workflow:guide", "path": "skills/guide/SKILL.md" },
+    { "name": "hw:init", "slash": "/hw:init", "skill": "hypo-workflow:init", "path": "skills/init/SKILL.md" },
+    { "name": "hw:goal", "slash": "/hw:goal", "skill": "hypo-workflow:goal", "path": "skills/goal/SKILL.md" },
+    { "name": "hw:plan", "slash": "/hw:plan", "skill": "hypo-workflow:plan", "path": "skills/plan/SKILL.md" },
+    { "name": "hw:cycle", "slash": "/hw:cycle", "skill": "hypo-workflow:cycle", "path": "skills/cycle/SKILL.md" },
+    { "name": "hw:maintain", "slash": "/hw:maintain", "skill": "hypo-workflow:maintain", "path": "skills/maintain/SKILL.md" },
+    { "name": "hw:resume", "slash": "/hw:resume", "skill": "hypo-workflow:resume", "path": "skills/resume/SKILL.md" },
+    { "name": "hw:accept", "slash": "/hw:accept", "skill": "hypo-workflow:accept", "path": "skills/accept/SKILL.md" },
+    { "name": "hw:reject", "slash": "/hw:reject", "skill": "hypo-workflow:reject", "path": "skills/reject/SKILL.md" }
+  ]
+}

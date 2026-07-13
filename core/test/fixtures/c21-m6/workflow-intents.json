@@ -1,0 +1,92 @@
+[
+  {
+    "name": "goal-natural",
+    "input": "我想先明确一个单一验收目标，不拆里程碑",
+    "context": { "workspace": "current", "active_delivery": null },
+    "canonical": "/hw:goal",
+    "authority_intent": "delivery.propose_goal",
+    "delivery_kind": "goal"
+  },
+  {
+    "name": "goal-command",
+    "input": "/hw:goal 构建一个可验收的队列 API",
+    "context": { "workspace": "current", "active_delivery": null },
+    "canonical": "/hw:goal",
+    "authority_intent": "delivery.propose_goal",
+    "delivery_kind": "goal"
+  },
+  {
+    "name": "cycle-natural",
+    "input": "这个项目要分成两个有顺序的阶段，最后整体验收",
+    "context": { "workspace": "current", "active_delivery": null },
+    "canonical": "/hw:cycle",
+    "authority_intent": "delivery.propose_cycle",
+    "delivery_kind": "cycle"
+  },
+  {
+    "name": "cycle-command",
+    "input": "/hw:cycle new 两阶段队列服务",
+    "context": { "workspace": "current", "active_delivery": null },
+    "canonical": "/hw:cycle",
+    "authority_intent": "delivery.propose_cycle",
+    "delivery_kind": "cycle"
+  },
+  {
+    "name": "explicit-start-natural",
+    "input": "方案确认了，开始做吧",
+    "context": { "workspace": "current", "active_delivery": { "status": "waiting_to_start" } },
+    "canonical": "/hw:start",
+    "authority_intent": "delivery.start",
+    "discoverable": false
+  },
+  {
+    "name": "explicit-start-command",
+    "input": "/hw:start",
+    "context": { "workspace": "current", "active_delivery": { "status": "waiting_to_start" } },
+    "canonical": "/hw:start",
+    "authority_intent": "delivery.start",
+    "discoverable": false
+  },
+  {
+    "name": "resume-natural",
+    "input": "继续刚才没有做完的交付",
+    "context": { "workspace": "current", "active_delivery": { "status": "executing" } },
+    "canonical": "/hw:resume",
+    "authority_intent": "delivery.resume"
+  },
+  {
+    "name": "accept-natural",
+    "input": "这次结果我验收通过",
+    "context": { "workspace": "current", "active_delivery": { "status": "pending_acceptance" } },
+    "canonical": "/hw:accept",
+    "authority_intent": "delivery.accept"
+  },
+  {
+    "name": "reject-natural",
+    "input": "验收不通过，FIFO 顺序不对",
+    "context": { "workspace": "current", "active_delivery": { "status": "pending_acceptance" } },
+    "canonical": "/hw:reject",
+    "authority_intent": "delivery.reject"
+  },
+  {
+    "name": "maintain-natural",
+    "input": "把我刚才这段日常修改记录到项目里",
+    "context": { "workspace": "current", "active_delivery": null },
+    "canonical": "/hw:maintain",
+    "authority_intent": "maintain.record"
+  },
+  {
+    "name": "init-natural",
+    "input": "接手这个已有项目，先识别现在的架构",
+    "context": { "workspace": "unmanaged_brownfield", "active_delivery": null },
+    "canonical": "/hw:init",
+    "authority_intent": "workspace.initialize"
+  },
+  {
+    "name": "guide-natural",
+    "input": "我不知道应该从哪个工作流开始",
+    "context": { "workspace": "current", "active_delivery": null },
+    "canonical": "/hw:guide",
+    "authority_intent": "workflow.guide"
+  }
+]

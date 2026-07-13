@@ -28,7 +28,7 @@ fi
 
 status="$(printf '%s\n' "$summary" | sed -n 's/^Status: //p' | head -n1)"
 if [[ "$status" != "running" ]]; then
-  bash "$scripts_dir/log-append.sh" \
+  HYPO_WORKFLOW_LEGACY_WRITER_ID="legacy.hook.codex-notify" bash "$scripts_dir/log-append.sh" \
     --pipeline-dir "$pipeline_dir" \
     --step "hook:codex-notify" \
     --status "done" \
@@ -51,7 +51,7 @@ if [[ -n "$safe_resume_command" ]]; then
   message="${message}; safe_resume_command=${safe_resume_command}"
 fi
 
-bash "$scripts_dir/log-append.sh" \
+HYPO_WORKFLOW_LEGACY_WRITER_ID="legacy.hook.codex-notify" bash "$scripts_dir/log-append.sh" \
   --pipeline-dir "$pipeline_dir" \
   --step "hook:codex-notify" \
   --status "done" \

@@ -1,0 +1,10 @@
+{
+  "schema_version": "1",
+  "contract_version": "1",
+  "files": [
+    {
+      "path": "payload/SKILL.md",
+      "sha256": "38618f1019d93a899fb5d9b378a3eb6691c0073f92bb33677fb939e7013fc2b6"
+    }
+  ]
+}

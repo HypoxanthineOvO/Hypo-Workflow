@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import { redactSecrets } from "../evidence/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 export {
   buildGlobalKnowledgeProjection,
   buildInfrastructureFactProjection,
@@ -314,6 +315,7 @@ export function renderProjectGlobalProjectionCompact(projection = {}) {
 }
 
 export async function appendKnowledgeRecord(projectRoot, record, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.knowledge");
   const normalized = normalizeKnowledgeRecord(record, options);
   const result = validateKnowledgeRecord(normalized);
   if (!result.ok) {
@@ -329,6 +331,7 @@ export async function appendKnowledgeRecord(projectRoot, record, options = {}) {
 }
 
 export async function rebuildKnowledgeIndexes(projectRoot, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.knowledge");
   const records = await loadKnowledgeRecords(projectRoot, options);
   const root = knowledgeRoot(projectRoot, options);
   const indexDir = join(root, "index");
@@ -346,6 +349,7 @@ export async function rebuildKnowledgeIndexes(projectRoot, options = {}) {
 }
 
 export async function renderKnowledgeCompact(projectRoot, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.knowledge");
   const records = options.records || await loadKnowledgeRecords(projectRoot, options);
   const content = renderCompactContent(records, options);
   const compactFile = options.compact_file || DEFAULT_KNOWLEDGE_CONFIG.compaction.compact_file;
@@ -356,6 +360,7 @@ export async function renderKnowledgeCompact(projectRoot, options = {}) {
 }
 
 export async function rebuildKnowledgeLedger(projectRoot, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.knowledge");
   const indexes = await rebuildKnowledgeIndexes(projectRoot, options);
   const compact = await renderKnowledgeCompact(projectRoot, { ...options, records: indexes.records });
   return {

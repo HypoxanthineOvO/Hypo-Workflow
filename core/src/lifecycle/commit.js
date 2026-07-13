@@ -1,6 +1,7 @@
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
 import { parseYaml, stringifyYaml } from "../config/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 
 const CORE_AUTHORITY_PATHS = Object.freeze([
   ".pipeline/state.yaml",
@@ -9,6 +10,7 @@ const CORE_AUTHORITY_PATHS = Object.freeze([
 ]);
 
 export async function commitWorkflowUpdate(projectRoot = ".", update = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.lifecycle.commit");
   const root = resolve(projectRoot);
   const now = update.now || new Date().toISOString();
   const id = update.id || `workflow-${compactTimestamp(now)}`;

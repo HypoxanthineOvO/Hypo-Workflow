@@ -69,10 +69,11 @@ async function readAuditFiles(projectRoot) {
     resumeSkill: "skills/resume/SKILL.md",
     pluginManifest: ".claude-plugin/plugin.json",
     marketplaceManifest: ".claude-plugin/marketplace.json",
-    hooksJson: "hooks/hooks.json",
   };
   const entries = await Promise.all(Object.entries(paths).map(async ([key, path]) => [key, await readOptional(join(projectRoot, path))]));
-  return Object.fromEntries(entries);
+  const claudeHooks = await readOptional(join(projectRoot, "hooks/claude/hooks.json"));
+  const legacyHooks = claudeHooks || await readOptional(join(projectRoot, "hooks/hooks.json"));
+  return { ...Object.fromEntries(entries), hooksJson: legacyHooks };
 }
 
 async function readOptional(path) {

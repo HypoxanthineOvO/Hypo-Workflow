@@ -1,47 +1,87 @@
-# Codex Guide
+# Official Codex Guide
 
 [中文](../../platforms/codex.md) | English
 
-Hypo-Workflow does not execute project work directly. The host Agent reads `.pipeline/` files and performs implementation, tests, and review.
+Hypo-Workflow currently runs as a Codex plugin with nine focused Skills and ten lifecycle Hook events. It is not a runner: the Codex Agent implements, tests, and reviews work, while Core validates and persists authority.
 
-## Capability Summary
+## Installation Shapes
 
-- Commands: skill.
-- Ask gates: chat.
-- Plan support: codex-plan-tool.
-- Subagents: codex-gpt-runtime.
-- Events/hooks: limited.
-- Rules/instructions: skill-files.
-- Recovery: lease-heartbeat.
-
-## Install / Sync
-
-Local checkout install:
+Use the plugin for full behavior. Add a development checkout as a local marketplace:
 
 ```bash
-git clone https://github.com/HypoxanthineOvO/Hypo-Workflow.git ~/.codex/skills/hypo-workflow
+codex plugin marketplace add /absolute/path/to/Hypo-Workflow
+codex plugin marketplace list
 ```
 
-For development, symlink the current checkout instead of copying it:
+Install or enable `hypo-workflow` from Codex `/plugins`, then start a new session. Use `/hooks` to inspect sources and trust the current definitions. Codex binds trust to Hook hashes, so changed definitions are skipped until trusted again.
+
+A Skill-only symlink is available for degraded testing without Hooks:
 
 ```bash
-mkdir -p ~/.codex/skills
-ln -sfn /absolute/path/to/Hypo-Workflow ~/.codex/skills/hypo-workflow
+mkdir -p "$CODEX_HOME/skills"
+ln -sfn /absolute/path/to/Hypo-Workflow "$CODEX_HOME/skills/hypo-workflow"
 ```
 
-## Supported Behavior
+This loads Skills only and is not a full plugin installation.
 
-- Read `.pipeline/` state, config, Cycle, Rules/Habits, prompts, reports, logs, and review artifacts.
-- Use canonical `/hw:*` workflow vocabulary: init, plan, start/resume, status/report, sync/docs, rules, patch, release.
-- Support `/hw:explain` as a read-only evidence-first command.
-- Protect authority files unless the active lifecycle command owns the write.
-- Use Codex skills and the Codex plan tool when available.
-- Prefer Codex Subagents for substantial implementation or review work when available.
-- Keep implementation separate from testing/review; strict worker separation hides test source, fixtures, snapshots, and assertion details from implementation workers.
-- Keep Codex Subagents inside the Codex/GPT runtime and do not require external model routing.
+## Current Capabilities
+
+| Surface | Current contract |
+| --- | --- |
+| Commands | nine public Skills: guide, init, goal, plan, cycle, maintain, resume, accept, reject |
+| Questions | use the host Ask/request-user-input surface after showing full decision context |
+| Plan | maintain a visible host Plan/Todo; `/hw:plan` selects internal phases |
+| Subagents | choose by complexity; material work may separate test, implement, audit, or domain roles |
+| Memory | Manifest, Runtime, Continuation, Records, Receipts, Journal, Capsule, Pack, Snapshots |
+| Hooks | ten current Official Codex lifecycle events |
+| Destruction | exact Deletion Manifest + fresh Receipt + controlled executor |
+
+OpenCode, Claude Code, Cursor, Copilot, Trae, and custom Codex-fork adapters are outside the current support surface.
+
+## Hook Events
+
+The plugin discovers `hooks/hooks.json` by default:
+
+| Event | Hypo-Workflow behavior |
+| --- | --- |
+| `SessionStart` | inject bounded Recovery Pack context after compaction |
+| `UserPromptSubmit` | extract a clean durable semantic delta into a Journal/Inbox proposal |
+| `PreToolUse` | deny obvious direct deletion and explain the gate |
+| `PermissionRequest` | add deletion or permission context before an approval prompt |
+| `PostToolUse` | record bounded tool evidence and emit relevant deduplicated docs/Record reminders |
+| `PreCompact` | seal a Recovery Pack from a validated Capsule |
+| `PostCompact` | record the compaction outcome |
+| `SubagentStart` | record worker identity and role |
+| `SubagentStop` | record worker evidence references and closure |
+| `Stop` | record the turn boundary and recovery clue |
+
+Commands locate the installed bundle through `PLUGIN_ROOT`, and timeouts use seconds. The wrapper writes one valid JSON line to stdout and sends diagnostics to stderr.
 
 ## Boundaries
 
-- Hypo-Workflow is not a runner; implementation, tests, and review are performed by the host Agent.
-- `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/rules.yaml` are protected authority files.
-- External installs, user-level config writes, destructive commands, and network side effects require explicit confirmation.
+Matching command Hooks launch concurrently, so one Hook cannot stop another from starting. `PreToolUse` covers supported Bash, `apply_patch`, and MCP paths, but interception remains incomplete. Therefore:
+
+- Hooks do not replace Runtime or Receipt authority.
+- Reminders do not force a documentation write after every tool call.
+- Worker observations count for acceptance only when they satisfy topology and evidence contracts.
+- Plugin enablement, Hook trust, and project trust are discovery prerequisites.
+
+Deletion authority comes only from an exact hashed Deletion Manifest already shown to the user and a `deletion.execute` Receipt bound to actor, intent, scope, Manifest hash, and plan/Git state. The controlled executor revalidates content and Git before deletion; drift invalidates the Receipt.
+
+## Workspace And Recovery
+
+Current authority order:
+
+```text
+.pipeline/manifest.yaml
+  -> .pipeline/runtime/active.yaml
+  -> Runtime + Continuation
+  -> Records / Receipts
+  -> Journal / Capsule / latest valid sealed Pack
+```
+
+Resume reads Runtime and Continuation first; a Pack only enriches bounded context. Resume still works without a Pack and reports degraded recovery context. Never restore a current Delivery from legacy `state.yaml`, `cycle.yaml`, `log.yaml`, or `PROGRESS.md`.
+
+## Validation
+
+Repository checks can validate the manifest, JSON, Hook wrapper, and deterministic Core. A real-host result is PASS only with a compatible current Official Codex, the plugin enabled, and Hooks trusted. Otherwise report SKIP/UNAVAILABLE; a VSP fork or old Codex binary is not equivalent evidence.

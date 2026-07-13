@@ -1,7 +1,6 @@
 import { access, cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { commandMap, legacyOpenCodeCommandName } from "../commands/index.js";
-import { loadStructuredRulesAuthority, renderStructuredRulesInstructionBlock } from "../rules/index.js";
 
 export const CURSOR_SKILLS_DIR = ".cursor/skills";
 export const CURSOR_COMMANDS_DIR = ".cursor/commands";
@@ -89,83 +88,15 @@ export const THIRD_PARTY_MANAGED_BEGIN = "<!-- HYPO-WORKFLOW:MANAGED:BEGIN -->";
 export const THIRD_PARTY_MANAGED_END = "<!-- HYPO-WORKFLOW:MANAGED:END -->";
 
 export async function writeThirdPartyAdapterArtifacts(projectRoot = ".", options = {}) {
-  const adapters = selectThirdPartyAdapters(options.platform || "all");
-  const files = [];
-  const skillBundles = [];
-  const rulesBlock = await renderAdapterRulesBlock(projectRoot, options);
-  for (const adapter of adapters) {
-    const file = join(projectRoot, adapter.path);
-    const existing = await readOptionalText(file);
-    const rendered = renderThirdPartyAdapter(adapter, { rulesBlock });
-    const next = mergeManagedContent(existing, rendered);
-    await mkdir(dirname(file), { recursive: true });
-    await writeFile(file, next, "utf8");
-    files.push({
-      platform: adapter.platform,
-      path: adapter.path,
-      changed: existing !== next,
-    });
-    if (adapter.platform === "cursor") {
-      skillBundles.push(await writeCursorSkillBundle(projectRoot, options));
-    }
-  }
-  const result = { files };
-  if (skillBundles.length) result.skill_bundles = skillBundles;
-  return result;
+  void projectRoot;
+  void options;
+  throw deferredAdapterError("Third-party");
 }
 
 export async function writeCursorSkillBundle(projectRoot = ".", options = {}) {
-  const repoRoot = options.repoRoot || resolve(new URL("../../..", import.meta.url).pathname);
-  const bundleRoot = join(projectRoot, CURSOR_RESOURCE_BUNDLE_PATH);
-  const copied = [];
-  const missing = [];
-
-  await removeLegacyCursorSkillBundle(projectRoot);
-  await resetManagedCursorResourceBundle(projectRoot);
-  await mkdir(bundleRoot, { recursive: true });
-  for (const sourcePath of CURSOR_RESOURCE_BUNDLE_SOURCES) {
-    const source = join(repoRoot, sourcePath);
-    if (!await existsPath(source)) {
-      missing.push(sourcePath);
-      continue;
-    }
-    const target = join(bundleRoot, sourcePath);
-    await mkdir(dirname(target), { recursive: true });
-    await cp(source, target, {
-      recursive: true,
-      force: true,
-      errorOnExist: false,
-    });
-    copied.push(sourcePath);
-  }
-  if (missing.length) {
-    throw new Error(`Cannot sync Cursor Skill bundle; missing source paths: ${missing.join(", ")}`);
-  }
-
-  await writeFile(
-    join(bundleRoot, ".hypo-workflow-managed.json"),
-    `${JSON.stringify({
-      managed_by: "hypo-workflow",
-      entry: `${CURSOR_SKILLS_DIR}/hypo-workflow.md`,
-      strategy: "compact-shared-resources",
-      source_paths: copied,
-    }, null, 2)}\n`,
-    "utf8",
-  );
-
-  const skillFiles = await writeCursorSkillFiles(projectRoot, repoRoot);
-  const commandFiles = await writeCursorCommandFiles(projectRoot);
-
-  return {
-    platform: "cursor",
-    path: CURSOR_SKILLS_DIR,
-    entry: `${CURSOR_SKILLS_DIR}/hypo-workflow.md`,
-    resource_bundle: CURSOR_RESOURCE_BUNDLE_PATH,
-    command_dir: CURSOR_COMMANDS_DIR,
-    files: skillFiles,
-    command_files: commandFiles,
-    source_paths: copied,
-  };
+  void projectRoot;
+  void options;
+  throw deferredAdapterError("Cursor");
 }
 
 async function writeCursorSkillFiles(projectRoot, repoRoot) {
@@ -482,12 +413,10 @@ async function existsPath(file) {
   }
 }
 
-async function renderAdapterRulesBlock(projectRoot, options = {}) {
-  try {
-    const repoRoot = options.repoRoot || resolve(new URL("../../..", import.meta.url).pathname);
-    const authority = options.rulesAuthority || await loadStructuredRulesAuthority(projectRoot, repoRoot, options);
-    return renderStructuredRulesInstructionBlock(authority);
-  } catch {
-    return "";
-  }
+function deferredAdapterError(platform) {
+  const error = new Error(`${platform} adapter generation is deferred; this writer is retired and performed no writes.`);
+  error.code = "ERR_HYPO_WORKFLOW_ADAPTER_DEFERRED";
+  error.status = "deferred";
+  error.writes = [];
+  return error;
 }

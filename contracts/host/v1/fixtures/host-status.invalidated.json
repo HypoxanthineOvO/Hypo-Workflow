@@ -1,0 +1,14 @@
+{
+  "schema_version": "1",
+  "contract_version": "1",
+  "projection_status": "invalidated",
+  "generated_at": "2026-07-12T12:05:00.000Z",
+  "generation": 8,
+  "workspace": null,
+  "delivery": null,
+  "continuation": null,
+  "invalidation": {
+    "invalidated_at": "2026-07-12T12:05:00.000Z",
+    "reason": "authority_transaction_failed"
+  }
+}

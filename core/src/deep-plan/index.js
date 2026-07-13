@@ -2,6 +2,7 @@ import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { parseYaml, writeConfig } from "../config/index.js";
 import { redactSecrets } from "../evidence/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 
 export const DEEP_PLAN_LIFECYCLE_STATES = Object.freeze([
   "drafting",
@@ -53,6 +54,7 @@ const SIDE_EFFECT_RESEARCH_ACTIONS = Object.freeze([
 ]);
 
 export async function createDeepPlanPackage(projectRoot = ".", options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.deep-plan");
   const root = resolve(projectRoot);
   const now = options.now || new Date().toISOString();
   const title = requiredTitle(options.title);
@@ -128,6 +130,7 @@ export async function listDeepPlanPackages(projectRoot = ".") {
 }
 
 export async function updateDeepPlanPackage(projectRoot = ".", ref, updates = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.deep-plan");
   const root = resolve(projectRoot);
   const found = await findDeepPlanPackage(root, ref);
   const current = parseYaml(await readFile(found.file, "utf8"));
@@ -199,6 +202,7 @@ export async function generateDeepPlanAskQuestions(packageDataOrInput, options =
 }
 
 export async function recordDeepPlanAskRound(projectRoot = ".", ref, round = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.deep-plan");
   const root = resolve(projectRoot);
   const found = await findDeepPlanPackage(root, ref);
   const current = parseYaml(await readFile(found.file, "utf8"));
@@ -237,6 +241,7 @@ export async function recordDeepPlanAskRound(projectRoot = ".", ref, round = {})
 }
 
 export async function recordDeepPlanResearch(projectRoot = ".", ref, researchEntry = {}, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.deep-plan");
   const root = resolve(projectRoot);
   const found = await findDeepPlanPackage(root, ref);
   const current = parseYaml(await readFile(found.file, "utf8"));
@@ -452,6 +457,7 @@ export async function deriveDeepPlanModuleTracks(packageDataOrInput, options = {
 }
 
 export async function updateDeepPlanArchitectureMap(projectRoot = ".", ref, architectureUpdate = {}, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.deep-plan");
   const root = resolve(projectRoot);
   const found = await findDeepPlanPackage(root, ref);
   const current = parseYaml(await readFile(found.file, "utf8"));
@@ -505,6 +511,7 @@ export async function validateDeepPlanTrackRelationships(packageDataOrInput, opt
 }
 
 export async function drillDeepPlanTopic(projectRoot = ".", ref, targetIdOrTopic, drillInput = {}, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.deep-plan");
   const root = resolve(projectRoot);
   const found = await findDeepPlanPackage(root, ref);
   const current = parseYaml(await readFile(found.file, "utf8"));
@@ -624,6 +631,7 @@ export async function assessDeepPlanReadiness(packageDataOrInput, options = {}) 
 }
 
 export async function convertDeepPlanToPlanContext(projectRoot = ".", ref, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.deep-plan");
   const root = resolve(projectRoot);
   const resolved = await resolveDeepPlanPackageForConversion(root, ref);
   if (resolved.blocked) return resolved;
@@ -756,6 +764,7 @@ export async function validateDeepPlanPackageBoundary(projectRoot = ".", package
 }
 
 export async function archiveDeepPlanPackage(projectRoot = ".", ref, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.deep-plan");
   const root = resolve(projectRoot);
   const found = await findDeepPlanPackage(root, ref);
   const current = parseYaml(await readFile(found.file, "utf8"));

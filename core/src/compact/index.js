@@ -2,6 +2,7 @@ import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { DEFAULT_GLOBAL_CONFIG, loadConfig, parseYaml, stringifyYaml } from "../config/index.js";
 import { buildDerivedArtifactMap } from "../sync/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 
 const COMPACT_ARTIFACT_IDS = Object.freeze([
   "progress_compact",
@@ -33,6 +34,7 @@ export function compactEndOfRunTargets(options = {}) {
 }
 
 export async function runEndOfRunCompact(projectRoot = ".", options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.compact");
   const root = resolve(projectRoot);
   const config = options.config || await loadConfig(join(root, ".pipeline", "config.yaml"))
     .catch(() => DEFAULT_GLOBAL_CONFIG);

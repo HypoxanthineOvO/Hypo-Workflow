@@ -231,15 +231,17 @@ test("knowledge specs and skill document command semantics and state boundary", 
   assert.match(rootSkill, /\/hw:knowledge/);
 });
 
-test("knowledge command is exposed through the canonical OpenCode command map", () => {
+test("knowledge remains an internal compatibility route in the canonical OpenCode map", () => {
   const commands = commandMap("opencode");
   const knowledge = commandByCanonical("/hw:knowledge");
 
-  assert.equal(commands.length, 53);
+  assert.equal(commands.length, 54);
   assert.equal(knowledge.opencode, "/hw:knowledge");
   assert.equal(knowledge.agent, "hw-compact");
   assert.equal(knowledge.route, "tool");
   assert.equal(knowledge.skill, "skills/knowledge/SKILL.md");
+  assert.equal(knowledge.exposure, "internal");
+  assert.equal(knowledge.availability, "unavailable");
 });
 
 test("knowledge record normalization is deterministic and contract-safe", () => {

@@ -12,6 +12,7 @@ import {
   saveProjectRegistry,
 } from "../config/index.js";
 import { writeOpenCodeArtifacts } from "../artifacts/opencode.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 
 export const MODEL_POOL_ROLES = Object.freeze(["plan", "implement", "review", "evaluate", "chat"]);
 
@@ -89,6 +90,7 @@ export async function syncSelectedProjectAction(registryFile, projectId, options
   const project = await inspectProject(selected.path, { ...options, existing: selected });
   const config = await loadSyncConfig(project.path, options);
   if (options.platform === "opencode" || project.platform === "opencode") {
+    await assertLegacyWorkspaceWritable(project.path, "legacy.actions.project-sync");
     await writeOpenCodeArtifacts(project.path, { config, profile: project.profile || options.profile || "standard" });
   }
 

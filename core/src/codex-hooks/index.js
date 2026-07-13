@@ -1,0 +1,852 @@
+import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import { basename, resolve } from "node:path";
+import { createAmbientMaintainStore } from "../maintain/index.js";
+import { createRecoveryStore } from "../recovery/index.js";
+import { readActivePointer, readRuntimeObject } from "../runtime/index.js";
+import { canonicalHash } from "../serialization/index.js";
+import { refreshHostStatusProjection } from "../host-contract/index.js";
+import {
+  assertExactKeys,
+  assertNoRawSecrets,
+  assertPlainObject,
+  authorityError,
+  normalizeCanonicalValue,
+  normalizeSafeIdentifier,
+} from "../runtime/internal.js";
+
+export const CODEX_HOOK_EVENTS = Object.freeze([
+  "SessionStart",
+  "UserPromptSubmit",
+  "PreToolUse",
+  "PermissionRequest",
+  "PostToolUse",
+  "PreCompact",
+  "PostCompact",
+  "SubagentStart",
+  "SubagentStop",
+  "Stop",
+]);
+
+const EVENT_SET = new Set(CODEX_HOOK_EVENTS);
+const PERMISSION_MODES = new Set(["default", "acceptEdits", "plan", "dontAsk", "bypassPermissions"]);
+const WRITE_EVENTS = new Set(CODEX_HOOK_EVENTS.filter((event) => ![
+  "SessionStart",
+  "PreToolUse",
+  "PermissionRequest",
+].includes(event)));
+const PERMISSION_MODE_EVENTS = new Set([
+  "SessionStart",
+  "UserPromptSubmit",
+  "PreToolUse",
+  "PermissionRequest",
+  "PostToolUse",
+  "SubagentStart",
+  "SubagentStop",
+  "Stop",
+]);
+const COMMON_KEYS = ["session_id", "transcript_path", "cwd", "hook_event_name", "model"];
+const EVENT_KEYS = Object.freeze({
+  SessionStart: ["permission_mode", "source"],
+  UserPromptSubmit: ["permission_mode", "turn_id", "prompt"],
+  PreToolUse: ["permission_mode", "turn_id", "tool_name", "tool_use_id", "tool_input"],
+  PermissionRequest: ["permission_mode", "turn_id", "tool_name", "tool_input"],
+  PostToolUse: ["permission_mode", "turn_id", "tool_name", "tool_use_id", "tool_input", "tool_response"],
+  PreCompact: ["turn_id", "trigger"],
+  PostCompact: ["turn_id", "trigger"],
+  SubagentStart: ["permission_mode", "turn_id", "agent_id", "agent_type"],
+  SubagentStop: [
+    "permission_mode",
+    "turn_id",
+    "agent_id",
+    "agent_type",
+    "agent_transcript_path",
+    "stop_hook_active",
+    "last_assistant_message",
+  ],
+  Stop: ["permission_mode", "turn_id", "stop_hook_active", "last_assistant_message"],
+});
+
+export function validateCodexHookInput(input) {
+  assertPlainObject(input, "Codex Hook input");
+  const event = input.hook_event_name;
+  if (!EVENT_SET.has(event)) {
+    throw hookError("ERR_CODEX_HOOK_EVENT_UNSUPPORTED", "Codex Hook event is unsupported");
+  }
+  assertExactKeys(input, [...COMMON_KEYS, ...EVENT_KEYS[event]], "Codex Hook input");
+  requireText(input.session_id, "session_id");
+  requireNullableText(input.transcript_path, "transcript_path");
+  requireText(input.cwd, "cwd");
+  requireText(input.model, "model");
+  if (PERMISSION_MODE_EVENTS.has(event)) {
+    if (!PERMISSION_MODES.has(input.permission_mode)) {
+      throw hookError("ERR_CODEX_HOOK_INPUT_INVALID", "Codex Hook permission_mode is unsupported");
+    }
+  }
+  if (event !== "SessionStart") requireText(input.turn_id, "turn_id");
+
+  switch (event) {
+    case "SessionStart":
+      requireOneOf(input.source, ["startup", "resume", "clear", "compact"], "source");
+      break;
+    case "UserPromptSubmit":
+      requireText(input.prompt, "prompt", 128 * 1024);
+      break;
+    case "PreToolUse":
+    case "PostToolUse":
+      requireToolInput(input);
+      requireText(input.tool_use_id, "tool_use_id");
+      if (event === "PostToolUse") normalizeJsonValue(input.tool_response, "tool_response");
+      break;
+    case "PermissionRequest":
+      requireToolInput(input);
+      break;
+    case "PreCompact":
+    case "PostCompact":
+      requireOneOf(input.trigger, ["manual", "auto"], "trigger");
+      break;
+    case "SubagentStart":
+      requireAgentFields(input);
+      break;
+    case "SubagentStop":
+      requireAgentFields(input);
+      requireNullableText(input.agent_transcript_path, "agent_transcript_path");
+      requireBoolean(input.stop_hook_active, "stop_hook_active");
+      requireNullableText(input.last_assistant_message, "last_assistant_message", 128 * 1024);
+      break;
+    case "Stop":
+      requireBoolean(input.stop_hook_active, "stop_hook_active");
+      requireNullableText(input.last_assistant_message, "last_assistant_message", 128 * 1024);
+      break;
+  }
+  return normalizeCanonicalValue(input, "Codex Hook input");
+}
+
+export function validateCodexHookOutput(event, output, input = undefined) {
+  if (!EVENT_SET.has(event)) {
+    throw hookError("ERR_CODEX_HOOK_EVENT_UNSUPPORTED", "Codex Hook output event is unsupported");
+  }
+  assertPlainObject(output, "Codex Hook output");
+  const allowed = outputKeysFor(event);
+  for (const key of Object.keys(output)) {
+    if (!allowed.has(key)) throw hookError("ERR_CODEX_HOOK_OUTPUT_UNSUPPORTED", `Codex Hook output field ${key} is unsupported for ${event}`);
+  }
+  if (Object.hasOwn(output, "continue")) requireBoolean(output.continue, "continue");
+  if (Object.hasOwn(output, "suppressOutput")) requireBoolean(output.suppressOutput, "suppressOutput");
+  if (Object.hasOwn(output, "stopReason")) requireText(output.stopReason, "stopReason");
+  if (Object.hasOwn(output, "systemMessage")) requireText(output.systemMessage, "systemMessage");
+  if (Object.hasOwn(output, "decision")) {
+    if (output.decision !== "block") throw hookError("ERR_CODEX_HOOK_OUTPUT_UNSUPPORTED", "Codex Hook decision is unsupported");
+    requireText(output.reason, "reason");
+  } else if (Object.hasOwn(output, "reason")) {
+    throw hookError("ERR_CODEX_HOOK_OUTPUT_INVALID", "Codex Hook reason requires decision:block");
+  }
+  if (Object.hasOwn(output, "hookSpecificOutput")) validateHookSpecificOutput(event, output.hookSpecificOutput, input);
+  return output;
+}
+
+export async function evaluateCodexHookEvent(root, rawInput, options = {}) {
+  const input = validateCodexHookInput(rawInput);
+  const workspaceRoot = resolve(root || ".");
+  if (resolve(input.cwd) !== workspaceRoot) {
+    throw hookError("ERR_CODEX_HOOK_ROOT_MISMATCH", "Codex Hook cwd does not match the target workspace");
+  }
+  const operation = normalizeEvaluationOptions(input.hook_event_name, options);
+  const recovery = createRecoveryStore({ ...(operation.clock ? { clock: operation.clock } : {}) });
+
+  let output;
+  switch (input.hook_event_name) {
+    case "SessionStart":
+      output = await evaluateSessionStart(workspaceRoot, input, operation, recovery);
+      break;
+    case "UserPromptSubmit":
+      output = await evaluateUserPrompt(workspaceRoot, input, operation);
+      break;
+    case "PreToolUse":
+      output = evaluatePreToolUse(input);
+      break;
+    case "PermissionRequest":
+      output = evaluatePermissionRequest(input);
+      break;
+    case "PostToolUse":
+      output = await evaluatePostToolUse(workspaceRoot, input, operation, recovery);
+      break;
+    case "PreCompact":
+      output = await evaluatePreCompact(workspaceRoot, input, operation, recovery);
+      break;
+    case "PostCompact":
+      output = await evaluatePostCompact(workspaceRoot, input, operation, recovery);
+      break;
+    case "SubagentStart":
+      output = await evaluateSubagent(workspaceRoot, input, operation, recovery, true);
+      break;
+    case "SubagentStop":
+      output = await evaluateSubagent(workspaceRoot, input, operation, recovery, false);
+      break;
+    case "Stop":
+      output = await evaluateStop(workspaceRoot, input, operation, recovery);
+      break;
+  }
+  return validateCodexHookOutput(input.hook_event_name, output, input);
+}
+
+async function evaluateSessionStart(root, input, operation, recovery) {
+  await refreshProjectionIfCurrent(root, operation, "session-start");
+  if (input.source !== "compact") return {};
+  const objectRef = await readActiveObjectRef(root);
+  if (!objectRef) return {};
+  try {
+    const plan = await recovery.planRecoveryRestore(root, {
+      object_ref: objectRef,
+      budget_bytes: 12 * 1024,
+    });
+    const additionalContext = boundUtf8(renderRestoreContext(plan), 16_000);
+    return {
+      hookSpecificOutput: {
+        hookEventName: "SessionStart",
+        additionalContext,
+      },
+    };
+  } catch (error) {
+    if (error?.code === "ERR_RECOVERY_PACK_NOT_FOUND") return {};
+    throw error;
+  }
+}
+
+async function evaluateUserPrompt(root, input, operation) {
+  const semanticDelta = inferSemanticDelta(root, input);
+  const promptIsSecretSafe = isSecretSafeText(input.prompt);
+  const maintain = createAmbientMaintainStore({ clock: operation.clock ?? (() => new Date().toISOString()) });
+  await maintain.captureSemanticDelta(root, {
+    object_ref: { kind: "activity", id: "ambient-maintain" },
+    session_id: input.session_id,
+    turn_id: input.turn_id,
+    writer: { kind: "main", id: "main" },
+    source: "user_prompt",
+    summary: semanticDelta?.body ?? (promptIsSecretSafe
+      ? "User prompt contained no clean durable statement."
+      : "User prompt omitted because it contains secret-like material."),
+    semantic_delta: semanticDelta,
+  }, { id: operation.id });
+  return {};
+}
+
+function evaluatePreToolUse(input) {
+  if (!isObviousDirectDeletion(input.tool_name, input.tool_input)) return {};
+  return {
+    hookSpecificOutput: {
+      hookEventName: "PreToolUse",
+      permissionDecision: "deny",
+      permissionDecisionReason: deletionGuardReason(),
+    },
+  };
+}
+
+function evaluatePermissionRequest(input) {
+  if (!isObviousDirectDeletion(input.tool_name, input.tool_input)) return {};
+  return {
+    hookSpecificOutput: {
+      hookEventName: "PermissionRequest",
+      decision: { behavior: "deny", message: deletionGuardReason() },
+    },
+  };
+}
+
+async function evaluatePostToolUse(root, input, operation, recovery) {
+  const objectRef = await readActiveObjectRef(root);
+  if (!objectRef) return {};
+  const changedPaths = extractChangedPaths(root, input);
+  const worktreeEffect = collectReminderWorktreeEffect(root, changedPaths);
+  const reminderKey = reminderDigest(input.tool_name, changedPaths, input.tool_input, worktreeEffect.digest);
+  const replay = await recovery.replayRecoveryJournal(root, { object_ref: objectRef });
+  const alreadyReminded = replay.events.some((event) => event.payload?.reminder_key === reminderKey);
+  await recovery.appendRecoveryEvent(root, {
+    object_ref: objectRef,
+    session_id: input.session_id,
+    writer: { kind: "main", id: "main" },
+    turn_id: input.turn_id,
+    type: "tool.completed",
+    summary: `Codex completed ${input.tool_name}.`,
+    payload: {
+      operation_id: operation.id,
+      tool_name: input.tool_name,
+      tool_use_id: input.tool_use_id,
+      changed_paths: changedPaths,
+      worktree_effect_digest: worktreeEffect.digest,
+      reminder_key: reminderKey,
+      evidence_refs: [],
+    },
+  });
+  await refreshProjectionIfCurrent(root, operation, "post-tool");
+  if (alreadyReminded || !shouldRemind(input.tool_name, changedPaths)) return {};
+  const target = changedPaths.length ? changedPaths.join(", ") : input.tool_name;
+  return {
+    systemMessage: `Review documentation affected by ${target}; stage a Record only for durable requirements or decisions.`,
+  };
+}
+
+async function refreshProjectionIfCurrent(root, operation, suffix) {
+  try {
+    await refreshHostStatusProjection(root, {
+      clock: operation.clock ?? (() => new Date().toISOString()),
+      id: `${operation.id}-${suffix}-host-status`,
+    });
+  } catch (error) {
+    if (new Set([
+      "ERR_WORKSPACE_MANIFEST_MISSING",
+      "ERR_WORKSPACE_MANIFEST_INVALID",
+      "ERR_AUTHORITY_OBJECT_NOT_FOUND",
+      "ERR_HOST_STATUS_INVALID",
+    ]).has(error?.code)) return;
+    throw error;
+  }
+}
+
+async function evaluatePreCompact(root, input, operation, recovery) {
+  const objectRef = await readActiveObjectRef(root);
+  if (!objectRef) return { continue: true };
+  const [capsule, runtime, worktreeSummary] = await Promise.all([
+    recovery.readContextCapsule(root, objectRef),
+    readRuntimeObject(root, objectRef),
+    collectGitWorktreeSummary(root),
+  ]);
+  const sealed = await recovery.sealRecoveryPack(root, {
+    object_ref: objectRef,
+    trigger: "pre_compact",
+    capsule,
+    continuation: runtime.continuation,
+    record_refs: capsule.sources.records,
+    receipt_refs: capsule.sources.receipts,
+    evidence_refs: [],
+    worktree_summary: worktreeSummary,
+    cursor: capsule.cursor,
+  }, { id: operation.id });
+  await recovery.appendRecoveryEvent(root, {
+    object_ref: objectRef,
+    session_id: input.session_id,
+    writer: { kind: "main", id: "main" },
+    turn_id: input.turn_id,
+    type: "compact.started",
+    summary: "Codex started context compaction after sealing a Recovery Pack.",
+    payload: { operation_id: operation.id, trigger: input.trigger, pack_ref: sealed.pack_ref, evidence_refs: [] },
+  });
+  return { continue: true };
+}
+
+async function evaluatePostCompact(root, input, operation, recovery) {
+  const objectRef = await readActiveObjectRef(root);
+  if (!objectRef) return { continue: true };
+  const selected = await recovery.selectLatestValidRecoveryPack(root, { object_ref: objectRef });
+  await recovery.appendRecoveryEvent(root, {
+    object_ref: objectRef,
+    session_id: input.session_id,
+    writer: { kind: "main", id: "main" },
+    turn_id: input.turn_id,
+    type: "compact.completed",
+    summary: "Codex completed context compaction.",
+    payload: {
+      operation_id: operation.id,
+      trigger: input.trigger,
+      pack_ref: selected.pack_ref,
+      evidence_refs: [],
+    },
+  });
+  return { continue: true };
+}
+
+async function evaluateSubagent(root, input, operation, recovery, starting) {
+  const objectRef = await readActiveObjectRef(root);
+  const evidenceRefs = starting ? [] : extractEvidenceLocators(input.last_assistant_message);
+  if (objectRef) {
+    const writer = { kind: "subagent", id: input.agent_id };
+    await recovery.appendRecoveryEvent(root, {
+      object_ref: objectRef,
+      session_id: input.session_id,
+      writer,
+      turn_id: input.turn_id,
+      type: starting ? "worker.started" : "worker.stopped",
+      summary: `Codex subagent ${input.agent_id} ${starting ? "started" : "stopped"}.`,
+      payload: {
+        operation_id: operation.id,
+        writer,
+        role: input.agent_type,
+        evidence_refs: evidenceRefs,
+      },
+    });
+  }
+  if (!starting) {
+    return evidenceRefs.length ? {} : {
+      systemMessage: `Subagent ${input.agent_id} stopped without an explicit evidence locator; record the bounded evidence reference before relying on its result.`,
+    };
+  }
+  return {
+    hookSpecificOutput: {
+      hookEventName: "SubagentStart",
+      additionalContext: "Keep role-specific evidence_refs explicit and return a concise result to the main agent.",
+    },
+  };
+}
+
+async function evaluateStop(root, input, operation, recovery) {
+  const objectRef = await readActiveObjectRef(root);
+  if (objectRef) {
+    await recovery.appendRecoveryEvent(root, {
+      object_ref: objectRef,
+      session_id: input.session_id,
+      writer: { kind: "main", id: "main" },
+      turn_id: input.turn_id,
+      type: "turn.agent",
+      summary: "Codex reached the turn Stop boundary.",
+      payload: {
+        operation_id: operation.id,
+        stop_hook_active: input.stop_hook_active,
+        evidence_refs: [],
+      },
+    });
+  }
+  return { continue: true };
+}
+
+function normalizeEvaluationOptions(event, options) {
+  assertPlainObject(options, "Codex Hook evaluation options");
+  assertExactKeys(options, ["id", "clock"], "Codex Hook evaluation options");
+  const clock = options.clock;
+  if (clock !== undefined && typeof clock !== "function") {
+    throw hookError("ERR_CODEX_HOOK_OPTIONS_INVALID", "Codex Hook clock must be a zero-argument function");
+  }
+  if (!WRITE_EVENTS.has(event)) {
+    return {
+      ...(options.id === undefined ? {} : { id: normalizeSafeIdentifier(options.id, "Codex Hook operation id") }),
+      ...(clock === undefined ? {} : { clock }),
+    };
+  }
+  if (options.id === undefined) {
+    throw hookError("ERR_CODEX_HOOK_OPERATION_REQUIRED", `${event} requires a unique operation id`);
+  }
+  return { id: normalizeSafeIdentifier(options.id, "Codex Hook operation id"), ...(clock === undefined ? {} : { clock }) };
+}
+
+async function readActiveObjectRef(root) {
+  try {
+    const pointer = await readActivePointer(root);
+    return pointer.active.delivery ?? pointer.active.activity ?? pointer.active.bootstrap_job ?? null;
+  } catch (error) {
+    if (error?.code === "ERR_AUTHORITY_OBJECT_NOT_FOUND") return null;
+    throw error;
+  }
+}
+
+function inferSemanticDelta(root, input) {
+  if (!isSecretSafeText(input.prompt)) return null;
+  const body = extractDurableStatement(input.prompt);
+  if (!body) return null;
+  return {
+    scope: { type: "project", ref: `project:${safeRef(basename(root))}` },
+    kind: /\b(decide|decision|choose|selected)\b/i.test(body) ? "decision" : "requirement",
+    confidence: "confirmed",
+    dedupe_key: `codex-prompt:${canonicalHash({ body })}`,
+    body,
+    source_refs: [{ type: "session", ref: input.session_id, locator: input.turn_id }],
+    supersedes: [],
+  };
+}
+
+function isDurablePrompt(value) {
+  return /(?:\bremember\b|\bmust\b|\brequire(?:d|ment)?\b|\balways\b|\bnever\b|\bdecision\b|\bdecided\b|\bconstraint\b|记住|必须|要求|约束|决定)/i.test(value);
+}
+
+function extractDurableStatement(prompt) {
+  const statements = [];
+  for (const line of prompt.split("\n")) {
+    for (const sentence of splitSemanticSentences(line)) {
+      const candidate = sentence.replace(/\s+/g, " ").trim();
+      if (!candidate || isTransientDiagnostic(candidate) || !isDurablePrompt(candidate)) continue;
+      statements.push(candidate);
+    }
+  }
+  if (!statements.length) return null;
+  return boundSemanticText(statements.join(" "), 512);
+}
+
+function splitSemanticSentences(line) {
+  const trimmed = line.trim();
+  if (!trimmed) return [];
+  return trimmed.match(/[^.!?。！？]+[.!?。！？]?/gu) ?? [trimmed];
+}
+
+function isTransientDiagnostic(value) {
+  return /^(?:TRACE(?:_[A-Z0-9_-]+)?|DEBUG|INFO|WARN(?:ING)?|ERROR|LOG|STDOUT|STDERR|CONSOLE|STACK(?:\s+TRACE)?)(?:\s*[:=[\]-]|\s)/i.test(value)
+    || /^console\.(?:log|debug|info|warn|error)\b/i.test(value)
+    || /^at\s+(?:async\s+)?(?:\S+\s+)?\(?[^\s()]+:\d+:\d+\)?$/i.test(value);
+}
+
+function boundSemanticText(value, maximumBytes) {
+  const bytes = Buffer.from(value, "utf8");
+  if (bytes.length <= maximumBytes) return value;
+  return `${bytes.subarray(0, maximumBytes - 3).toString("utf8").replace(/\uFFFD+$/u, "")}...`;
+}
+
+function isSecretSafeText(value) {
+  try {
+    assertNoRawSecrets(value, "Codex Hook prompt");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function isObviousDirectDeletion(toolName, toolInput) {
+  const command = typeof toolInput?.command === "string" ? toolInput.command : "";
+  if (toolName === "apply_patch" && /^\*\*\* Delete File:/m.test(command)) return true;
+  if (/(?:^|[;&|()\n]\s*|\bsudo\s+)(?:rm|unlink|rmdir)\b|\bgit\s+clean\b|\bfind\b[^\n]*\s-delete\b|\bRemove-Item\b|\bdel(?:ete)?\s+\//i.test(command)) {
+    return true;
+  }
+  return /(?:^|__)(?:delete|remove|unlink|rmdir)(?:$|__)/i.test(toolName);
+}
+
+function deletionGuardReason() {
+  return "Direct destructive deletion is blocked: report an exact deletion manifest, obtain an explicit Receipt, and use the controlled deletion executor. This Hook is only an additional guardrail.";
+}
+
+function extractChangedPaths(root, input) {
+  const commandPaths = input.tool_name === "apply_patch"
+    ? extractApplyPatchPaths(input.tool_input?.command)
+    : [];
+  const bashPaths = input.tool_name === "Bash"
+    ? extractBashWriteTargets(input.tool_input?.command)
+    : [];
+  const candidates = input.tool_response && typeof input.tool_response === "object" && !Array.isArray(input.tool_response)
+    ? input.tool_response.changed_paths
+    : null;
+  const responsePaths = Array.isArray(candidates) ? candidates : [];
+  const fallbackPaths = input.tool_name === "Bash"
+    && bashPaths.length === 0
+    && isLikelyMutatingBash(input.tool_input?.command)
+    ? collectBoundedDirtyPaths(root)
+    : [];
+  return [...new Set([...commandPaths, ...bashPaths, ...responsePaths, ...fallbackPaths].map(normalizeReminderPath).filter(Boolean))]
+    .sort()
+    .slice(0, 32);
+}
+
+function extractApplyPatchPaths(command) {
+  if (typeof command !== "string") return [];
+  const paths = [];
+  for (const match of command.matchAll(/^\*\*\* (?:Add|Update|Delete) File:\s*(.+?)\s*$/gm)) paths.push(match[1]);
+  for (const match of command.matchAll(/^\*\*\* Move to:\s*(.+?)\s*$/gm)) paths.push(match[1]);
+  return paths;
+}
+
+function extractBashWriteTargets(command) {
+  if (typeof command !== "string") return [];
+  const paths = [];
+  for (const match of command.matchAll(/(?:^|\s)\d*>>?\s*(?!&)(?:"([^"]+)"|'([^']+)'|([^\s;&|]+))/gm)) {
+    paths.push(match[1] ?? match[2] ?? match[3]);
+  }
+  for (const segment of command.split(/&&|\|\||[;\n|]/)) {
+    const words = shellWords(segment);
+    if (!words.length) continue;
+    let commandIndex = words[0] === "sudo" ? 1 : 0;
+    if (words[commandIndex] === "env") {
+      commandIndex += 1;
+      while (/^[A-Za-z_][A-Za-z0-9_]*=/.test(words[commandIndex] ?? "")) commandIndex += 1;
+    }
+    const executable = (words[commandIndex] ?? "").split("/").at(-1);
+    const args = words.slice(commandIndex + 1);
+    if (["touch", "mkdir", "tee"].includes(executable)) {
+      paths.push(...args.filter((arg) => !arg.startsWith("-")));
+    } else if (["cp", "mv", "install", "truncate"].includes(executable)) {
+      const operands = args.filter((arg) => !arg.startsWith("-"));
+      if (operands.length) paths.push(operands.at(-1));
+    } else if (executable === "sed" && args.some((arg) => /^-[^-]*i/.test(arg))) {
+      const operands = args.filter((arg) => !arg.startsWith("-"));
+      if (operands.length > 1) paths.push(operands.at(-1));
+    } else if (executable === "perl" && args.some((arg) => /^-[^-]*i/.test(arg))) {
+      const operands = args.filter((arg) => !arg.startsWith("-"));
+      if (operands.length) paths.push(operands.at(-1));
+    } else if (executable === "dd") {
+      const output = args.find((arg) => arg.startsWith("of="));
+      if (output) paths.push(output.slice(3));
+    }
+  }
+  return paths;
+}
+
+function shellWords(value) {
+  return (value.match(/"(?:\\.|[^"])*"|'[^']*'|[^\s]+/g) ?? []).map((word) => {
+    if ((word.startsWith('"') && word.endsWith('"')) || (word.startsWith("'") && word.endsWith("'"))) {
+      return word.slice(1, -1);
+    }
+    return word;
+  });
+}
+
+function isLikelyMutatingBash(command) {
+  if (typeof command !== "string") return false;
+  if (extractBashWriteTargets(command).length) return true;
+  return /(?:^|[;&|\n]\s*)(?:sudo\s+)?(?:git\s+(?:apply|checkout|restore|reset|add|rm|mv)\b|(?:npm|pnpm|yarn|bun)\s+(?:run|install|uninstall|update|add|remove)\b|make\b|cmake\s+--build\b|cargo\s+(?:build|fix|fmt)\b|patch\b)/im.test(command);
+}
+
+function collectBoundedDirtyPaths(root) {
+  const result = spawnSync("git", ["status", "--porcelain=v1", "-z", "--untracked-files=all"], {
+    cwd: root,
+    encoding: "utf8",
+    maxBuffer: 64 * 1024,
+  });
+  if (result.status !== 0) return [];
+  return parseStatusPaths(result.stdout)
+    .map(normalizeReminderPath)
+    .filter(Boolean)
+    .slice(0, 32);
+}
+
+function normalizeReminderPath(value) {
+  if (typeof value !== "string") return null;
+  const path = value.trim().replaceAll("\\", "/");
+  if (
+    !path
+    || path.length > 512
+    || path.startsWith("/")
+    || /^[A-Za-z]:\//.test(path)
+    || /[\0-\x1f\x7f]/.test(path)
+    || path.split("/").some((part) => !part || part === "." || part === "..")
+  ) return null;
+  return path;
+}
+
+function collectReminderWorktreeEffect(root, paths) {
+  const facts = paths.map((path) => ({
+    path,
+    worktree_blob: runGitOptional(root, ["hash-object", "--", path]) || "missing",
+  }));
+  return {
+    digest: `sha256:${canonicalHash({ paths, facts })}`,
+    facts,
+  };
+}
+
+function runGitOptional(root, args) {
+  const result = spawnSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 });
+  if (result.status !== 0) return null;
+  return result.stdout.trim().slice(0, 256);
+}
+
+function reminderDigest(toolName, paths, toolInput, effectDigest) {
+  const command = typeof toolInput?.command === "string" ? toolInput.command : null;
+  return canonicalHash({ tool_name: toolName, changed_paths: paths, command, effect_digest: effectDigest });
+}
+
+function shouldRemind(toolName, paths) {
+  if (paths.length) return paths.some((path) => /^(?:core|src|lib|app|packages|skills|references|scripts)\//.test(path));
+  return toolName === "apply_patch";
+}
+
+function extractEvidenceLocators(message) {
+  if (typeof message !== "string" || !message.trim()) return [];
+  const matches = message.matchAll(/(?:^|[\s`'"(\[])(\.?[A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)+(?::\d+)?)/g);
+  const refs = [];
+  for (const match of matches) {
+    const ref = match[1];
+    if (
+      ref.length > 256
+      || ref.startsWith("/")
+      || ref.includes("\\")
+      || ref.split("/").some((part) => part === "..")
+    ) continue;
+    refs.push(ref);
+    if (refs.length === 8) break;
+  }
+  return [...new Set(refs)].sort();
+}
+
+async function collectGitWorktreeSummary(root) {
+  const head = runGit(root, ["rev-parse", "--verify", "HEAD"]) || "unborn";
+  const status = runGit(root, ["status", "--porcelain=v1", "-z"]);
+  const numstat = runGit(root, ["diff", "--numstat", "HEAD", "--"]);
+  const dirtyPaths = parseStatusPaths(status);
+  let insertions = 0;
+  let deletions = 0;
+  let filesChanged = 0;
+  for (const line of numstat.split("\n").filter(Boolean)) {
+    const [added, removed] = line.split("\t");
+    filesChanged += 1;
+    if (/^\d+$/.test(added)) insertions += Number(added);
+    if (/^\d+$/.test(removed)) deletions += Number(removed);
+  }
+  return {
+    head,
+    dirty_paths: dirtyPaths,
+    diff_summary: { files_changed: filesChanged, insertions, deletions },
+    diff_digest: `sha256:${createHash("sha256").update(`${status}\0${numstat}`).digest("hex")}`,
+  };
+}
+
+function runGit(root, args) {
+  const result = spawnSync("git", args, { cwd: root, encoding: "utf8" });
+  if (result.status !== 0) {
+    throw hookError("ERR_CODEX_HOOK_GIT_FAILED", result.stderr.trim() || `git ${args.join(" ")} failed`);
+  }
+  return result.stdout.trim();
+}
+
+function parseStatusPaths(status) {
+  if (!status) return [];
+  const entries = status.split("\0").filter(Boolean);
+  const paths = [];
+  for (let index = 0; index < entries.length; index += 1) {
+    const entry = entries[index];
+    const code = entry.slice(0, 2);
+    const path = entry.slice(3);
+    if (path) paths.push(path);
+    if ((code.includes("R") || code.includes("C")) && entries[index + 1]) index += 1;
+  }
+  return [...new Set(paths)].sort();
+}
+
+function renderRestoreContext(plan) {
+  return [
+    "Hypo-Workflow compact recovery context (derived from a sealed Recovery Pack):",
+    `next_action: ${plan.next_action}`,
+    `current_goal: ${plan.context.current_goal ?? "none"}`,
+    `scope: ${JSON.stringify(plan.context.scope ?? [])}`,
+    `non_goals: ${JSON.stringify(plan.context.non_goals ?? [])}`,
+    `recent_verification: ${JSON.stringify(plan.context.recent_verification ?? null)}`,
+    `workers: ${JSON.stringify(plan.context.workers ?? [])}`,
+    `journal_delta: ${JSON.stringify(plan.journal_delta ?? [])}`,
+  ].join("\n");
+}
+
+function boundUtf8(value, maximumBytes) {
+  const bytes = Buffer.from(value, "utf8");
+  if (bytes.length < maximumBytes) return value;
+  return `${bytes.subarray(0, maximumBytes - 32).toString("utf8").replace(/\uFFFD+$/u, "")}\n[context truncated]`;
+}
+
+function validateHookSpecificOutput(event, value, input) {
+  assertPlainObject(value, "Codex Hook hookSpecificOutput");
+  if (value.hookEventName !== event) throw hookError("ERR_CODEX_HOOK_OUTPUT_INVALID", "hookEventName does not match the event");
+  const contextEvents = new Set(["SessionStart", "UserPromptSubmit", "SubagentStart", "PostToolUse"]);
+  if (event === "PreToolUse") {
+    assertAllowedOutputKeys(value, ["hookEventName", "additionalContext", "permissionDecision", "permissionDecisionReason", "updatedInput"]);
+    if (Object.hasOwn(value, "additionalContext")) requireText(value.additionalContext, "additionalContext");
+    if (Object.hasOwn(value, "permissionDecision")) {
+      requireOneOf(value.permissionDecision, ["allow", "deny"], "permissionDecision");
+      if (value.permissionDecision === "deny") requireText(value.permissionDecisionReason, "permissionDecisionReason");
+      if (value.permissionDecision === "allow" && Object.hasOwn(value, "permissionDecisionReason")) {
+        throw hookError("ERR_CODEX_HOOK_OUTPUT_UNSUPPORTED", "permissionDecisionReason is only supported for deny");
+      }
+      if (Object.hasOwn(value, "updatedInput")) {
+        if (value.permissionDecision !== "allow") throw hookError("ERR_CODEX_HOOK_OUTPUT_UNSUPPORTED", "updatedInput requires permissionDecision:allow");
+        validateUpdatedToolInput(value.updatedInput, input);
+      }
+    } else if (Object.hasOwn(value, "permissionDecisionReason") || Object.hasOwn(value, "updatedInput")) {
+      throw hookError("ERR_CODEX_HOOK_OUTPUT_UNSUPPORTED", "PreToolUse decision fields require permissionDecision");
+    }
+    return;
+  }
+  if (event === "PermissionRequest") {
+    assertAllowedOutputKeys(value, ["hookEventName", "decision"]);
+    assertPlainObject(value.decision, "PermissionRequest decision");
+    assertAllowedOutputKeys(value.decision, ["behavior", "message"]);
+    requireOneOf(value.decision.behavior, ["allow", "deny"], "PermissionRequest behavior");
+    if (value.decision.behavior === "deny") requireText(value.decision.message, "PermissionRequest message");
+    return;
+  }
+  if (!contextEvents.has(event)) throw hookError("ERR_CODEX_HOOK_OUTPUT_UNSUPPORTED", `hookSpecificOutput is unsupported for ${event}`);
+  assertAllowedOutputKeys(value, ["hookEventName", "additionalContext"]);
+  requireText(value.additionalContext, "additionalContext");
+}
+
+function validateUpdatedToolInput(updatedInput, input) {
+  assertPlainObject(updatedInput, "updatedInput");
+  let normalizedInput;
+  try {
+    normalizedInput = validateCodexHookInput(input);
+  } catch {
+    throw hookError("ERR_CODEX_HOOK_OUTPUT_INVALID", "updatedInput rewrite requires validated PreToolUse input context");
+  }
+  if (normalizedInput.hook_event_name !== "PreToolUse") {
+    throw hookError("ERR_CODEX_HOOK_OUTPUT_INVALID", "updatedInput rewrite requires validated PreToolUse input context");
+  }
+  if (normalizedInput.tool_name === "Bash" || normalizedInput.tool_name === "apply_patch") {
+    requireText(updatedInput.command, "updatedInput.command", 512 * 1024);
+    return;
+  }
+  if (/^mcp__[^_].*__[^_].*/i.test(normalizedInput.tool_name)) {
+    normalizeJsonValue(updatedInput, "updatedInput");
+    return;
+  }
+  throw hookError("ERR_CODEX_HOOK_OUTPUT_UNSUPPORTED", `updatedInput rewrite is unsupported for ${normalizedInput.tool_name}`);
+}
+
+function outputKeysFor(event) {
+  if (event === "PreToolUse") return new Set(["systemMessage", "decision", "reason", "hookSpecificOutput"]);
+  if (event === "PermissionRequest") return new Set(["systemMessage", "hookSpecificOutput"]);
+  if (event === "PostToolUse") return new Set(["continue", "stopReason", "systemMessage", "decision", "reason", "hookSpecificOutput"]);
+  if (event === "SubagentStart") return new Set(["continue", "stopReason", "systemMessage", "hookSpecificOutput"]);
+  if (event === "SessionStart") return new Set(["continue", "stopReason", "suppressOutput", "systemMessage", "hookSpecificOutput"]);
+  if (["UserPromptSubmit", "SubagentStop", "Stop"].includes(event)) {
+    const keys = ["continue", "stopReason", "systemMessage", "decision", "reason"];
+    if (event === "UserPromptSubmit") keys.push("hookSpecificOutput");
+    if (["UserPromptSubmit", "SubagentStop", "Stop"].includes(event)) keys.push("suppressOutput");
+    return new Set(keys);
+  }
+  if (["PreCompact", "PostCompact"].includes(event)) {
+    return new Set(["continue", "stopReason", "suppressOutput", "systemMessage"]);
+  }
+  return new Set(["continue", "stopReason", "systemMessage"]);
+}
+
+function requireToolInput(input) {
+  requireText(input.tool_name, "tool_name");
+  normalizeJsonValue(input.tool_input, "tool_input");
+  if (input.tool_name === "Bash" || input.tool_name === "apply_patch") {
+    assertPlainObject(input.tool_input, "tool_input");
+    requireText(input.tool_input.command, "tool_input.command", 512 * 1024);
+  } else if (input.tool_input && typeof input.tool_input === "object" && !Array.isArray(input.tool_input) && Object.hasOwn(input.tool_input, "command")) {
+    requireText(input.tool_input.command, "tool_input.command", 512 * 1024);
+  }
+}
+
+function requireAgentFields(input) {
+  requireText(input.agent_id, "agent_id");
+  requireText(input.agent_type, "agent_type");
+}
+
+function normalizeJsonValue(value, field) {
+  normalizeCanonicalValue(value, field);
+}
+
+function assertAllowedOutputKeys(value, allowed) {
+  const allowedSet = new Set(allowed);
+  for (const key of Object.keys(value)) {
+    if (!allowedSet.has(key)) throw hookError("ERR_CODEX_HOOK_OUTPUT_UNSUPPORTED", `Codex Hook output field ${key} is unsupported`);
+  }
+}
+
+function requireText(value, field, max = 4096) {
+  if (typeof value !== "string" || !value.trim() || value.length > max || /[\0\r]/.test(value)) {
+    throw hookError("ERR_CODEX_HOOK_INPUT_INVALID", `Codex Hook ${field} must be non-empty text`);
+  }
+}
+
+function requireNullableText(value, field, max = 4096) {
+  if (value === null) return;
+  requireText(value, field, max);
+}
+
+function requireBoolean(value, field) {
+  if (typeof value !== "boolean") throw hookError("ERR_CODEX_HOOK_INPUT_INVALID", `Codex Hook ${field} must be boolean`);
+}
+
+function requireOneOf(value, allowed, field) {
+  if (!allowed.includes(value)) throw hookError("ERR_CODEX_HOOK_INPUT_INVALID", `Codex Hook ${field} is unsupported`);
+}
+
+function safeRef(value) {
+  return value.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "") || "workspace";
+}
+
+function hookError(code, message) {
+  return authorityError(code, message);
+}

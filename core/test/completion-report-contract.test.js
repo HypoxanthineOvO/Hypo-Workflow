@@ -32,6 +32,7 @@ const FIELD_MATCHERS = Object.freeze({
   modified_files_or_modules: [
     /\bmodified[_ -]?files[_ -]?or[_ -]?modules\b/i,
     /\bmodified files\b/i,
+    /\bmodified modules\b/i,
     /\bchanged modules\b/i,
     /修改文件|修改模块|文件\/模块/,
   ],
@@ -42,22 +43,26 @@ const FIELD_MATCHERS = Object.freeze({
   ],
   validation_results: [
     /\bvalidation[_ -]?results\b/i,
+    /\bvalidation result\b/i,
     /\bverification results\b/i,
     /验证结果/,
   ],
   expected_results: [
     /\bexpected[_ -]?results\b/i,
     /\bexpected outcome\b/i,
+    /\bexpected behavior\b/i,
     /预期结果|预期产出/,
   ],
   encountered_issues: [
     /\bencountered[_ -]?issues\b/i,
     /\bproblems encountered\b/i,
+    /\bencountered problems\b/i,
     /遇到的问题/,
   ],
   risks_and_followups: [
     /\brisks?[_ -]?(and|\/)?[_ -]?follow[_ -]?ups?\b/i,
     /\bknown risks\b/i,
+    /\bremaining risks\b/i,
     /风险\/后续|风险与后续|风险和后续/,
   ],
 });

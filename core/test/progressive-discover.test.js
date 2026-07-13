@@ -59,14 +59,10 @@ test("progressive discover spec defines big questions, stages, and command cover
   assert.match(planSkill, /Progressive Discover/i);
   assert.match(planSkill, /真实测试方法|real test method/i);
   assert.match(planSkill, /off.*recommended.*strict/is);
-  assert.match(planSkill, /implement\/test\/audit|三权分立/i);
-  assert.match(planSkill, /Codex.*authorizes execution subworkers|Codex.*authorize.*\/hw:start.*\/hw:resume/is);
-  assert.match(planSkill, /even when.*execution\.worker_separation\.mode.*already.*recommended.*strict|即使.*execution\.worker_separation\.mode=.*recommended.*strict/is);
-  assert.match(planSkill, /Discover must not enter Decompose.*authorization gate.*unresolved|Discover.*不得进入 Decompose|Discover.*不能进入 Decompose|Discover.*不得进入 Decompose/is);
-  assert.match(planSkill, /Claude Code.*subcodex.*subclaude/is);
-  assert.match(planSkill, /OpenCode.*no extra authorization gate|OpenCode.*不需要额外的授权门控/is);
-  assert.match(planSkill, /For Codex only.*missing authorization.*`recommended`|仅限 Codex.*缺失授权.*`recommended`/is);
-  assert.match(planSkill, /explicitly confirm.*fastest single-agent|显式确认最快的单代理/is);
+  assert.match(planSkill, /`test`, `implement`, and `audit` use distinct identities when required/i);
+  assert.match(planSkill, /Approval creates `waiting_to_start`; it does not execute/i);
+  assert.match(planSkill, /Start only after the user explicitly says to begin/i);
+  assert.match(planSkill, /does not enforce `min_rounds`/i);
   assert.match(discoverSkill, /Big Questions First|先问关键问题/i);
   assert.match(discoverSkill, /伪测试|pseudo/i);
   assert.match(discoverSkill, /worker separation|三权分立/i);

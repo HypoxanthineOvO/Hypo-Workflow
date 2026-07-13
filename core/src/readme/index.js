@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { commandMap } from "../commands/index.js";
 import { PLATFORM_CAPABILITIES } from "../platform/index.js";
@@ -88,6 +88,8 @@ export function replaceManagedBlock(source, block, replacement, options = {}) {
 }
 
 export async function updateReadme(readmeFile = "README.md", options = {}) {
+  if (options.write) throw readmeWriteRetiredError();
+
   const policy = { ...DEFAULT_README_CONFIG, ...(options.policy || {}) };
   const blocks = options.blocks || [
     "badges",
@@ -115,10 +117,6 @@ export async function updateReadme(readmeFile = "README.md", options = {}) {
     if (next !== before) changedBlocks.push(block);
   }
 
-  if (options.write && next !== original) {
-    await writeFile(readmeFile, next.endsWith("\n") ? next : `${next}\n`, "utf8");
-  }
-
   return {
     changed: next !== original,
     changedBlocks,
@@ -126,6 +124,14 @@ export async function updateReadme(readmeFile = "README.md", options = {}) {
     warnings,
     content: next,
   };
+}
+
+function readmeWriteRetiredError() {
+  const error = new Error("README generation writes are retired; call without write:true for a zero-write preview.");
+  error.code = "ERR_HYPO_WORKFLOW_README_WRITE_RETIRED";
+  error.status = "removed";
+  error.writes = [];
+  return error;
 }
 
 export async function checkReadmeFreshness(readmeFile = "README.md", options = {}) {

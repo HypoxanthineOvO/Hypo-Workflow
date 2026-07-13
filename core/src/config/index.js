@@ -2,9 +2,12 @@ import { createHash } from "node:crypto";
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import yaml from "js-yaml";
 import { DEFAULT_ANALYSIS_INTERACTION } from "../analysis/index.js";
 import { DEFAULT_KNOWLEDGE_CONFIG } from "../knowledge/index.js";
+import { parseYaml, stringifyYaml } from "../serialization/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
+
+export { parseYaml, stringifyYaml } from "../serialization/index.js";
 
 export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
   version: "13.1.0-beta.2",
@@ -774,8 +777,19 @@ async function readConfigSource(name, file) {
 }
 
 export async function writeConfig(file, config) {
+  const projectRoot = projectRootForConfigFile(file);
+  if (projectRoot) {
+    await assertLegacyWorkspaceWritable(projectRoot, "legacy.config.project");
+  }
   await mkdir(dirname(file), { recursive: true });
   await writeFile(file, `${stringifyYaml(config).trimEnd()}\n`, "utf8");
+}
+
+function projectRootForConfigFile(file) {
+  const absolute = resolve(file);
+  const pipelineDir = dirname(absolute);
+  if (basename(absolute) !== "config.yaml" || basename(pipelineDir) !== ".pipeline") return null;
+  return dirname(pipelineDir);
 }
 
 export async function loadGlobalConfigForSave(file, defaults = DEFAULT_GLOBAL_CONFIG) {
@@ -1635,22 +1649,6 @@ function formatBackupTimestamp(value) {
     .replace(/\.\d+/, "")
     .replace(/\+/, "+")
     .replace(/Z$/, "Z");
-}
-
-export function parseYaml(source) {
-  const text = String(source ?? "");
-  if (!text.trim()) return {};
-  const parsed = yaml.load(text, { schema: yaml.CORE_SCHEMA });
-  return parsed === undefined ? {} : parsed;
-}
-
-export function stringifyYaml(value) {
-  return yaml.dump(value, {
-    schema: yaml.CORE_SCHEMA,
-    sortKeys: true,
-    noRefs: true,
-    lineWidth: 120,
-  });
 }
 
 function isPlainObject(value) {

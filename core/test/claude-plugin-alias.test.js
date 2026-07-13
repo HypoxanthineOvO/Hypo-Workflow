@@ -22,14 +22,15 @@ test("writeClaudeCodePluginArtifacts renders hw namespace plugin metadata", asyn
   const planDiscoverCommand = await readFile(join(dir, "commands", "plan", "discover.md"), "utf8");
   const setupCommand = await readFile(join(dir, "commands", "setup.md"), "utf8");
 
-  assert.equal(commands.length, 53);
+  assert.equal(commands.length, 54);
   assert.equal(plugin.name, "hw");
   assert.equal(plugin.skills, "./skills/");
   assert.equal(plugin.monitors, "./monitors/monitors.json");
   assert.equal(monitors[0].command, "node hooks/claude-hook.mjs ProgressMonitor");
   const result = await writeClaudeCodePluginArtifacts(dir);
   assert.equal(result.namespace, "hw");
-  assert.equal(result.command_count, 53);
+  assert.equal(result.command_count, 54);
+  assert.ok(result.written_commands.includes("commands/goal.md"));
   assert.ok(result.written_commands.includes("commands/patch.md"));
   assert.ok(result.written_commands.includes("commands/plan/discover.md"));
   assert.ok(plugin.keywords.includes("claude-code"));

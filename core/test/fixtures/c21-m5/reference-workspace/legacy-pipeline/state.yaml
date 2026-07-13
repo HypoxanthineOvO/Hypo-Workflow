@@ -1,0 +1,9 @@
+current:
+  phase: executing
+  prompt_index: 3
+  prompt_name: init-workspace-adoption-and-minimal-skill-router
+  step: review_code
+  step_index: 5
+pipeline:
+  status: running
+  prompts_completed: 3

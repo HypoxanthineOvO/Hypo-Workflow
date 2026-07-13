@@ -1,0 +1,11 @@
+current:
+  phase: executing
+  prompt_index: 2
+  step: implement
+pipeline:
+  name: Legacy Fixture
+  status: running
+milestones:
+  - id: C7-M2
+    name: legacy-delivery
+    status: in_progress

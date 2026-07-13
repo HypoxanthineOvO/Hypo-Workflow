@@ -1,59 +1,25 @@
 # 命令参考
 
-本页由 `core/src/commands/index.js` 生成。当前用户命令数量：53。命令名、平台映射和 Skill 路径保留英文/代码格式。阅读时以 Canonical 列为用户入口，以 OpenCode 列为平台映射；新增或删除命令必须先修改 command registry，再刷新本页。
+当前 Official Codex 公共发现面严格包含九个入口。Root Router 负责 namespace normalization 与 backend availability；每个入口只加载一个普通、非 symlink 的 Child Skill。
 
-| Canonical | OpenCode | Agent | Skill |
-|---|---|---|---|
-| `/hw:start` | `/hw:start` | `hw-build` | `skills/start/SKILL.md` |
-| `/hw:resume` | `/hw:resume` | `hw-build` | `skills/resume/SKILL.md` |
-| `/hw:status` | `/hw:status` | `hw-status` | `skills/status/SKILL.md` |
-| `/hw:skip` | `/hw:skip` | `hw-build` | `skills/skip/SKILL.md` |
-| `/hw:stop` | `/hw:stop` | `hw-status` | `skills/stop/SKILL.md` |
-| `/hw:report` | `/hw:report` | `hw-report` | `skills/report/SKILL.md` |
-| `/hw:chat` | `/hw:chat` | `hw-build` | `skills/chat/SKILL.md` |
-| `/hw:analysis` | `/hw:analysis` | `hw-debug` | `skills/analysis/SKILL.md` |
-| `/hw:plan` | `/hw:plan` | `hw-plan` | `skills/plan/SKILL.md` |
-| `/hw:plan:deep` | `/hw:plan:deep` | `hw-plan` | `skills/plan-deep/SKILL.md` |
-| `/hw:plan:discover` | `/hw:plan:discover` | `hw-plan` | `skills/plan-discover/SKILL.md` |
-| `/hw:plan:technical-stack` | `/hw:plan:technical-stack` | `hw-plan` | `skills/plan-technical-stack/SKILL.md` |
-| `/hw:plan:architecture` | `/hw:plan:architecture` | `hw-plan` | `skills/plan-architecture/SKILL.md` |
-| `/hw:plan:decompose` | `/hw:plan:decompose` | `hw-plan` | `skills/plan-decompose/SKILL.md` |
-| `/hw:plan:generate` | `/hw:plan:generate` | `hw-plan` | `skills/plan-generate/SKILL.md` |
-| `/hw:plan:extend` | `/hw:plan:extend` | `hw-plan` | `skills/plan-extend/SKILL.md` |
-| `/hw:plan:review` | `/hw:plan:review` | `hw-review` | `skills/plan-review/SKILL.md` |
-| `/hw:cycle` | `/hw:cycle` | `hw-status` | `skills/cycle/SKILL.md` |
-| `/hw:accept` | `/hw:accept` | `hw-build` | `skills/accept/SKILL.md` |
-| `/hw:reject` | `/hw:reject` | `hw-build` | `skills/reject/SKILL.md` |
-| `/hw:explore` | `/hw:explore` | `hw-explore` | `skills/explore/SKILL.md` |
-| `/hw:sync` | `/hw:sync` | `hw-build` | `skills/sync/SKILL.md` |
-| `/hw:maintain` | `/hw:maintain` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain status` | `/hw:maintain:status` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain scan` | `/hw:maintain:scan` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain plan` | `/hw:maintain:plan` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain queue` | `/hw:maintain:queue` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain run` | `/hw:maintain:run` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain apply` | `/hw:maintain:apply` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain verify` | `/hw:maintain:verify` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain log` | `/hw:maintain:log` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:docs` | `/hw:docs` | `hw-docs` | `skills/docs/SKILL.md` |
-| `/hw:patch` | `/hw:patch` | `hw-build` | `skills/patch/SKILL.md` |
-| `/hw:patch fix` | `/hw:patch:fix` | `hw-build` | `skills/patch/SKILL.md` |
-| `/hw:pr` | `/hw:pr` | `hw-review` | `skills/pr/SKILL.md` |
-| `/hw:pr create` | `/hw:pr:create` | `hw-build` | `skills/pr/SKILL.md` |
-| `/hw:explain` | `/hw:explain` | `hw-review` | `skills/explain/SKILL.md` |
-| `/hw:compact` | `/hw:compact` | `hw-compact` | `skills/compact/SKILL.md` |
-| `/hw:knowledge` | `/hw:knowledge` | `hw-compact` | `skills/knowledge/SKILL.md` |
-| `/hw:guide` | `/hw:guide` | `hw-plan` | `skills/guide/SKILL.md` |
-| `/hw:showcase` | `/hw:showcase` | `hw-build` | `skills/showcase/SKILL.md` |
-| `/hw:rules` | `/hw:rules` | `hw-status` | `skills/rules/SKILL.md` |
-| `/hw:init` | `/hw:init` | `hw-plan` | `skills/init/SKILL.md` |
-| `/hw:check` | `/hw:check` | `hw-status` | `skills/check/SKILL.md` |
-| `/hw:audit` | `/hw:audit` | `hw-review` | `skills/audit/SKILL.md` |
-| `/hw:quality` | `/hw:quality` | `hw-review` | `skills/quality/SKILL.md` |
-| `/hw:optimize` | `/hw:optimize` | `hw-build` | `skills/optimize/SKILL.md` |
-| `/hw:release` | `/hw:release` | `hw-build` | `skills/release/SKILL.md` |
-| `/hw:debug` | `/hw:debug` | `hw-debug` | `skills/debug/SKILL.md` |
-| `/hw:help` | `/hw:help` | `hw-status` | `skills/help/SKILL.md` |
-| `/hw:reset` | `/hw:reset` | `hw-status` | `skills/reset/SKILL.md` |
-| `/hw:log` | `/hw:log` | `hw-status` | `skills/log/SKILL.md` |
-| `/hw:setup` | `/hw:setup` | `hw-status` | `skills/setup/SKILL.md` |
+| 命令 | Child Skill | 何时使用 |
+| --- | --- | --- |
+| `/hw:guide` | `skills/guide/SKILL.md` | 不确定应初始化、维护、恢复、使用 Goal 还是 Cycle |
+| `/hw:init` | `skills/init/SKILL.md` | 新项目、接手已有项目或检查旧 `.pipeline/` |
+| `/hw:goal` | `skills/goal/SKILL.md` | 一个明确结果和一次最终人工验收 |
+| `/hw:plan` | `skills/plan/SKILL.md` | 需要澄清、技术选择、架构、拆分或持久调研 |
+| `/hw:cycle` | `skills/cycle/SKILL.md` | 多个阶段存在真实先后依赖 |
+| `/hw:maintain` | `skills/maintain/SKILL.md` | 保存日常 requirement、preference、decision 或 feedback |
+| `/hw:resume` | `skills/resume/SKILL.md` | 会话中断、压缩或重启后继续当前 Delivery |
+| `/hw:accept` | `skills/accept/SKILL.md` | 验证后的 Goal/Cycle 已进入 `pending_acceptance` |
+| `/hw:reject` | `skills/reject/SKILL.md` | 验收不通过，需要记录反馈并生成修订方案 |
+
+## 内部自然行为
+
+Chat、Explain、Status、Report、Log、Check、Compact、Knowledge、Sync 和 Debug 由 Agent 根据语义自然执行。Start 是批准后的上下文 transition；Plan 的 Deep Plan、Discover、Technical Stack、Architecture、Decompose、Generate、Extend 和 Review 均由 `/hw:plan` 内部选择。这些行为不创建额外 Codex Skill 或命令。
+
+## 延后与移除
+
+Analysis、Audit、Quality、Docs、PR、Release、Explore、Optimize 延后到后续 Cycle。Setup、Rules、Stop、Skip、Reset、Showcase、Patch、Help、Watchdog、plan-confirm 已移除。
+
+显式调用内部、延后、移除或未知的旧命令时，只返回当前分类、零写原因和最接近的九命令入口。不得写入 `.pipeline/`、生成平台适配器或调用 legacy writer。

@@ -8,8 +8,11 @@
     "hw-core": "./bin/hw-core"
   },
   "scripts": {
-    "test": "cd .. && node --test core/test/*.test.js",
-    "test:scenario-smoke": "cd .. && bash tests/scenarios/v9/s59-v9-regression-bundle/run.sh",
+    "test": "node ../tests/run_core_tests.mjs --set maintained",
+    "test:all": "node ../tests/run_core_tests.mjs --set all",
+    "test:quarantine": "node ../tests/run_core_tests.mjs --set quarantined",
+    "test:inventory": "node ../tests/run_core_tests.mjs --set all --dry-run",
+    "test:scenario-smoke": "python3 ../tests/run_regression.py --set maintained",
     "test:smoke": "npm run test && npm run test:scenario-smoke"
   },
   "dependencies": {

@@ -1,0 +1,19 @@
+{
+  "schema_version": "1",
+  "fixture_kind": "redacted_reference_bootstrap",
+  "project_id": "hypo-workflow-reference-fixture",
+  "workspace_id": "hypo-workflow-reference-fixture-local",
+  "bootstrap_job_id": "c21-reference-bootstrap",
+  "delivery_id": "c21",
+  "legacy_state_is_intentionally_stale": true,
+  "source_root": ".pipeline/bootstrap-sources",
+  "source_files": [
+    "active-requirement.md",
+    "accepted-outcome.md",
+    "architecture-legacy.md",
+    "architecture-current.md",
+    "constraint.md",
+    "failure.md",
+    "current-context.md"
+  ]
+}

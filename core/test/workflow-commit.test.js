@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import * as CORE from "../src/index.js";
 import {
   acceptCycle,
   commitWorkflowUpdate,
@@ -10,6 +11,16 @@ import {
   rejectCycle,
   writeConfig,
 } from "../src/index.js";
+import { snapshotTree } from "./fixtures/c21-m2/helpers.js";
+import {
+  FIXED_NOW,
+  LATER_NOW,
+  createDeliveryTestStore,
+  goalDesignInput,
+  issueDeliveryReceipt,
+  soloTopologyInput,
+  temporaryCurrentWorkspace,
+} from "./fixtures/c21-m6/helpers.js";
 
 test("commitWorkflowUpdate atomically writes authority files and derived views", async () => {
   const root = await fixtureRoot("hw-workflow-commit-ok-");
@@ -214,23 +225,92 @@ test("acceptCycle and rejectCycle use workflow commit warnings for derived refre
   assert.match(await readFile(join(root, rejected.feedback_ref), "utf8"), /Needs another pass/);
 });
 
-test("workflow commit helper contract is documented for lifecycle commands", async () => {
+test("legacy commit helper remains documented while current Delivery mutations use the M1 transaction store", async (t) => {
   const stateContract = await readFile("references/state-contract.md", "utf8");
   const commandsSpec = await readFile("references/commands-spec.md", "utf8");
+  const goalSkill = await readFile("skills/goal/SKILL.md", "utf8");
+  const cycleSkill = await readFile("skills/cycle/SKILL.md", "utf8");
   const acceptSkill = await readFile("skills/accept/SKILL.md", "utf8");
   const rejectSkill = await readFile("skills/reject/SKILL.md", "utf8");
-  const startSkill = await readFile("skills/start/SKILL.md", "utf8");
   const resumeSkill = await readFile("skills/resume/SKILL.md", "utf8");
-  const planGenerateSkill = await readFile("skills/plan-generate/SKILL.md", "utf8");
 
   assert.match(stateContract, /workflow commit helper/);
   assert.match(stateContract, /derived-refresh.yaml/);
   assert.match(commandsSpec, /Lifecycle-mutating commands must use the workflow commit helper/);
-  assert.match(acceptSkill, /workflow commit helper|工作流提交助手/);
-  assert.match(rejectSkill, /workflow commit helper|工作流提交助手/);
-  assert.match(startSkill, /workflow commit helper|工作流提交助手/);
-  assert.match(resumeSkill, /workflow commit helper|工作流提交助手/);
-  assert.match(planGenerateSkill, /workflow commit helper|工作流提交助手/);
+  assert.equal(typeof CORE.commitWorkspaceTransaction, "function");
+  assert.equal(typeof CORE.createDeliveryStore, "function");
+
+  const root = await temporaryCurrentWorkspace(t, "hw-current-delivery-transaction-");
+  const { store, setNow } = createDeliveryTestStore(CORE, FIXED_NOW);
+  const proposal = {
+    design: CORE.compileGoalDesign(goalDesignInput()),
+    topology: CORE.selectExecutionTopology(soloTopologyInput()),
+  };
+
+  const beforeMissingId = await snapshotTree(root);
+  await assert.rejects(
+    store.proposeGoal(root, proposal, {}),
+    /transaction|options\.id|identifier|required/i,
+  );
+  assert.deepEqual(await snapshotTree(root), beforeMissingId, "a current proposal without a transaction id must be zero-write");
+
+  const proposalPhases = [];
+  let delivery = await store.proposeGoal(root, proposal, {
+    id: "current-goal-proposal",
+    faultInjector(event) {
+      proposalPhases.push(event.phase);
+    },
+  });
+  assert.equal(delivery.status, "proposed");
+  assert.ok(proposalPhases.includes("after_prepare"));
+  assert.ok(proposalPhases.includes("before_manifest_activation"));
+  assert.ok(proposalPhases.includes("after_manifest_activation"));
+
+  let receipt = await issueDeliveryReceipt(CORE, root, delivery, "delivery.approve", {
+    transaction_id: "current-goal-approve-receipt",
+    tool_use_id: "current-goal-approve",
+  });
+  delivery = await store.approve(root, receipt, { id: "current-goal-approve" });
+  assert.equal(delivery.status, "waiting_to_start");
+
+  setNow(LATER_NOW);
+  receipt = await issueDeliveryReceipt(CORE, root, delivery, "delivery.start", {
+    now: LATER_NOW,
+    transaction_id: "current-goal-start-receipt",
+    tool_use_id: "current-goal-start",
+  });
+  const beforeMissingStartId = await snapshotTree(root);
+  await assert.rejects(
+    store.start(root, receipt, {}),
+    /transaction|options\.id|identifier|required/i,
+  );
+  assert.deepEqual(await snapshotTree(root), beforeMissingStartId, "explicit start must reject before reserving its Receipt when id is missing");
+
+  const startPhases = [];
+  delivery = await store.start(root, receipt, {
+    id: "current-goal-start",
+    faultInjector(event) {
+      startPhases.push(event.phase);
+    },
+  });
+  assert.equal(delivery.status, "executing");
+  assert.ok(startPhases.includes("after_prepare"));
+  assert.ok(startPhases.includes("after_manifest_activation"));
+
+  const beforeResume = await snapshotTree(root);
+  const resumed = await store.resume(root, {});
+  assert.equal(resumed.delivery.status, "executing");
+  assert.equal(resumed.recovery.pack_status, "missing");
+  assert.deepEqual(await snapshotTree(root), beforeResume, "Resume is a read-only authority reconstruction");
+
+  assert.match(goalSkill, /unique safe `\{ id \}`/i);
+  assert.match(goalSkill, /createDeliveryStore\(\.\.\.\)\.proposeGoal/i);
+  assert.match(cycleSkill, /unique safe `\{ id \}`/i);
+  assert.match(cycleSkill, /Persist with `proposeCycle`/i);
+  assert.match(acceptSkill, /call `accept` with a unique safe mutation `\{ id \}`/i);
+  assert.match(rejectSkill, /call `reject` with a unique safe mutation `\{ id \}`/i);
+  assert.match(resumeSkill, /createDeliveryStore\(\{ clock \}\)\.resume\(root, \{\}\)/i);
+  assert.match(resumeSkill, /Resume itself is read-only and takes no transaction `\{ id \}`/i);
 });
 
 async function fixtureRoot(prefix) {

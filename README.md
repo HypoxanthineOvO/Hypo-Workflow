@@ -2,125 +2,115 @@
 
 # Hypo-Workflow
 
-**面向 AI Agent 的本地工作流协议**
+**面向 Codex 的本地项目工作流协议**
 
-规划 -> 执行 -> 审查 -> 报告 -> 恢复
+规划 -> 执行 -> 独立验证 -> 人工验收 -> 可恢复继续
 
-[![Version](https://img.shields.io/badge/version-13.1.0-beta.2-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-13.1.0--beta.2-blue)](.codex-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/reference/platforms.md)
+[![Platform](https://img.shields.io/badge/platform-Official%20Codex-black)](docs/reference/platforms.md)
 
 **语言 / Language：中文 | [English](README.en.md)**
 
 </div>
 
-Hypo-Workflow 把长周期 AI 编程工作组织成可规划、可恢复、可审查的本地流程。它不是任务运行器，也不是后台服务；实际编码、测试和审查由你当前使用的智能体完成，`.pipeline/` 保存状态、周期、补丁、规则、进度、提示、报告和日志。
+Hypo-Workflow 是 Skill 协议，不是 runner 或后台服务。宿主 Agent 负责实现、测试和审查；`.pipeline/` 负责保存可验证、可恢复的项目事实。
 
-仓库入口是 `HypoxanthineOvO/Hypo-Workflow`；README 只讲通用快速开始，具体安装命令放在各平台 Guide。
+当前版本以 **Official Codex** 为唯一当前适配平台。OpenCode、Claude Code、Cursor、GitHub Copilot、Trae 和自定义 Codex fork 的适配器均延后，仓库中残留的旧平台产物不代表当前支持。
 
-## 快速开始与通用能力
+## 当前架构
 
-Hypo-Workflow 在所有平台上共享同一套 `.pipeline/` 协议：
-
-- **Cycle / Plan / Start / Resume**：把长任务拆成可恢复的 Feature、Milestone、Prompt 和 Report。
-- **P0 Configure**：每个新 Cycle 在 Discover 前确认或沿用自动化程度、Subagent 授权、验收、PR/MR 远端写确认、完整回归和 worker separation。
-- **Rules / Habits**：把用户习惯和项目规则保存成结构化 authority，再生成各平台可读的指令视图。
-- **Agent Review**：在计划、测试、实现和收口阶段记录 review artifact，支持多轮 `needs_changes -> repair -> review`。
-- **PR/MR Create**：`/hw:pr create` 支持 GitHub PR 与 GitLab MR 的问答式创建，已有本地改动和 plan-first 工作分开处理，远端写一次性确认。
-- **Acceptance / Compact Evidence**：`/hw:accept` 会阻塞缺失或冲突的 worker evidence；`/hw:start` 和 `/hw:resume` 成功收口后按 `dirty_only` 策略刷新 compact 视图。
-- **Domain Packs**：把 RTL 等领域知识做成可选包；外部包只记录 metadata，安装或远程获取必须明确确认。
-- **Sync / Docs / Release**：同步平台适配器、修复文档、执行发布检查，但 Hypo-Workflow 本身不替代宿主 Agent 工作。
-
-主工作流仍然是：
+`.pipeline/manifest.yaml` 选择当前格式与写入边界：
 
 ```text
-/hw:init -> /hw:plan -> /hw:start
+Manifest
+  -> Runtime + Continuation
+  -> Records + Receipts
+  -> Recovery Journal + Capsule + sealed Pack
+  -> accepted/checkpoint Snapshots
 ```
 
-查看状态并继续：
+- **Runtime** 保存 Goal/Cycle 生命周期；**Continuation** 只保存下一步。
+- **Records** 保存 requirement、preference、decision 和 feedback；它们替代通用 Rules 系统。
+- **Receipts** 保存一次性、带作用域的用户授权。
+- **Recovery Journal / Capsule / Pack** 保存有界恢复证据，不回放完整会话，也不覆盖较新的 Runtime。
+- 旧 `state.yaml`、`cycle.yaml`、`log.yaml`、`PROGRESS.md`、`rules.yaml` 和 `knowledge/` 不是当前 authority。
+
+## 安装
+
+完整能力使用 Codex plugin。开发 checkout 可作为本地 marketplace：
+
+```bash
+git clone https://github.com/HypoxanthineOvO/Hypo-Workflow.git
+codex plugin marketplace add /absolute/path/to/Hypo-Workflow
+```
+
+然后在 Codex 的 `/plugins` 中安装或启用 `hypo-workflow`，并在新会话中用 `/hooks` 审查、信任 plugin Hooks。Hook 文件变更后需要重新信任其新 hash。
+
+只把仓库 symlink 到 `$CODEX_HOME/skills` 可以加载 Skills，但不会提供 plugin-bundled Hooks，因此不是完整安装。
+
+## 两种主要工作流
+
+一个明确结果使用 Goal：
 
 ```text
-/hw:status -> /hw:resume
+/hw:init -> /hw:goal -> 讨论并批准 Design -> 明确“开始执行”
+         -> 验证 -> /hw:accept 或 /hw:reject
 ```
 
-## 平台入口
+存在真实先后依赖时使用 Cycle：
 
-README 只列通用入口。每个平台的安装命令、支持能力和限制写在对应 Guide 里。
+```text
+/hw:init -> /hw:cycle -> /hw:plan（按需要）
+         -> 批准有序 Milestones -> 明确“开始执行”
+         -> 逐 Milestone 验证 -> 一次最终人工验收
+```
 
-| 平台 | 最适合的入口 | 详细说明 |
-|---|---|---|
-| Codex | Codex Skill / repo skill source | [Codex Guide](docs/platforms/codex.md) |
-| Claude Code | `hw` plugin + Claude hooks/agents | [Claude Code Guide](docs/platforms/claude-code.md) |
-| OpenCode | 原生 commands、agents、plugins、TUI/status | [OpenCode Guide](docs/platforms/opencode.md) |
-| Cursor | 仓库规则 + 每命令 Skill/Command 文件 | [Cursor Guide](docs/platforms/cursor.md) |
-| GitHub Copilot | 仓库 custom instructions | [GitHub Copilot Guide](docs/platforms/copilot.md) |
-| Trae | 项目规则文件 | [Trae Guide](docs/platforms/trae.md) |
+批准只进入 `waiting_to_start`，不会自动实现。中断后使用 `/hw:resume`；日常写作、偏好、需求和反馈使用 `/hw:maintain`，不必开启 Delivery。
 
-第三方 IDE 的规则文件是仓库指令：它们帮助智能体学会读取 Hypo-Workflow 的 README、命令语义和 `.pipeline/` 文件协议；Cursor 还会为每个 `/hw-*` 入口同步一个平铺 Skill 文件和 command 文件。它们都不声明平台会自动安装、自动执行钩子或强制生命周期。
+## 九个公开入口
 
-## 工作原则
+| 命令 | 用途 |
+| --- | --- |
+| `/hw:guide` | 不确定下一步时推荐一个流程 |
+| `/hw:init` | 初始化、接手或检查工作区 |
+| `/hw:goal` | 交付一个有明确验收目标的结果 |
+| `/hw:plan` | 根据证据自适应规划深度 |
+| `/hw:cycle` | 交付有先后依赖的多个 Milestone |
+| `/hw:maintain` | 保存一个日常项目事实 |
+| `/hw:resume` | 从 Runtime、Continuation 和 Recovery Pack 恢复 |
+| `/hw:accept` | 接受待验收 Delivery |
+| `/hw:reject` | 带结构化反馈拒绝并进入修订 |
 
-- `.pipeline/state.yaml`、`.pipeline/cycle.yaml`、`.pipeline/rules.yaml` 是受保护 authority 文件。
-- Codex Subagents 优先用于非平凡 Codex 工作；实现与测试/审查要尽量分离，implementation Subagent 不读取测试源码/fixtures/snapshots/assertion 细节，无法隔离时记录 degraded mode。
-- 完成前做交付前检查：格式、派生产物、README/文档新鲜度、secret marker、测试证据和报告证据。
-- 自动化等级由 `.pipeline/config.yaml` 的 `automation.level` 决定；发布、破坏性操作和外部副作用仍按配置确认点执行。
+Chat、Explain、Status、Report、Log、Check、Compact、Knowledge、Sync、Debug、Start 和 Plan 阶段是内部自然行为，不占用命令面。Analysis、Audit、Quality、Docs、PR、Release、Explore、Optimize 延后。Setup、Rules、Stop、Skip、Reset、Showcase、Patch、Help、Watchdog 和 plan-confirm 已移除；旧显式调用只返回零写诊断。
 
-当前版本提供 **53 个用户指令**，另有 **1 个内部 watchdog** skill。
+## Codex Hooks
 
-## 常用命令
+Plugin 默认从 `hooks/hooks.json` 加载十类事件：
 
-| 场景 | 命令 |
-|---|---|
-| 初始化或重新扫描项目 | `/hw:init` |
-| 规划一个功能 | `/hw:plan` |
-| 规划多个 Feature | `/hw:plan --batch` |
-| 开始或继续执行 | `/hw:start` / `/hw:resume` |
-| 查看状态和最近事件 | `/hw:status` |
-| 查看报告 | `/hw:report` |
-| 持续分析和根因调查 | `/hw:analysis` |
-| 审查/评分代码质量 | `/hw:audit` / `/hw:quality` |
-| 闭环优化代码质量 | `/hw:optimize` |
-| 带证据解释代码/配置/改动 | `/hw:explain "为什么这样设计"` |
-| 小修复不进完整 Milestone | `/hw:patch` / `/hw:patch fix P001` |
-| 处理已有 PR/MR | `/hw:pr inspect URL`、`/hw:pr review URL`、`/hw:pr fix URL` |
-| 创建 PR/MR | `/hw:pr create` / `/hw:pr create --from-worktree` / `/hw:pr create --plan` |
-| 修复派生上下文 | `/hw:sync --repair` |
-| 检查或修复文档 | `/hw:docs check` / `/hw:docs repair` |
-| 压缩长上下文 | `/hw:compact` |
-| 引导下一步 | `/hw:guide` |
-| 查看或调整规则 | `/hw:rules` |
-| 隔离探索 | `/hw:explore` |
-| 接受或拒绝交付 | `/hw:accept` / `/hw:reject` |
+`SessionStart`、`UserPromptSubmit`、`PreToolUse`、`PermissionRequest`、`PostToolUse`、`PreCompact`、`PostCompact`、`SubagentStart`、`SubagentStop`、`Stop`。
 
-## 命令概览
+它们用于 ambient Maintain、相关文档/Record 提醒、压缩前 Pack 封存、压缩后恢复、worker evidence 和额外删除护栏。多个匹配 Hook 会并发运行，`PreToolUse` 也不能拦截所有等价路径，因此 Hook 不能替代 Core authority 或人工批准。
 
-| 类别 | 命令 |
-|---|---|
-| Pipeline | `/hw:start`, `/hw:resume`, `/hw:status`, `/hw:skip`, `/hw:stop`, `/hw:report`, `/hw:chat`, `/hw:analysis` |
-| Plan | `/hw:plan`, `/hw:plan:deep`, `/hw:plan:discover`, `/hw:plan:technical-stack`, `/hw:plan:architecture`, `/hw:plan:decompose`, `/hw:plan:generate`, `/hw:plan:extend`, `/hw:plan:review` |
-| Lifecycle | `/hw:init`, `/hw:cycle`, `/hw:accept`, `/hw:reject`, `/hw:patch`, `/hw:patch fix`, `/hw:release` |
-| Analysis/Review | `/hw:analysis`, `/hw:check`, `/hw:audit`, `/hw:quality`, `/hw:debug`, `/hw:pr`, `/hw:pr create`, `/hw:explain` |
-| Optimize | `/hw:optimize` |
-| Maintenance | `/hw:maintain`, `/hw:maintain status`, `/hw:maintain scan`, `/hw:maintain plan`, `/hw:maintain queue`, `/hw:maintain run`, `/hw:maintain apply`, `/hw:maintain verify`, `/hw:maintain log` |
-| Utility | `/hw:sync`, `/hw:docs`, `/hw:compact`, `/hw:knowledge`, `/hw:guide`, `/hw:showcase`, `/hw:rules`, `/hw:help`, `/hw:reset`, `/hw:log`, `/hw:setup`, `/hw:explore` |
+删除必须先展示 exact Deletion Manifest，经用户重新批准后签发绑定 Manifest 与 Git 状态的 `deletion.execute` Receipt，再由 controlled executor 执行。任何 hash 或 Git drift 都会使批准失效。
 
-完整映射见 [Commands Reference](docs/reference/commands.md) 和 [OpenCode Command Map](references/opencode-command-map.md)。
+## 执行纪律
 
-## 文档入口
+- 讨论、背景、想法、抱怨和方案反馈先回复“我的理解 -> 问题原因 -> 推荐方案”，不直接编辑。
+- 小且可逆的修复可用 `solo-verified`；重要实现按风险分离 test、implement、audit 或其他更合适的角色。
+- 完成报告必须在会话中讲清结论、方法、改动、测试、结果、问题和风险，不能只给文件路径。
+- 保留 dirty worktree 中不相关的用户修改。
 
-| 文档 | 用途 |
-|---|---|
-| [User Guide](docs/user-guide.md) | 常见流程、恢复、Feature Queue |
-| [Developer Guide](docs/developer.md) | 核心 helper、权限边界、派生产物和测试约定 |
-| [Commands Reference](docs/reference/commands.md) | 52 个标准命令和 OpenCode 映射 |
-| [Platforms Reference](docs/reference/platforms.md) | 六个平台能力表 |
-| [Generated Artifacts](docs/reference/generated-artifacts.md) | OpenCode、第三方适配、压缩视图和文档引用的生成来源 |
-| [OpenCode Guide](docs/platforms/opencode.md) | OpenCode 指令、智能体角色、模型矩阵和边界 |
-| [v13.1.0-beta.2 发布说明](docs/release/v13.1.0-beta.2.md) | C19 命名 Plan 阶段与 C20 协商优先修改边界 |
-| [Cursor Guide](docs/platforms/cursor.md) | Cursor 仓库规则 |
-| [GitHub Copilot Guide](docs/platforms/copilot.md) | GitHub Copilot 仓库指令 |
-| [Trae Guide](docs/platforms/trae.md) | Trae 项目规则 |
+## 文档
 
-## 许可证
+- [用户指南](docs/user-guide.md)
+- [九命令参考](docs/reference/commands.md)
+- [Codex 指南](docs/platforms/codex.md)
+- [平台状态](docs/reference/platforms.md)
+- [当前产物与 authority](docs/reference/generated-artifacts.md)
+- [命令规范](references/commands-spec.md)
+- [状态契约](references/state-contract.md)
 
-Hypo-Workflow 使用 MIT License，详见 [LICENSE](LICENSE)。
+## License
+
+MIT，见 [LICENSE](LICENSE)。

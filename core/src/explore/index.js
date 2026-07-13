@@ -4,8 +4,10 @@ import { basename, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { appendKnowledgeRecord, rebuildKnowledgeLedger } from "../knowledge/index.js";
 import { parseYaml, projectRegistryId, stringifyYaml, writeConfig } from "../config/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 
 export async function createExploration(projectRoot = ".", options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.explore");
   const root = resolve(projectRoot);
   const dirty = await decideExploreDirtyWorktree(root);
   if (dirty.requires_decision && !options.allowDirty) {
@@ -117,6 +119,7 @@ export async function readExploration(projectRoot = ".", ref) {
 }
 
 export async function endExploration(projectRoot = ".", ref, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.explore");
   const root = resolve(projectRoot);
   const found = await findExploration(root, ref);
   const now = options.now || new Date().toISOString();
@@ -152,6 +155,7 @@ export async function endExploration(projectRoot = ".", ref, options = {}) {
 }
 
 export async function archiveExploration(projectRoot = ".", ref, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.explore");
   if (options.deleteWorktree && !options.confirmDelete) {
     throw new Error("explicit deletion confirmation is required before deleting an exploration worktree");
   }
@@ -214,6 +218,7 @@ export async function buildExplorePlanContext(projectRoot = ".", source) {
 }
 
 export async function createExploreAnalysisContext(projectRoot = ".", ref, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.explore");
   const exploration = await readExploration(projectRoot, ref);
   const root = resolve(projectRoot);
   const notes = await readOptional(join(root, exploration.notes_path));

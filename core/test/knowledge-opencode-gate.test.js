@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, stat } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   decideOpenCodePermission,
   loadKnowledgeRecords,
@@ -9,7 +11,7 @@ import {
   shouldOpenCodeAutoContinue,
 } from "../src/index.js";
 
-test("F001 gate has a real Knowledge Ledger record and generated context", async () => {
+test("F001 gate has a real Knowledge Ledger record and generated context", async (t) => {
   const records = await loadKnowledgeRecords(".");
   const gateRecord = records.find((record) =>
     record.type === "milestone" &&
@@ -36,7 +38,39 @@ test("F001 gate has a real Knowledge Ledger record and generated context", async
     ".opencode/runtime/hypo-workflow-hooks.js",
   ]);
 
-  const { content: compact } = await renderKnowledgeCompact(".", { records });
+  const liveCompactPath = ".pipeline/knowledge/knowledge.compact.md";
+  const liveCompactBefore = await readFile(liveCompactPath);
+  const liveCompactStatBefore = await stat(liveCompactPath, { bigint: true });
+  await assert.rejects(
+    renderKnowledgeCompact(".", { records }),
+    {
+      code: "ERR_LEGACY_WORKSPACE_WRITE_BLOCKED",
+      message: /legacy\.knowledge.*mixed_current_with_legacy_residue/,
+    },
+  );
+  const liveCompactAfter = await readFile(liveCompactPath);
+  const liveCompactStatAfter = await stat(liveCompactPath, { bigint: true });
+  assert.deepEqual(liveCompactAfter, liveCompactBefore, "blocked live render must not change compact bytes");
+  assert.deepEqual(
+    {
+      size: liveCompactStatAfter.size,
+      mtimeNs: liveCompactStatAfter.mtimeNs,
+      ctimeNs: liveCompactStatAfter.ctimeNs,
+    },
+    {
+      size: liveCompactStatBefore.size,
+      mtimeNs: liveCompactStatBefore.mtimeNs,
+      ctimeNs: liveCompactStatBefore.ctimeNs,
+    },
+    "blocked live render must not write the compact file",
+  );
+
+  const legacyRoot = await mkdtemp(join(tmpdir(), "hw-f001-knowledge-gate-"));
+  t.after(() => rm(legacyRoot, { recursive: true, force: true }));
+  await mkdir(join(legacyRoot, ".pipeline/knowledge"), { recursive: true });
+  const { path: compactPath, content: compact } = await renderKnowledgeCompact(legacyRoot, { records });
+  assert.equal(compactPath, join(legacyRoot, ".pipeline/knowledge/knowledge.compact.md"));
+  assert.equal(await readFile(compactPath, "utf8"), compact);
   assert.match(compact, new RegExp(gateRecord.id));
   assert.match(compact, /F001 Knowledge and OpenCode integration gate/);
 

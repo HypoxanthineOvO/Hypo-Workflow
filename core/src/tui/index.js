@@ -3,6 +3,7 @@ import { join, resolve } from "node:path";
 import { DEFAULT_GLOBAL_CONFIG, loadConfig, loadProjectRegistry, mergeConfig, writeConfig } from "../config/index.js";
 import { resolveAcceptancePolicy } from "../acceptance/index.js";
 import { buildOpenCodeStatusModel } from "../opencode-status/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 
 const PROTECTED_LIFECYCLE_FILES = Object.freeze([
   ".pipeline/state.yaml",
@@ -276,6 +277,10 @@ export async function applyConfigTuiEdit(staged, options = {}) {
       diff: staged.diff || [],
       sync: staged.sync,
     };
+  }
+
+  if (staged.target.id === "project") {
+    await assertLegacyWorkspaceWritable(staged.target.project_root, "legacy.tui.project-config");
   }
 
   assertNotProtectedLifecycleFile(staged.target.config_file, staged.target.project_root);

@@ -13,16 +13,18 @@ import {
 const DEEP_PLAN_CANONICAL = "/hw:plan:deep";
 const DEEP_PLAN_OPENCODE = "/hw:plan:deep";
 
-test("Deep Plan is first-class in canonical command maps for OpenCode and Claude Code", () => {
+test("Deep Plan remains a single internal compatibility route in generated command maps", () => {
   for (const platform of ["opencode", "claude-code"]) {
     const commands = commandMap(platform);
     const deepPlanCommands = commands.filter((command) => command.canonical === DEEP_PLAN_CANONICAL);
 
-    assert.equal(commands.length, 53, `${platform} command count should include Deep Plan, Plan phases, Analysis, Maintain, Quality, and Optimize`);
+    assert.equal(commands.length, 54, `${platform} command map should include Goal plus the compatibility inventory`);
     assert.equal(deepPlanCommands.length, 1, `${platform} should expose Deep Plan exactly once`);
     assert.equal(deepPlanCommands[0].agent, "hw-plan");
     assert.equal(deepPlanCommands[0].route, "plan");
     assert.equal(deepPlanCommands[0].skill, "skills/plan-deep/SKILL.md");
+    assert.equal(deepPlanCommands[0].exposure, "internal");
+    assert.equal(deepPlanCommands[0].availability, "unavailable");
   }
 
   assert.equal(commandByCanonical(DEEP_PLAN_CANONICAL).opencode, DEEP_PLAN_OPENCODE);
@@ -50,7 +52,7 @@ test("Claude Code generated commands include Deep Plan as a namespaced slash com
   const dir = await mkdtemp(join(tmpdir(), "hw-deep-plan-claude-"));
   const result = await writeClaudeCodePluginArtifacts(dir);
 
-  assert.equal(result.command_count, 53);
+  assert.equal(result.command_count, 54);
   assert.equal(result.written_commands.filter((file) => file === "commands/plan/deep.md").length, 1);
 
   const command = await readFile(join(dir, "commands", "plan", "deep.md"), "utf8");

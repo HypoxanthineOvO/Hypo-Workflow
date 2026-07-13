@@ -22,10 +22,138 @@ export {
   saveProjectRegistry,
   registerProject,
   mergeConfig,
-  parseYaml,
-  stringifyYaml,
   DEFAULT_GLOBAL_CONFIG,
 } from "./config/index.js";
+export {
+  parseYaml,
+  stringifyYaml,
+  parseFrontmatter,
+  canonicalHash,
+} from "./serialization/index.js";
+export {
+  createWorkspaceManifest,
+  validateWorkspaceManifest,
+  WORKSPACE_MANIFEST_PATH,
+  WORKSPACE_MANIFEST_SCHEMA_VERSION,
+  WORKSPACE_FORMAT,
+  WORKSPACE_ZONES,
+} from "./manifest/index.js";
+export {
+  detectWorkspaceFormat,
+  assertLegacyWorkspaceWritable,
+  LEGACY_WORKSPACE_WRITER_INVENTORY,
+  WORKSPACE_FORMAT_KINDS,
+} from "./workspace-format/index.js";
+export {
+  commitWorkspaceTransaction,
+  recoverWorkspaceTransaction,
+  assertWorkspacePathAllowed,
+  normalizeWorkspacePath,
+  WORKSPACE_ALLOWED_WRITE_ROOTS,
+} from "./workspace-store/index.js";
+export {
+  normalizeRuntimeObjectRef,
+  writeRuntimeObject,
+  readRuntimeObject,
+  writeActivePointer,
+  readActivePointer,
+} from "./runtime/index.js";
+export {
+  createRecordPatch,
+  commitRecordPatch,
+  readRecord,
+  rebuildRecordIndexes,
+} from "./records/index.js";
+export {
+  createAmbientMaintainStore,
+} from "./maintain/index.js";
+export {
+  createReceiptStore,
+  issueReceipt,
+  readReceipt,
+  validateReceipt,
+  reserveReceipt,
+  consumeReceipt,
+  invalidateReceipt,
+  revokeReceipt,
+} from "./receipts/index.js";
+export {
+  buildDeletionReceiptContext,
+} from "./permissions/index.js";
+export {
+  buildDeletionManifest,
+  validateDeletionManifest,
+  executeDeletionManifest,
+  executeRepositoryDeletionManifest,
+} from "./deletion/index.js";
+export {
+  compileGoalDesign,
+  compileCyclePlan,
+  selectAdaptivePlan,
+  assessPlanReadiness,
+} from "./planning/index.js";
+export {
+  selectExecutionTopology,
+  assessExecutionEvidence,
+} from "./execution-topology/index.js";
+export {
+  createDeliveryStore,
+  buildDeliveryReceiptContext,
+} from "./delivery/index.js";
+export {
+  buildSnapshotProjection,
+  writeSnapshot,
+  readSnapshot,
+} from "./snapshots/index.js";
+export {
+  RECOVERY_EVENT_TYPES,
+  createRecoveryStore,
+  appendRecoveryEvent,
+  replayRecoveryJournal,
+  readRecoveryBlob,
+  updateContextCapsule,
+  rebuildContextCapsule,
+  readContextCapsule,
+  sealRecoveryPack,
+  validateRecoveryPack,
+  selectLatestValidRecoveryPack,
+  planRecoveryRestore,
+  planRecoveryRetention,
+  applyRecoveryRetention,
+} from "./recovery/index.js";
+export {
+  CODEX_HOOK_EVENTS,
+  validateCodexHookInput,
+  validateCodexHookOutput,
+  evaluateCodexHookEvent,
+} from "./codex-hooks/index.js";
+export {
+  initializeWorkspace,
+} from "./init/index.js";
+export {
+  HOST_CONTRACT_VERSION,
+  HOST_STATUS_PATH,
+  HOST_STATUS_RELATIVE_PATH,
+  parseHostStatusProjection,
+  invalidateHostStatusProjection,
+  compileHostStatusProjection,
+  readHostStatusProjection,
+  refreshHostStatusProjection,
+  verifyPortableBundle,
+} from "./host-contract/index.js";
+export {
+  inspectLegacyWorkspace,
+  createBootstrapProposal,
+  mergeBootstrapProposals,
+  curateBootstrapProposals,
+  auditBootstrapProposal,
+  stageBootstrapWorkspace,
+  activateBootstrapWorkspace,
+  recoverBootstrapActivation,
+  rollbackBootstrapActivation,
+  acceptBootstrapActivation,
+  restoreBootstrapWorkspace,
+} from "./migration/index.js";
 export {
   normalizeProfile,
   selectProfile,
@@ -46,25 +174,10 @@ export {
   commandMap,
   commandByCanonical,
   CANONICAL_COMMANDS,
+  resolveCommandRoute,
+  resolveWorkflowIntent,
+  discoverableCommandMap,
 } from "./commands/index.js";
-export {
-  loadRulesSummary,
-  normalizeStructuredRule,
-  resolveEffectiveStructuredRules,
-  buildEffectiveRulesMatrix,
-  loadStructuredRulesAuthority,
-  buildRememberRuleProposal,
-  detectRememberRuleCandidates,
-  writeConfirmedStructuredRule,
-  structuredRuleAuthorityPath,
-  renderStructuredHabitsDocument,
-  renderStructuredRulesInstructionBlock,
-  writeStructuredHabitsDocument,
-  STRUCTURED_RULE_SCOPES,
-  STRUCTURED_RULE_SEVERITIES,
-  STRUCTURED_RULE_HOOKS,
-  STRUCTURED_RULE_CHECK_KINDS,
-} from "./rules/index.js";
 export {
   reviewArtifactDir,
   validateReviewArtifact,
@@ -92,7 +205,6 @@ export {
   renderClaudeResumeAudit,
 } from "./claude-resume/index.js";
 export {
-  writeOpenCodeArtifacts,
   renderCommand,
   renderAgent,
   renderOpenCodeModelId,
@@ -106,9 +218,7 @@ export {
   OPENCODE_AGENTS,
 } from "./artifacts/opencode.js";
 export {
-  writeClaudeCodePluginArtifacts,
   renderClaudeCodeSlashCommand,
-  writeClaudeCodeAgentArtifacts,
   buildClaudeAgentRoutingMetadata,
   renderClaudeCodeAgent,
   selectClaudeAgentRole,
@@ -116,8 +226,6 @@ export {
   renderClaudeCodeMarketplaceManifest,
 } from "./artifacts/claude.js";
 export {
-  writeThirdPartyAdapterArtifacts,
-  writeCursorSkillBundle,
   renderThirdPartyAdapter,
   selectThirdPartyAdapters,
   CURSOR_SKILLS_DIR,
@@ -139,7 +247,6 @@ export {
   defaultReadmeConfig,
   renderReadmeBlock,
   replaceManagedBlock,
-  updateReadme,
   checkReadmeFreshness,
   platformDisplayNames,
 } from "./readme/index.js";
@@ -209,15 +316,6 @@ export {
   redactOpenCodeSecrets,
 } from "./opencode-hooks/index.js";
 export {
-  buildGlobalTuiModel,
-  renderGlobalTuiSnapshot,
-  buildConfigTuiModel,
-  stageConfigTuiEdit,
-  applyConfigTuiEdit,
-  buildReadOnlyProgressDashboardModel,
-  renderReadOnlyProgressDashboardSnapshot,
-} from "./tui/index.js";
-export {
   startChatSession,
   recoverChatContext,
   appendChatLogEntry,
@@ -285,16 +383,6 @@ export {
   sanitizeProjection,
 } from "./knowledge/index.js";
 export {
-  updateModelPoolRole,
-  saveGlobalModelPoolEdit,
-  addProjectAction,
-  scanProjectsAction,
-  refreshProjectRegistryAction,
-  syncSelectedProjectAction,
-  inspectProject,
-  MODEL_POOL_ROLES,
-} from "./actions/index.js";
-export {
   resolveAcceptancePolicy,
   evaluateAcceptanceStatus,
   evaluateAcceptanceReadiness,
@@ -313,13 +401,6 @@ export {
   mergeAuditMemoryForMilestone,
   buildScopedAuditSummary,
 } from "./audit-memory/index.js";
-export {
-  readPatch,
-  requestPatchAcceptance,
-  acceptPatch,
-  rejectPatch,
-  buildPatchFixContext,
-} from "./patches/index.js";
 export {
   normalizeChangeRequestSource,
   buildChangeRequestArchive,
@@ -384,13 +465,9 @@ export {
   renderExplainAnswerFromSubagentEvidence,
 } from "./explain/index.js";
 export {
-  runProjectSync,
-  writeClaudeHookArtifacts,
   mergeClaudeCodeSettings,
-  syncClaudeCodeSettings,
   buildDerivedArtifactMap,
   checkDerivedArtifacts,
-  repairDerivedArtifacts,
   runSessionStartLightSyncCheck,
 } from "./sync/index.js";
 export {
@@ -409,11 +486,6 @@ export {
   GUIDE_ROUTER_OUTPUTS,
 } from "./guide/index.js";
 export {
-  buildExecutionLease,
-  assessExecutionLease,
-  resolvePlatformHandoff,
-} from "./lease/index.js";
-export {
   redactSecrets,
   validateSecretSafeEvidence,
   assertSecretSafeEvidence,
@@ -431,7 +503,6 @@ export {
 export {
   docsMap,
   checkDocs,
-  repairDocs,
   checkNarrativeDocsForRelease,
   checkDocsLanguage,
 } from "./docs/index.js";
@@ -465,106 +536,8 @@ export {
   INTERMEDIATE_UPDATE_SECTIONS,
 } from "./response/index.js";
 export {
-  validateWorkspaceAuthority,
-  deriveProjectRegistryFromWorkspace,
-  loadWorkspaceAuthority,
-} from "./workspace-authority/index.js";
-export {
-  buildProjectLinkageRegistry,
-  buildProjectLinkGraph,
-  validateWorkspaceRelations,
-} from "./project-linkage/index.js";
-export {
-  classifyProjectStopEvent,
-  buildProjectStopEvent,
-} from "./project-stop-events/index.js";
-export {
-  parseCodexFinalAssistantOutput,
-  captureFinalAssistantOutput,
-  probeFinalAssistantOutputSource,
-} from "./codex-capture/index.js";
-export {
-  formatProjectStopNotification,
-  segmentProjectStopNotification,
-  sendProjectStopNotification,
-} from "./notification-sender/index.js";
-export {
-  scanArtifactCatalog,
-} from "./artifact-catalog/index.js";
-export {
-  buildStorageSyncTemplate,
-  validateStorageSyncTemplate,
-  planNotionProjectHomeDryRun,
-  canonicalJson,
-  sha256Canonical,
-} from "./storage-sync/index.js";
-export {
-  validateMaintenanceQueueItem,
-  validateMaintenanceRun,
-  planMaintenanceRun,
-  discoverMaintenanceRunItems,
-  transitionMaintenanceRun,
-  applyMaintenanceRun,
-  transitionMaintenanceQueueItem,
-  evaluateMaintenanceSideEffectGate,
-  appendMaintenanceLedgerEvent,
-  validateMaintenanceLedger,
-  learnMaintenanceTemplateCandidates,
-  validateMaintenanceTemplateCandidate,
-  reviewMaintenanceTemplateCandidate,
-  resolveMaintenanceEvidencePaths,
-  renderMaintenanceStatus,
-  renderMaintenanceLog,
-  MAINTENANCE_QUEUE_STATUSES,
-  MAINTENANCE_SIDE_EFFECT_LEVELS,
-  MAINTENANCE_RUN_STATUSES,
-  MAINTENANCE_TEMPLATE_CANDIDATE_STATUSES,
-  CONSOLIDATION_SOURCE_KINDS,
-  discoverConsolidationSources,
-  canonicalSourceKinds,
-  classifyAndRedactRecord,
-  scrubConsolidationSecretMarkers,
-  planGlobalConsolidationRun,
-  runMaintenanceScheduler,
-  planHistoricalBackfillShards,
-  buildConsolidationResumeState,
-  generateGlobalConsolidationOutputs,
-  projectConsolidationToNotionDryRun,
-  buildRootManagementDryRunBundle,
-  applyApprovedNotionDryRunBundle,
-  renderRootDryRunReviewReport,
-  resolveDailyProjectSummaryWindow,
-  buildDailyProjectSummary,
-  renderDailyProjectSummary,
-  sendDailyProjectSummary,
-  runDailyProjectSummaryScheduler,
-  buildProjectLinkageE2EDryRunBundle,
-} from "./maintenance/index.js";
-export {
-  jsonlLedgerPathFor,
-  compactLedgerSummaryPathFor,
-  appendJsonlLedgerEntry,
-  readJsonlLedger,
-  migrateYamlLedgerToJsonl,
-  writeCompactLedgerSummary,
-} from "./ledger/index.js";
-export {
   buildSecretCapabilityProjection,
 } from "./secrets/index.js";
-export {
-  buildProjectEvent,
-  emitProjectEvent,
-  loadProjectEventLedger,
-  routeProjectEvent,
-  routeWriterNewsIssue,
-  buildWriterNewsCommand,
-  renderWriterIssueReadyMessage,
-} from "./project-events/index.js";
-export {
-  enqueueProjectStopNotification,
-  dispatchProjectStopNotifications,
-  loadPendingNotifications,
-} from "./project-notifications/index.js";
 export {
   buildAuditInventory,
   auditInventory,

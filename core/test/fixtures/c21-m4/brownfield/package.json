@@ -1,0 +1,12 @@
+{
+  "name": "m4-brownfield-service",
+  "version": "0.3.0",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

@@ -1,32 +1,42 @@
 {
   "name": "hypo-workflow",
   "version": "13.1.0-beta.2",
-  "description": "Serialized prompt workflow with setup, planning, execution, analysis evidence ledgers, cycles, patches, compact context, guide, showcase, rules, OpenCode native adapter scaffold, global config TUI, docs governance, lifecycle recovery, auditing, debugging, release automation, watchdog, and WebUI support.",
+  "description": "Manifest-based Goal and Cycle delivery, durable project memory, restart-safe recovery, and Receipt-controlled actions for Codex.",
   "author": {
     "name": "Hypoxanthine",
     "url": "https://github.com/HypoxanthineOvO"
   },
   "homepage": "https://github.com/HypoxanthineOvO/Hypo-Workflow",
-  "repo_url": "https://github.com/HypoxanthineOvO/Hypo-Workflow",
+  "repository": "https://github.com/HypoxanthineOvO/Hypo-Workflow",
   "license": "MIT",
   "keywords": [
     "workflow",
     "planning",
     "tdd",
-    "prompt-engineering",
+    "project-memory",
     "ai-agent",
-    "dashboard",
-    "debugging",
-    "release",
-    "opencode"
+    "recovery",
+    "codex"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Hypo-Workflow",
-    "shortDescription": "Plan-to-release workflow automation with setup, progress tracking, and dashboard support.",
-    "longDescription": "Hypo-Workflow packages a complete planning and execution workflow with native skills, smart stop hooks, dual plan modes, Cycle archives, persistent Patches, context-injected planning, progress summaries, serial subagent orchestration, configurable Rules, OpenCode adapter scaffold, plugin setup, Auto Resume watchdog, and a live dashboard for a local .pipeline workspace.",
+    "shortDescription": "Durable Goal and Cycle delivery with project memory and recovery.",
+    "longDescription": "Hypo-Workflow gives Codex a manifest-based project workspace with bounded Goal and Cycle delivery, ambient Maintain records, restart-safe recovery, explicit human acceptance, and Receipt-backed control for destructive operations.",
     "developerName": "Hypoxanthine",
     "category": "Productivity",
+    "capabilities": [
+      "Nine focused workflow Skills",
+      "Official Codex lifecycle Hooks",
+      "Goal and Cycle delivery",
+      "Project memory and recovery",
+      "Controlled destructive operations"
+    ],
+    "defaultPrompt": [
+      "Initialize this repository with Hypo-Workflow.",
+      "Define and run one bounded delivery Goal.",
+      "Resume the active Hypo-Workflow delivery."
+    ],
     "websiteURL": "https://github.com/HypoxanthineOvO/Hypo-Workflow"
   }
 }

@@ -1,61 +1,27 @@
 # Commands Reference
 
-[中文](../../../reference/commands.md) | English
+[中文](../../reference/commands.md) | English
 
-This page is generated from `core/src/commands/index.js`. Current user-facing command count: 53. Use the Canonical column as the user entrypoint and the OpenCode column as the platform mapping.
+The current Official Codex discovery surface contains exactly nine public routes. The Root Router normalizes namespaces and checks backend availability; each route loads one ordinary, non-symlink Child Skill.
 
-| Canonical | OpenCode | Agent | Skill |
-|---|---|---|---|
-| `/hw:start` | `/hw:start` | `hw-build` | `skills/start/SKILL.md` |
-| `/hw:resume` | `/hw:resume` | `hw-build` | `skills/resume/SKILL.md` |
-| `/hw:status` | `/hw:status` | `hw-status` | `skills/status/SKILL.md` |
-| `/hw:skip` | `/hw:skip` | `hw-build` | `skills/skip/SKILL.md` |
-| `/hw:stop` | `/hw:stop` | `hw-status` | `skills/stop/SKILL.md` |
-| `/hw:report` | `/hw:report` | `hw-report` | `skills/report/SKILL.md` |
-| `/hw:chat` | `/hw:chat` | `hw-build` | `skills/chat/SKILL.md` |
-| `/hw:analysis` | `/hw:analysis` | `hw-debug` | `skills/analysis/SKILL.md` |
-| `/hw:plan` | `/hw:plan` | `hw-plan` | `skills/plan/SKILL.md` |
-| `/hw:plan:deep` | `/hw:plan:deep` | `hw-plan` | `skills/plan-deep/SKILL.md` |
-| `/hw:plan:discover` | `/hw:plan:discover` | `hw-plan` | `skills/plan-discover/SKILL.md` |
-| `/hw:plan:technical-stack` | `/hw:plan:technical-stack` | `hw-plan` | `skills/plan-technical-stack/SKILL.md` |
-| `/hw:plan:architecture` | `/hw:plan:architecture` | `hw-plan` | `skills/plan-architecture/SKILL.md` |
-| `/hw:plan:decompose` | `/hw:plan:decompose` | `hw-plan` | `skills/plan-decompose/SKILL.md` |
-| `/hw:plan:generate` | `/hw:plan:generate` | `hw-plan` | `skills/plan-generate/SKILL.md` |
-| `/hw:plan:extend` | `/hw:plan:extend` | `hw-plan` | `skills/plan-extend/SKILL.md` |
-| `/hw:plan:review` | `/hw:plan:review` | `hw-review` | `skills/plan-review/SKILL.md` |
-| `/hw:cycle` | `/hw:cycle` | `hw-status` | `skills/cycle/SKILL.md` |
-| `/hw:accept` | `/hw:accept` | `hw-build` | `skills/accept/SKILL.md` |
-| `/hw:reject` | `/hw:reject` | `hw-build` | `skills/reject/SKILL.md` |
-| `/hw:explore` | `/hw:explore` | `hw-explore` | `skills/explore/SKILL.md` |
-| `/hw:sync` | `/hw:sync` | `hw-build` | `skills/sync/SKILL.md` |
-| `/hw:maintain` | `/hw:maintain` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain status` | `/hw:maintain:status` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain scan` | `/hw:maintain:scan` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain plan` | `/hw:maintain:plan` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain queue` | `/hw:maintain:queue` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain run` | `/hw:maintain:run` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain apply` | `/hw:maintain:apply` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain verify` | `/hw:maintain:verify` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:maintain log` | `/hw:maintain:log` | `hw-build` | `skills/maintain/SKILL.md` |
-| `/hw:docs` | `/hw:docs` | `hw-docs` | `skills/docs/SKILL.md` |
-| `/hw:patch` | `/hw:patch` | `hw-build` | `skills/patch/SKILL.md` |
-| `/hw:patch fix` | `/hw:patch:fix` | `hw-build` | `skills/patch/SKILL.md` |
-| `/hw:pr` | `/hw:pr` | `hw-review` | `skills/pr/SKILL.md` |
-| `/hw:pr create` | `/hw:pr:create` | `hw-build` | `skills/pr/SKILL.md` |
-| `/hw:explain` | `/hw:explain` | `hw-review` | `skills/explain/SKILL.md` |
-| `/hw:compact` | `/hw:compact` | `hw-compact` | `skills/compact/SKILL.md` |
-| `/hw:knowledge` | `/hw:knowledge` | `hw-compact` | `skills/knowledge/SKILL.md` |
-| `/hw:guide` | `/hw:guide` | `hw-plan` | `skills/guide/SKILL.md` |
-| `/hw:showcase` | `/hw:showcase` | `hw-build` | `skills/showcase/SKILL.md` |
-| `/hw:rules` | `/hw:rules` | `hw-status` | `skills/rules/SKILL.md` |
-| `/hw:init` | `/hw:init` | `hw-plan` | `skills/init/SKILL.md` |
-| `/hw:check` | `/hw:check` | `hw-status` | `skills/check/SKILL.md` |
-| `/hw:audit` | `/hw:audit` | `hw-review` | `skills/audit/SKILL.md` |
-| `/hw:quality` | `/hw:quality` | `hw-review` | `skills/quality/SKILL.md` |
-| `/hw:optimize` | `/hw:optimize` | `hw-build` | `skills/optimize/SKILL.md` |
-| `/hw:release` | `/hw:release` | `hw-build` | `skills/release/SKILL.md` |
-| `/hw:debug` | `/hw:debug` | `hw-debug` | `skills/debug/SKILL.md` |
-| `/hw:help` | `/hw:help` | `hw-status` | `skills/help/SKILL.md` |
-| `/hw:reset` | `/hw:reset` | `hw-status` | `skills/reset/SKILL.md` |
-| `/hw:log` | `/hw:log` | `hw-status` | `skills/log/SKILL.md` |
-| `/hw:setup` | `/hw:setup` | `hw-status` | `skills/setup/SKILL.md` |
+| Command | Child Skill | Use when |
+| --- | --- | --- |
+| `/hw:guide` | `skills/guide/SKILL.md` | the user is unsure whether to initialize, maintain, resume, use Goal, or use Cycle |
+| `/hw:init` | `skills/init/SKILL.md` | starting a project, adopting an existing codebase, or inspecting old `.pipeline/` data |
+| `/hw:goal` | `skills/goal/SKILL.md` | one explicit outcome needs one final human acceptance |
+| `/hw:plan` | `skills/plan/SKILL.md` | clarification, technical choices, architecture, decomposition, or durable research is needed |
+| `/hw:cycle` | `skills/cycle/SKILL.md` | multiple stages have real dependency order |
+| `/hw:maintain` | `skills/maintain/SKILL.md` | persisting an everyday requirement, preference, decision, or feedback fact |
+| `/hw:resume` | `skills/resume/SKILL.md` | continuing an active Delivery after interruption, compaction, or restart |
+| `/hw:accept` | `skills/accept/SKILL.md` | a verified Goal or Cycle is in `pending_acceptance` |
+| `/hw:reject` | `skills/reject/SKILL.md` | acceptance fails and structured feedback must produce a revision |
+
+## Internal Natural Behavior
+
+Chat, Explain, Status, Report, Log, Check, Compact, Knowledge, Sync, and Debug are selected naturally by the Agent. Start is a contextual post-approval transition. Deep Plan, Discover, Technical Stack, Architecture, Decompose, Generate, Extend, and Review are internal `/hw:plan` phases. They do not create additional Codex commands or Skills.
+
+## Deferred And Removed
+
+Analysis, Audit, Quality, Docs, PR, Release, Explore, and Optimize are deferred to later Cycles. Setup, Rules, Stop, Skip, Reset, Showcase, Patch, Help, Watchdog, and plan-confirm are removed.
+
+An explicit invocation of an internal, deferred, removed, or unknown old command returns only its classification, the zero-write reason, and the closest current route. It must not mutate `.pipeline/`, generate platform adapters, or call legacy writers.

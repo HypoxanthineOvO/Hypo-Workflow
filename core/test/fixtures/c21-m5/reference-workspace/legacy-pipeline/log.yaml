@@ -1,0 +1,5 @@
+- id: fixture-c21-m4-complete
+  type: milestone_complete
+  status: completed
+  timestamp: "2026-07-12T06:32:43+08:00"
+  summary: C21-M4 completed in the synthetic reference fixture

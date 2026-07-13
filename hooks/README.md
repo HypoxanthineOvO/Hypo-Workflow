@@ -1,89 +1,69 @@
-# Pipeline Hooks
+# Hypo-Workflow Hooks
 
-Hooks 为 Hypo-Workflow Pipeline 提供被动安全网。
+Hooks provide bounded recovery, ambient Maintain, relevant reminders, worker evidence, and an additional safety guardrail. They call deterministic Core APIs, but do not own Delivery lifecycle, human acceptance, or permission authority.
 
-## 平台支持
+## Official Codex Adapter
 
-| Hook | Claude Code | Codex |
-|------|-------------|-------|
-| Stop 强制完成 | ✅ decision:block | ❌ 不支持 |
-| SessionStart 上下文注入 | ✅ additionalContext | ❌ 不支持 |
-| Compact 恢复包 | ✅ PreCompact / PostCompact | ❌ 不支持 |
-| PermissionRequest | ✅ profile-aware allow/ask/deny | ❌ 不支持 |
-| Progress refresh | ✅ PostToolUse / PostToolBatch / FileChanged | ❌ 不支持 |
-| InstructionsLoaded 监听 | ✅ 可选 | ❌ 不支持 |
-| 完成通知 | ✅ Notification | ✅ notify |
-
-## Claude Hook Runtime
-
-C6 起，Claude Code 使用统一 wrapper：
-
-```bash
-node hooks/claude-hook.mjs <EventName>
-```
-
-当前注册事件：
+Enabled plugins discover `hooks/hooks.json` by default. Hypo-Workflow uses one process wrapper for ten current events:
 
 - `SessionStart`
-- `Stop`
+- `UserPromptSubmit`
+- `PreToolUse`
+- `PermissionRequest`
+- `PostToolUse`
 - `PreCompact`
 - `PostCompact`
-- `PostToolUse`
-- `PostToolBatch`
-- `UserPromptSubmit`
-- `PermissionRequest`
-- `FileChanged` for `.pipeline/PROGRESS.md`
+- `SubagentStart`
+- `SubagentStop`
+- `Stop`
 
-Stop 会阻止缺失 `state.yaml`、`log.yaml`、`PROGRESS.md`、最终步骤 report 等关键证据；metrics 和 derived refresh gap 只作为 warning。Compact 事件输出 resume packet，明确当前 Cycle/Milestone/step、下一步、自动化边界和最近事件，避免压缩后重放已完成步骤。PermissionRequest 按 `claude_code.profile` 决策：`developer` 本地宽松，`standard` 对破坏性/外部副作用 ask，`strict` 对高风险操作 deny。
+Commands use `PLUGIN_ROOT` to locate the installed bundle. Timeout values are seconds. `hooks/codex-hook.mjs` writes exactly one valid JSON line to stdout and sends diagnostics to stderr.
 
-## Project Stop QQ Notifications
+Main behavior:
 
-旧的 Hypo-Workflow project-stop QQ 通知链路已经退役。此前 Claude Stop hook 和 Codex notify hook 会在终态时写入本地 pending queue，再由 `scripts/project-notification-dispatcher.sh` 每分钟读取队列并通过 Hypo-Claw 发送 QQ。现在用户侧 Codex 完成通知由 Hermes 的 `Codex completion watch` 负责：Hermes 每 2 分钟扫描 `~/.codex/sessions/**/*.jsonl`，发现 `task_complete` / `final_answer` 后通过 Hermes Cron 投递到 QQ。
+- `UserPromptSubmit` may stage a clean requirement, preference, decision, or feedback delta in the Recovery Journal and `.pipeline/memory/inbox/`.
+- `PostToolUse` records bounded tool evidence and emits effect-aware, deduplicated docs/Record reminders.
+- `PreCompact` seals a Recovery Pack from a validated Capsule; `PostCompact` records the outcome.
+- `SessionStart(source=compact)` injects bounded restore context, never a raw transcript or full Journal.
+- `SubagentStart` and `SubagentStop` use per-writer Journal streams for role and evidence references.
+- `PreToolUse` and `PermissionRequest` reject or explain obvious direct deletion paths.
 
-退役原因：旧队列 `~/.hypo-workflow/notifications/project-stop-pending.yaml` 曾膨胀到约 528 MB，dispatcher 每分钟读取时触发 Node heap out-of-memory，并在系统日志中产生规律性的 `cron:session opened/closed` 噪声。避免重复通知和资源浪费后，Hypo-Workflow hooks 只保留工作流约束、resume/context、progress refresh 等本地安全功能，不再写入 project-stop QQ 通知队列。
+## Trust And Limits
 
-## Chat Recovery
+Non-managed plugin Hooks do not run merely because the plugin is installed. Review and trust them through Codex `/hooks`. Trust is hash-bound, so changed definitions require review again. Project-local discovery also depends on project trust.
 
-M13 起，Hook 规范额外支持 `/hw:chat` 的追加对话语义：
+Multiple matching command Hooks launch concurrently. `PreToolUse` interception is incomplete and does not cover every equivalent execution path. Hooks are therefore guardrails and evidence producers, not a complete enforcement boundary.
 
-- SessionStart 可在无 active Milestone 时提示用户可以进入 `/hw:chat`
-- SessionStart 可在 `chat.active == true` 时恢复 chat context
-- 恢复时优先注入 `state.yaml + cycle.yaml + PROGRESS.md + recent report`
-- Stop Hook 可根据会话规模决定写 `chat summary`，或只保留 `chat_entry` 与修改痕迹
-- 当 chat 修改不再轻量时，Hook / runtime 可提示升级为 Patch escalation
+Real deletion requires all of:
 
-## Knowledge Ledger
+1. an exact hashed Deletion Manifest with Git binding shown in chat
+2. fresh explicit user approval for that Manifest
+3. a scoped `deletion.execute` Receipt
+4. Core controlled executor revalidation immediately before execution
 
-M03 起，Hook 规范支持 Knowledge Ledger 的轻量上下文和停止前自检：
+Hash, tree, or Git drift invalidates the authorization and returns to the user gate.
 
-- SessionStart 注入 `.pipeline/knowledge/knowledge.compact.md`
-- SessionStart 注入 `.pipeline/knowledge/index/*.yaml`
-- SessionStart 默认不读取 `.pipeline/knowledge/records/*.yaml`
-- Stop Hook 在 `knowledge-ledger-self-check: error` 时阻止缺少 Knowledge record 的最终停止
-- warn 模式只提示 Agent 自检，不阻止继续
+## Ambient Maintain Authority
 
-## 安装
+Ambient capture first produces a Journal event and staged Inbox proposal. A proposal is not a durable Record. Only the main Agent may promote an exact bound `RecordPatch`, after which Core writes the Markdown Record and refreshes derived indexes. Recorder Subagents may propose but cannot commit authority.
 
-### 方式 1：Plugin 安装（推荐，Claude Code）
+Raw credentials, full transcripts, and hidden reasoning are excluded. Metadata-only `secret_refs` may point to separately authorized secret locations.
 
-如果通过 Plugin 安装了 hypo-workflow，Hook 已自动配置。
+## Deferred Platforms
 
-### 方式 2：手动安装
+Claude Code Hook files remain isolated under `hooks/claude/` as deferred source material. OpenCode and other platform adapters are also deferred. These assets do not constitute current adapter support and must not be parsed as Official Codex Hook configuration.
 
-详见：
-
-- Claude Code: `references/platform-claude.md`
-- Codex: `references/platform-codex.md`
-
-## 验证
+## Validation
 
 ```bash
-# 测试 stop-check（非 Pipeline 目录，应输出空 JSON）
-echo '{}' | bash hooks/stop-check.sh
-
-# 测试 session-start（非 Pipeline 目录，应输出空 JSON）
-echo '{}' | bash hooks/session-start.sh startup
-
-# 测试 Claude wrapper（非 Pipeline 目录，应输出空 JSON）
-echo '{}' | node hooks/claude-hook.mjs SessionStart
+node scripts/codex-hook-smoke.mjs
+python3 /home/heyx/.vsp-codex/skills/.system/plugin-creator/scripts/validate_plugin.py .
 ```
+
+Real-host probing is conditional:
+
+```bash
+CODEX_HOOK_SMOKE=1 node scripts/codex-real-hook-smoke.mjs
+```
+
+If the compatible current Official Codex host, plugin enablement, or Hook trust path is unavailable, report `SKIP` / `UNAVAILABLE`. Never count an old binary or VSP fork as a current-host PASS.

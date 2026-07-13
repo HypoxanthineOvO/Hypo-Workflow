@@ -2,95 +2,115 @@
 
 # Hypo-Workflow
 
-**A local workflow protocol for AI Agents**
+**A local project workflow protocol for Codex**
 
-Plan -> Execute -> Review -> Report -> Resume
+Plan -> Execute -> Independently verify -> Human acceptance -> Resume safely
 
-[![Version](https://img.shields.io/badge/version-13.1.0-beta.2-blue)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-13.1.0--beta.2-blue)](.codex-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Codex%20%7C%20Claude%20Code%20%7C%20OpenCode%20%7C%20Cursor%20%7C%20Copilot%20%7C%20Trae-purple)](docs/en/reference/platforms.md)
+[![Platform](https://img.shields.io/badge/platform-Official%20Codex-black)](docs/en/reference/platforms.md)
 
 **Language:** [中文](README.md) | English
 
 </div>
 
-Hypo-Workflow organizes long-running AI programming work into local, reviewable, resumable workflows. It is not a task runner or background service; your current host Agent still performs implementation, tests, and review, while `.pipeline/` keeps workflow state, cycles, patches, rules, progress, prompts, reports, and logs.
+Hypo-Workflow is a Skill protocol, not a runner or background service. The host Agent implements, tests, and reviews project work; `.pipeline/` preserves verifiable, recoverable project facts.
 
-The repository entrypoint is `HypoxanthineOvO/Hypo-Workflow`. This English README links only to English subpages under `docs/en/`.
+This release supports **Official Codex** as its only current adapter. OpenCode, Claude Code, Cursor, GitHub Copilot, Trae, and custom Codex-fork adapters are deferred. Old platform artifacts that remain in the repository are not current support claims.
 
-## Quick Start
+## Current Architecture
 
-Primary workflow:
-
-```text
-/hw:init -> /hw:plan -> /hw:start
-```
-
-Check status and continue:
+`.pipeline/manifest.yaml` selects the current format and write boundary:
 
 ```text
-/hw:status -> /hw:resume
+Manifest
+  -> Runtime + Continuation
+  -> Records + Receipts
+  -> Recovery Journal + Capsule + sealed Pack
+  -> accepted/checkpoint Snapshots
 ```
 
-## Shared Capabilities
+- **Runtime** owns Goal/Cycle lifecycle; **Continuation** owns only the next action.
+- **Records** store requirements, preferences, decisions, and feedback. They replace the generic Rules system.
+- **Receipts** store one-time, scoped user authorization.
+- **Recovery Journal / Capsule / Pack** preserve bounded recovery evidence without replaying full conversations or overriding newer Runtime.
+- Legacy `state.yaml`, `cycle.yaml`, `log.yaml`, `PROGRESS.md`, `rules.yaml`, and `knowledge/` are not current authority.
 
-- **Cycle / Plan / Start / Resume**: split long tasks into resumable Features, Milestones, Prompts, and Reports.
-- **P0 Configure**: before Discover, confirm or reuse automation level, Subagent authorization, acceptance, PR/MR remote-write confirmation, full regression, and worker separation.
-- **Rules / Habits**: store user habits and project rules as structured authority, then render platform-readable instruction views.
-- **Agent Review**: record review artifacts during planning, tests, implementation, and final checks.
-- **PR/MR Create**: `/hw:pr create` guides GitHub PR and GitLab MR creation from existing local changes or a plan-first work item, with remote writes gated by explicit confirmation.
-- **Acceptance / Compact Evidence**: `/hw:accept` blocks missing or colliding worker evidence; successful `/hw:start` and `/hw:resume` refresh compact views with `dirty_only` policy.
-- **Sync / Docs / Release**: synchronize platform adapters, repair docs, and run release checks without replacing host Agent work.
+## Install
 
-## Platform Entrypoints
+Use the Codex plugin for full behavior. A development checkout can be added as a local marketplace:
 
-| Platform | Best entrypoint | Guide |
-|---|---|---|
-| Codex | Codex Skill / repo skill source | [Codex Guide](docs/en/platforms/codex.md) |
-| Claude Code | `hw` plugin plus Claude hooks/agents | [Claude Code Guide](docs/en/platforms/claude-code.md) |
-| OpenCode | Native commands, agents, plugins, TUI/status | [OpenCode Guide](docs/en/platforms/opencode.md) |
-| Cursor | Repository rule plus per-command Skills/commands | [Cursor Guide](docs/en/platforms/cursor.md) |
-| GitHub Copilot | Repository custom instructions | [GitHub Copilot Guide](docs/en/platforms/copilot.md) |
-| Trae | Project rule file | [Trae Guide](docs/en/platforms/trae.md) |
+```bash
+git clone https://github.com/HypoxanthineOvO/Hypo-Workflow.git
+codex plugin marketplace add /absolute/path/to/Hypo-Workflow
+```
 
-Third-party IDE adapters provide repository instruction surfaces; Cursor also receives one flat Skill file and one command file per `/hw-*` entry. They teach the host IDE Agent to read Hypo-Workflow docs and `.pipeline/`, but they do not claim native hooks, automatic installs, or lifecycle enforcement.
+Install or enable `hypo-workflow` from Codex `/plugins`, then use `/hooks` in a new session to review and trust its plugin Hooks. Changed Hook definitions require trust for the new hash.
 
-## Operating Principles
+A symlink under `$CODEX_HOME/skills` loads Skills only. It does not load plugin-bundled Hooks and is therefore not a full installation.
 
-- `.pipeline/state.yaml`, `.pipeline/cycle.yaml`, and `.pipeline/rules.yaml` are protected authority files.
-- Prefer Codex Subagents for substantial Codex work when available; keep implementation separate from testing/review, and do not let implementation workers read test source, fixtures, snapshots, or assertion details.
-- Run pre-delivery checks for formatting, stale derived artifacts, README/docs freshness, secret markers, tests, and report evidence.
-- Automation is governed by `.pipeline/config.yaml`; release, destructive operations, external side effects, and PR/MR remote writes still follow explicit confirmation gates.
+## Two Main Workflows
 
-Current version exposes **53 user-facing commands** and **1 internal watchdog** skill.
+Use Goal for one explicit outcome:
 
-## Common Commands
+```text
+/hw:init -> /hw:goal -> discuss and approve Design -> explicitly say “start”
+         -> verify -> /hw:accept or /hw:reject
+```
 
-| Scenario | Command |
-|---|---|
-| Initialize or rescan a project | `/hw:init` |
-| Plan a feature | `/hw:plan` |
-| Start or continue execution | `/hw:start` / `/hw:resume` |
-| Show status and recent events | `/hw:status` |
-| Continue analysis and root-cause investigation | `/hw:analysis` |
-| Explain code/config/changes with evidence | `/hw:explain "why this design"` |
-| Handle existing PR/MR | `/hw:pr inspect URL`, `/hw:pr review URL`, `/hw:pr fix URL` |
-| Create PR/MR | `/hw:pr create` / `/hw:pr create --from-worktree` / `/hw:pr create --plan` |
-| Repair derived context | `/hw:sync --repair` |
-| Check or repair docs | `/hw:docs check` / `/hw:docs repair` |
+Use Cycle when stages have real dependency order:
+
+```text
+/hw:init -> /hw:cycle -> /hw:plan when needed
+         -> approve ordered Milestones -> explicitly say “start”
+         -> verify each Milestone -> one final human acceptance
+```
+
+Approval moves only to `waiting_to_start`; it does not implement. Use `/hw:resume` after interruption. Use `/hw:maintain` for everyday requirements, preferences, decisions, feedback, and writing context without opening a Delivery.
+
+## Nine Public Routes
+
+| Command | Purpose |
+| --- | --- |
+| `/hw:guide` | recommend one workflow when the next step is unclear |
+| `/hw:init` | initialize, adopt, or inspect a workspace |
+| `/hw:goal` | deliver one outcome with explicit acceptance |
+| `/hw:plan` | adapt planning depth to available evidence |
+| `/hw:cycle` | deliver ordered dependent Milestones |
+| `/hw:maintain` | persist one day-to-day project fact |
+| `/hw:resume` | recover from Runtime, Continuation, and a Recovery Pack |
+| `/hw:accept` | accept a pending Delivery |
+| `/hw:reject` | reject with structured feedback and revise |
+
+Chat, Explain, Status, Report, Log, Check, Compact, Knowledge, Sync, Debug, Start, and Plan phases are internal natural behavior. Analysis, Audit, Quality, Docs, PR, Release, Explore, and Optimize are deferred. Setup, Rules, Stop, Skip, Reset, Showcase, Patch, Help, Watchdog, and plan-confirm are removed; old explicit invocations return zero-write diagnostics.
+
+## Codex Hooks
+
+The plugin loads ten events from `hooks/hooks.json`:
+
+`SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PermissionRequest`, `PostToolUse`, `PreCompact`, `PostCompact`, `SubagentStart`, `SubagentStop`, and `Stop`.
+
+They support ambient Maintain, relevant docs/Record reminders, pre-compaction Pack sealing, post-compaction recovery, worker evidence, and an additional deletion guardrail. Matching Hooks can run concurrently, and `PreToolUse` cannot intercept every equivalent path, so Hooks never replace Core authority or human approval.
+
+Deletion requires the full exact Deletion Manifest in chat, fresh user approval, a `deletion.execute` Receipt bound to that Manifest and Git state, and the controlled executor. Any hash or Git drift invalidates approval.
+
+## Execution Discipline
+
+- Treat discussion, background, ideas, complaints, and revision feedback as consultation, not editing authorization.
+- Use `solo-verified` for trivial reversible work; separate test, implement, audit, or other domain roles when material work benefits from independent evidence.
+- Explain completion reports in chat: conclusion, approach, changed modules, tests, results, problems, and risks. A path alone is insufficient.
+- Preserve unrelated user changes in a dirty worktree.
 
 ## Documentation
 
-| Document | Purpose |
-|---|---|
-| [User Guide](docs/en/user-guide.md) | Common workflows, recovery, Feature Queue |
-| [Developer Guide](docs/en/developer.md) | Core helpers, authority boundaries, derived artifacts, tests |
-| [Commands Reference](docs/en/reference/commands.md) | Standard commands and OpenCode mappings |
-| [Platforms Reference](docs/en/reference/platforms.md) | Platform capability matrix |
-| [Generated Artifacts](docs/en/reference/generated-artifacts.md) | Generated adapter and docs sources |
-| [Configuration Reference](docs/en/reference/configuration.md) | Automation, gates, profiles, and worker separation |
-| [v13.1.0-beta.2 Release Notes](docs/en/release/v13.1.0-beta.2.md) | C19 named Plan phases and C20 consultation-first action boundary |
+- [User Guide](docs/en/user-guide.md)
+- [Nine-command Reference](docs/en/reference/commands.md)
+- [Codex Guide](docs/en/platforms/codex.md)
+- [Platform Status](docs/en/reference/platforms.md)
+- [Current Artifacts and Authority](docs/en/reference/generated-artifacts.md)
+- [Command Spec](references/commands-spec.md)
+- [State Contract](references/state-contract.md)
 
 ## License
 
-Hypo-Workflow is released under the MIT License. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

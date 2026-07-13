@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { selectExecutionTopology } from "../src/index.js";
 
 test("Subagent spec defines authorization, hidden tests, and degraded mode", async () => {
   const spec = await readFile("references/subagent-spec.md", "utf8");
@@ -78,7 +79,14 @@ test("execution skills carry the same Subagent separation contract", async () =>
   ];
   const combined = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
 
-  assert.match(combined, /P0 Configure.*(Subagent authorization|Subagent 授权)/is);
+  const strict = selectExecutionTopology({
+    task_kind: "engineering",
+    change_size: "material",
+    reversible: true,
+    policy: { profile: "auto", allow_solo_verified: false },
+  });
+  assert.equal(strict.profile, "strict");
+  assert.deepEqual(strict.required_roles, ["test", "implement", "audit"]);
   assert.match(combined, /implement.*test source.*fixtures.*snapshot.*assertion|implementation Subagent 不应读取测试源码、fixtures、snapshots 或 assertion 细节|implement.*不得.*测试.*fixture.*snapshot.*assertion/is);
   assert.match(combined, /degraded mode.*user confirmation|降级模式.*用户明确确认/is);
   assert.match(combined, /non-delegation rationale|非委托理由/i);

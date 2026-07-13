@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { parseYaml, stringifyYaml } from "../config/index.js";
 import { redactSecrets, validateSecretSafeEvidence } from "../evidence/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 
 export const LIFECYCLE_LOG_FAMILIES = Object.freeze([
   "cycle",
@@ -35,6 +36,7 @@ export const LIFECYCLE_LOG_STATUSES = Object.freeze([
   "blocked",
   "failed",
   "proposed",
+  "requested",
   "queued",
   "skipped",
   "accepted",
@@ -154,6 +156,7 @@ export function buildRecentEvents(log = {}, options = {}) {
 }
 
 export async function appendLifecycleLogEntry(projectRoot = ".", entry = {}, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.log");
   const logFile = options.logFile || join(projectRoot, ".pipeline", "log.yaml");
   let log = { entries: [] };
   try {

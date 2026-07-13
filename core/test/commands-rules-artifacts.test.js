@@ -26,7 +26,9 @@ const MAINTAIN_SUBCOMMANDS = Object.freeze([
 
 test("commandMap exposes Plan phase commands and removes user-facing plan confirm", () => {
   const commands = commandMap("opencode");
-  assert.equal(commands.length, 53);
+  assert.equal(commands.length, 54);
+  assert.equal(commandByCanonical("/hw:goal").opencode, "/hw:goal");
+  assert.equal(commandByCanonical("/hw:goal").skill, "skills/goal/SKILL.md");
   assert.equal(commandByCanonical("/hw:plan").opencode, "/hw:plan");
   assert.equal(commandByCanonical("/hw:plan:deep").opencode, "/hw:plan:deep");
   assert.equal(commandByCanonical("/hw:plan:discover").opencode, "/hw:plan:discover");

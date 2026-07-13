@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, relative, sep } from "node:path";
 import { parseYaml, stringifyYaml } from "../config/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 
 export const STRUCTURED_RULE_SCOPES = Object.freeze(["builtin", "global", "project", "cycle"]);
 export const STRUCTURED_RULE_SEVERITIES = Object.freeze(["off", "warn", "error"]);
@@ -318,6 +319,7 @@ export function detectRememberRuleCandidates(text = "", options = {}) {
 }
 
 export async function writeConfirmedStructuredRule(projectRoot = ".", proposal = {}, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.rules");
   const rule = normalizeStructuredRule({
     ...proposal,
     source: {
@@ -427,6 +429,7 @@ export function renderStructuredRulesInstructionBlock(authority = {}, options = 
 }
 
 export async function writeStructuredHabitsDocument(projectRoot = ".", repoRoot = process.cwd(), options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.rules");
   const authority = options.authority || await loadStructuredRulesAuthority(projectRoot, repoRoot, options);
   const path = options.path || join(projectRoot, ".pipeline", "HABITS.md");
   await mkdir(dirname(path), { recursive: true });

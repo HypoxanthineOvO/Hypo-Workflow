@@ -237,7 +237,6 @@ test("M07 docs describe insert confirmation, auto-chain gates, JIT, and metrics 
   const featureSpec = await readFile("references/feature-queue-spec.md", "utf8");
   const planSkill = await readFile("skills/plan/SKILL.md", "utf8");
   const startSkill = await readFile("skills/start/SKILL.md", "utf8");
-  const resumeSkill = await readFile("skills/resume/SKILL.md", "utf8");
 
   assert.match(commandsSpec, /--insert <natural language>/);
   assert.match(commandsSpec, /summarize the queue diff/i);
@@ -246,8 +245,9 @@ test("M07 docs describe insert confirmation, auto-chain gates, JIT, and metrics 
   assert.match(planSkill, /\/hw:plan --insert/);
   assert.match(startSkill, /auto[-_ ]?chain|自动链/i);
   assert.match(startSkill, /gate: confirm/);
-  assert.match(resumeSkill, /just_in_time/);
-  assert.match(resumeSkill, /token\/cost|令牌\/成本/i);
+  assert.match(featureSpec, /just_in_time/);
+  assert.match(featureSpec, /token.*cost|cost.*token/is);
+  assert.match(featureSpec, /token_count:\s*n\/a/);
 });
 
 function sampleQueue(overrides = {}) {

@@ -14,42 +14,9 @@ import {
 const HW_VERSION = "13.1.0-beta.2";
 
 export async function writeClaudeCodePluginArtifacts(outDir = ".", options = {}) {
-  const pluginDir = join(outDir, ".claude-plugin");
-  const monitorsDir = join(outDir, "monitors");
-  const commands = commandMap("claude-code");
-  await mkdir(pluginDir, { recursive: true });
-  await mkdir(monitorsDir, { recursive: true });
-
-  await writeFile(
-    join(pluginDir, "plugin.json"),
-    `${JSON.stringify(renderClaudeCodePluginManifest(options), null, 2)}\n`,
-    "utf8",
-  );
-  await writeFile(
-    join(pluginDir, "marketplace.json"),
-    `${JSON.stringify(renderClaudeCodeMarketplaceManifest(options), null, 2)}\n`,
-    "utf8",
-  );
-  await writeFile(
-    join(monitorsDir, "monitors.json"),
-    `${JSON.stringify(renderClaudeStatusMonitorManifest(), null, 2)}\n`,
-    "utf8",
-  );
-  const writtenCommands = await writeClaudeCodeSlashCommandArtifacts(outDir, commands, options);
-  const removedAliases = await removeLegacyClaudeAliasSkills(outDir);
-
-  return {
-    plugin_dir: ".claude-plugin",
-    namespace: "hw",
-    command_namespace: "/hw",
-    command_count: writtenCommands.length,
-    skill_count: commands.length,
-    skills_dir: "skills",
-    commands_dir: "commands",
-    written_commands: writtenCommands,
-    monitors_file: "monitors/monitors.json",
-    removed_legacy_aliases: removedAliases,
-  };
+  void outDir;
+  void options;
+  throw deferredAdapterError("Claude Code");
 }
 
 async function writeClaudeCodeSlashCommandArtifacts(outDir, commands, options = {}) {
@@ -170,38 +137,9 @@ const CLAUDE_AGENT_ROLES = Object.freeze([
 ]);
 
 export async function writeClaudeCodeAgentArtifacts(outDir = ".", options = {}) {
-  const config = options.configFile ? await loadConfig(options.configFile) : options.config;
-  const metadata = buildClaudeAgentRoutingMetadata(config || {});
-  const agentsDir = join(outDir, ".claude", "agents");
-  await mkdir(agentsDir, { recursive: true });
-
-  const written = [];
-  const conflicts = [];
-  for (const role of CLAUDE_AGENT_ROLES) {
-    const relative = `.claude/agents/hw-${role}.md`;
-    const path = join(outDir, relative);
-    const existing = await readOptionalText(path);
-    if (existing && !isManagedClaudeAgent(existing)) {
-      conflicts.push({ path: relative, reason: "user-owned-agent" });
-      continue;
-    }
-    await writeFile(path, renderClaudeCodeAgent(role, metadata.agents[role]), "utf8");
-    written.push(relative);
-  }
-
-  const result = {
-    agent_count: CLAUDE_AGENT_ROLES.length,
-    written,
-    conflicts,
-    agents: metadata.agents,
-    metadata_file: ".claude/hypo-workflow-agents.json",
-  };
-  await writeFile(
-    join(outDir, ".claude", "hypo-workflow-agents.json"),
-    `${JSON.stringify({ ...metadata, conflicts }, null, 2)}\n`,
-    "utf8",
-  );
-  return result;
+  void outDir;
+  void options;
+  throw deferredAdapterError("Claude Code agent");
 }
 
 export function buildClaudeAgentRoutingMetadata(config = {}) {
@@ -375,4 +313,12 @@ export function renderClaudeCodeMarketplaceManifest(options = {}) {
       },
     ],
   };
+}
+
+function deferredAdapterError(platform) {
+  const error = new Error(`${platform} adapter generation is deferred; this writer is retired and performed no writes.`);
+  error.code = "ERR_HYPO_WORKFLOW_ADAPTER_DEFERRED";
+  error.status = "deferred";
+  error.writes = [];
+  return error;
 }

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { lstat, readFile } from "node:fs/promises";
 import { commandMap } from "../src/commands/index.js";
 
 const SPEC_FILE = "references/skill-spec.md";
@@ -39,18 +39,25 @@ test("skill spec documents required sections and quality contract", async () => 
   }
 });
 
-test("skill spec keeps command map and local skill inventory traceable", async () => {
+test("current command map keeps every compatibility Skill backend traceable and ordinary", async () => {
   const spec = await readFile(SPEC_FILE, "utf8");
   const commands = commandMap("opencode");
   const userSkillPaths = [...new Set(commands.map((command) => command.skill))];
 
-  assert.equal(commands.length, 53);
-  assert.equal(userSkillPaths.length, 43);
+  assert.equal(commands.length, 54);
+  assert.equal(userSkillPaths.length, 44);
 
   for (const skillPath of userSkillPaths) {
     assert.ok(existsSync(skillPath), `command map references missing skill: ${skillPath}`);
-    assert.match(spec, new RegExp(escapeRegExp(skillPath)));
+    const stats = await lstat(skillPath);
+    assert.equal(stats.isFile(), true, `${skillPath} must be an ordinary file`);
+    assert.equal(stats.isSymbolicLink(), false, `${skillPath} must not be a symlink`);
   }
+
+  const goal = commands.find((command) => command.canonical === "/hw:goal");
+  assert.equal(goal.skill, "skills/goal/SKILL.md");
+  assert.equal(goal.exposure, "public");
+  assert.equal(goal.availability, "available");
 
   assert.match(spec, /skills\/watchdog\/SKILL\.md/);
   assert.match(spec, /skills\/plan-deep\/SKILL\.md/);

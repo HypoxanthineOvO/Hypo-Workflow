@@ -14,8 +14,8 @@ import { writeOpenCodeArtifacts } from "../artifacts/opencode.js";
 import { writeClaudeCodeAgentArtifacts, writeClaudeCodePluginArtifacts } from "../artifacts/claude.js";
 import { writeThirdPartyAdapterArtifacts } from "../artifacts/third-party.js";
 import { renderClaudeCodeSettingsHooks, renderClaudeHookWrapper } from "../claude-hooks/index.js";
-import { refreshProjectRegistryAction } from "../actions/index.js";
 import { rebuildKnowledgeLedger } from "../knowledge/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 
 const PROTECTED_AUTHORITY_PATHS = Object.freeze([
   ".pipeline/state.yaml",
@@ -41,6 +41,10 @@ export async function runProjectSync(projectRoot = ".", options = {}) {
       derived_health: derivedHealth,
     };
   }
+
+  throw retiredSyncError(mode, platform);
+
+  await assertLegacyWorkspaceWritable(root, "legacy.sync");
 
   if (mode === "light") return runLightSync(root, { ...options, now });
 
@@ -139,6 +143,7 @@ const MANAGED_BY = "hypo-workflow";
 const LEGACY_CLAUDE_PLUGIN_REF = "../.claude-plugin/plugin.json";
 
 export async function writeClaudeHookArtifacts(projectRoot = ".", options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.sync");
   const root = resolve(projectRoot);
   const relative = "hooks/claude-hook.mjs";
   const hookFile = join(root, relative);
@@ -214,6 +219,7 @@ export function mergeClaudeCodeSettings(existing = {}, options = {}) {
 }
 
 export async function syncClaudeCodeSettings(projectRoot = ".", options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.sync");
   const root = resolve(projectRoot);
   const config = options.config || DEFAULT_GLOBAL_CONFIG;
   const localFile = config.claude_code?.settings?.local_file || ".claude/settings.local.json";
@@ -377,6 +383,7 @@ export async function checkDerivedArtifacts(projectRoot = ".", options = {}) {
 }
 
 export async function repairDerivedArtifacts(projectRoot = ".", options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.sync");
   const root = resolve(projectRoot);
   const map = (options.map || buildDerivedArtifactMap()).map(normalizeDerivedEntry);
   const refreshed = [];
@@ -452,15 +459,6 @@ export async function runSessionStartLightSyncCheck(projectRoot = ".", options =
 async function runLightSync(root, options = {}) {
   const operations = ["external_change_detection"];
   const externalChanges = await detectExternalChanges(root, options);
-
-  if (options.registryFile && await exists(options.registryFile)) {
-    await refreshProjectRegistryAction(options.registryFile, {
-      platform: options.platform || "opencode",
-      profile: options.profile || "standard",
-      now: options.now,
-    });
-    operations.push("registry_refresh");
-  }
 
   if (await exists(join(root, ".pipeline", "knowledge", "records"))) {
     await rebuildKnowledgeLedger(root);
@@ -550,6 +548,14 @@ function normalizeSyncPlatform(platform) {
   const value = String(platform || "opencode").toLowerCase();
   if (value === "claude") return "claude-code";
   return value;
+}
+
+function retiredSyncError(mode, platform) {
+  const error = new Error(`Project sync ${mode}/${platform} writes are retired; use read-only checkOnly or a future adapter Cycle.`);
+  error.code = "ERR_HYPO_WORKFLOW_SYNC_RETIRED";
+  error.status = "deferred";
+  error.writes = [];
+  return error;
 }
 
 function managedClaudeSettingsKeys(desiredEnv = {}) {

@@ -8,6 +8,7 @@ import {
   resolveCycleLifecyclePolicy,
   selectLifecycleContinuation,
 } from "../lifecycle/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 
 export function resolveAcceptancePolicy(projectConfig = {}, globalConfig = DEFAULT_GLOBAL_CONFIG) {
   const merged = mergeConfig(
@@ -139,6 +140,7 @@ export function buildReworkPromptLinkage({ rejection_artifact: rejectionArtifact
 }
 
 export async function markCyclePendingAcceptance(projectRoot = ".", options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.acceptance");
   const context = await loadAcceptanceContext(projectRoot);
   const now = options.now || new Date().toISOString();
   const cycleId = cycleIdentifier(context.cycle);
@@ -198,6 +200,7 @@ export async function markCyclePendingAcceptance(projectRoot = ".", options = {}
 }
 
 export async function acceptCycle(projectRoot = ".", options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.acceptance");
   const context = await loadAcceptanceContext(projectRoot);
   const now = options.now || new Date().toISOString();
   const cycleId = cycleIdentifier(context.cycle);
@@ -297,6 +300,7 @@ export async function acceptCycle(projectRoot = ".", options = {}) {
 }
 
 export async function rejectCycle(projectRoot = ".", options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.acceptance");
   const context = await loadAcceptanceContext(projectRoot);
   const now = options.now || new Date().toISOString();
   const cycleId = cycleIdentifier(context.cycle);

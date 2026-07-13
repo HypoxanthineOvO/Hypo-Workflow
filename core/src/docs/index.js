@@ -1,5 +1,5 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { commandMap } from "../commands/index.js";
 import { PLATFORM_CAPABILITIES } from "../platform/index.js";
 import { listConfigurationProfiles } from "../profile/index.js";
@@ -231,55 +231,45 @@ export async function checkDocs(projectRoot = ".", options = {}) {
 }
 
 export async function repairDocs(projectRoot = ".", options = {}) {
-  const generated = [];
-  const managedBlocks = [];
-  const write = options.write !== false;
-  await writeGenerated(projectRoot, "README.en.md", renderEnglishReadme());
-  generated.push("README.en.md");
-  await writeGenerated(projectRoot, "docs/user-guide.md", renderUserGuide());
-  generated.push("docs/user-guide.md");
-  await writeGenerated(projectRoot, "docs/en/user-guide.md", renderEnglishUserGuide());
-  generated.push("docs/en/user-guide.md");
-  await writeGenerated(projectRoot, "docs/developer.md", renderDeveloperGuide());
-  generated.push("docs/developer.md");
-  await writeGenerated(projectRoot, "docs/en/developer.md", renderEnglishDeveloperGuide());
-  generated.push("docs/en/developer.md");
-  for (const platform of ["codex", "claude-code", "opencode", "cursor", "copilot", "trae"]) {
-    const path = `docs/platforms/${platform}.md`;
-    await writeGenerated(projectRoot, path, renderPlatformGuide(platform));
-    generated.push(path);
-    const englishPath = `docs/en/platforms/${platform}.md`;
-    await writeGenerated(projectRoot, englishPath, renderEnglishPlatformGuide(platform));
-    generated.push(englishPath);
-  }
-  await writeGenerated(projectRoot, "docs/reference/commands.md", renderCommandsReference());
-  generated.push("docs/reference/commands.md");
-  await writeGenerated(projectRoot, "docs/en/reference/commands.md", renderEnglishCommandsReference());
-  generated.push("docs/en/reference/commands.md");
-  await writeGenerated(projectRoot, "docs/reference/platforms.md", renderPlatformsReference());
-  generated.push("docs/reference/platforms.md");
-  await writeGenerated(projectRoot, "docs/en/reference/platforms.md", renderEnglishPlatformsReference());
-  generated.push("docs/en/reference/platforms.md");
-  await writeGenerated(projectRoot, "docs/reference/generated-artifacts.md", renderGeneratedArtifactsReference());
-  generated.push("docs/reference/generated-artifacts.md");
-  await writeGenerated(projectRoot, "docs/en/reference/generated-artifacts.md", renderEnglishGeneratedArtifactsReference());
-  generated.push("docs/en/reference/generated-artifacts.md");
-  await writeGenerated(projectRoot, "docs/reference/configuration.md", renderConfigurationReference());
-  generated.push("docs/reference/configuration.md");
-  await writeGenerated(projectRoot, "docs/en/reference/configuration.md", renderEnglishConfigurationReference());
-  generated.push("docs/en/reference/configuration.md");
+  if (options.write !== false) throw docsWriteDeferredError();
 
+  const plannedFiles = [
+    "README.en.md",
+    "docs/user-guide.md",
+    "docs/en/user-guide.md",
+    "docs/developer.md",
+    "docs/en/developer.md",
+  ];
+  for (const platform of ["codex", "claude-code", "opencode", "cursor", "copilot", "trae"]) {
+    plannedFiles.push(`docs/platforms/${platform}.md`);
+    plannedFiles.push(`docs/en/platforms/${platform}.md`);
+  }
+  plannedFiles.push(
+    "docs/reference/commands.md",
+    "docs/en/reference/commands.md",
+    "docs/reference/platforms.md",
+    "docs/en/reference/platforms.md",
+    "docs/reference/generated-artifacts.md",
+    "docs/en/reference/generated-artifacts.md",
+    "docs/reference/configuration.md",
+    "docs/en/reference/configuration.md",
+  );
+
+  const managedBlocks = [];
   const readmePath = join(projectRoot, "README.md");
   if (await readOptionalText(readmePath)) {
     const result = await updateReadme(readmePath, {
       blocks: ["command-count", "command-reference", "platform-matrix"],
-      write,
+      write: false,
     });
     managedBlocks.push(...result.changedBlocks);
   }
 
   return {
-    generated,
+    status: "preview",
+    write: false,
+    generated: [],
+    planned_files: plannedFiles,
     managed_blocks: managedBlocks,
     narrative_rewritten: false,
   };
@@ -1487,12 +1477,6 @@ function userCommandCount() {
   return commandMap("opencode").length;
 }
 
-async function writeGenerated(projectRoot, relativePath, content) {
-  const path = join(projectRoot, relativePath);
-  await mkdir(dirname(path), { recursive: true });
-  await writeFile(path, content, "utf8");
-}
-
 async function readOptionalText(file) {
   try {
     return await readFile(file, "utf8");
@@ -1500,4 +1484,12 @@ async function readOptionalText(file) {
     if (error.code === "ENOENT") return "";
     throw error;
   }
+}
+
+function docsWriteDeferredError() {
+  const error = new Error("Documentation repair writes are deferred; use write:false for a zero-write preview.");
+  error.code = "ERR_HYPO_WORKFLOW_DOCS_DEFERRED";
+  error.status = "deferred";
+  error.writes = [];
+  return error;
 }

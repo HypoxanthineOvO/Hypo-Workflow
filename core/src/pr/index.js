@@ -2,6 +2,7 @@ import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { redactSecrets } from "../evidence/index.js";
 import { stringifyYaml } from "../config/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 
 export const CHANGE_REQUEST_FILES = Object.freeze([
   "request.yaml",
@@ -84,6 +85,7 @@ export function buildChangeRequestArchive(source, options = {}) {
 }
 
 export async function writeChangeRequestArchive(projectRoot = ".", source, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.pr");
   const now = options.now || new Date().toISOString();
   const id = options.archive_id || await nextArchiveId(projectRoot, options.date || compactDate(now));
   const archive = buildChangeRequestArchive(source, {
@@ -168,6 +170,7 @@ export function buildChangeRequestCreateProposal(source = {}, options = {}) {
 }
 
 export async function writeChangeRequestCreateProposal(projectRoot = ".", source = {}, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.pr");
   const now = options.now || new Date().toISOString();
   const id = options.archive_id || await nextArchiveId(projectRoot, options.date || compactDate(now));
   const proposal = buildChangeRequestCreateProposal(source, {
@@ -388,6 +391,7 @@ export async function executeChangeRequestCreatePlan(projectRoot = ".", plan, op
       confirmation_summary: plan.confirmation?.summary || "",
     };
   }
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.pr");
   const provider = requireCreateProvider(options.provider);
   const calls = [];
   await provider.push(plan);
@@ -430,6 +434,7 @@ export async function executeChangeRequestCreatePlan(projectRoot = ".", plan, op
 }
 
 export async function inspectChangeRequest(projectRoot = ".", source, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.pr");
   const provider = requireReadonlyProvider(options.provider);
   const remote = await provider.readChangeRequest(source);
   const diff = await provider.readDiff(source);
@@ -456,6 +461,7 @@ export async function inspectChangeRequest(projectRoot = ".", source, options = 
 }
 
 export async function reviewChangeRequest(projectRoot = ".", source, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.pr");
   const inspected = await inspectChangeRequest(projectRoot, source, options);
   const findings = buildReviewFindings(inspected.evidence);
   const mergeRecommendation = findings.some((finding) => ["blocking", "warning"].includes(finding.severity)) ? "blocked" : "ready_for_human_review";
@@ -471,6 +477,7 @@ export async function reviewChangeRequest(projectRoot = ".", source, options = {
 }
 
 export async function planChangeRequestFix(projectRoot = ".", source, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.pr");
   const inspected = await inspectChangeRequest(projectRoot, source, options);
   const changes = renderFixChanges(options.local_changes || [], options.tests || []);
   const decisions = {
@@ -492,6 +499,7 @@ export async function planChangeRequestFix(projectRoot = ".", source, options = 
 }
 
 export async function prepareChangeRequestMerge(projectRoot = ".", source, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.pr");
   const inspected = await inspectChangeRequest(projectRoot, source, options);
   const blockers = mergeBlockers(inspected.evidence.remote, inspected.evidence.checks);
   const status = blockers.length ? "blocked" : "waiting_confirmation";
@@ -516,6 +524,7 @@ export async function prepareChangeRequestMerge(projectRoot = ".", source, optio
 }
 
 export async function prepareChangeRequestClose(projectRoot = ".", source, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.pr");
   const reason = String(options.reason || "").trim();
   if (!reason) throw new Error("A close reason is required before preparing a Change Request close proposal.");
   const inspected = await inspectChangeRequest(projectRoot, source, options);

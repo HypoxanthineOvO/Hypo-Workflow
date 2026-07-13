@@ -6,6 +6,7 @@ import { homedir } from "node:os";
 import { spawnSync } from "node:child_process";
 import {
   DEFAULT_GLOBAL_CONFIG,
+  assertLegacyWorkspaceWritable,
   buildGlobalTuiModel,
   buildConfigMigrationPlan,
   loadConfig,
@@ -215,6 +216,8 @@ async function initProject(flags) {
   const platform = valueAfter(flags, "--platform") || "opencode";
   const automationLevel = valueAfter(flags, "--automation") || "balanced";
   normalizeAutomationPolicy({ level: automationLevel });
+  await mkdir(project, { recursive: true });
+  await assertLegacyWorkspaceWritable(project, "legacy.cli.init-project");
   const pipelineDir = join(project, ".pipeline");
   await mkdir(pipelineDir, { recursive: true });
   const configFile = join(pipelineDir, "config.yaml");

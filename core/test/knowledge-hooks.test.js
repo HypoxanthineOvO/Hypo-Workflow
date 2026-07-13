@@ -61,7 +61,7 @@ test("stop hook blocks strict knowledge ledger self-check when no record exists"
   }
 });
 
-test("knowledge hook docs define archive summary, compact generation, and rules", async () => {
+test("knowledge hook docs preserve legacy compact gates while current Cycle uses Records", async () => {
   const cycleSkill = await readFile("skills/cycle/SKILL.md", "utf8");
   const compactSkill = await readFile("skills/compact/SKILL.md", "utf8");
   const hooksReadme = await readFile("hooks/README.md", "utf8");
@@ -69,8 +69,8 @@ test("knowledge hook docs define archive summary, compact generation, and rules"
   const sessionRule = await readFile("rules/builtin/session-start-context-load.yaml", "utf8");
   const knowledgeRule = await readFile("rules/builtin/knowledge-ledger-self-check.yaml", "utf8");
 
-  assert.match(cycleSkill, /knowledge-summary\.md/);
-  assert.match(cycleSkill, /Do not archive, move, or delete `.pipeline\/knowledge\/`|不要归档、移动或删除 `.pipeline\/knowledge\/`/);
+  assert.match(cycleSkill, /New-format Records replace legacy Knowledge Ledger archival/i);
+  assert.match(cycleSkill, /never write or delete legacy `.pipeline\/knowledge\/`/i);
   assert.match(compactSkill, /\.pipeline\/knowledge\/knowledge\.compact\.md/);
   assert.match(compactSkill, /raw knowledge records are not loaded by default|默认不加载完整的原始知识记录/i);
   assert.match(hooksReadme, /Knowledge Ledger/);

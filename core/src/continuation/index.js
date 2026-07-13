@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { parseYaml, stringifyYaml } from "../config/index.js";
+import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 
 const DEFAULT_CONTINUATION_PATH = ".pipeline/continuation.yaml";
 const SAFE_RESUME_COMMANDS = new Set(["/hw:resume", "继续", "下一步", "执行下一步"]);
@@ -35,6 +36,7 @@ export async function readContinuationState(projectRoot = ".", options = {}) {
 }
 
 export async function writeContinuationState(projectRoot = ".", continuation = {}, options = {}) {
+  await assertLegacyWorkspaceWritable(projectRoot, "legacy.continuation");
   const path = join(projectRoot, options.path || DEFAULT_CONTINUATION_PATH);
   const normalized = normalizeContinuationState(continuation);
   await mkdir(dirname(path), { recursive: true });

@@ -2,7 +2,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test core/test/*.test.js"
+    "build:host": "node scripts/build-host-artifacts.mjs",
+    "test": "node tests/run_core_tests.mjs --set maintained",
+    "test:all": "node tests/run_core_tests.mjs --set all",
+    "test:quarantine": "node tests/run_core_tests.mjs --set quarantined",
+    "test:inventory": "node tests/run_core_tests.mjs --set all --dry-run"
   },
   "dependencies": {
     "js-yaml": "^4.1.1"

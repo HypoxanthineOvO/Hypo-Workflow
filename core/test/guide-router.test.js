@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import {
   buildDesignConceptArtifacts,
   evaluateDiscoverGrillMeRisk,
+  resolveWorkflowIntent,
   routeGuideIntent,
 } from "../src/index.js";
 
@@ -128,18 +129,20 @@ test("design concept artifacts keep machine concepts, glossary, and knowledge in
   assert.match(artifacts.knowledge_index_guidance.rule, /do not copy full glossary/i);
 });
 
-test("guide and Discover contracts document router, adaptive Grill-Me, and artifact layering", async () => {
-  const guideSkill = await readFile("skills/guide/SKILL.md", "utf8");
+test("guide intent routing and Discover artifact layering remain behaviorally connected", async () => {
   const discoverSkill = await readFile("skills/plan-discover/SKILL.md", "utf8");
   const knowledgeSpec = await readFile("references/knowledge-spec.md", "utf8");
   const commandsSpec = await readFile("references/commands-spec.md", "utf8");
 
-  assert.match(guideSkill, /intent router|意图路由器/i);
-  assert.match(guideSkill, /one next path|一个.*下一步路径/i);
-  assert.match(guideSkill, /deep Grill-Me|深度 Grill-Me/i);
-  assert.match(guideSkill, /Plan long-running or multi-Feature work|长期运行或多 Feature 工作/);
-  assert.match(guideSkill, /do not force deep Grill-Me|不要.*强制深度 Grill-Me/i);
-  assert.match(guideSkill, /\/hw:docs/);
+  const routed = await resolveWorkflowIntent("我不知道应该从哪个工作流开始", {
+    repoRoot: process.cwd(),
+    workspace: "current",
+    active_delivery: null,
+  });
+  assert.equal(routed.status, "available");
+  assert.equal(routed.canonical, "/hw:guide");
+  assert.equal(routed.authority_intent, "workflow.guide");
+  assert.deepEqual(routed.writes, []);
   assert.match(discoverSkill, /Adaptive Grill-Me|自适应追问/i);
   assert.match(discoverSkill, /\.pipeline\/design-concepts\.yaml/);
   assert.match(discoverSkill, /\.pipeline\/glossary\.md/);

@@ -129,7 +129,7 @@ test("explore contexts can feed plan discover and analysis without losing eviden
   assert.equal(plan.kind, "plan_context");
   assert.match(plan.discover_context, /Assess analysis upgrade/);
   assert.match(plan.discover_context, /Context source support/);
-  assert.match(await readFile("skills/plan/SKILL.md", "utf8"), /explore:E001/);
+  assert.match(plan.discover_context, /Summary should be injectable into plan and analysis/);
 
   const analysis = await createExploreAnalysisContext(root, "E001", {
     now: "2026-05-03T02:32:00+08:00",

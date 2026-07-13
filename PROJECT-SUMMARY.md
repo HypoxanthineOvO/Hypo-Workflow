@@ -1,10 +1,10 @@
-# 协商优先的修改启动风格
+# C21 Hypo-Workflow vNext：全局架构、平台能力与效果治理
 
 This file is a generated Hypo-Workflow project summary. Edit authority files under `.pipeline/`, then run `/hw:sync --repair`.
 
-- Pipeline status: completed
-- Cycle: 20
-- Current: target-cycle-input-and-distribution-boundary-package
+- Pipeline status: idle
+- Cycle: 21
+- Current: n/a
 - Step: n/a
-- Progress: 4/4
-- Progress note: > 最后更新：21:43 | 状态：running | 进度：0/0 Milestone
+- Progress: 0/0
+- Progress note: C21 Hypo-Workflow vNext：全局架构、平台能力与效果治理 — 研究进度

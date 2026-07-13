@@ -14,80 +14,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCENARIOS_ROOT = ROOT / "tests" / "scenarios"
-RESULTS_ROOT = ROOT / "tests" / "results"
 TEST_BIN = ROOT / "tests" / "bin"
 VALIDATE_CONFIG = ROOT / "scripts" / "validate-config.sh"
 PLUGIN_JSON = ROOT / ".claude-plugin" / "plugin.json"
-TARGET_SCENARIOS = {
-    "s01-fresh-start",
-    "s02-resume-interrupt",
-    "s03-diff-score-blocks",
-    "s04-skip-step",
-    "s05-implement-only",
-    "s06-custom-sequence",
-    "s07-full-hypo-todo",
-    "s08-subagent-self-review",
-    "s09-subagent-full-delegation",
-    "s10-progressive-disclosure",
-    "s11-scripts-executability",
-    "s12-hook-stop-check",
-    "s13-hook-session-start",
-    "s14-multi-dim-scoring",
-    "s15-architecture-drift",
-    "s16-plan-discover",
-    "s17-plan-review",
-    "s18-template-library",
-    "s19-help-list",
-    "s20-help-init",
-    "s21-check-output",
-    "s22-init-empty-project",
-    "s23-init-existing-project",
-    "s24-audit-report",
-    "s25-debug-flow",
-    "s26-release-dry-run",
-    "s27-reset-modes",
-    "s28-log-filters",
-    "s29-plan-review-migration",
-    "s30-init-rescan",
-    "s31-import-history-tags",
-    "s32-import-history-keyword",
-    "s33-import-history-merge",
-    "s34-import-history-time-gap",
-    "s35-import-history-interactive",
-    "s36-import-history-non-git",
-    "s37-import-history-existing-pipeline",
-    "s38-patch-fix-flow",
-    "s39-compact-generator",
-    "s40-compact-session-start",
-    "s41-full-view-flags",
-    "s42-guide-flow",
-    "s43-v8-2-registration",
-    "s44-showcase-skeleton",
-    "s45-showcase-docs",
-    "s46-showcase-slides-poster",
-    "s47-showcase-lifecycle",
-    "s48-i18n-templates",
-    "s49-showcase-bootstrap",
-    "s50-rules-system",
-    "s51-opencode-capability-matrix",
-    "s52-core-config-artifacts",
-    "s53-global-cli-tui-setup",
-    "s54-opencode-plugin-scaffold",
-    "s55-opencode-command-map",
-    "s56-agents-ask-todo-plan-discipline",
-    "s57-opencode-events-auto-continue-file-guard",
-    "s58-opencode-full-v84-parity",
-    "s59-v9-regression-bundle",
-    "s60-progress-board-format",
-    "s61-opencode-model-matrix-sync",
-    "s62-analysis-preset-runtime",
-    "s63-init-automation-non-git",
-    "s64-audit-governance-contract",
-    "s65-audit-memory-handoff",
-    "s67-worker-separation-spawn-enforcement",
-    "s68-rejection-rework-blocked-runtime-loop",
-    "s69-audit-regression-canonical-examples",
-}
+DEFAULT_CATALOG = ROOT / "tests" / "regression-catalog.json"
+CLASSIFICATIONS = ("maintained", "quarantined")
+VALID_SETS = (*CLASSIFICATIONS, "all")
 
 
 @dataclass
@@ -124,6 +56,10 @@ def run(cmd: str, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run Hypo-Workflow regression scenarios.")
+    parser.add_argument("--catalog", type=Path, default=DEFAULT_CATALOG)
+    parser.add_argument("--set", choices=VALID_SETS, default="maintained")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--json", action="store_true")
     parser.add_argument(
         "--scenario",
         action="append",
@@ -131,6 +67,164 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="Run only the named scenario. May be provided multiple times.",
     )
     return parser.parse_args(argv)
+
+
+def canonical_repository_path(value: object, label: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{label} path must be a string")
+    normalized = value.replace(os.sep, "/")
+    segments = normalized.split("/")
+    if (
+        Path(value).is_absolute()
+        or "\\" in normalized
+        or any(not segment or segment in {".", ".."} for segment in segments)
+    ):
+        raise ValueError(f"{label} has an unsafe or non-canonical path: {value}")
+    return normalized
+
+
+def discover_core_tests() -> list[str]:
+    return sorted(
+        f"core/test/{path.name}"
+        for path in (ROOT / "core" / "test").glob("*.test.js")
+        if path.is_file()
+    )
+
+
+def discover_registered_scenarios() -> list[str]:
+    discovered: list[str] = []
+    for version in SCENARIOS_ROOT.iterdir():
+        if not version.is_dir():
+            continue
+        for scene in version.iterdir():
+            if (
+                scene.is_dir()
+                and scene.name.startswith("s")
+                and "placeholder" not in scene.name
+                and (scene / "checklist.md").is_file()
+            ):
+                discovered.append(scene.relative_to(ROOT).as_posix())
+    return sorted(discovered)
+
+
+def validate_partition(value: object, suite: str) -> dict[str, object]:
+    if not isinstance(value, dict) or set(value) != set(CLASSIFICATIONS):
+        raise ValueError(f"catalog.suites.{suite} must contain exactly maintained and quarantined")
+    entries: list[dict[str, object]] = []
+    paths_by_class: dict[str, list[str]] = {}
+    seen: set[str] = set()
+    for classification in CLASSIFICATIONS:
+        group = value[classification]
+        if not isinstance(group, list):
+            raise ValueError(f"{suite}.{classification} must be an array")
+        paths: list[str] = []
+        for entry in group:
+            if not isinstance(entry, dict):
+                raise ValueError(f"{suite}.{classification} contains an invalid entry")
+            if entry.get("classification") != classification:
+                raise ValueError(f"{suite}:{entry.get('path', '<unknown>')} classification mismatch")
+            path = canonical_repository_path(entry.get("path"), f"{suite}.{classification}")
+            if path in seen:
+                raise ValueError(f"{suite} overlap: {path} is classified twice")
+            seen.add(path)
+            paths.append(path)
+            entries.append(entry)
+        paths_by_class[classification] = sorted(paths)
+    if not paths_by_class["maintained"] or not paths_by_class["quarantined"]:
+        raise ValueError(f"{suite} must expose non-empty maintained and quarantined sets")
+    return {
+        "entries": entries,
+        "maintained": paths_by_class["maintained"],
+        "quarantined": paths_by_class["quarantined"],
+        "all": sorted(paths_by_class["maintained"] + paths_by_class["quarantined"]),
+    }
+
+
+def assert_exact_inventory(actual: list[str], expected: list[str], suite: str) -> None:
+    actual_set = set(actual)
+    expected_set = set(expected)
+    unclassified = [path for path in expected if path not in actual_set]
+    missing = [path for path in actual if path not in expected_set]
+    if unclassified or missing:
+        raise ValueError(
+            f"{suite} catalog coverage mismatch; unclassified: {', '.join(unclassified) or 'none'}; "
+            f"missing files: {', '.join(missing) or 'none'}"
+        )
+
+
+def load_catalog(path: Path) -> dict[str, dict[str, object]]:
+    catalog = json.loads(path.resolve().read_text(encoding="utf-8"))
+    if not isinstance(catalog, dict) or catalog.get("schema_version") != "1":
+        raise ValueError("catalog schema_version must be 1")
+    suites = catalog.get("suites")
+    if not isinstance(suites, dict) or set(suites) != {"core", "scenarios"}:
+        raise ValueError("catalog.suites must contain exactly core and scenarios")
+    partitions = {
+        "core": validate_partition(suites["core"], "core"),
+        "scenarios": validate_partition(suites["scenarios"], "scenarios"),
+    }
+    assert_exact_inventory(partitions["core"]["all"], discover_core_tests(), "core")
+    assert_exact_inventory(partitions["scenarios"]["all"], discover_registered_scenarios(), "scenarios")
+
+    maintained = set(partitions["core"]["maintained"] + partitions["scenarios"]["maintained"])
+    for suite, partition in partitions.items():
+        for entry in partition["entries"]:
+            reason = entry.get("reason")
+            if not isinstance(reason, str) or not reason.strip():
+                raise ValueError(f"{suite}:{entry.get('path')} requires a non-empty reason")
+            if entry["classification"] != "quarantined":
+                continue
+            replacement = entry.get("replacement")
+            if not isinstance(replacement, list) or not replacement:
+                raise ValueError(f"{suite}:{entry['path']} requires at least one replacement")
+            for target in replacement:
+                if target not in maintained:
+                    raise ValueError(f"{suite}:{entry['path']} replacement is not maintained: {target}")
+
+    retired_surfaces = catalog.get("retired_surfaces")
+    if not isinstance(retired_surfaces, list):
+        raise ValueError("retired_surfaces must be an array")
+    for surface in retired_surfaces:
+        if not isinstance(surface, dict):
+            raise ValueError("retired_surfaces contains an invalid entry")
+        path = canonical_repository_path(surface.get("path"), "retired surface")
+        if surface.get("classification") != "quarantined":
+            raise ValueError(f"retired surface {path} must be quarantined")
+        reason = surface.get("reason")
+        if not isinstance(reason, str) or not reason.strip():
+            raise ValueError(f"retired surface {path} requires a reason")
+        replacement = surface.get("replacement")
+        if not isinstance(replacement, list) or not replacement:
+            raise ValueError(f"retired surface {path} requires replacement routes")
+        for target in replacement:
+            if not isinstance(target, str) or not target.strip():
+                raise ValueError(f"retired surface {path} has an invalid replacement")
+            if not target.startswith("/hw:") and target not in maintained:
+                raise ValueError(f"retired surface {path} replacement is not maintained: {target}")
+    return partitions
+
+
+def selection_payload(selected_set: str, partition: dict[str, object], paths: list[str]) -> dict[str, object]:
+    return {
+        "schema_version": "1",
+        "suite": "scenarios",
+        "selected_set": selected_set,
+        "maintained_count": len(partition["maintained"]),
+        "quarantined_count": len(partition["quarantined"]),
+        "selected_count": len(paths),
+        "selected_paths": paths,
+    }
+
+
+def print_selection(payload: dict[str, object]) -> None:
+    print(
+        "Scenario regression inventory: "
+        f"maintained={payload['maintained_count']} "
+        f"quarantined={payload['quarantined_count']} "
+        f"selected={payload['selected_count']} set={payload['selected_set']}"
+    )
+    for path in payload["selected_paths"]:
+        print(f"- {path}")
 
 
 def read(path: Path) -> str:
@@ -247,87 +341,48 @@ def scenario_specific(scene: Path, result: ScenarioResult) -> None:
         add(result, "prompt_count", len(list((scene / ".pipeline" / "prompts").glob("*.md"))) == 2)
         eval_spec = read(ROOT / "references" / "evaluation-spec.md")
         add(result, "arch_stop_rule", "architecture_drift >= 4" in eval_spec)
-    elif name in {
-        "s16-plan-discover",
-        "s17-plan-review",
-        "s18-template-library",
-        "s19-help-list",
-        "s20-help-init",
-        "s21-check-output",
-        "s22-init-empty-project",
-        "s23-init-existing-project",
-        "s24-audit-report",
-        "s25-debug-flow",
-        "s26-release-dry-run",
-        "s27-reset-modes",
-        "s28-log-filters",
-        "s29-plan-review-migration",
-        "s30-init-rescan",
-        "s31-import-history-tags",
-        "s32-import-history-keyword",
-        "s33-import-history-merge",
-        "s34-import-history-time-gap",
-        "s35-import-history-interactive",
-        "s36-import-history-non-git",
-        "s37-import-history-existing-pipeline",
-        "s38-patch-fix-flow",
-        "s39-compact-generator",
-        "s40-compact-session-start",
-        "s41-full-view-flags",
-        "s42-guide-flow",
-        "s43-v8-2-registration",
-        "s44-showcase-skeleton",
-        "s45-showcase-docs",
-        "s46-showcase-slides-poster",
-        "s47-showcase-lifecycle",
-        "s48-i18n-templates",
-        "s49-showcase-bootstrap",
-        "s50-rules-system",
-        "s51-opencode-capability-matrix",
-        "s52-core-config-artifacts",
-        "s53-global-cli-tui-setup",
-        "s54-opencode-plugin-scaffold",
-        "s55-opencode-command-map",
-        "s56-agents-ask-todo-plan-discipline",
-        "s57-opencode-events-auto-continue-file-guard",
-        "s58-opencode-full-v84-parity",
-        "s59-v9-regression-bundle",
-        "s60-progress-board-format",
-        "s61-opencode-model-matrix-sync",
-        "s62-analysis-preset-runtime",
-        "s63-init-automation-non-git",
-        "s64-audit-governance-contract",
-        "s65-audit-memory-handoff",
-        "s67-worker-separation-spawn-enforcement",
-        "s68-rejection-rework-blocked-runtime-loop",
-        "s69-audit-regression-canonical-examples",
-    }:
+    elif (scene / "run.sh").is_file():
         proc = run(f'bash "{scene / "run.sh"}"', cwd=scene)
         add(result, "run_sh", proc.returncode == 0, (proc.stdout + proc.stderr).strip())
 
 
 def main() -> int:
     args = parse_args(sys.argv[1:])
-    RESULTS_ROOT.mkdir(parents=True, exist_ok=True)
-    all_scenario_dirs = sorted(
-        [p for p in SCENARIOS_ROOT.glob("v*/s*") if p.is_dir() and p.name in TARGET_SCENARIOS],
-        key=lambda p: p.name,
-    )
-    scenario_by_name = {p.name: p for p in all_scenario_dirs}
+    try:
+        partitions = load_catalog(args.catalog)
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        print(f"Regression catalog error: {error}", file=sys.stderr)
+        return 2
+
+    partition = partitions["scenarios"]
+    selected_paths = list(partition["all"] if args.set == "all" else partition[args.set])
     if args.scenario:
-        unknown = [name for name in args.scenario if name not in scenario_by_name]
+        by_path = {path: path for path in selected_paths}
+        by_name = {Path(path).name: path for path in selected_paths}
+        unknown = [name for name in args.scenario if name not in by_path and name not in by_name]
         if unknown:
             print(
                 "Unknown scenario(s): " + ", ".join(unknown) + "\n"
-                "Known scenarios: " + ", ".join(sorted(scenario_by_name)),
+                "Known scenarios in selected set: " + ", ".join(sorted(by_name)),
                 file=sys.stderr,
             )
             return 2
-        scenario_dirs = [scenario_by_name[name] for name in args.scenario]
-        result_suffix = f"selected-{len(scenario_dirs)}"
-    else:
-        scenario_dirs = all_scenario_dirs
-        result_suffix = f"all-{len(scenario_dirs)}"
+        selected_paths = [
+            by_path[name] if name in by_path else by_name[name]
+            for name in args.scenario
+        ]
+
+    selection = selection_payload(args.set, partition, selected_paths)
+    if args.dry_run:
+        if args.json:
+            print(json.dumps(selection, ensure_ascii=False, separators=(",", ":")))
+        else:
+            print_selection(selection)
+        return 0
+
+    scenario_dirs = [ROOT / path for path in selected_paths]
+    if not args.json:
+        print_selection(selection)
 
     results: list[ScenarioResult] = []
     for scene in scenario_dirs:
@@ -337,13 +392,15 @@ def main() -> int:
         scenario_specific(scene, res)
         res.duration_s = round(time.time() - started, 3)
         results.append(res)
-        status = "PASS" if res.ok else "FAIL"
-        print(f"{status} {scene.name} ({res.duration_s}s)")
-        for check in res.checks:
-            if not check.ok:
-                print(f"  - {check.name}: {check.detail}")
+        if not args.json:
+            status = "PASS" if res.ok else "FAIL"
+            print(f"{status} {scene.name} ({res.duration_s}s)")
+            for check in res.checks:
+                if not check.ok:
+                    print(f"  - {check.name}: {check.detail}")
 
     payload = {
+        **selection,
         "results": [
             {
                 "name": r.name,
@@ -355,10 +412,11 @@ def main() -> int:
             for r in results
         ]
     }
-    stamp = time.strftime("%Y%m%dT%H%M%S")
-    (RESULTS_ROOT / f"{stamp}-{result_suffix}.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     failed = [r for r in results if not r.ok]
-    print(f"\nSummary: {len(results)-len(failed)}/{len(results)} passed")
+    if args.json:
+        print(json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
+    else:
+        print(f"\nSummary: {len(results)-len(failed)}/{len(results)} passed")
     return 1 if failed else 0
 
 

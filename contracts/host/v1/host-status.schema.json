@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hypo-workflow.dev/contracts/host/v1/host-status.schema.json",
+  "title": "Hypo-Workflow Host Status v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_version", "projection_status", "generated_at", "generation", "workspace", "delivery", "continuation", "invalidation"],
+  "properties": {
+    "schema_version": { "const": "1" },
+    "contract_version": { "const": "1" },
+    "projection_status": { "enum": ["current", "invalidated"] },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "generation": { "type": "integer", "minimum": 0 },
+    "workspace": { "anyOf": [{ "$ref": "#/$defs/workspace" }, { "type": "null" }] },
+    "delivery": { "anyOf": [{ "$ref": "#/$defs/delivery" }, { "type": "null" }] },
+    "continuation": { "anyOf": [{ "$ref": "#/$defs/continuation" }, { "type": "null" }] },
+    "invalidation": { "anyOf": [{ "$ref": "#/$defs/invalidation" }, { "type": "null" }] }
+  },
+  "$defs": {
+    "workspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format_version", "status"],
+      "properties": {
+        "format_version": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id", "status", "revision"],
+      "properties": {
+        "kind": { "enum": ["goal", "cycle"] },
+        "id": { "type": "string" },
+        "status": { "type": "string" },
+        "revision": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "continuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available", "safe_resume_command"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "safe_resume_command": { "const": "/hw:resume" }
+      }
+    },
+    "invalidation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["invalidated_at", "reason"],
+      "properties": {
+        "invalidated_at": { "type": "string", "format": "date-time" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
