@@ -16,6 +16,8 @@ description: Resume the active manifest-based Hypo-Workflow Delivery from Runtim
 5. If Pack Continuation matches current Continuation, report `current`; otherwise report `stale` and replay bounded Journal context without replacing lifecycle state.
 6. Continue the exact `next_action`. Do not replay completed transitions or accept an arbitrary inactive object.
 
+If Runtime or Continuation contains `worker_routing`, validate and reuse that exact semantic decision, Task Assessment, reason codes, failure count, and policy version. Recovery Capsule Worker projections may restore the same bounded fields, but they never override newer Continuation. Do not reclassify on Resume, and do not let routing metadata change role identity, evidence, acceptance, or user authority.
+
 Use `createDeliveryStore({ clock }).resume(root, {})`. Never shell-execute a saved command and never read legacy state as fallback in a current workspace.
 
 Import `createDeliveryStore` from the installed Skill bundle's `core/src/index.js`; pass the target workspace separately as `root` and use a zero-argument timezone-bearing Clock. Resume itself is read-only and takes no transaction `{ id }`.
@@ -23,3 +25,5 @@ Import `createDeliveryStore` from the installed Skill bundle's `core/src/index.j
 The target workspace root and installed Skill bundle root are separate. `repoRoot` identifies the project whose `.pipeline/` is resumed; backend routing uses explicit `skillRoot` or the installed bundle default, never the target repository as a Skill directory.
 
 For worker-separated work, preserve requested -> started -> completed|failed|blocked -> closed|close_failed evidence and distinct identities. When `/hw:resume` stops, blocks, aborts, or completes, close/release workers it opened or record `close_failed`; incomplete lifecycle evidence blocks worker-separated completion.
+
+When a resumed Worker needs a different semantic handoff, start it with no-history or bounded-history context. A full-history fork inherits its parent execution context and cannot be silently switched.

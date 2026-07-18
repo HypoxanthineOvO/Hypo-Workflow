@@ -1,0 +1,198 @@
+{
+  "fixture_id": "c23-m2-acesim-knowledge",
+  "project": {
+    "id": "acesim-sandbox",
+    "title": "AceSim reference sandbox",
+    "version_ref": {
+      "type": "git",
+      "ref": "fixture:acesim-v1"
+    }
+  },
+  "facts": [
+    {
+      "project_id": "acesim-sandbox",
+      "fact_type": "principle",
+      "fact_key": "principle.trace-replay",
+      "title": "Trace-driven GPU simulation",
+      "aliases": ["trace replay", "trace-driven simulation", "trace 回放"],
+      "summary": "Replay a captured workload trace against a selected modeled GPU configuration.",
+      "details": {
+        "mechanism": "The trace fixes workload events while the hardware profile changes modeled timing and resource behavior.",
+        "inputs": ["trace", "GPU profile"],
+        "outputs": ["simulated cycles", "cache statistics", "host resource evidence"]
+      },
+      "source_refs": [
+        {
+          "type": "project_document",
+          "ref": "docs/acesim-notes.md",
+          "version": "fixture:acesim-v1",
+          "locator": "heading:AceSim Fixture Notes"
+        }
+      ],
+      "code_refs": [],
+      "version_ref": {
+        "type": "git",
+        "ref": "fixture:acesim-v1"
+      },
+      "confidence": "confirmed",
+      "supersedes": []
+    },
+    {
+      "project_id": "acesim-sandbox",
+      "fact_type": "metric",
+      "fact_key": "metric.ipc",
+      "title": "Instructions per cycle",
+      "aliases": ["IPC", "instructions per cycle", "每周期指令数"],
+      "summary": "Committed simulated instructions divided by modeled GPU cycles.",
+      "details": {
+        "meaning": "Higher IPC means more modeled instruction throughput per simulated cycle for a comparable trace.",
+        "direction": "higher_is_better",
+        "unit": "instructions/cycle",
+        "comparability_notes": "Compare the same trace, completion policy, and simulator version."
+      },
+      "source_refs": [
+        {
+          "type": "project_document",
+          "ref": "docs/acesim-notes.md",
+          "version": "fixture:acesim-v1",
+          "locator": "paragraph:IPC"
+        }
+      ],
+      "code_refs": [
+        {
+          "path": "src/metrics/simulator_stats.py",
+          "sha256": "4b0e0d0799800a400362b1fed5bca5afba59befaa4274cb65c16e0a8dcddc3c3",
+          "locator": "symbol:instructions_per_cycle"
+        }
+      ],
+      "version_ref": {
+        "type": "git",
+        "ref": "fixture:acesim-v1"
+      },
+      "confidence": "confirmed",
+      "supersedes": []
+    },
+    {
+      "project_id": "acesim-sandbox",
+      "fact_type": "metric",
+      "fact_key": "metric.trace-host-memory",
+      "title": "Trace replay peak host memory",
+      "aliases": ["trace memory", "host memory peak", "trace 内存"],
+      "summary": "Peak host memory consumed while loading and replaying a trace.",
+      "details": {
+        "meaning": "This determines whether a trace can run on a server; it is not the simulated GPU memory capacity.",
+        "direction": "lower_is_better",
+        "unit": "bytes",
+        "comparability_notes": "Compare on the same simulator build and trace-loading mode."
+      },
+      "source_refs": [
+        {
+          "type": "project_document",
+          "ref": "docs/acesim-notes.md",
+          "version": "fixture:acesim-v1",
+          "locator": "paragraph:Trace peak memory"
+        }
+      ],
+      "code_refs": [
+        {
+          "path": "src/metrics/simulator_stats.py",
+          "sha256": "4b0e0d0799800a400362b1fed5bca5afba59befaa4274cb65c16e0a8dcddc3c3",
+          "locator": "symbol:trace_memory_peak_bytes"
+        }
+      ],
+      "version_ref": {
+        "type": "git",
+        "ref": "fixture:acesim-v1"
+      },
+      "confidence": "confirmed",
+      "supersedes": []
+    },
+    {
+      "project_id": "acesim-sandbox",
+      "fact_type": "module",
+      "fact_key": "module.gpu-profile",
+      "title": "GPU profile configuration",
+      "aliases": ["QV100 config", "GPU profile", "硬件配置", "低温配置"],
+      "summary": "Defines temperature, frequency, and L1/L2 cache capacity for a modeled GPU.",
+      "details": {
+        "role": "Provide the hardware parameters consumed by trace replay.",
+        "owns": ["temperature_k", "core_frequency_mhz", "l1_cache_kib", "l2_cache_kib"]
+      },
+      "source_refs": [
+        {
+          "type": "project_document",
+          "ref": "docs/acesim-notes.md",
+          "version": "fixture:acesim-v1",
+          "locator": "paragraph:QV100"
+        }
+      ],
+      "code_refs": [
+        {
+          "path": "src/config/gpu_profile.py",
+          "sha256": "a37f41edb649259ade7d20586455ce32721b0beee1bd83f2f6db39316ba24895",
+          "locator": "symbol:QV100_300K"
+        },
+        {
+          "path": "src/config/gpu_profile.py",
+          "sha256": "a37f41edb649259ade7d20586455ce32721b0beee1bd83f2f6db39316ba24895",
+          "locator": "symbol:cryogenic_profile"
+        }
+      ],
+      "version_ref": {
+        "type": "git",
+        "ref": "fixture:acesim-v1"
+      },
+      "confidence": "confirmed",
+      "supersedes": []
+    },
+    {
+      "project_id": "acesim-sandbox",
+      "fact_type": "optimization",
+      "fact_key": "optimization.cache-capacity-scan",
+      "title": "Temperature-aware frequency and cache scan",
+      "aliases": ["L1 L2 scan", "cache size scan", "cache 参数扫描", "低温 GPU 参数"],
+      "summary": "Vary frequency and L1/L2 cache capacity within one temperature-specific GPU profile.",
+      "details": {
+        "mechanism": "Hold the trace and unrelated hardware fields fixed while changing one axis or an explicit cross-scan.",
+        "module_refs": ["module.gpu-profile"],
+        "principle_refs": ["principle.trace-replay"],
+        "tradeoffs": ["large traces may exceed host memory", "cross scans expand run count"]
+      },
+      "source_refs": [
+        {
+          "type": "project_document",
+          "ref": "docs/acesim-notes.md",
+          "version": "fixture:acesim-v1",
+          "locator": "paragraph:QV100"
+        }
+      ],
+      "code_refs": [
+        {
+          "path": "src/config/gpu_profile.py",
+          "sha256": "a37f41edb649259ade7d20586455ce32721b0beee1bd83f2f6db39316ba24895",
+          "locator": "symbol:cryogenic_profile"
+        }
+      ],
+      "version_ref": {
+        "type": "git",
+        "ref": "fixture:acesim-v1"
+      },
+      "confidence": "confirmed",
+      "supersedes": []
+    }
+  ],
+  "queries": [
+    {
+      "query": "低温 GPU 的 L1 和 L2 cache 参数在哪里配置，怎么做交叉扫描",
+      "expected_fact_key": "optimization.cache-capacity-scan",
+      "expected_path": "src/config/gpu_profile.py",
+      "expected_locator": "symbol:cryogenic_profile"
+    },
+    {
+      "query": "IPC 指标是什么意思",
+      "expected_fact_key": "metric.ipc",
+      "expected_direction": "higher_is_better",
+      "expected_unit": "instructions/cycle"
+    }
+  ]
+}

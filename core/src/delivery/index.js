@@ -27,6 +27,8 @@ import {
 } from "../runtime/internal.js";
 import { canonicalHash, stringifyYaml } from "../serialization/index.js";
 import { assertWorkspacePathAllowed, commitWorkspaceTransaction } from "../workspace-store/index.js";
+import { inspectBootstrapAcceptanceGate } from "../workspace-store/bootstrap-acceptance.js";
+import { validateWorkerRoutingDecision } from "../worker-routing/index.js";
 
 const TRANSITIONS = Object.freeze({
   "delivery.approve": { action: "approve", states: ["proposed", "needs_revision"] },
@@ -47,6 +49,9 @@ export function createDeliveryStore(input = {}) {
     },
     proposeCycle(root, proposal, options = {}) {
       return propose(root, "cycle", proposal, options, clock);
+    },
+    promoteBootstrapCycle(root, proposal, options = {}) {
+      return promoteBootstrapCycle(root, proposal, options, clock);
     },
     read,
     approve(root, transition, options = {}) {
@@ -164,6 +169,68 @@ async function propose(root, deliveryKind, proposal, options, clock) {
   return clone(delivery);
 }
 
+async function promoteBootstrapCycle(root, proposal, options, clock) {
+  assertPlainObject(proposal, "Bootstrap Cycle promotion proposal");
+  assertExactKeys(proposal, ["plan", "topology"], "Bootstrap Cycle promotion proposal");
+  validateCompiledPlan(proposal.plan, "cycle");
+  validateTopology(proposal.topology);
+
+  const objectRef = { kind: "delivery", id: proposal.plan.id };
+  const pointer = await readActivePointer(root);
+  if (!pointer.active.delivery || !sameObjectRef(pointer.active.delivery, objectRef)) {
+    throw deliveryError("ERR_DELIVERY_ACTIVE_EXISTS", "Bootstrap promotion requires the active Delivery pointer to match the compiled Cycle plan");
+  }
+
+  const acceptance = await inspectBootstrapAcceptanceGate(root);
+  if (acceptance.state !== "accepted") {
+    throw deliveryError("ERR_BOOTSTRAP_ACCEPTANCE_PENDING", "Bootstrap promotion requires accepted Bootstrap activation");
+  }
+
+  const authority = await readRuntimeObject(root, objectRef);
+  const placeholder = authority.runtime;
+  if (
+    placeholder.status !== "planning"
+    || placeholder.current_phase !== "bootstrap_adoption"
+    || authority.continuation.blocked_on !== "bootstrap_acceptance"
+  ) {
+    throw deliveryError("ERR_DELIVERY_STATE_INVALID", "Bootstrap promotion requires the unpromoted Bootstrap Delivery placeholder");
+  }
+
+  const updatedAt = now(clock);
+  const planRecord = buildPlanRecord(proposal.plan, "cycle", updatedAt, []);
+  const delivery = {
+    schema_version: "1",
+    object_ref: objectRef,
+    delivery_kind: "cycle",
+    status: "proposed",
+    revision: proposal.plan.revision,
+    plan_hash: proposal.plan.plan_hash,
+    plan_record_ref: recordRef(planRecord),
+    topology: proposal.topology,
+    milestones: proposal.plan.milestones.map((item) => ({ ...item, status: "pending" })),
+    updated_at: updatedAt,
+  };
+  const docs = compileRuntimeObjectDocuments(toRuntimeDocuments(delivery));
+  const manifest = await readCurrentManifest(root);
+  const operation = transactionOptions(options, "delivery-bootstrap-promote");
+  await assertActivePointerUnchanged(root, pointer);
+  await commitWorkspaceTransaction(root, {
+    id: operation.id,
+    faultInjector: operation.faultInjector,
+    manifest,
+    writes: [
+      { path: recordPath(planRecord), content: renderRecordDocument(planRecord.attributes, planRecord.body) },
+      { path: docs.runtime_path, content: renderYaml(docs.runtime) },
+      { path: docs.continuation_path, content: renderYaml(docs.continuation) },
+      { path: ".pipeline/runtime/active.yaml", content: renderYaml(compileActivePointerDocument({
+        schema_version: "1",
+        active: { ...pointer.active, delivery: objectRef },
+      })) },
+    ],
+  });
+  return clone(delivery);
+}
+
 async function assertProposalCreateAllowed(root, objectRef, pointer) {
   const existing = await optionalReadDelivery(root, objectRef);
   if (existing) {
@@ -254,7 +321,7 @@ async function recordRevision(root, request, options, clock) {
   assertExactKeys(request, ["object_ref", "actor", "feedback", "proposal"], "Delivery revision request");
   const objectRef = storedObjectRef(normalizeAuthorityObjectRef(request.object_ref));
   const current = await read(root, objectRef);
-  if (!["proposed", "waiting_to_start", "needs_revision"].includes(current.status)) {
+  if (!["proposed", "waiting_to_start", "executing", "needs_revision"].includes(current.status)) {
     throw deliveryError("ERR_DELIVERY_STATE_INVALID", `Delivery revision is not allowed from state ${current.status}`);
   }
   normalizeActor(request.actor);
@@ -436,6 +503,9 @@ function toRuntimeDocuments(delivery) {
     next_action: nextAction(delivery),
     plan_hash: delivery.plan_hash,
     revision: delivery.revision,
+    ...(delivery.worker_routing === undefined ? {} : {
+      worker_routing: validateWorkerRoutingDecision(delivery.worker_routing),
+    }),
     updated_at: delivery.updated_at,
   };
   return { object_ref: delivery.object_ref, runtime, continuation };
@@ -461,7 +531,14 @@ function normalizeView(value) {
   if (!/^[a-f0-9]{64}$/.test(value.plan_hash)) throw deliveryError("ERR_DELIVERY_SCHEMA_INVALID", "Delivery plan_hash is invalid");
   if (value.delivery_kind === "goal" && Object.hasOwn(value, "milestones")) throw deliveryError("ERR_DELIVERY_SCHEMA_INVALID", "Goal must not expose milestones");
   if (value.delivery_kind === "cycle" && !Array.isArray(value.milestones)) throw deliveryError("ERR_DELIVERY_SCHEMA_INVALID", "Cycle milestones are required");
-  return clone({ ...value, object_ref: objectRef });
+  const workerRouting = value.worker_routing === undefined
+    ? undefined
+    : validateWorkerRoutingDecision(value.worker_routing);
+  return clone({
+    ...value,
+    object_ref: objectRef,
+    ...(workerRouting === undefined ? {} : { worker_routing: workerRouting }),
+  });
 }
 
 function validateCompiledPlan(value, kind) {

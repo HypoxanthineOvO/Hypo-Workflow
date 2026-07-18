@@ -1,0 +1,83 @@
+{
+  "fixture_id": "acesim-like",
+  "project": {
+    "id": "acesim-sandbox",
+    "kind": "reference-sandbox",
+    "description": "Small AceSim-style frequency, cache, and trace sandbox."
+  },
+  "experiment": {
+    "id": "acesim-frequency-cache-scan",
+    "title": "Scan frequency and cache policy for AceSim",
+    "project_ref": {
+      "kind": "project",
+      "id": "acesim-sandbox"
+    },
+    "lane": "experiment",
+    "hypothesis": "Warm caching reduces latency for the 1 kHz trace without changing the numerical result.",
+    "design": {
+      "kind": "cross-scan",
+      "parameters": {
+        "frequency_hz": [500, 1000],
+        "cache": ["cold", "warm"],
+        "trace_limit": [64]
+      },
+      "dataset_ref": "acesim-toy-trace"
+    },
+    "baseline": {
+      "id": "acesim-baseline-cold-500hz",
+      "code_ref": "git:acesim-sandbox-baseline-v1",
+      "dataset_ref": "acesim-toy-trace",
+      "metric": {
+        "name": "latency_ms",
+        "value": 12.4,
+        "unit": "ms"
+      }
+    },
+    "baseline_v2": {
+      "id": "acesim-baseline-warm-500hz",
+      "code_ref": "git:acesim-sandbox-baseline-v2",
+      "dataset_ref": "acesim-toy-trace",
+      "metric": {
+        "name": "latency_ms",
+        "value": 8.8,
+        "unit": "ms"
+      }
+    }
+  },
+  "attempts": [
+    {
+      "id": "acesim-attempt-cold-500hz",
+      "status": "completed",
+      "started_at": "2026-07-18T10:00:00+08:00",
+      "finished_at": "2026-07-18T10:00:40+08:00",
+      "baseline_id": "acesim-baseline-cold-500hz",
+      "parameters": {
+        "frequency_hz": 500,
+        "cache": "cold",
+        "trace_limit": 64
+      },
+      "metrics": {
+        "latency_ms": 12.4,
+        "error": 0.002
+      },
+      "output_refs": ["artifacts/acesim-attempt-cold-500hz.json"]
+    }
+  ],
+  "rerun": {
+    "id": "acesim-attempt-warm-500hz-rerun-1",
+    "status": "completed",
+    "started_at": "2026-07-18T10:05:00+08:00",
+    "finished_at": "2026-07-18T10:05:35+08:00",
+    "baseline_id": "acesim-baseline-cold-500hz",
+    "parameters": {
+      "frequency_hz": 500,
+      "cache": "warm",
+      "trace_limit": 64
+    },
+    "metrics": {
+      "latency_ms": 8.8,
+      "error": 0.002
+    },
+    "output_refs": ["artifacts/acesim-attempt-warm-500hz-rerun-1.json"]
+  }
+}

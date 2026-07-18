@@ -2,7 +2,7 @@
 
 [中文](../../platforms/codex.md) | English
 
-Hypo-Workflow currently runs as a Codex plugin with nine focused Skills and ten lifecycle Hook events. It is not a runner: the Codex Agent implements, tests, and reviews work, while Core validates and persists authority.
+Hypo-Workflow v14.0.0-alpha.2 ships as a Codex plugin with ten focused Skills and ten lifecycle Hook events. It is not a runner: the Codex Agent implements, runs experiments, tests, and reviews work, while Core validates and persists authority. Host Contract v1 and both ZIP artifacts include `/hw:experiment`.
 
 ## Installation Shapes
 
@@ -28,15 +28,24 @@ This loads Skills only and is not a full plugin installation.
 
 | Surface | Current contract |
 | --- | --- |
-| Commands | nine public Skills: guide, init, goal, plan, cycle, maintain, resume, accept, reject |
+| Commands | ten public Skills: guide, init, goal, plan, cycle, maintain, experiment, resume, accept, reject |
 | Questions | use the host Ask/request-user-input surface after showing full decision context |
 | Plan | maintain a visible host Plan/Todo; `/hw:plan` selects internal phases |
 | Subagents | choose by complexity; material work may separate test, implement, audit, or domain roles |
 | Memory | Manifest, Runtime, Continuation, Records, Receipts, Journal, Capsule, Pack, Snapshots |
+| Experiment | project knowledge, code/`uv`/machine context, scans, Attempts, scientific review, Git events, and instant status |
 | Hooks | ten current Official Codex lifecycle events |
 | Destruction | exact Deletion Manifest + fresh Receipt + controlled executor |
 
 OpenCode, Claude Code, Cursor, Copilot, Trae, and custom Codex-fork adapters are outside the current support surface.
+
+## Task Assessment And Worker Routing
+
+Codex first uses topology to decide whether independent test, implement, audit, or other Worker identities are required. It then generates and shows a Task Assessment for every Worker before start. The assessment covers `complexity`, `uncertainty`, `oracle_strength`, `blast_radius`, `reversibility`, `risk_flags`, and a concise conclusion. Core only performs exact, bounded, secret-safe validation and deterministically emits `mechanical`, `standard`, `explore`, `critical`, or `escalation`.
+
+This semantic handoff contains no concrete model, execution provider, credential, prompt, or reasoning effort. `SubagentStart` records only the persisted routing class, reason codes, policy version, and visible assessment in Worker Journal context. `advisory` records an explicit fallback and inherits the current execution context when the host lacks this handoff; `required` blocks Worker start; `off` emits no hint.
+
+Routing does not replace topology or relax role separation, evidence, acceptance, or user authority. Resume reuses the Runtime/Continuation decision. A Worker that needs a different semantic class uses a no-history or bounded-history fork; a full-history fork inherits its parent's execution context. See the [configuration governance reference](../reference/configuration.md) for the complete field and classification tables.
 
 ## Hook Events
 
@@ -56,6 +65,8 @@ The plugin discovers `hooks/hooks.json` by default:
 | `Stop` | record the turn boundary and recovery clue |
 
 Commands locate the installed bundle through `PLUGIN_ROOT`, and timeouts use seconds. The wrapper writes one valid JSON line to stdout and sends diagnostics to stderr.
+
+Turn-level Hook inputs may omit `turn_id` or `tool_use_id` without causing a compatibility failure. This does not change Hook trust, enablement, or authority boundaries.
 
 ## Boundaries
 

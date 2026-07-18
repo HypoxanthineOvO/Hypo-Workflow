@@ -12,7 +12,7 @@ const DIST_ROOT = join(ROOT, "dist");
 const STAGING_ROOT = join(DIST_ROOT, ".host-artifacts-staging");
 const INSTALLED_DESCRIPTOR_PATH = "contracts/host/v1/installed-release.json";
 const BUNDLE_MANIFEST_PATH = "bundle-manifest.json";
-const PUBLIC_SKILLS = ["guide", "init", "goal", "plan", "cycle", "maintain", "resume", "accept", "reject"];
+const PUBLIC_SKILLS = ["guide", "init", "goal", "plan", "cycle", "maintain", "experiment", "resume", "accept", "reject"];
 
 const plugin = JSON.parse(await readFile(join(ROOT, ".codex-plugin", "plugin.json"), "utf8"));
 const version = plugin.version;
@@ -33,7 +33,7 @@ const common = [
   "contracts/host/v1/command-manifest.json",
   "contracts/host/v1/host-status.schema.json",
   "contracts/host/v1/release-manifest.schema.json",
-  ...PUBLIC_SKILLS.map((name) => `skills/${name}/SKILL.md`),
+  ...PUBLIC_SKILLS.map((name) => `skills/${name}`),
 ];
 const targets = [
   {

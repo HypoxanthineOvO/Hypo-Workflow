@@ -6,6 +6,7 @@ import { createRecoveryStore } from "../recovery/index.js";
 import { readActivePointer, readRuntimeObject } from "../runtime/index.js";
 import { canonicalHash } from "../serialization/index.js";
 import { refreshHostStatusProjection } from "../host-contract/index.js";
+import { validateWorkerRoutingDecision } from "../worker-routing/index.js";
 import {
   assertExactKeys,
   assertNoRawSecrets,
@@ -83,7 +84,7 @@ export function validateCodexHookInput(input) {
       throw hookError("ERR_CODEX_HOOK_INPUT_INVALID", "Codex Hook permission_mode is unsupported");
     }
   }
-  if (event !== "SessionStart") requireText(input.turn_id, "turn_id");
+  if (event !== "SessionStart") validateOptionalHookIdentifier(input, "turn_id");
 
   switch (event) {
     case "SessionStart":
@@ -95,7 +96,7 @@ export function validateCodexHookInput(input) {
     case "PreToolUse":
     case "PostToolUse":
       requireToolInput(input);
-      requireText(input.tool_use_id, "tool_use_id");
+      validateOptionalHookIdentifier(input, "tool_use_id");
       if (event === "PostToolUse") normalizeJsonValue(input.tool_response, "tool_response");
       break;
     case "PermissionRequest":
@@ -146,12 +147,13 @@ export function validateCodexHookOutput(event, output, input = undefined) {
 }
 
 export async function evaluateCodexHookEvent(root, rawInput, options = {}) {
-  const input = validateCodexHookInput(rawInput);
+  const validatedInput = validateCodexHookInput(rawInput);
   const workspaceRoot = resolve(root || ".");
-  if (resolve(input.cwd) !== workspaceRoot) {
+  if (resolve(validatedInput.cwd) !== workspaceRoot) {
     throw hookError("ERR_CODEX_HOOK_ROOT_MISMATCH", "Codex Hook cwd does not match the target workspace");
   }
-  const operation = normalizeEvaluationOptions(input.hook_event_name, options);
+  const operation = normalizeEvaluationOptions(validatedInput.hook_event_name, options);
+  const input = bindOptionalHookIdentifiers(validatedInput, operation);
   const recovery = createRecoveryStore({ ...(operation.clock ? { clock: operation.clock } : {}) });
 
   let output;
@@ -188,6 +190,23 @@ export async function evaluateCodexHookEvent(root, rawInput, options = {}) {
       break;
   }
   return validateCodexHookOutput(input.hook_event_name, output, input);
+}
+
+function bindOptionalHookIdentifiers(input, operation) {
+  if (operation.id === undefined) return input;
+  const bound = {
+    ...input,
+    ...(input.hook_event_name !== "SessionStart" && input.turn_id === undefined
+      ? { turn_id: `turn-${operation.id}` }
+      : {}),
+  };
+  if (
+    ["PreToolUse", "PostToolUse"].includes(input.hook_event_name)
+    && input.tool_use_id === undefined
+  ) {
+    bound.tool_use_id = `tool-${operation.id}`;
+  }
+  return bound;
 }
 
 async function evaluateSessionStart(root, input, operation, recovery) {
@@ -357,6 +376,9 @@ async function evaluatePostCompact(root, input, operation, recovery) {
 async function evaluateSubagent(root, input, operation, recovery, starting) {
   const objectRef = await readActiveObjectRef(root);
   const evidenceRefs = starting ? [] : extractEvidenceLocators(input.last_assistant_message);
+  const workerRouting = objectRef
+    ? await readWorkerRoutingForEvent(root, objectRef, input, recovery, starting)
+    : null;
   if (objectRef) {
     const writer = { kind: "subagent", id: input.agent_id };
     await recovery.appendRecoveryEvent(root, {
@@ -371,6 +393,7 @@ async function evaluateSubagent(root, input, operation, recovery, starting) {
         writer,
         role: input.agent_type,
         evidence_refs: evidenceRefs,
+        ...(workerRouting ? { worker_routing: workerRouting } : {}),
       },
     });
   }
@@ -382,9 +405,62 @@ async function evaluateSubagent(root, input, operation, recovery, starting) {
   return {
     hookSpecificOutput: {
       hookEventName: "SubagentStart",
-      additionalContext: "Keep role-specific evidence_refs explicit and return a concise result to the main agent.",
+      additionalContext: workerRouting
+        ? renderWorkerRoutingContext(workerRouting)
+        : "Keep role-specific evidence_refs explicit and return a concise result to the main agent.",
     },
   };
+}
+
+async function readWorkerRoutingForEvent(root, objectRef, input, recovery, starting) {
+  if (starting) return readActiveWorkerRouting(root, objectRef);
+  const replay = await recovery.replayRecoveryJournal(root, { object_ref: objectRef });
+  const workerEvents = replay.events.filter((event) => (
+    event.writer?.kind === "subagent"
+    && event.writer.id === input.agent_id
+    && (event.type === "worker.started" || event.type === "worker.stopped")
+  ));
+  const sameSessionStart = findOpenWorkerStart(workerEvents, input.session_id);
+  const priorStart = sameSessionStart ?? findOpenWorkerStart(workerEvents);
+  if (priorStart && priorStart.payload?.worker_routing === undefined) return null;
+  if (priorStart) {
+    return validateWorkerRoutingDecision(priorStart.payload.worker_routing);
+  }
+  return readActiveWorkerRouting(root, objectRef);
+}
+
+function findOpenWorkerStart(events, sessionId = null) {
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const event = events[index];
+    if (sessionId !== null && event.session_id !== sessionId) continue;
+    if (event.type === "worker.stopped") return null;
+    if (event.type === "worker.started") return event;
+  }
+  return null;
+}
+
+async function readActiveWorkerRouting(root, objectRef) {
+  const authority = await readRuntimeObject(root, objectRef);
+  const runtimeRouting = authority.runtime?.worker_routing;
+  const continuationRouting = authority.continuation?.worker_routing;
+  if (runtimeRouting === undefined && continuationRouting === undefined) return null;
+  const selected = validateWorkerRoutingDecision(continuationRouting ?? runtimeRouting);
+  if (runtimeRouting !== undefined && canonicalHash(validateWorkerRoutingDecision(runtimeRouting)) !== canonicalHash(selected)) {
+    throw hookError("ERR_CODEX_HOOK_INPUT_INVALID", "Runtime and Continuation Worker Routing decisions differ");
+  }
+  return selected;
+}
+
+function renderWorkerRoutingContext(routing) {
+  const assessment = routing.assessment;
+  const details = assessment
+    ? ` complexity=${assessment.complexity}, uncertainty=${assessment.uncertainty}, oracle_strength=${assessment.oracle_strength}, blast_radius=${assessment.blast_radius}, reversibility=${assessment.reversibility}.`
+    : " unavailable; use the validated semantic decision.";
+  return [
+    `Task Assessment:${details}`,
+    `Semantic Worker Routing: class=${routing.routing_class}, policy=${routing.policy_version}, reasons=${routing.reason_codes.join(",")}.`,
+    "Keep role-specific evidence_refs explicit; routing does not change role separation or acceptance.",
+  ].join("\n");
 }
 
 async function evaluateStop(root, input, operation, recovery) {
@@ -833,6 +909,17 @@ function requireText(value, field, max = 4096) {
 function requireNullableText(value, field, max = 4096) {
   if (value === null) return;
   requireText(value, field, max);
+}
+
+function validateOptionalHookIdentifier(input, field) {
+  if (!Object.hasOwn(input, field)) return;
+  assertNoRawSecrets(input[field], `Codex Hook ${field}`);
+  try {
+    normalizeSafeIdentifier(input[field], `Codex Hook ${field}`);
+  } catch (error) {
+    if (error?.code === "ERR_RAW_SECRET_FORBIDDEN") throw error;
+    throw hookError("ERR_CODEX_HOOK_INPUT_INVALID", `Codex Hook ${field} must be a safe identifier`);
+  }
 }
 
 function requireBoolean(value, field) {

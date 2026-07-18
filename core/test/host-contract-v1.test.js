@@ -13,6 +13,7 @@ const FIXTURES = join(CONTRACT_ROOT, "fixtures");
 const EXPECTED_COMMANDS = [
   "hw:accept",
   "hw:cycle",
+  "hw:experiment",
   "hw:goal",
   "hw:guide",
   "hw:init",
@@ -34,7 +35,7 @@ async function sha256(path) {
   return createHash("sha256").update(await readFile(path)).digest("hex");
 }
 
-test("Host Contract v1 publishes one release manifest and exactly nine public commands", async () => {
+test("Host Contract v1 publishes one release manifest and exactly ten public commands", async () => {
   const release = await readJson(join(CONTRACT_ROOT, "release-manifest.json"));
   const commands = await readJson(join(CONTRACT_ROOT, "command-manifest.json"));
 
@@ -88,6 +89,7 @@ test("release artifacts are materialized, checksummed, and portable content matc
   for (const command of EXPECTED_COMMANDS) {
     assert.ok(has(`skills/${command.slice(3)}/SKILL.md`), `portable bundle missing ${command}`);
   }
+  assert.ok(has("skills/experiment/agents/openai.yaml"), "portable bundle missing Experiment agent metadata");
   for (const retired of ["start", "status", "stop", "rules", "patch", "sync", "setup"]) {
     assert.ok(!has(`skills/${retired}/SKILL.md`), `portable bundle contains retired Skill ${retired}`);
   }

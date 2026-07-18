@@ -41,7 +41,7 @@ Planning approval persists a proposal and moves the Delivery only to `waiting_to
 
 A Goal has one final manual acceptance. A Cycle has ordered Milestones with verification but no per-Milestone acceptance gates; only the aggregate Cycle enters final manual acceptance.
 
-## Worker Topology
+## Worker Topology And Routing
 
 Use `selectExecutionTopology` from actual complexity and risk:
 
@@ -50,6 +50,10 @@ Use `selectExecutionTopology` from actual complexity and risk:
 - Add bounded research, challenge, curation, design, or visual-audit roles when the domain requires them.
 
 When separation is required, show the role boundaries and expected evidence before start. If the host cannot provide required independence, stop for an explicit degraded-mode decision rather than silently self-certifying.
+
+Topology chooses identities; Worker Routing chooses only a semantic capability class after identities are fixed. The host Agent generates a visible Task Assessment from repository evidence, including complexity, uncertainty, oracle strength, blast radius, reversibility, risk flags, and a bounded summary. Validate it with `validateTaskAssessment`, then call `selectWorkerRouting`; do not invoke another classifier or persist its prompt.
+
+Routing precedence is `escalation > critical > explore > standard > mechanical`. Security, migration, irreversible work, or two distinct failed execution routes escalate; architecture, weak oracle, independent audit, and recovery conflict are critical; unknown root causes and candidate comparisons explore. Same-route retries, cancellation, startup failures, and network failures do not increase the distinct-route count. Display the assessment, class, reasons, and any fallback before Worker start. Routing metadata never relaxes topology or acceptance.
 
 ## Persistence And Reporting
 

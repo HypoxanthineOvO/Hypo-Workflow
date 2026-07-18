@@ -1,5 +1,28 @@
 # Changelog
 
+## v14.0.0-alpha.2 - 2026-07-18
+
+### Features
+
+- 新增 `/hw:experiment` 非线性实验通道，覆盖项目知识、指标与 concept-to-code 映射、Git 代码快照、`uv` 环境、机器/数据集上下文、逻辑 Experiment 与 Attempt 身份、参数扫描、长任务监督、科学审查、trash/restore 和 contextual baseline。
+- 新增基于 immutable Experiment events 的 Git 合并与 bounded materialized status projection；普通“现在实验怎么样”查询不再扫描结果目录或全部事件。
+- 新增可见 Task Assessment 和确定性 semantic Worker Routing，输出 `mechanical`、`standard`、`explore`、`critical` 或 `escalation`，并跨 Runtime、Continuation、Journal、Capsule 和 Resume 保持一致。
+
+### Fixes
+
+- Codex turn Hooks 允许宿主省略 `turn_id` 或 `tool_use_id`，避免兼容输入反复报错，同时不改变 Hook 信任和启用策略。
+- Host Contract v1、Codex plugin ZIP 和 portable ZIP 现包含第十个公开 Experiment Skill 及其 agent metadata，修复源码可发现但发布包漏装的差异。
+- Worker Routing 对配置 partial override、输入边界、失败路线计数和 Worker start/stop 路由冻结进行 fail-closed 加固。
+
+### Docs
+
+- README、用户指南、命令/配置参考、Codex 平台说明、插件描述和中英文 release notes 完整说明 Experiment、semantic routing、验证边界和非目标。
+
+### Tests
+
+- C23 最终维护回归 `638/638 PASS`，Worker Routing focused `21/21 PASS`，相关集成 `138/138 PASS`。
+- 独立最终审计 `P0=0 / P1=0 / P2=0`；真实 NeRF、AceSim、GitLab、SSH/SCP、大 trace 和多周实验仍保留为后续 Pilot 边界。
+
 ## v14.0.0-alpha.1 - 2026-07-13
 
 ### Versioning

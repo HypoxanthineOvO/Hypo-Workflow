@@ -1,0 +1,163 @@
+{
+  "fixture_id": "c23-m2-nerf-knowledge",
+  "project": {
+    "id": "nerf-sandbox",
+    "title": "NeRF reference sandbox",
+    "version_ref": {
+      "type": "git",
+      "ref": "fixture:nerf-v1"
+    }
+  },
+  "facts": [
+    {
+      "project_id": "nerf-sandbox",
+      "fact_type": "principle",
+      "fact_key": "principle.volume-rendering",
+      "title": "Volume rendering",
+      "aliases": ["volume rendering", "体渲染"],
+      "summary": "Integrate color and density samples along each camera ray to synthesize a pixel.",
+      "details": {
+        "mechanism": "Transmittance weights ordered samples so nearer density can occlude farther color.",
+        "inputs": ["camera ray", "sample density", "sample color"],
+        "outputs": ["rendered pixel", "accumulated opacity"]
+      },
+      "source_refs": [
+        {
+          "type": "paper",
+          "ref": "mildenhall-nerf-2020",
+          "version": "arxiv-v2",
+          "locator": "section:5"
+        }
+      ],
+      "code_refs": [],
+      "version_ref": {
+        "type": "git",
+        "ref": "fixture:nerf-v1"
+      },
+      "confidence": "confirmed",
+      "supersedes": []
+    },
+    {
+      "project_id": "nerf-sandbox",
+      "fact_type": "metric",
+      "fact_key": "metric.psnr",
+      "title": "Peak signal-to-noise ratio",
+      "aliases": ["PSNR", "峰值信噪比", "重建质量"],
+      "summary": "A logarithmic reconstruction-fidelity metric derived from mean squared pixel error.",
+      "details": {
+        "meaning": "Higher PSNR means lower pixel reconstruction error when value ranges match.",
+        "direction": "higher_is_better",
+        "unit": "dB",
+        "comparability_notes": "Compare only runs with the same image range, crop, mask, and evaluation split."
+      },
+      "source_refs": [
+        {
+          "type": "project_document",
+          "ref": "docs/nerf-notes.md",
+          "version": "fixture:nerf-v1",
+          "locator": "heading:PSNR"
+        }
+      ],
+      "code_refs": [
+        {
+          "path": "src/metrics/image_quality.py",
+          "sha256": "f8bea74941d0c7f9b9675c0c785068ce612fba7dff98f1498aeb59709dc57df9",
+          "locator": "symbol:peak_signal_to_noise_ratio"
+        }
+      ],
+      "version_ref": {
+        "type": "git",
+        "ref": "fixture:nerf-v1"
+      },
+      "confidence": "confirmed",
+      "supersedes": []
+    },
+    {
+      "project_id": "nerf-sandbox",
+      "fact_type": "module",
+      "fact_key": "module.render-engine",
+      "title": "Render engine",
+      "aliases": ["RE", "render engine", "渲染模块"],
+      "summary": "Owns ray marching, occupancy lookup, live-ray compaction, and volume integration.",
+      "details": {
+        "role": "Coordinate sampling work for active rays and feed ordered samples into volume rendering.",
+        "owns": ["ray marching", "occupancy lookup", "live-ray compaction"]
+      },
+      "source_refs": [
+        {
+          "type": "project_document",
+          "ref": "docs/nerf-notes.md",
+          "version": "fixture:nerf-v1",
+          "locator": "heading:NeRF Fixture Notes"
+        }
+      ],
+      "code_refs": [
+        {
+          "path": "src/render/occupancy.py",
+          "sha256": "f2fb6a327625585028fb2c96a7fefc4d1a71bc488955a7613204e84490a2f4a2",
+          "locator": "symbol:march_active_rays"
+        }
+      ],
+      "version_ref": {
+        "type": "git",
+        "ref": "fixture:nerf-v1"
+      },
+      "confidence": "confirmed",
+      "supersedes": []
+    },
+    {
+      "project_id": "nerf-sandbox",
+      "fact_type": "optimization",
+      "fact_key": "optimization.re-sampling",
+      "title": "RE occupancy-guided sampling acceleration",
+      "aliases": ["RE acceleration", "RE 加速", "sampling acceleration", "采样加速", "empty-space skipping"],
+      "summary": "Skip empty intervals and compact live rays so the renderer evaluates fewer network samples.",
+      "details": {
+        "mechanism": "The occupancy grid selects the next non-empty step; terminated rays are removed before another pass.",
+        "module_refs": ["module.render-engine"],
+        "principle_refs": ["principle.volume-rendering"],
+        "tradeoffs": ["occupancy-grid refresh cost", "threshold sensitivity"]
+      },
+      "source_refs": [
+        {
+          "type": "project_document",
+          "ref": "docs/nerf-notes.md",
+          "version": "fixture:nerf-v1",
+          "locator": "paragraph:RE acceleration"
+        }
+      ],
+      "code_refs": [
+        {
+          "path": "src/render/occupancy.py",
+          "sha256": "f2fb6a327625585028fb2c96a7fefc4d1a71bc488955a7613204e84490a2f4a2",
+          "locator": "symbol:march_active_rays"
+        },
+        {
+          "path": "src/render/occupancy.py",
+          "sha256": "f2fb6a327625585028fb2c96a7fefc4d1a71bc488955a7613204e84490a2f4a2",
+          "locator": "symbol:compact_alive"
+        }
+      ],
+      "version_ref": {
+        "type": "git",
+        "ref": "fixture:nerf-v1"
+      },
+      "confidence": "confirmed",
+      "supersedes": []
+    }
+  ],
+  "queries": [
+    {
+      "query": "把 RE 加速那一部分的采样加速改一下",
+      "expected_fact_key": "optimization.re-sampling",
+      "expected_path": "src/render/occupancy.py",
+      "expected_locator": "symbol:march_active_rays"
+    },
+    {
+      "query": "PSNR 是什么意思，数值越高越好吗",
+      "expected_fact_key": "metric.psnr",
+      "expected_direction": "higher_is_better",
+      "expected_unit": "dB"
+    }
+  ]
+}

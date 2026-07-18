@@ -59,6 +59,7 @@ test("discoverableCommandMap discovers installed backends through skillRoot, not
   assert.deepEqual(discovered.map((command) => command.canonical).sort(), [
     "/hw:accept",
     "/hw:cycle",
+    "/hw:experiment",
     "/hw:goal",
     "/hw:guide",
     "/hw:init",

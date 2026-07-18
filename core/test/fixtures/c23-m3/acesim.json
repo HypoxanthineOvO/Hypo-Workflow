@@ -1,0 +1,142 @@
+{
+  "fixture_id": "c23-m3-acesim-runs",
+  "experiment": {
+    "id": "acesim-qv100-77k-scans",
+    "title": "AceSim QV100 77K parameter and trace scans",
+    "objective": "Map frequency and cache behavior over traces that fit within host memory.",
+    "baseline": {
+      "id": "qv100-77k-unmodified",
+      "label": "QV100 at 77K without cache optimization"
+    }
+  },
+  "base_run": {
+    "schema_version": "1",
+    "id_prefix": "acesim",
+    "project_id": "acesim-sandbox",
+    "experiment_id": "acesim-qv100-77k-scans",
+    "code_snapshot": {
+      "repository_ref": "gitlab:research/acesim",
+      "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "tree": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    "environment": {
+      "manager": "uv",
+      "python_version": "3.11.9",
+      "lockfile": {
+        "path": "uv.lock",
+        "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      },
+      "run_prefix": ["uv", "run", "--frozen"]
+    },
+    "machine": {
+      "id": "server-v100-02",
+      "hostname": "gpu-v100-02",
+      "gpu": {
+        "model": "NVIDIA V100-SXM2-32GB",
+        "count": 1,
+        "memory_bytes": 34359738368
+      },
+      "driver_version": "550.90.07",
+      "cuda_version": "12.1",
+      "host_memory_bytes": 68719476736,
+      "external_locations": [
+        {
+          "id": "acesim-traces-v100",
+          "path": "/srv/traces/acesim-v3",
+          "content_id": "acesim-trace-suite-v3"
+        }
+      ]
+    },
+    "dataset": {
+      "id": "acesim-traces",
+      "version": "suite-v3",
+      "subset": "rodinia",
+      "trace": "vectoradd-small",
+      "external_location_id": "acesim-traces-v100"
+    },
+    "command": {
+      "cwd": "simulator",
+      "argv": ["python", "run_trace.py", "--gpu", "qv100"],
+      "argument_bindings": [
+        {"flag": "--trace", "source": "dataset.trace"},
+        {"flag": "--temperature-k", "source": "parameters.temperature_k"},
+        {"flag": "--frequency-mhz", "source": "parameters.frequency_mhz"},
+        {"flag": "--l1-cache-kib", "source": "parameters.l1_cache_kib"},
+        {"flag": "--l2-cache-kib", "source": "parameters.l2_cache_kib"}
+      ],
+      "env": {
+        "CUDA_VISIBLE_DEVICES": {"literal": "0"}
+      }
+    },
+    "output": {
+      "root": "results/acesim/qv100-77k",
+      "log_file": "simulator.log",
+      "config_file": "resolved-config.json",
+      "metrics_file": "stats.json"
+    },
+    "resource_limits": {
+      "host_memory_bytes": 64424509440,
+      "gpu_memory_bytes": 32212254720,
+      "wall_time_seconds": 86400
+    },
+    "parameters": {}
+  },
+  "frequency_scan": {
+    "schema_version": "1",
+    "scan_id": "acesim-qv100-77k-frequency",
+    "purpose": "Hold temperature and caches fixed while sweeping frequency over two traces.",
+    "fixed_parameters": {
+      "temperature_k": 77,
+      "l1_cache_kib": 128,
+      "l2_cache_kib": 6144
+    },
+    "axes": [
+      {"name": "frequency_mhz", "values": [1000, 2000, 3000]}
+    ],
+    "cases": [
+      {"id": "vectoradd-small", "dataset": {"trace": "vectoradd-small"}},
+      {"id": "bfs-large", "dataset": {"trace": "bfs-large"}}
+    ],
+    "expected_run_count": 6
+  },
+  "cache_cross_scan": {
+    "schema_version": "1",
+    "scan_id": "acesim-qv100-77k-cache-cross",
+    "purpose": "Cross L1 and L2 capacities at a fixed frequency over two traces.",
+    "fixed_parameters": {
+      "temperature_k": 77,
+      "frequency_mhz": 2000
+    },
+    "axes": [
+      {"name": "l1_cache_kib", "values": [64, 128]},
+      {"name": "l2_cache_kib", "values": [4096, 8192]}
+    ],
+    "cases": [
+      {"id": "vectoradd-small", "dataset": {"trace": "vectoradd-small"}},
+      {"id": "bfs-large", "dataset": {"trace": "bfs-large"}}
+    ],
+    "expected_run_count": 8
+  },
+  "resource_failure": {
+    "trace": "bfs-large",
+    "outcome": {
+      "attempt_id": "acesim-bfs-large-memory-limit-1",
+      "status": "failed",
+      "started_at": "2026-07-18T14:00:00+08:00",
+      "finished_at": "2026-07-18T14:04:12+08:00",
+      "baseline_id": "qv100-77k-unmodified",
+      "metrics": {"trace_events_loaded": 481000000},
+      "output_refs": [
+        "results/acesim/qv100-77k/acesim-bfs-large-frequency-mhz-2000-l1-cache-kib-128-l2-cache-kib-6144-temperature-k-77/simulator.log",
+        "results/acesim/qv100-77k/acesim-bfs-large-frequency-mhz-2000-l1-cache-kib-128-l2-cache-kib-6144-temperature-k-77/resource-evidence.json"
+      ],
+      "failure": {
+        "reason_code": "resource_exhausted",
+        "resource": "host_memory",
+        "limit_bytes": 64424509440,
+        "observed_peak_bytes": 67645734912,
+        "evidence_ref": "results/acesim/qv100-77k/acesim-bfs-large-frequency-mhz-2000-l1-cache-kib-128-l2-cache-kib-6144-temperature-k-77/resource-evidence.json"
+      }
+    }
+  }
+}

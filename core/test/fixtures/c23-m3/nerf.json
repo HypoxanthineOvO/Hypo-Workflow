@@ -1,0 +1,128 @@
+{
+  "fixture_id": "c23-m3-nerf-runs",
+  "experiment": {
+    "id": "nerf-re-method-study",
+    "title": "NeRF RE method screening and full-scene expansion",
+    "objective": "Screen RE variants on chair, then retain the selected method on all NeRF Synthetic scenes.",
+    "baseline": {
+      "id": "nerf-synthetic-reference",
+      "label": "Reference NeRF on NeRF Synthetic"
+    }
+  },
+  "base_run": {
+    "schema_version": "1",
+    "id_prefix": "nerf",
+    "project_id": "nerf-sandbox",
+    "experiment_id": "nerf-re-method-study",
+    "code_snapshot": {
+      "repository_ref": "gitlab:research/nerf-sandbox",
+      "commit": "1111111111111111111111111111111111111111",
+      "tree": "2222222222222222222222222222222222222222",
+      "dirty_patch": {
+        "artifact_ref": "snapshots/nerf-re-method-study.patch",
+        "sha256": "3333333333333333333333333333333333333333333333333333333333333333"
+      }
+    },
+    "environment": {
+      "manager": "uv",
+      "python_version": "3.12.4",
+      "lockfile": {
+        "path": "uv.lock",
+        "sha256": "4444444444444444444444444444444444444444444444444444444444444444"
+      },
+      "run_prefix": ["uv", "run", "--frozen"]
+    },
+    "machine": {
+      "id": "server-a100-01",
+      "hostname": "gpu-a100-01",
+      "gpu": {
+        "model": "NVIDIA A100-SXM4-80GB",
+        "count": 1,
+        "memory_bytes": 85899345920
+      },
+      "driver_version": "555.42.06",
+      "cuda_version": "12.4",
+      "host_memory_bytes": 274877906944,
+      "external_locations": [
+        {
+          "id": "nerf-synthetic-a100",
+          "path": "/mnt/datasets/nerf_synthetic",
+          "content_id": "nerf-synthetic-blender-v1"
+        }
+      ]
+    },
+    "dataset": {
+      "id": "nerf-synthetic",
+      "version": "blender-v1",
+      "subset": "train-test-official",
+      "scene": "chair",
+      "external_location_id": "nerf-synthetic-a100"
+    },
+    "command": {
+      "cwd": ".",
+      "argv": ["python", "train.py"],
+      "argument_bindings": [
+        {"flag": "--scene", "source": "dataset.scene"},
+        {"flag": "--method", "source": "parameters.method"},
+        {"flag": "--seed", "source": "parameters.seed"}
+      ],
+      "env": {
+        "CUDA_VISIBLE_DEVICES": {"literal": "0"},
+        "WANDB_API_KEY": {"secret_ref": "env:WANDB_API_KEY"}
+      }
+    },
+    "output": {
+      "root": "results/nerf/re-method-study",
+      "log_file": "run.log",
+      "config_file": "resolved-config.json",
+      "metrics_file": "metrics.json"
+    },
+    "resource_limits": {
+      "host_memory_bytes": 137438953472,
+      "gpu_memory_bytes": 80530636800,
+      "wall_time_seconds": 43200
+    },
+    "parameters": {}
+  },
+  "screening_scan": {
+    "schema_version": "1",
+    "scan_id": "nerf-chair-method-screen",
+    "purpose": "Compare three RE methods on the chair scene before paying for the full dataset.",
+    "fixed_parameters": {"seed": 7},
+    "axes": [
+      {"name": "method", "values": ["baseline", "re-grid", "re-grid-v2"]}
+    ],
+    "cases": [
+      {"id": "chair", "dataset": {"scene": "chair"}}
+    ],
+    "expected_run_ids": [
+      "nerf-chair-method-baseline-seed-7",
+      "nerf-chair-method-re-grid-seed-7",
+      "nerf-chair-method-re-grid-v2-seed-7"
+    ]
+  },
+  "full_scan": {
+    "schema_version": "1",
+    "scan_id": "nerf-re-grid-v2-full-scenes",
+    "purpose": "Run the selected RE method over all eight NeRF Synthetic scenes.",
+    "derived_from_scan_id": "nerf-chair-method-screen",
+    "selection": {
+      "axis": "method",
+      "value": "re-grid-v2",
+      "reason": "Selected after chair screening"
+    },
+    "fixed_parameters": {"method": "re-grid-v2", "seed": 7},
+    "axes": [],
+    "cases": [
+      {"id": "chair", "dataset": {"scene": "chair"}},
+      {"id": "drums", "dataset": {"scene": "drums"}},
+      {"id": "ficus", "dataset": {"scene": "ficus"}},
+      {"id": "hotdog", "dataset": {"scene": "hotdog"}},
+      {"id": "lego", "dataset": {"scene": "lego"}},
+      {"id": "materials", "dataset": {"scene": "materials"}},
+      {"id": "mic", "dataset": {"scene": "mic"}},
+      {"id": "ship", "dataset": {"scene": "ship"}}
+    ],
+    "expected_scenes": ["chair", "drums", "ficus", "hotdog", "lego", "materials", "mic", "ship"]
+  }
+}

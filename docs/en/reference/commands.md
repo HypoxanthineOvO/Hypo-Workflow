@@ -2,7 +2,7 @@
 
 [中文](../../reference/commands.md) | English
 
-The current Official Codex discovery surface contains exactly nine public routes. The Root Router normalizes namespaces and checks backend availability; each route loads one ordinary, non-symlink Child Skill.
+The v14.0.0-alpha.2 Official Codex surface and Host Contract v1 expose exactly ten public routes. The Root Router normalizes namespaces and checks backend availability; each route loads one ordinary, non-symlink Child Skill. The Codex plugin ZIP and portable ZIP contain the same route set.
 
 | Command | Child Skill | Use when |
 | --- | --- | --- |
@@ -12,6 +12,7 @@ The current Official Codex discovery surface contains exactly nine public routes
 | `/hw:plan` | `skills/plan/SKILL.md` | clarification, technical choices, architecture, decomposition, or durable research is needed |
 | `/hw:cycle` | `skills/cycle/SKILL.md` | multiple stages have real dependency order |
 | `/hw:maintain` | `skills/maintain/SKILL.md` | persisting an everyday requirement, preference, decision, or feedback fact |
+| `/hw:experiment` | `skills/experiment/SKILL.md` | maintaining experiment environments, baselines, scans, reruns, result review, and instant status |
 | `/hw:resume` | `skills/resume/SKILL.md` | continuing an active Delivery after interruption, compaction, or restart |
 | `/hw:accept` | `skills/accept/SKILL.md` | a verified Goal or Cycle is in `pending_acceptance` |
 | `/hw:reject` | `skills/reject/SKILL.md` | acceptance fails and structured feedback must produce a revision |

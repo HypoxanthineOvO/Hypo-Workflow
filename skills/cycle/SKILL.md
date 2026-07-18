@@ -17,8 +17,10 @@ Use the Root Core Call Contract: import from the installed bundle, pass the targ
 2. Milestones contain outcomes, dependencies, and verification criteria, but never user acceptance gates.
 3. Persist with `proposeCycle`; approval moves only to `waiting_to_start`.
 4. Require a separate start Receipt. Start only the first runnable Milestone.
-5. Verify each Milestone in order with the selected worker topology. Only after all Milestones verify may aggregate Cycle verification run.
-6. Move only the aggregate Cycle to `pending_acceptance`, then route one Cycle-level manual gate to `/hw:accept` or `/hw:reject`.
+5. After topology is fixed and before each Worker starts, have the host Agent generate and show a bounded Task Assessment, validate it, and select a deterministic semantic Worker Routing class. Persist the decision in Runtime/Continuation and Worker Journal evidence; never persist the generating prompt.
+6. Apply `execution.worker_routing.mode` without changing role separation: `off` omits hints, `advisory` records fallback, and `required` blocks an unsupported semantic handoff.
+7. Verify each Milestone in order with the selected worker topology. Only after all Milestones verify may aggregate Cycle verification run.
+8. Move only the aggregate Cycle to `pending_acceptance`, then route one Cycle-level manual gate to `/hw:accept` or `/hw:reject`.
 
 Revision creates Feedback plus a superseding Plan Record, resets revised Milestones to pending, and requires renewed approval and explicit start.
 

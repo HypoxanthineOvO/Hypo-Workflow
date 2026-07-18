@@ -34,6 +34,8 @@
 | `plan.interactive.require_explicit_confirm` | 是否要求明确 Generate final confirmation | 团队或高风险项目设为 `true` |
 | `execution.mode` | `self`、subagent 或 host-specific execution mode | Codex 默认主 Agent 编排，必要时使用 Subagents |
 | `execution.worker_separation.mode` | `off` / `recommended` / `strict` | `recommended` 尽量分离 implement/test/audit；`strict` 不接受降级为 fully accepted |
+| `execution.worker_routing.mode` | `off` / `advisory` / `required` | topology 确定后传递语义能力档；默认 `advisory` |
+| `execution.worker_routing.failure_escalation_threshold` | 固定为 `2` | 两条不同执行路线失败后进入 `escalation`；同路线重试不累计 |
 | `execution.step_overrides.review_tests.strict` | 测试审查是否严格阻塞 | release/team 模式可设更严格 |
 | `execution.step_overrides.review_code.strict` | 代码审查是否严格阻塞 | 关键功能建议更严格 |
 | `acceptance.mode` | `auto`、`manual`、`timeout` 或 legacy `confirm` 控制交付接受方式 | 手动验收或团队流程用 `manual`/`confirm` |
@@ -46,6 +48,47 @@
 strict worker separation 要求 implementation Subagent 与 test/review/audit 角色隔离。implementation worker 不读取 test source、fixtures、snapshots 或 assertion details；它只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若宿主平台不能提供这种隔离，必须在执行前说明 degraded mode，获得 explicit user confirmation，并记录 role isolation degradation。
 
 acceptance hardening：`/hw:accept` 会阻塞缺失或身份碰撞的 implement/test/audit worker evidence、失败或 `close_failed` worker lifecycle、缺少 Codex `/hw:start` + `/hw:resume` 授权范围，以及把 runtime-only observation 当成 worker evidence 的验收。
+
+## Task Assessment 与 Worker Routing
+
+Worker topology 和 Worker Routing 是两步独立决策。topology 先决定是否需要 test、implement、audit 等独立身份；之后，宿主 AI 根据当前仓库证据为每个待启动 Worker 生成一份可见的 Task Assessment。Core 只验证这份结构化说明并按确定性规则输出语义路由档，不会再调用模型，也不会选择具体模型、运行方、凭据或推理强度。
+
+Task Assessment 在 Worker 启动前向用户显示，字段含义如下：
+
+| 字段 | 允许值 | 含义 |
+|---|---|---|
+| `complexity` | `low` / `medium` / `high` | 实现、协调和理解所需的总体难度 |
+| `uncertainty` | `low` / `medium` / `high` | 根因、方案或输入尚未确定的程度 |
+| `oracle_strength` | `strong` / `mixed` / `weak` | 是否有可靠测试、规范或客观指标判断结果正确 |
+| `blast_radius` | `low` / `medium` / `high` | 可能影响的模块、用户或 authority 范围 |
+| `reversibility` | `reversible` / `guarded` / `irreversible` | 回退是否直接、是否需要保护措施、或实质不可逆 |
+| `risk_flags` | 最多 16 个、每个最多 128 UTF-8 bytes 的安全标识 | security、migration、recovery conflict 等需要优先处理的语义风险 |
+| `summary` | 最多 1024 UTF-8 bytes | 面向用户的简短结论；不得包含 secret、prompt 或隐藏推理 |
+
+确定性优先级为 `escalation > critical > explore > standard > mechanical`：
+
+| 路由档 | 典型触发 |
+|---|---|
+| `mechanical` | `status`、`format`、`read-only-summary`、`deterministic-test-command`，或其他 trivial 且 reversible 的工作 |
+| `standard` | 普通实现、常规测试设计或文档工作 |
+| `explore` | 根因未知、候选路线比较、高不确定性或探索性实现 |
+| `critical` | architecture、weak oracle、independent audit、recovery conflict 或高 blast radius |
+| `escalation` | security、migration、不可逆任务，或两条不同执行路线已经失败 |
+
+`off` 不产生路由提示；`advisory` 在宿主不支持语义路由时允许继承当前执行上下文，并明确记录 fallback；`required` 在宿主不支持时阻止该 Worker 启动。路由档不会改变角色独立性、证据要求、acceptance 或用户授权。Resume 复用 Runtime/Continuation 中已持久化的 assessment、route、reason、失败计数和 policy version，不重新猜测。
+
+所有 routing identifier 都限制为 128 UTF-8 bytes。一次失败历史输入最多包含 256 个 attempt，持久化的 distinct failed route IDs 最多 64 个；超过边界时在写入 Runtime、Journal 或 Capsule 前 fail closed。
+
+```yaml
+execution:
+  worker_routing:
+    mode: advisory
+    policy_version: worker-routing-v1
+    failure_escalation_threshold: 2
+automation:
+  codex:
+    external_model_routing: false
+```
 
 ## Analysis preset 边界
 

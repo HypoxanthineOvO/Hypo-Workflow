@@ -1,0 +1,4 @@
+interface:
+  display_name: "Experiment"
+  short_description: "Manage reproducible experiments and instant status"
+  default_prompt: "Use $experiment to record, run, review, and summarize this project experiment."

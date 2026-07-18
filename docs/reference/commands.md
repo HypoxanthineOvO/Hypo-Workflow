@@ -1,6 +1,6 @@
 # 命令参考
 
-当前 Official Codex 公共发现面严格包含九个入口。Root Router 负责 namespace normalization 与 backend availability；每个入口只加载一个普通、非 symlink 的 Child Skill。
+v14.0.0-alpha.2 的 Official Codex 公共发现面与 Host Contract v1 严格包含十个入口。Root Router 负责 namespace normalization 与 backend availability；每个入口只加载一个普通、非 symlink 的 Child Skill。Codex plugin ZIP 和 portable ZIP 均包含同一组入口。
 
 | 命令 | Child Skill | 何时使用 |
 | --- | --- | --- |
@@ -10,6 +10,7 @@
 | `/hw:plan` | `skills/plan/SKILL.md` | 需要澄清、技术选择、架构、拆分或持久调研 |
 | `/hw:cycle` | `skills/cycle/SKILL.md` | 多个阶段存在真实先后依赖 |
 | `/hw:maintain` | `skills/maintain/SKILL.md` | 保存日常 requirement、preference、decision 或 feedback |
+| `/hw:experiment` | `skills/experiment/SKILL.md` | 持续维护实验环境、基线、扫描、重跑、结果审查和即时状态 |
 | `/hw:resume` | `skills/resume/SKILL.md` | 会话中断、压缩或重启后继续当前 Delivery |
 | `/hw:accept` | `skills/accept/SKILL.md` | 验证后的 Goal/Cycle 已进入 `pending_acceptance` |
 | `/hw:reject` | `skills/reject/SKILL.md` | 验收不通过，需要记录反馈并生成修订方案 |
@@ -22,4 +23,4 @@ Chat、Explain、Status、Report、Log、Check、Compact、Knowledge、Sync 和 
 
 Analysis、Audit、Quality、Docs、PR、Release、Explore、Optimize 延后到后续 Cycle。Setup、Rules、Stop、Skip、Reset、Showcase、Patch、Help、Watchdog、plan-confirm 已移除。
 
-显式调用内部、延后、移除或未知的旧命令时，只返回当前分类、零写原因和最接近的九命令入口。不得写入 `.pipeline/`、生成平台适配器或调用 legacy writer。
+显式调用内部、延后、移除或未知的旧命令时，只返回当前分类、零写原因和最接近的十命令入口。不得写入 `.pipeline/`、生成平台适配器或调用 legacy writer。

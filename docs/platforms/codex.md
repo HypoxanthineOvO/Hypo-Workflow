@@ -1,6 +1,6 @@
 # Official Codex 指南
 
-Hypo-Workflow 当前以 Codex plugin + 九个 focused Skills + 十事件 Hooks 运行。它不是 runner；Codex Agent 执行实现、测试和审查，Core 负责验证与持久化。
+Hypo-Workflow v14.0.0-alpha.2 以 Codex plugin + 十个 focused Skills + 十事件 Hooks 发布。它不是 runner；Codex Agent 执行实现、实验、测试和审查，Core 负责验证与持久化。Host Contract v1 与两个 ZIP 均包含 `/hw:experiment`。
 
 ## 安装形态
 
@@ -26,15 +26,24 @@ ln -sfn /absolute/path/to/Hypo-Workflow "$CODEX_HOME/skills/hypo-workflow"
 
 | Surface | 当前契约 |
 | --- | --- |
-| Commands | 九个公开 Skills：guide、init、goal、plan、cycle、maintain、resume、accept、reject |
+| Commands | 十个公开 Skills：guide、init、goal、plan、cycle、maintain、experiment、resume、accept、reject |
 | Questions | 使用当前 host 的 Ask / request-user-input 能力；开卡片前先展示完整上下文 |
 | Plan | 使用 host 可见 Plan/Todo，并由 `/hw:plan` 内部选择规划阶段 |
 | Subagents | 按复杂度选择；重要实现可分离 test、implement、audit 或其他领域角色 |
 | Memory | Manifest、Runtime、Continuation、Records、Receipts、Journal、Capsule、Pack、Snapshots |
+| Experiment | 项目知识、代码/`uv`/机器上下文、扫描、Attempt、科学审查、Git events 与即时状态 |
 | Hooks | 十类当前 Official Codex lifecycle events |
 | Destruction | exact Deletion Manifest + fresh Receipt + controlled executor |
 
 OpenCode、Claude Code、Cursor、Copilot、Trae 与自定义 Codex fork 适配不属于当前支持面。
+
+## Task Assessment 与 Worker Routing
+
+Codex 先用 topology 决定是否需要独立的 test、implement、audit 或其他 Worker 身份，再为每个待启动 Worker 生成并展示 Task Assessment。Assessment 明确说明 `complexity`、`uncertainty`、`oracle_strength`、`blast_radius`、`reversibility`、`risk_flags` 和简短结论；Core 只做 exact、bounded、secret-safe 验证，并确定性输出 `mechanical`、`standard`、`explore`、`critical` 或 `escalation`。
+
+该语义 handoff 不包含具体模型、运行方、凭据、prompt 或 reasoning effort。`SubagentStart` 只把已持久化的 routing class、reason codes、policy version 和可见 assessment 写入 Worker Journal context。`advisory` 在宿主不支持该 handoff 时明确记录 fallback 并继承当前执行上下文；`required` 阻止 Worker 启动；`off` 不传提示。
+
+路由不会替代 topology，也不会放宽角色隔离、evidence、acceptance 或用户授权。Resume 必须复用 Runtime/Continuation 中的决定；需要不同语义档的新 Worker 使用 no-history 或 bounded-history fork，full-history fork 只继承父执行上下文。完整字段与分类表见 [配置治理参考](../reference/configuration.md)。
 
 ## Hook 事件
 
@@ -54,6 +63,8 @@ Plugin 默认发现 `hooks/hooks.json`：
 | `Stop` | 记录 turn boundary 与恢复线索 |
 
 Hook 命令通过 `PLUGIN_ROOT` 定位安装包，timeout 单位为秒。Hook wrapper 的 stdout 只输出一行合法 JSON，诊断写 stderr。
+
+Turn 级 Hook 输入允许宿主省略 `turn_id` 或 `tool_use_id`；缺省字段不会再导致兼容性错误。该兼容行为不改变 Hook 的信任、启用或 authority 边界。
 
 ## 边界
 

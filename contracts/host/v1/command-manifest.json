@@ -13,6 +13,7 @@
     { "name": "hw:plan", "slash": "/hw:plan", "skill": "hypo-workflow:plan", "path": "skills/plan/SKILL.md" },
     { "name": "hw:cycle", "slash": "/hw:cycle", "skill": "hypo-workflow:cycle", "path": "skills/cycle/SKILL.md" },
     { "name": "hw:maintain", "slash": "/hw:maintain", "skill": "hypo-workflow:maintain", "path": "skills/maintain/SKILL.md" },
+    { "name": "hw:experiment", "slash": "/hw:experiment", "skill": "hypo-workflow:experiment", "path": "skills/experiment/SKILL.md" },
     { "name": "hw:resume", "slash": "/hw:resume", "skill": "hypo-workflow:resume", "path": "skills/resume/SKILL.md" },
     { "name": "hw:accept", "slash": "/hw:accept", "skill": "hypo-workflow:accept", "path": "skills/accept/SKILL.md" },
     { "name": "hw:reject", "slash": "/hw:reject", "skill": "hypo-workflow:reject", "path": "skills/reject/SKILL.md" }

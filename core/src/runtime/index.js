@@ -18,6 +18,7 @@ import {
   readCurrentManifest,
   storedObjectRef,
 } from "./internal.js";
+import { validateWorkerRoutingDecision } from "../worker-routing/index.js";
 
 const ACTIVE_KINDS = Object.freeze(["delivery", "activity", "bootstrap_job"]);
 const CONTINUATION_OWNERSHIP_FIELDS = new Set([
@@ -72,6 +73,12 @@ export function compileActivePointerDocument(pointerInput) {
 
 export async function writeRuntimeObject(root, input, options = {}) {
   const compiled = compileRuntimeObjectDocuments(input);
+  if (compiled.object_ref.kind === "experiment") {
+    throw authorityError(
+      "ERR_RUNTIME_EXPERIMENT_WRITE_FORBIDDEN",
+      "Generic Runtime writes cannot mutate Experiment authority; use the Experiment Store",
+    );
+  }
   const transaction = normalizeTransactionOptions(options, "runtime-write", {
     object_ref: compiled.object_ref,
     runtime: compiled.runtime,
@@ -170,7 +177,10 @@ function normalizeObjectDocument(value, field, expectedRef, options) {
       `${field} contains Receipt-owned fields: ${receiptFields.join(", ")}`,
     );
   }
-  const normalized = normalizeCanonicalValue(value, field);
+  const normalizedInput = value.worker_routing === undefined
+    ? value
+    : { ...value, worker_routing: validateWorkerRoutingDecision(value.worker_routing) };
+  const normalized = normalizeCanonicalValue(normalizedInput, field);
   if (options.continuation) normalized.next_action = value.next_action.trim();
   else normalized.status = value.status.trim();
   return {

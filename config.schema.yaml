@@ -439,6 +439,29 @@ $defs:
       - off
       - recommended
       - strict
+  worker_routing_policy:
+    type: object
+    additionalProperties: false
+    properties:
+      mode:
+        type: string
+        enum:
+          - off
+          - advisory
+          - required
+        default: advisory
+      policy_version:
+        type: string
+        const: worker-routing-v1
+        default: worker-routing-v1
+      failure_escalation_threshold:
+        type: integer
+        const: 2
+        default: 2
+    default:
+      mode: advisory
+      policy_version: worker-routing-v1
+      failure_escalation_threshold: 2
   worker_separation_role:
     type: object
     additionalProperties: false
@@ -1738,6 +1761,12 @@ properties:
           profiles: []
       worker_separation:
         $ref: "#/$defs/worker_separation_policy"
+      worker_routing:
+        $ref: "#/$defs/worker_routing_policy"
+        default:
+          mode: advisory
+          policy_version: worker-routing-v1
+          failure_escalation_threshold: 2
       step_overrides:
         type: object
         default: {}
@@ -1818,6 +1847,10 @@ properties:
         evidence:
           log_roles: true
           report_roles: true
+      worker_routing:
+        mode: advisory
+        policy_version: worker-routing-v1
+        failure_escalation_threshold: 2
       steps:
         preset: tdd
   output:

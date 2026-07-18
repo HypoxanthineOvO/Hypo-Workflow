@@ -30,6 +30,7 @@ const PUBLIC_ROUTES = new Map([
   ["/hw:goal", "skills/goal/SKILL.md"],
   ["/hw:plan", "skills/plan/SKILL.md"],
   ["/hw:cycle", "skills/cycle/SKILL.md"],
+  ["/hw:experiment", "skills/experiment/SKILL.md"],
   ["/hw:maintain", "skills/maintain/SKILL.md"],
   ["/hw:resume", "skills/resume/SKILL.md"],
   ["/hw:accept", "skills/accept/SKILL.md"],
@@ -80,7 +81,7 @@ const REMOVED_ROUTES = Object.freeze([
 ]);
 const PUBLIC_SKILL_FILES = [...PUBLIC_ROUTES.values()].sort();
 
-test("Codex Plugin filesystem discovery and Registry projection expose exactly the same nine routes", async () => {
+test("Codex Plugin filesystem discovery and Registry projection expose exactly the same ten routes", async () => {
   const discoveredSkills = await discoverPluginSkills(REPOSITORY_ROOT);
   const physicalPaths = discoveredSkills.map((entry) => entry.path).sort();
   assert.deepEqual(
@@ -304,11 +305,11 @@ test("Root Skill, Plugin metadata, and current Codex docs describe the replaceme
   }
 
   for (const path of ["README.md", "README.en.md", "docs/reference/commands.md", "docs/en/reference/commands.md"]) {
-    await t.test(`${path} advertises exactly nine routes`, () => {
+    await t.test(`${path} advertises exactly ten routes`, () => {
       assert.deepEqual(
         [...extractAdvertisedRoutes(docs.get(path))].sort(),
         [...PUBLIC_ROUTES.keys()].sort(),
-        `${path} must advertise the same nine routes as the Plugin and Registry`,
+        `${path} must advertise the same ten routes as the Plugin and Registry`,
       );
     });
   }

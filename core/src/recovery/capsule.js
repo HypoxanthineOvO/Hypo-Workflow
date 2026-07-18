@@ -5,6 +5,7 @@ import { readRecord } from "../records/index.js";
 import { normalizePersistedRecord, recordScopeDirectory } from "../records/schema.js";
 import { readRuntimeObject } from "../runtime/index.js";
 import { canonicalHash, parseYaml, stringifyYaml } from "../serialization/index.js";
+import { validateWorkerRoutingDecision } from "../worker-routing/index.js";
 import { assertWorkspacePathAllowed, commitWorkspaceTransaction } from "../workspace-store/index.js";
 import {
   assertExactKeys,
@@ -345,6 +346,9 @@ function reduceContext(events, continuation, previousContext = null) {
   let scope = previous?.scope ?? [];
   let nonGoals = previous?.non_goals ?? [];
   let recentVerification = previous?.recent_verification ?? null;
+  const workerRouting = continuation.worker_routing === undefined
+    ? previous?.worker_routing
+    : normalizeRoutingProjection(continuation.worker_routing, "Continuation worker_routing");
   const workers = new Map((previous?.workers ?? []).map((worker) => [`${worker.writer.kind}:${worker.writer.id}`, worker]));
   const eventSummaries = [...(previous?.recent_events ?? [])];
   for (const event of events) {
@@ -366,11 +370,17 @@ function reduceContext(events, continuation, previousContext = null) {
     }
     if (event.type === "worker.started" || event.type === "worker.stopped") {
       const writer = normalizeWorkerProjection(payload.writer ?? payload.worker ?? event.writer);
-      workers.set(`${writer.kind}:${writer.id}`, {
+      const workerKey = `${writer.kind}:${writer.id}`;
+      const priorWorker = workers.get(workerKey);
+      const routing = payload.worker_routing === undefined
+        ? priorWorker?.worker_routing
+        : normalizeRoutingProjection(payload.worker_routing, "Recovery worker event worker_routing");
+      workers.set(workerKey, {
         writer,
         role: normalizeProjectionText(payload.role ?? "worker", "worker role"),
         status: event.type === "worker.started" ? "started" : "stopped",
         evidence_refs: normalizeProjectionRefs(payload.evidence_refs),
+        ...(routing === undefined ? {} : { worker_routing: routing }),
       });
     }
   }
@@ -379,6 +389,7 @@ function reduceContext(events, continuation, previousContext = null) {
     scope,
     non_goals: nonGoals,
     next_action: continuation.next_action,
+    ...(workerRouting === undefined ? {} : { worker_routing: workerRouting }),
     recent_verification: recentVerification,
     workers: [...workers.values()].sort((left, right) => `${left.writer.kind}:${left.writer.id}`.localeCompare(`${right.writer.kind}:${right.writer.id}`)),
     recent_events: eventSummaries.slice(-80),
@@ -392,6 +403,7 @@ function normalizeCapsuleContext(value) {
     "scope",
     "non_goals",
     "next_action",
+    "worker_routing",
     "recent_verification",
     "workers",
     "recent_events",
@@ -406,6 +418,11 @@ function normalizeCapsuleContext(value) {
     scope: normalizeContextList(value.scope, "Context Capsule.context.scope"),
     non_goals: normalizeContextList(value.non_goals, "Context Capsule.context.non_goals"),
     next_action: nextAction,
+    ...(value.worker_routing === undefined ? {} : {
+      worker_routing: value.worker_routing === null
+        ? null
+        : normalizeRoutingProjection(value.worker_routing, "Context Capsule.context.worker_routing"),
+    }),
     recent_verification: normalizeVerificationProjection(value.recent_verification),
     workers: normalizeWorkerProjections(value.workers),
     recent_events: normalizeEventSummaries(value.recent_events, "Context Capsule.context.recent_events"),
@@ -455,7 +472,7 @@ function normalizeWorkerProjections(value) {
   const workers = value.map((entry, index) => {
     const field = `Context Capsule.context.workers[${index}]`;
     assertPlainObject(entry, field);
-    assertExactKeys(entry, ["writer", "role", "status", "evidence_refs"], field);
+    assertExactKeys(entry, ["writer", "role", "status", "evidence_refs", "worker_routing"], field);
     const writer = normalizeWorkerProjection(entry.writer);
     const key = `${writer.kind}:${writer.id}`;
     if (seen.has(key)) throw authorityError("ERR_RECOVERY_CAPSULE_INVALID", "Context Capsule workers must be consolidated by writer");
@@ -468,9 +485,20 @@ function normalizeWorkerProjections(value) {
       role: normalizeProjectionText(entry.role, `${field}.role`),
       status: entry.status,
       evidence_refs: normalizeProjectionRefs(entry.evidence_refs),
+      ...(entry.worker_routing === undefined ? {} : {
+        worker_routing: normalizeRoutingProjection(entry.worker_routing, `${field}.worker_routing`),
+      }),
     };
   });
   return workers.sort((left, right) => `${left.writer.kind}:${left.writer.id}`.localeCompare(`${right.writer.kind}:${right.writer.id}`));
+}
+
+function normalizeRoutingProjection(value, field) {
+  try {
+    return validateWorkerRoutingDecision(value);
+  } catch {
+    throw authorityError("ERR_RECOVERY_CAPSULE_INVALID", `${field} is invalid`);
+  }
 }
 
 function normalizeEventSummary(value, field) {

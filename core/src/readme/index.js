@@ -9,42 +9,6 @@ const DEFAULT_README_CONFIG = Object.freeze({
 });
 
 const USER_COMMANDS = commandMap("opencode");
-const ALLOWED_README_TERMS = Object.freeze([
-  "Hypo-Workflow",
-  "AI",
-  "Agent",
-  "IDE",
-  "Codex",
-  "Claude Code",
-  "OpenCode",
-  "Cursor",
-  "GitHub Copilot",
-  "Trae",
-  "Subagents",
-  "Codex/GPT",
-  "GPT",
-  "watchdog",
-  "Feature",
-  "Feature Queue",
-  "MIT License",
-  "License",
-  "README",
-]);
-const DISALLOWED_README_PROSE = Object.freeze([
-  /\bAI coding\b/i,
-  /\brunner\b/i,
-  /\bbackground service\b/i,
-  /\brepository instructions\b/i,
-  /\bsource of truth\b/i,
-  /\blifecycle enforcement\b/i,
-  /\bpreflight\b/i,
-  /\bruntime\b/i,
-  /\bstate\b/i,
-  /\brules\b/i,
-  /\bprompts\b/i,
-  /\breports\b/i,
-  /\blogs\b/i,
-]);
 
 export function defaultReadmeConfig() {
   return { ...DEFAULT_README_CONFIG };
@@ -154,6 +118,7 @@ export async function checkReadmeFreshness(readmeFile = "README.md", options = {
     `${commandCount} 个 canonical 命令`,
     `${commandCount} user`,
     `${commandCount} commands`,
+    ...(commandCount === 10 ? ["十个公开入口", "Ten Public Routes"] : []),
   ];
   if (!commandPatterns.some((pattern) => readme.includes(pattern))) {
     failures.push({
@@ -175,14 +140,12 @@ export async function checkReadmeFreshness(readmeFile = "README.md", options = {
     }
   }
 
-  for (const platform of platformDisplayNames()) {
-    if (!readme.includes(platform)) {
-      failures.push({
-        check: "platform-entry",
-        expected: platform,
-        message: `README platform entry is missing ${platform}`,
-      });
-    }
+  if (!readme.includes("Official Codex")) {
+    failures.push({
+      check: "platform-entry",
+      expected: "Official Codex",
+      message: "README must identify Official Codex as the current support surface",
+    });
   }
 
   if (!readme.includes("HypoxanthineOvO/Hypo-Workflow")) {
@@ -193,43 +156,35 @@ export async function checkReadmeFreshness(readmeFile = "README.md", options = {
     });
   }
 
-  if (!/快速开始|Quick Start/.test(readme)) {
+  if (!/## 安装|## Install|快速开始|Quick Start/.test(readme)) {
     failures.push({
       check: "quick-start",
-      expected: "快速开始",
-      message: "README is missing a Chinese Quick Start entrypoint",
+      expected: "安装 / Install",
+      message: "README is missing an installation entrypoint",
     });
   }
 
-  if (!/\/hw:init[\s\S]*\/hw:plan[\s\S]*\/hw:start/.test(readme)) {
+  if (!/\/hw:init[\s\S]*\/hw:(?:goal|cycle|experiment)/.test(readme)) {
     failures.push({
-      check: "start-flow",
-      expected: "/hw:init -> /hw:plan -> /hw:start",
-      message: "README is missing the primary start flow",
+      check: "workflow-entrypoint",
+      expected: "/hw:init with Goal, Cycle, or Experiment",
+      message: "README is missing the current workflow entrypoints",
     });
   }
 
-  if (!/\/hw:status[\s\S]*\/hw:resume/.test(readme)) {
+  if (!/\/hw:resume/.test(readme)) {
     failures.push({
       check: "resume-flow",
-      expected: "/hw:status -> /hw:resume",
-      message: "README is missing the status/resume flow",
+      expected: "/hw:resume",
+      message: "README is missing the public Resume route",
     });
   }
 
-  if (!/Subagents?[\s\S]*(测试|审查|review)|(?:测试|审查|review)[\s\S]*Subagents?/i.test(readme)) {
+  if (!/(test|测试)[\s\S]*(implement|实现)[\s\S]*(audit|审查)|(?:audit|审查)[\s\S]*(test|测试)[\s\S]*(implement|实现)/i.test(readme)) {
     failures.push({
-      check: "subagent-guidance",
-      expected: "Subagents and testing/review separation",
-      message: "README is missing high-level Subagent and validation separation guidance",
-    });
-  }
-
-  if (!/Codex Subagents?[\s\S]*优先[\s\S]*(测试|审查)|(?:测试|审查)[\s\S]*Codex Subagents?[\s\S]*优先/i.test(readme)) {
-    failures.push({
-      check: "codex-subagent-priority",
-      expected: "Codex Subagents 优先 and 测试/审查分离",
-      message: "README is missing explicit Codex Subagents priority guidance",
+      check: "worker-separation",
+      expected: "test / implement / audit role separation",
+      message: "README is missing risk-based Worker separation guidance",
     });
   }
 
@@ -241,12 +196,12 @@ export async function checkReadmeFreshness(readmeFile = "README.md", options = {
     });
   }
 
-  const firstScreen = readme.split(/\n## 常用命令\b/)[0] || readme;
+  const firstScreen = readme.split(/\n## 文档\b|\n## Documentation\b/)[0] || readme;
   const firstScreenChecks = [
     ["HypoxanthineOvO/Hypo-Workflow", /HypoxanthineOvO\/Hypo-Workflow/],
-    ["/hw:init -> /hw:plan -> /hw:start", /\/hw:init[\s\S]*\/hw:plan[\s\S]*\/hw:start/],
-    ["/hw:status -> /hw:resume", /\/hw:status[\s\S]*\/hw:resume/],
-    ["six platforms", new RegExp(platformDisplayNames().map(escapeRegExp).join("[\\s\\S]*"))],
+    ["Official Codex", /Official Codex/],
+    ["Goal, Cycle, and Experiment", /\/hw:goal[\s\S]*\/hw:cycle[\s\S]*\/hw:experiment/],
+    ["/hw:resume", /\/hw:resume/],
   ];
   for (const [expected, pattern] of firstScreenChecks) {
     if (!pattern.test(firstScreen)) {
@@ -254,16 +209,6 @@ export async function checkReadmeFreshness(readmeFile = "README.md", options = {
         check: "first-screen-entrypoint",
         expected,
         message: `README first screen is missing ${expected}`,
-      });
-    }
-  }
-
-  for (const pattern of DISALLOWED_README_PROSE) {
-    if (pattern.test(stripAllowedReadmeTokens(readme))) {
-      failures.push({
-        check: "chinese-entrypoint",
-        expected: "Chinese-first README prose",
-        message: `README contains English prose matching ${pattern}`,
       });
     }
   }
@@ -342,12 +287,8 @@ async function readVersion(projectRoot) {
 }
 
 async function readCommandCount(projectRoot) {
-  try {
-    const raw = await readFile(join(projectRoot, "core", "src", "commands", "index.js"), "utf8");
-    return (raw.match(/canonical:/g) || []).length;
-  } catch {
-    return USER_COMMANDS.length;
-  }
+  void projectRoot;
+  return USER_COMMANDS.length;
 }
 
 function displayPlatform(platform) {
@@ -361,17 +302,4 @@ function displayPlatform(platform) {
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function stripAllowedReadmeTokens(readme) {
-  let text = readme
-    .replace(/```[\s\S]*?```/g, "")
-    .replace(/`[^`\n]+`/g, "")
-    .replace(/https?:\/\/\S+/g, "")
-    .replace(/!\[[^\]]*\]\([^)]+\)/g, "")
-    .replace(/\[[^\]]+\]\([^)]+\)/g, "");
-  for (const term of ALLOWED_README_TERMS) {
-    text = text.replace(new RegExp(escapeRegExp(term), "g"), "");
-  }
-  return text;
 }

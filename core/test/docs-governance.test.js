@@ -4,21 +4,31 @@ import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
+  commandByCanonical,
+  commandMap,
+} from "../src/index.js";
+import {
   checkDocs,
   checkDocsLanguage,
   checkNarrativeDocsForRelease,
-  commandByCanonical,
-  commandMap,
   docsMap,
   repairDocs,
-} from "../src/index.js";
+} from "../src/docs/index.js";
 
-test("docs command is exposed and mapped to OpenCode", async () => {
-  assert.ok(commandMap("opencode").length >= 35, `commands=${commandMap("opencode").length} should be >= 35`);
-  assert.equal(commandByCanonical("/hw:docs").opencode, "/hw:docs");
-  assert.equal(commandByCanonical("/hw:docs").agent, "hw-docs");
-  assert.equal(commandByCanonical("/hw:docs").skill, "skills/docs/SKILL.md");
-  assert.match(await readFile("skills/docs/SKILL.md", "utf8"), /generate|check|repair|sync/i);
+test("public command surface is exactly ten routes and Docs remains deferred", () => {
+  assert.deepEqual(commandMap("codex").map(({ canonical }) => canonical), [
+    "/hw:guide",
+    "/hw:init",
+    "/hw:goal",
+    "/hw:plan",
+    "/hw:cycle",
+    "/hw:maintain",
+    "/hw:experiment",
+    "/hw:resume",
+    "/hw:accept",
+    "/hw:reject",
+  ]);
+  assert.equal(commandByCanonical("/hw:docs"), undefined);
 });
 
 test("docs map defines ownership, generated references, and narrative policy", () => {
@@ -30,8 +40,8 @@ test("docs map defines ownership, generated references, and narrative policy", (
   const userGuide = map.documents.find((doc) => doc.path === "docs/user-guide.md");
   const englishUserGuide = map.documents.find((doc) => doc.path === "docs/en/user-guide.md");
   const configuration = map.documents.find((doc) => doc.path === "docs/reference/configuration.md");
-  const releaseNote = map.documents.find((doc) => doc.path === "docs/release/v14.0.0-alpha.1.md");
-  const englishReleaseNote = map.documents.find((doc) => doc.path === "docs/en/release/v14.0.0-alpha.1.md");
+  const releaseNote = map.documents.find((doc) => doc.path === "docs/release/v14.0.0-alpha.2.md");
+  const englishReleaseNote = map.documents.find((doc) => doc.path === "docs/en/release/v14.0.0-alpha.2.md");
 
   assert.equal(readme.role, "concise_user_entrypoint");
   assert.equal(readme.narrative_update_policy, "explicit_repair");
@@ -67,7 +77,7 @@ test("docs check rejects README internals, stale commands, and missing license l
   assert.ok(result.failures.some((failure) => failure.check === "license-link"));
 });
 
-test("docs repair writes docs IA and generated references without silently rewriting narrative docs", async () => {
+test("docs repair returns a zero-write preview without rewriting narrative docs", async () => {
   const root = await fixtureRoot();
   await writeFile(join(root, "README.md"), [
     "# Manual README",
@@ -77,61 +87,28 @@ test("docs repair writes docs IA and generated references without silently rewri
     "<!-- HW:README:END command-count -->",
   ].join("\n"), "utf8");
 
-  const result = await repairDocs(root, { write: true });
+  const before = await readFile(join(root, "README.md"), "utf8");
+  const result = await repairDocs(root, { write: false });
 
-  assert.ok(result.generated.includes("README.en.md"));
-  assert.ok(result.generated.includes("docs/reference/commands.md"));
-  assert.ok(result.generated.includes("docs/en/reference/commands.md"));
-  assert.ok(result.generated.includes("docs/reference/configuration.md"));
-  assert.ok(result.generated.includes("docs/en/reference/configuration.md"));
-  assert.ok(result.generated.includes("docs/user-guide.md"));
-  assert.ok(result.generated.includes("docs/en/user-guide.md"));
-  assert.ok(result.generated.includes("docs/platforms/opencode.md"));
-  assert.ok(result.generated.includes("docs/en/platforms/opencode.md"));
+  assert.equal(result.status, "preview");
+  assert.equal(result.write, false);
+  assert.deepEqual(result.generated, []);
+  for (const path of [
+    "README.en.md",
+    "docs/reference/commands.md",
+    "docs/en/reference/commands.md",
+    "docs/reference/configuration.md",
+    "docs/en/reference/configuration.md",
+    "docs/user-guide.md",
+    "docs/en/user-guide.md",
+    "docs/platforms/opencode.md",
+    "docs/en/platforms/opencode.md",
+  ]) {
+    assert.ok(result.planned_files.includes(path), `preview missing ${path}`);
+  }
   assert.ok(result.managed_blocks.includes("command-count"));
-  assert.match(await readFile(join(root, "README.md"), "utf8"), /Manual README/);
-  assert.match(await readFile(join(root, "README.md"), "utf8"), new RegExp(`${commandMap("opencode").length} 个用户指令`));
-  assert.match(await readFile(join(root, "README.en.md"), "utf8"), /docs\/en\/user-guide\.md/);
-  assert.match(await readFile(join(root, "README.en.md"), "utf8"), /docs\/en\/platforms\/opencode\.md/);
-  assert.match(await readFile(join(root, "docs/en/user-guide.md"), "utf8"), /\/hw:pr create/);
-  assert.doesNotMatch(await readFile(join(root, "README.en.md"), "utf8"), /docs\/user-guide\.md/);
-  assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:docs/);
-  assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:pr/);
-  assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:pr create/);
-  assert.match(await readFile(join(root, "docs/reference/commands.md"), "utf8"), /\/hw:explain/);
-  const commandsReference = await readFile(join(root, "docs/reference/commands.md"), "utf8");
-  const englishCommandsReference = await readFile(join(root, "docs/en/reference/commands.md"), "utf8");
-  assert.match(commandsReference, /\/hw:plan:technical-stack/);
-  assert.match(commandsReference, /\/hw:plan:architecture/);
-  assert.doesNotMatch(commandsReference, /\/hw:plan:confirm/);
-  assert.match(englishCommandsReference, /\/hw:plan:technical-stack/);
-  assert.match(englishCommandsReference, /\/hw:plan:architecture/);
-  assert.doesNotMatch(englishCommandsReference, /\/hw:plan:confirm/);
-  const userGuide = await readFile(join(root, "docs/user-guide.md"), "utf8");
-  const englishUserGuide = await readFile(join(root, "docs/en/user-guide.md"), "utf8");
-  const opencodeGuide = await readFile(join(root, "docs/platforms/opencode.md"), "utf8");
-  const englishOpencodeGuide = await readFile(join(root, "docs/en/platforms/opencode.md"), "utf8");
-  const generatedArtifacts = await readFile(join(root, "docs/reference/generated-artifacts.md"), "utf8");
-  const englishGeneratedArtifacts = await readFile(join(root, "docs/en/reference/generated-artifacts.md"), "utf8");
-  const englishConfiguration = await readFile(join(root, "docs/en/reference/configuration.md"), "utf8");
-
-  assert.match(userGuide, /\/hw:explain --subagent/);
-  assert.match(userGuide, /P0 Configure/);
-  assert.match(userGuide, /\/hw:pr create/);
-  assert.match(userGuide, /\/hw:accept[\s\S]*worker evidence/);
-  assert.match(userGuide, /close_failed/);
-  assert.match(userGuide, /dirty_only/);
-  assert.match(englishUserGuide, /\/hw:accept[\s\S]*worker evidence/);
-  assert.match(englishUserGuide, /close_failed/);
-  assert.match(englishUserGuide, /dirty_only/);
-  assert.match(opencodeGuide, /runtime-only[\s\S]*worker evidence/);
-  assert.match(englishOpencodeGuide, /runtime-only[\s\S]*worker evidence/);
-  assert.match(generatedArtifacts, /dirty_only/);
-  assert.match(englishGeneratedArtifacts, /dirty_only/);
-  assert.match(await readFile(join(root, "docs/reference/configuration.md"), "utf8"), /automation\.gates\.destructive_external/);
-  assert.match(await readFile(join(root, "docs/reference/configuration.md"), "utf8"), /strict worker separation/);
-  assert.match(englishConfiguration, /Acceptance hardening/);
-  assert.match(englishConfiguration, /runtime-only observations/);
+  assert.equal(result.narrative_rewritten, false);
+  assert.equal(await readFile(join(root, "README.md"), "utf8"), before);
 });
 
 test("configuration governance reference covers automation, strictness, and hard gates", async () => {
@@ -170,18 +147,18 @@ test("human-facing docs and key references stay Chinese-body", async () => {
   assert.ok(result.checked.some((item) => item.path === "references/commands-spec.md"));
 });
 
-test("v14.0.0-alpha.1 release coverage is Chinese-first and linked from entrypoints", async () => {
-  const chineseRelease = await readFile("docs/release/v14.0.0-alpha.1.md", "utf8");
-  const englishRelease = await readFile("docs/en/release/v14.0.0-alpha.1.md", "utf8");
+test("v14.0.0-alpha.2 release coverage is Chinese-first and linked from entrypoints", async () => {
+  const chineseRelease = await readFile("docs/release/v14.0.0-alpha.2.md", "utf8");
+  const englishRelease = await readFile("docs/en/release/v14.0.0-alpha.2.md", "utf8");
   const readme = await readFile("README.md", "utf8");
   const englishReadme = await readFile("README.en.md", "utf8");
 
-  for (const item of ["Host Contract", "Receipt", "Codex", "OpenCode", "486/486", "7/7"]) {
+  for (const item of ["Experiment", "Worker Routing", "Hook", "Host Contract", "Codex", "638/638", "P0=0"]) {
     assert.match(chineseRelease, new RegExp(escapeRegExp(item)), `Chinese release note missing ${item}`);
     assert.match(englishRelease, new RegExp(escapeRegExp(item)), `mirror release note missing ${item}`);
   }
-  assert.match(chineseRelease, /修复[\s\S]*测试/);
-  assert.match(englishRelease, /Fixes[\s\S]*Tests/);
+  assert.match(chineseRelease, /修复[\s\S]*验证/);
+  assert.match(englishRelease, /Fix[\s\S]*Validation/);
   assert.match(readme, /docs\/release\/v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?\.md/);
   assert.match(englishReadme, /docs\/en\/release\/v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?\.md/);
 });

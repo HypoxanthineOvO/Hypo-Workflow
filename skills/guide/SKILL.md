@@ -1,6 +1,6 @@
 ---
 name: guide
-description: Inspect the repository and recommend one available Hypo-Workflow path. Use for /hw:guide or when the user is unsure whether to initialize, use Goal, use Cycle, maintain, resume, accept, or reject.
+description: Inspect the repository and recommend one available Hypo-Workflow path. Use for /hw:guide or when the user is unsure whether to initialize, use Goal, use Cycle, manage experiments, maintain, resume, accept, or reject.
 ---
 
 # Guide
@@ -17,6 +17,7 @@ Guide is a read-only intent router. Detect workspace class, inspect the active D
 - Active unfinished Delivery: recommend `/hw:resume`.
 - Pending final acceptance: recommend `/hw:accept` or `/hw:reject` according to user intent.
 - Focused day-to-day project fact: recommend `/hw:maintain`.
+- Non-linear experiment setup, reruns, scans, supervision, result review, or instant project experiment status: recommend `/hw:experiment`.
 - Explicit request for design before choosing Goal/Cycle: recommend `/hw:plan`.
 
 Recommend one next path and explain what it will do. Do not advertise internal, deferred, removed, or missing-backend commands.

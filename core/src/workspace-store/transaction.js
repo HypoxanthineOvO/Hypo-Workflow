@@ -207,7 +207,11 @@ async function includeFailClosedHostProjection(root, writes, manifest, transacti
     },
   };
   return normalizeWrites([
-    ...writes.map((entry) => ({ path: entry.path, content: entry.content })),
+    ...writes.map((entry) => ({
+      path: entry.path,
+      content: entry.content,
+      ...(entry.expectedHash === undefined ? {} : { expected_hash: entry.expectedHash }),
+    })),
     { path: HOST_STATUS_PATH, content: `${JSON.stringify(projection, null, 2)}\n` },
   ]);
 }
@@ -350,6 +354,10 @@ async function prepareTransaction({ id, txDir, writes, manifest, manifestPath })
     const staged = `staged/${suffix}`;
     const backup = `backups/${suffix}`;
     const old = await readExistingFile(write.absolutePath);
+    const oldHash = old === null ? null : fileHash(old);
+    if (write.expectedHash !== undefined && write.expectedHash !== oldHash) {
+      throw transactionConflict(id, `target precondition drift at ${write.path}`);
+    }
     await writeFile(join(txDir, staged), write.content);
     if (old) await writeFile(join(txDir, backup), old);
     entries.push({
@@ -358,7 +366,7 @@ async function prepareTransaction({ id, txDir, writes, manifest, manifestPath })
       staged,
       staged_hash: fileHash(write.content),
       old_exists: old !== null,
-      old_hash: old === null ? null : fileHash(old),
+      old_hash: oldHash,
       backup: old === null ? null : backup,
     });
   }
@@ -519,10 +527,18 @@ function normalizeWrites(writes) {
     return {
       path,
       content: Buffer.isBuffer(entry.content) ? Buffer.from(entry.content) : Buffer.from(entry.content, "utf8"),
+      ...(entry.expected_hash === undefined ? {} : {
+        expectedHash: normalizeExpectedHash(entry.expected_hash, path),
+      }),
     };
   });
   assertPrefixFreeWriteSet(normalized.map((entry) => entry.path));
   return normalized;
+}
+
+function normalizeExpectedHash(value, path) {
+  if (value === null || (typeof value === "string" && /^[a-f0-9]{64}$/.test(value))) return value;
+  throw new TypeError(`workspace transaction expected_hash must be null or a lowercase SHA-256 digest: ${path}`);
 }
 
 function assertPrefixFreeWriteSet(paths) {

@@ -1,7 +1,7 @@
 {
   "name": "hypo-workflow",
-  "version": "14.0.0-alpha.1",
-  "description": "Manifest-based Goal and Cycle delivery, durable project memory, restart-safe recovery, and Receipt-controlled actions for Codex.",
+  "version": "14.0.0-alpha.2",
+  "description": "Manifest-based Goal, Cycle, and Experiment workflows with durable project memory, semantic Worker Routing, restart-safe recovery, and Receipt-controlled actions for Codex.",
   "author": {
     "name": "Hypoxanthine",
     "url": "https://github.com/HypoxanthineOvO"
@@ -21,20 +21,23 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Hypo-Workflow",
-    "shortDescription": "Durable Goal and Cycle delivery with project memory and recovery.",
-    "longDescription": "Hypo-Workflow gives Codex a manifest-based project workspace with bounded Goal and Cycle delivery, ambient Maintain records, restart-safe recovery, explicit human acceptance, and Receipt-backed control for destructive operations.",
+    "shortDescription": "Durable Goal, Cycle, and Experiment workflows for Codex.",
+    "longDescription": "Hypo-Workflow gives Codex a manifest-based project workspace with bounded Goal and Cycle delivery, nonlinear Experiment management, ambient Maintain records, semantic Worker Routing, restart-safe recovery, explicit human acceptance, and Receipt-backed control for destructive operations.",
     "developerName": "Hypoxanthine",
     "category": "Productivity",
     "capabilities": [
-      "Nine focused workflow Skills",
+      "Ten focused workflow Skills",
       "Official Codex lifecycle Hooks",
       "Goal and Cycle delivery",
+      "Reproducible Experiment management and instant status",
+      "Semantic Worker Routing",
       "Project memory and recovery",
       "Controlled destructive operations"
     ],
     "defaultPrompt": [
       "Initialize this repository with Hypo-Workflow.",
       "Define and run one bounded delivery Goal.",
+      "Set up and manage a reproducible experiment lane.",
       "Resume the active Hypo-Workflow delivery."
     ],
     "websiteURL": "https://github.com/HypoxanthineOvO/Hypo-Workflow"

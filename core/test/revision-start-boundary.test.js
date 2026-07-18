@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import * as ROOT_API from "../src/index.js";
 import { snapshotTree } from "./fixtures/c21-m2/helpers.js";
 import {
+  CYCLE_REF,
   DELIVERY_API_URL,
   FIXED_NOW,
   GOAL_REF,
@@ -12,6 +13,7 @@ import {
   TOPOLOGY_API_URL,
   USER_ACTOR,
   createDeliveryTestStore,
+  cyclePlanInput,
   goalDesignInput,
   importProbe,
   initializeGitWorkspace,
@@ -113,6 +115,96 @@ revisionTest("direction-changing feedback writes Feedback + revised Plan Records
   delivery = await store.start(root, receipt, { id: "m6-revision-explicit-start-v2" });
   assert.equal(delivery.status, "executing");
   assert.deepEqual(await productSnapshot(root), productBefore, "Core only opens the implementation boundary");
+});
+
+revisionTest("executing Cycle revision stops work, resets milestones, and requires new approval plus start", async (t) => {
+  const root = await temporaryGitRepository(t, "hw-m6-executing-cycle-revision-");
+  const api = combinedApi();
+  await initializeGitWorkspace(api, root, { project_id: "m6-executing-cycle-revision" });
+  const { store, setNow } = createDeliveryTestStore(api);
+  const inputV1 = cyclePlanInput();
+  const planV1 = api.compileCyclePlan(inputV1);
+  const topology = api.selectExecutionTopology(strictTopologyInput());
+  let delivery = await store.proposeCycle(root, { plan: planV1, topology }, { id: "m6-executing-cycle-propose-v1" });
+  let receipt = await issueDeliveryReceipt(api, root, delivery, "delivery.approve");
+  delivery = await store.approve(root, receipt, { id: "m6-executing-cycle-approve-v1" });
+  setNow(LATER_NOW);
+  receipt = await issueDeliveryReceipt(api, root, delivery, "delivery.start", { now: LATER_NOW });
+  delivery = await store.start(root, receipt, { id: "m6-executing-cycle-start-v1" });
+
+  await writeProductFile(root, "src/in-progress.js", "export const direction = 'v1';\n");
+  const evidence = await writeWorkerEvidence(root, ["test", "implement", "audit"], {
+    object_id: CYCLE_REF.id,
+    prefix: "executing-cycle-revision-m1",
+  });
+  delivery = await store.verifyMilestone(root, {
+    object_ref: CYCLE_REF,
+    milestone_id: "M1",
+    evidence,
+  }, { id: "m6-executing-cycle-verify-m1-v1" });
+  assert.deepEqual(delivery.milestones.map(({ id, status }) => [id, status]), [
+    ["M1", "verified"],
+    ["M2", "executing"],
+  ]);
+  const productAtRevision = await productSnapshot(root);
+
+  setNow(REVISION_NOW);
+  const feedback = structuredFeedback({ context: "Direction changed while M2 was executing." });
+  const planV2 = api.compileCyclePlan(cyclePlanInput({
+    revision: 1,
+    outcome: "The revised storage, API, and export stages verify in order after a fresh explicit start.",
+    milestones: [
+      inputV1.milestones[0],
+      {
+        ...inputV1.milestones[1],
+        outcome: "Expose the revised storage contract through the queue API.",
+      },
+      {
+        id: "M3",
+        title: "Export contract",
+        outcome: "Export the verified queue state.",
+        verification_criteria: ["Export tests pass."],
+        depends_on: ["M2"],
+      },
+    ],
+  }));
+  delivery = await store.recordRevision(root, {
+    object_ref: CYCLE_REF,
+    actor: USER_ACTOR,
+    feedback,
+    proposal: planV2,
+  }, { id: "m6-executing-cycle-record-v2" });
+
+  assert.equal(delivery.status, "needs_revision");
+  assert.equal(delivery.revision_state, "proposal_ready");
+  assert.equal(delivery.revision, 1);
+  assert.equal(delivery.plan_hash, planV2.plan_hash);
+  assert.deepEqual(delivery.milestones.map(({ id, status }) => [id, status]), [
+    ["M1", "pending"],
+    ["M2", "pending"],
+    ["M3", "pending"],
+  ]);
+  assert.ok(delivery.milestones.every((item) => !Object.hasOwn(item, "verification")));
+  assert.deepEqual(await productSnapshot(root), productAtRevision);
+
+  const resumed = await store.resume(root, {});
+  assert.equal(resumed.continuation.next_action, "review_revised_proposal");
+  assert.equal(resumed.continuation.revision, 1);
+  assert.equal(resumed.continuation.plan_hash, planV2.plan_hash);
+
+  receipt = await issueDeliveryReceipt(api, root, delivery, "delivery.approve", { now: REVISION_NOW });
+  delivery = await store.approve(root, receipt, { id: "m6-executing-cycle-approve-v2" });
+  assert.equal(delivery.status, "waiting_to_start");
+  assert.deepEqual(await productSnapshot(root), productAtRevision);
+  receipt = await issueDeliveryReceipt(api, root, delivery, "delivery.start", { now: REVISION_NOW });
+  delivery = await store.start(root, receipt, { id: "m6-executing-cycle-start-v2" });
+  assert.equal(delivery.status, "executing");
+  assert.deepEqual(delivery.milestones.map(({ id, status }) => [id, status]), [
+    ["M1", "executing"],
+    ["M2", "pending"],
+    ["M3", "pending"],
+  ]);
+  assert.deepEqual(await productSnapshot(root), productAtRevision);
 });
 
 revisionTest("feedback without a revised proposal cannot partially mutate authority or begin work", async (t) => {

@@ -1,58 +1,124 @@
 # 用户指南
 
-Hypo-Workflow 围绕 `.pipeline/` 的状态、提示、报告、日志和恢复文件组织长周期 AI 编程工作。它不是 runner，真正的编码、测试和审查仍由当前宿主 Agent 完成。
+Hypo-Workflow 是当前 Codex 宿主中的项目工作协议。`.pipeline/manifest.yaml` 选择当前工作区格式，Runtime、Continuation、Records、Receipts、Recovery 与 Experiment events 保存可恢复的权威事实；实际编码、测试、命令执行和实验监控仍由宿主 Agent 完成，Workflow 不是 runner。
 
-## 安装形态
+## 当前入口
 
-从当前宿主 Agent 对应的平台 Guide 开始。README 保持通用入口，具体安装或同步命令放在平台页面。
+v14.0.0-alpha.2 的 Official Codex 发布包公开十个聚焦入口，每次只路由到一个 Child Skill：
 
-| 平台 | 安装 / 同步入口 | Guide |
-|---|---|---|
-| Codex | 将仓库安装或 symlink 为 Codex Skill source。 | `docs/platforms/codex.md` |
-| Claude Code | 安装 `hw` plugin 或用 `--plugin-dir` 调试；项目内用 `hypo-workflow sync --platform claude-code --project .` 同步 hooks/agents。 | `docs/platforms/claude-code.md` |
-| OpenCode | 用 `hypo-workflow init-project --platform opencode --project .` 生成 native commands、agents、plugins 和 status artifacts。 | `docs/platforms/opencode.md` |
-| Cursor | 生成 `.cursor/rules/hypo-workflow.mdc`、`.cursor/skills/hw-*.md` 和 `.cursor/commands/hw-*.md`。 | `docs/platforms/cursor.md` |
-| GitHub Copilot | 生成 `.github/copilot-instructions.md`。 | `docs/platforms/copilot.md` |
-| Trae | 生成 `.trae/rules/project_rules.md`。 | `docs/platforms/trae.md` |
+| 入口 | 用途 |
+| --- | --- |
+| `/hw:guide` | 检查仓库并推荐一个合适的 Workflow 路径 |
+| `/hw:init` | 初始化或检查 manifest-based 工作区 |
+| `/hw:goal` | 交付一个有明确验收目标的结果 |
+| `/hw:plan` | 对需要澄清、架构选择或分解的工作形成可执行设计 |
+| `/hw:cycle` | 交付存在真实依赖顺序的多个 Milestone |
+| `/hw:maintain` | 保存一个聚焦的 requirement、preference、decision 或 feedback |
+| `/hw:experiment` | 管理非线性实验、基线、环境、扫描、Attempt、结果审查与即时状态 |
+| `/hw:resume` | 在重启或上下文压缩后恢复当前 Delivery |
+| `/hw:accept` | 接受已经验证并等待人工验收的 Delivery |
+| `/hw:reject` | 拒绝待验收结果并记录结构化反馈 |
 
-## 常用流程
+普通对话不要求用户先选择入口。状态、报告、解释、检查、调试、知识索引和压缩属于 Agent 根据语义执行的内部行为，不是额外的公共命令。
 
-- 用 `/hw:cycle new` 开始新 Cycle 后，先完成或明确沿用 `P0 Configure`；它在 Discover 前确认自动化程度、Subagent 授权、验收方式、PR/MR 远端写确认、完整回归、analysis 边界和 worker separation。
-- 用 `/hw:plan` 规划工作，再用 `/hw:start` 或 `/hw:resume` 执行。
-- 用 `/hw:status` 查看进度，用 `/hw:report` 查看报告。
-- 用 `/hw:explain [question]` 提问代码、配置、命令或近期改动原因；回答必须引用本地文件证据，证据不足时要明确 unknowns。
-- 用 `/hw:explain --subagent [question]` 让独立 Subagent 先做只读取证，主 Agent 校验 evidence packet 后再回答；平台不支持 Subagent 时记录 `fallback_reason` 并降级为 self evidence-first。
-- 用 `/hw:pr inspect URL`、`/hw:pr review URL`、`/hw:pr fix URL` 等子命令处理已有 GitHub PR 或 GitLab MR，并把本地证据归档到 `.pipeline/pr/`。
-- 用 `/hw:pr create` 进入问答式 PR/MR 创建；已有本地改动走 `--from-worktree`，还没开始的工作走 `--plan`，所有 push、create、reviewer/label/target branch 远端写都要一次性确认。
-- 用 `/hw:sync --repair` 修复派生上下文，用 `/hw:docs repair` 修复文档。
-- 生命周期 gate 处用 `/hw:accept` 或 `/hw:reject` 明确验收。
+## Goal、Cycle、Maintain 与 Experiment
 
-## Subagent 与降级
+- Goal 适合一个边界清楚、只需一次最终验收的结果。
+- Cycle 只在阶段存在真实先后依赖时使用；Milestone 是可独立验证的阶段结果，不是机械任务清单。
+- Maintain 保存日常项目事实，不开启 Delivery。
+- Experiment 是长期、非线性的实验记录面。它把项目知识、环境、代码快照、机器、数据集、baseline、scan、Attempt、指标、异常、trash/restore 与 next action 组织成可索引事实。
 
-`execution.worker_separation.mode=recommended|strict` 时，非平凡工作要尽量拆出 implement、test、audit 不同角色。implementation Subagent 不应读取测试源码、fixtures、snapshots 或 assertion 细节，只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若平台无法维持隔离，必须记录 role isolation degradation；`recommended` 需要用户明确确认 degraded mode 后才可继续，`strict` 不能把降级执行视为 fully accepted。
+当用户询问“现在实验怎么样”时，Agent 首先读取项目的 bounded materialized status projection，直接概括默认与 contextual baseline、硬件与环境、数据集含义、扫描目的、outcome、可疑结果、资源边界和下一步；只有需要 drill-down 时才跟随 detail references。普通状态查询不会重新扫描仓库、结果目录或全部 immutable events。
 
-`/hw:accept` 会把 worker separation 当成验收 gate：缺少 `test`、`implement` 或 `audit` worker evidence、角色身份碰撞、`close_failed` lifecycle、缺少 Codex `/hw:start` + `/hw:resume` 授权范围，或把 runtime-only subtask observation 当成 evidence，都会阻塞验收或要求先做明确降级。
+## Experiment 工作模型
 
-成功完成 `/hw:start` 或 `/hw:resume` 后，如果 `compact.auto=true` 且 `compact.end_of_run=true`，收口阶段按默认 `compact.refresh_policy=dirty_only` 只刷新已变脏的 compact targets。刷新必须从完整 authority 文件生成，不能从旧 `.compact` 文件复制。
+### 项目知识与复现上下文
 
-## Explain 与 Status/Debug/Audit 的区别
+Experiment knowledge 保存实验目的、论文和文档的安全引用、指标语义、数据集单位、主要模块、优化位置和 concept-to-code 映射。它不仅记录“RE 加速”这个名字，还可以把采样或 occupancy 等真实功能映射到代码位置。代码变化后，Agent 必须检查这些引用是否 stale，并更新知识或明确报告差异。
 
-`/hw:explain` 是只读问答命令，适合解释新项目代码框架、某个配置为什么 strict、刚才为什么这样写，或者某个命令/文档的用途。它不修改文件，不替代 `/hw:status` 的进度摘要，也不替代 `/hw:debug` / `/hw:audit` 的问题定位和风险扫描。
+运行前记录：
 
-## Feature Queue
+- Git commit/tree 代码快照，以及工作树是否包含需要说明的变化。
+- `uv` 环境、lockfile digest 和必要版本；默认不引入 Conda。
+- 机器、GPU、驱动、CUDA、资源限制和外部大文件位置。不同服务器可以保存不同数据路径与运行细节。
+- 数据集、scene、参数、随机种子、完整命令、日志/config/metric 引用和可读输出目录。
 
-Feature Queue 支持长周期规划，但不会把 Hypo-Workflow 变成 runner。
+凭据、原始 Key、隐藏推理、完整对话和论文 PDF 不写入 Experiment event；只保存经授权位置的安全引用。
 
-- Use `/hw:plan --batch` to discover multiple Features and create a queue.
-- Use `/hw:plan --insert` to stage a natural-language queue edit before confirmation.
-- `.pipeline/feature-queue.yaml` stores Features, dependencies, gates, and scheduling metadata.
-- `.pipeline/metrics.yaml` stores duration, token, cost, and telemetry fallback summaries.
-- `upfront` decomposition writes milestones for the whole queue early.
-- `just_in_time` decomposition materializes milestones when a Feature becomes current.
-- `gate: confirm` pauses before work that requires explicit human review.
-- `auto_chain` can advance ready Features when gates and failure policy allow it.
-- `failure_policy: skip_defer` defers failed Features instead of blocking the whole queue.
+### Experiment、Attempt、扫描与 baseline
 
-## 恢复
+一个逻辑 Experiment 可以有多次 Attempt。明确“重跑这个实验”会保留逻辑身份并产生新的 Attempt；代码快照和失败证据仍然可追踪。数据集或 scene 不同则是不同实验身份，避免把 NeRF 的不同场景或模拟器的不同 trace 混在一起。
 
-结构化 execution lease 和生命周期日志会保存足够上下文，便于在支持的平台上安全 resume 或 handoff。
+扫描可以声明：
+
+- changed axes、fixed parameters 和选择范围；
+- 单轴频率扫描、L1/L2 交叉扫描或其他多参数组合；
+- screening case 为什么值得扩展到所有数据；
+- 内存、显存、磁盘、时间等 feasibility boundary，以及 OOM 或不可运行区域。
+
+Baseline 带作用域。项目可以同时存在全局 default baseline，以及温度、数据集、方法族或优化阶段内的 contextual baseline；变更 baseline 会留下理由和适用范围。
+
+### 长任务、结果审查与历史保留
+
+宿主 Agent 可以前台等待，或使用不干扰其他工作的唯一命名 tmux session。用户要求“帮我盯着”时，Agent 负责轮询并更新事实。意外中断会保存证据；有真实 checkpoint 就恢复，没有就明确记录 restart-from-scratch。
+
+Attempt 的 operational completion 只表示程序走完，不表示科学结果合理。Scientific review 会参考指标含义、baseline、论文预期、邻近运行、配置、数据预处理、随机性和资源边界。论文与本地结果不一致时先列出可能原因，不直接断言实现错误。AI 标出的可疑结果会进入 pending confirmation，由用户决定。
+
+错误或过期 Attempt 进入 trash，不直接删除；用户改变判断时可以 restore。只有新的明确删除授权才能永久清理。若同一 Attempt 重跑会覆盖已有输出，Agent 必须先说明保留风险。
+
+### 事件、Git 同步与即时状态
+
+Baseline、dataset、scan、Attempt、exception、lifecycle 和 next action 都追加为 content-addressed immutable event。不同 clone 的事件可以做 Git union；同一 `event_key` 出现无法解释的冲突时，Workflow 整理差异并停止自动选择，除非用户明确委托。
+
+Materialized status 是有界、可校验的项目视图。默认回答顺序是 baseline、硬件/环境、数据集语义、扫描及目的、outcome counts、可疑或资源受限结果、trash/保留状态和具体下一步。详细 JSON 和原始事件只在 drill-down 时读取。
+
+### Experiment 边界
+
+Workflow 不是 runner、队列系统或常驻扫描器，不创建一批只能改状态的后台进程。实际命令、tmux、SCP、重试和分析由宿主 Agent 执行，Workflow 负责验证并保存事实。
+
+真实 NeRF、AceSim、GPU、论文复现、GitLab remote、SSH/SCP、大 trace 和多周运行仍需要真实项目 Pilot。当前环境记录是实验级机器快照，不是整台电脑的代理、订阅、端口、服务、工具、Key 位置、SSH、软链接和二进制资产管理。
+
+## Task Assessment 与 Worker Routing
+
+这两个决策必须分开：
+
+```text
+Workflow 形态 -> Worker topology -> Task Assessment -> semantic routing class -> 宿主模型映射
+```
+
+Topology 决定主线程独立完成，还是需要 test、implement、audit 等独立身份。Task Assessment 由宿主 AI 根据仓库证据生成并在 Worker 启动前显示：
+
+| 字段 | 含义 | 当前强制信号 |
+| --- | --- | --- |
+| `complexity` | 理解、实现和协调难度 | 只展示，不单独升档 |
+| `uncertainty` | 根因、方案或输入尚不明确的程度 | `high` 至少 `explore` |
+| `oracle_strength` | 测试、规范或指标作为判卷标准的可靠性 | `weak` 至少 `critical` |
+| `blast_radius` | 潜在影响的模块、用户或 authority 范围 | `high` 至少 `critical` |
+| `reversibility` | 是否可直接回退、需保护回退或实质不可逆 | `irreversible` 为 `escalation` |
+| `risk_flags` | security、migration、recovery conflict 等特殊风险 | 任意非空至少 `critical` |
+
+Core 不调用分类模型，而是按 `escalation > critical > explore > standard > mechanical` 的确定性优先级输出一个档位和 reason code：
+
+| 档位 | 典型触发 |
+| --- | --- |
+| `mechanical` | 状态、格式化、只读摘要、确定性测试命令、trivial reversible change |
+| `standard` | 普通实现、常规测试设计或文档 |
+| `explore` | 未知根因、候选路线比较、高不确定性、探索性实现 |
+| `critical` | weak oracle、独立 audit、architecture、recovery conflict、高 blast radius |
+| `escalation` | security、migration、不可逆工作或两条不同执行路线失败 |
+
+同一路线重试、用户取消、Worker 启动失败和网络错误不增加 distinct failed route count。`off` 不产生路由提示；`advisory` 在宿主不支持时记录 fallback；`required` 阻止不支持 semantic handoff 的 Worker 启动。Resume 复用持久化决定，不重新猜测。
+
+Workflow 不输出 Luna/Sol、Provider、凭据、reasoning effort、token 或价格。宿主映射也不能改变角色独立性、验收证据或用户授权。
+
+## 执行与验收
+
+复杂交付由可验证效果驱动。Topology 决定是否需要 test、implement、audit 等独立身份；身份分离与验收证据不依赖具体模型。用户批准后的开始动作是上下文 transition，不是独立公共入口。
+
+Runtime 是生命周期权威，Continuation 保存下一步，Recovery Pack 只提供有界恢复上下文。Pack 缺失时仍可从 Runtime 与 Continuation degraded resume；旧 `.pipeline` lifecycle 文件不作为回退权威。
+
+最终交付会在对话中说明结论、技术方案、修改模块、测试设计、验证结果、预期行为、遇到的问题和残余风险；artifact 路径只作为证据索引。
+
+## 发布边界
+
+v14.0.0-alpha.2 的 Host Contract v1、Codex plugin ZIP 和 portable ZIP 均发布十个入口并包含 `/hw:experiment`。Official Codex 是当前唯一支持面；其他平台和 VSP-Codex 具体模型映射仍由各目标仓独立适配与验证。

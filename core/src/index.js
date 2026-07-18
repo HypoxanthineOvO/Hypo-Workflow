@@ -9,6 +9,7 @@ export {
   saveMigratedGlobalConfig,
   migrateGlobalConfigShape,
   normalizeExecutionBashPolicy,
+  normalizeWorkerRoutingConfig,
   normalizeAutomationPolicy,
   normalizeAutomationWhitelist,
   isAutomationActionAllowed,
@@ -97,9 +98,35 @@ export {
   assessExecutionEvidence,
 } from "./execution-topology/index.js";
 export {
+  WORKER_ROUTING_POLICY_VERSION,
+  WORKER_ROUTING_CLASSES,
+  validateTaskAssessment,
+  selectWorkerRouting,
+  resolveWorkerRoutingHandoff,
+} from "./worker-routing/index.js";
+export {
   createDeliveryStore,
   buildDeliveryReceiptContext,
 } from "./delivery/index.js";
+export {
+  createExperimentStore,
+  buildExperimentReceiptContext,
+} from "./experiment/index.js";
+export {
+  createExperimentKnowledgeStore,
+} from "./experiment/knowledge.js";
+export {
+  compileExperimentRunSpec,
+  expandExperimentScan,
+} from "./experiment/runs.js";
+export {
+  compileExperimentSupervisionPlan,
+  compileExperimentScientificReview,
+} from "./experiment/supervision.js";
+export {
+  createExperimentStatusStore,
+  compileExperimentProjectStatus,
+} from "./experiment/status.js";
 export {
   buildSnapshotProjection,
   writeSnapshot,

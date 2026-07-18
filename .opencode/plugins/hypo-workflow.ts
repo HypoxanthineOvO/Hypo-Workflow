@@ -12,7 +12,7 @@ import {
 
 const metadata = {
   name: "hypo-workflow",
-  version: "14.0.0-alpha.1",
+  version: "14.0.0-alpha.2",
   commandMap: [
   {
     "canonical": "/hw:start",

@@ -201,6 +201,86 @@
           ]
         },
         {
+          "path": "core/test/delivery-bootstrap-promotion.test.js",
+          "classification": "maintained",
+          "reason": "Executable current C21 Bootstrap-to-Delivery promotion and lifecycle handoff contract.",
+          "covers": [
+            "C21-M6"
+          ]
+        },
+        {
+          "path": "core/test/c23-m1-experiment.test.js",
+          "classification": "maintained",
+          "reason": "C23 M1 RED contract for Experiment identity, attempt history, Receipt gates, and reference sandboxes.",
+          "covers": [
+            "C23-M1"
+          ]
+        },
+        {
+          "path": "core/test/c23-m1-experiment-boundary.test.js",
+          "classification": "maintained",
+          "reason": "C23 M1 RED remediation boundaries for Experiment Store authority, target-bound Receipts, replay, baseline references, execution timestamps, and persisted attempt identity.",
+          "covers": [
+            "C23-M1"
+          ]
+        },
+        {
+          "path": "core/test/c23-m1-recovery-remediation.test.js",
+          "classification": "maintained",
+          "reason": "C23 M1 recovery-of-recovery transaction cleanup and persisted rerun lineage integrity contract.",
+          "covers": [
+            "C23-M1"
+          ]
+        },
+        {
+          "path": "core/test/c23-m2-experiment-knowledge.test.js",
+          "classification": "maintained",
+          "reason": "C23 M2 project knowledge, metric semantics, concept-to-code resolution, source/version binding, and stale-reference contract.",
+          "covers": [
+            "C23-M2"
+          ]
+        },
+        {
+          "path": "core/test/c23-m3-experiment-runs.test.js",
+          "classification": "maintained",
+          "reason": "C23 M3 reproducible run specification, uv/machine/dataset binding, deterministic scan expansion, readable identity, structured resource-failure evidence, and no-runner contract.",
+          "covers": [
+            "C23-M3"
+          ]
+        },
+        {
+          "path": "core/test/c23-m4-experiment-supervision.test.js",
+          "classification": "maintained",
+          "reason": "C23 M4 pure foreground/tmux supervision plans, interruption recovery, operational completion, scientific review, target-bound confirmation Receipts, and no-runner contract.",
+          "covers": [
+            "C23-M4"
+          ]
+        },
+        {
+          "path": "core/test/c23-m5-experiment-status.test.js",
+          "classification": "maintained",
+          "reason": "C23 M5 immutable Experiment events, bounded materialized project status, deterministic two-clone rebuild, retention risk, public Experiment Skill, and frozen release-artifact contract.",
+          "covers": [
+            "C23-M5"
+          ]
+        },
+        {
+          "path": "core/test/c23-m6-codex-hook-compatibility.test.js",
+          "classification": "maintained",
+          "reason": "C23 M6 optional Codex turn/tool Hook input compatibility, identifier validation, wrapper regression, and unchanged event-specific output contract.",
+          "covers": [
+            "C23-M6"
+          ]
+        },
+        {
+          "path": "core/test/c23-m7-worker-routing.test.js",
+          "classification": "maintained",
+          "reason": "C23 M7 deterministic semantic Worker Routing, visible host Task Assessment validation, capability modes, restart-safe persistence, Codex handoff, and topology/acceptance orthogonality contract.",
+          "covers": [
+            "C23-M7"
+          ]
+        },
+        {
           "path": "core/test/delivery-proposal-preflight.test.js",
           "classification": "maintained",
           "reason": "Executable current C21 behavior or protection contract used by the maintained release gate.",

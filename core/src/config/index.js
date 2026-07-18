@@ -10,7 +10,7 @@ import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 export { parseYaml, stringifyYaml } from "../serialization/index.js";
 
 export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
-  version: "14.0.0-alpha.1",
+  version: "14.0.0-alpha.2",
   agent: {
     platform: "codex",
     model: "default",
@@ -29,6 +29,11 @@ export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
       selection: "auto",
       compose: true,
       profiles: [],
+    },
+    worker_routing: {
+      mode: "advisory",
+      policy_version: "worker-routing-v1",
+      failure_escalation_threshold: 2,
     },
     worker_separation: {
       mode: "recommended",
@@ -755,6 +760,7 @@ function normalizeConfig(merged = {}) {
     execution: {
       ...merged.execution,
       bash: normalizeExecutionBashPolicy(merged.execution?.bash),
+      worker_routing: normalizeWorkerRoutingConfig(merged.execution?.worker_routing),
     },
     automation: normalizeAutomationPolicy(merged.automation),
   };
@@ -843,6 +849,7 @@ export function migrateGlobalConfigShape(config = {}, defaults = DEFAULT_GLOBAL_
     execution: {
       ...merged.execution,
       bash: normalizeExecutionBashPolicy(merged.execution?.bash),
+      worker_routing: normalizeWorkerRoutingConfig(merged.execution?.worker_routing),
     },
     automation: normalizeAutomationPolicy(merged.automation),
     version: DEFAULT_GLOBAL_CONFIG.version,
@@ -860,6 +867,31 @@ export function normalizeExecutionBashPolicy(policy = {}) {
     confirm_external: false,
     confirm_destructive: false,
     confirm_system_install: false,
+  };
+}
+
+export function normalizeWorkerRoutingConfig(input = {}) {
+  if (!isPlainObject(input)) throw new Error("Worker Routing config must be a mapping");
+  const allowed = new Set(["mode", "policy_version", "failure_escalation_threshold"]);
+  const unknown = Object.keys(input).filter((key) => !allowed.has(key));
+  if (unknown.length) {
+    throw new Error(`Unsupported Worker Routing config field: ${unknown.sort().join(", ")}`);
+  }
+  const merged = mergeConfig(DEFAULT_GLOBAL_CONFIG.execution.worker_routing, input);
+  const mode = String(merged.mode || "advisory").trim().toLowerCase();
+  if (!new Set(["off", "advisory", "required"]).has(mode)) {
+    throw new Error(`Unsupported Worker Routing mode: ${merged.mode}`);
+  }
+  if (merged.policy_version !== "worker-routing-v1") {
+    throw new Error(`Unsupported Worker Routing policy_version: ${merged.policy_version}`);
+  }
+  if (merged.failure_escalation_threshold !== 2) {
+    throw new Error("Unsupported Worker Routing failure_escalation_threshold; worker-routing-v1 requires 2");
+  }
+  return {
+    mode,
+    policy_version: "worker-routing-v1",
+    failure_escalation_threshold: 2,
   };
 }
 

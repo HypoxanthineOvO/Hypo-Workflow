@@ -12,6 +12,7 @@ const COMMAND_DEFINITIONS = Object.freeze([
   { canonical: "/hw:plan", agent: "hw-plan", route: "plan", skill: "skills/plan/SKILL.md" },
   { canonical: "/hw:cycle", agent: "hw-build", route: "delivery", skill: "skills/cycle/SKILL.md" },
   { canonical: "/hw:maintain", agent: "hw-build", route: "maintenance", skill: "skills/maintain/SKILL.md" },
+  { canonical: "/hw:experiment", agent: "hw-build", route: "experiment", skill: "skills/experiment/SKILL.md" },
   { canonical: "/hw:resume", agent: "hw-build", route: "delivery", skill: "skills/resume/SKILL.md" },
   { canonical: "/hw:accept", agent: "hw-build", route: "delivery", skill: "skills/accept/SKILL.md" },
   { canonical: "/hw:reject", agent: "hw-build", route: "delivery", skill: "skills/reject/SKILL.md" },
@@ -189,6 +190,7 @@ function inferNaturalIntent(input, context) {
   if (/验收通过|接受这次|accept|通过验收/.test(normalized)) return "/hw:accept";
   if (/开始做|开始执行|开干|explicit start/.test(normalized) && context.active_delivery?.status === "waiting_to_start") return "/hw:start";
   if (/继续.*(?:交付|刚才|没有做完)|resume|续跑/.test(normalized)) return "/hw:resume";
+  if (/实验|experiment|参数扫描|对比实验|重跑.*(?:实验|结果)|baseline/.test(normalized)) return "/hw:experiment";
   if (/日常修改|维护记录|记录到项目|maintain/.test(normalized)) return "/hw:maintain";
   if (/接手.*项目|识别.*架构|初始化|initialize|init/.test(normalized)) return "/hw:init";
   if (/不知道.*(?:工作流|开始)|怎么开始|guide|引导/.test(normalized)) return "/hw:guide";
@@ -206,6 +208,7 @@ function authorityIntentFor(canonical) {
     "/hw:plan": "delivery.plan",
     "/hw:cycle": "delivery.propose_cycle",
     "/hw:maintain": "maintain.record",
+    "/hw:experiment": "experiment.manage",
     "/hw:resume": "delivery.resume",
     "/hw:accept": "delivery.accept",
     "/hw:reject": "delivery.reject",

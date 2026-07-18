@@ -221,10 +221,11 @@ routerTest("target workspace repoRoot never substitutes for the trusted Skill ba
   assert.deepEqual(missingBackend.writes, []);
 });
 
-test("runtime discovery is exactly the nine public/contextual commands with real Skill backends", async () => {
+test("runtime discovery is exactly the ten public/contextual commands with real Skill backends", async () => {
   const expected = [
     "/hw:accept",
     "/hw:cycle",
+    "/hw:experiment",
     "/hw:goal",
     "/hw:guide",
     "/hw:init",
@@ -248,8 +249,8 @@ test("runtime discovery is exactly the nine public/contextual commands with real
   ].includes(command.canonical)), false);
 });
 
-test("backend discovery fails closed when one of the nine Skill entries is missing or symlinked", async (t) => {
-  const required = ["guide", "init", "goal", "plan", "cycle", "maintain", "resume", "accept", "reject"];
+test("backend discovery fails closed when one of the ten Skill entries is missing or symlinked", async (t) => {
+  const required = ["guide", "init", "goal", "plan", "cycle", "experiment", "maintain", "resume", "accept", "reject"];
   const missing = [];
   for (const name of required) {
     try {
@@ -260,7 +261,7 @@ test("backend discovery fails closed when one of the nine Skill entries is missi
     }
   }
   if (missing.length) {
-    assert.fail(`the nine-command backend inventory is incomplete: ${missing.join(", ")}`);
+    assert.fail(`the ten-command backend inventory is incomplete: ${missing.join(", ")}`);
   }
 
   const bundle = await temporaryDirectory(t, "hw-m6-skill-router-");
@@ -277,7 +278,7 @@ test("backend discovery fails closed when one of the nine Skill entries is missi
   assert.equal(discovered.some((command) => command.canonical === "/hw:goal"), false);
   assert.deepEqual(
     discovered.map((command) => command.canonical).sort(),
-    ["/hw:accept", "/hw:cycle", "/hw:guide", "/hw:init", "/hw:maintain", "/hw:plan", "/hw:reject", "/hw:resume"],
+    ["/hw:accept", "/hw:cycle", "/hw:experiment", "/hw:guide", "/hw:init", "/hw:maintain", "/hw:plan", "/hw:reject", "/hw:resume"],
   );
 
   await symlink(join(REPOSITORY_ROOT, "skills", "goal", "SKILL.md"), join(bundle, "skills", "goal", "SKILL.md"));
