@@ -298,6 +298,14 @@ test("Root Skill, Plugin metadata, and current Codex docs describe the replaceme
     const plugin = JSON.parse(await readFile(join(REPOSITORY_ROOT, ".codex-plugin/plugin.json"), "utf8"));
     const pluginClaims = JSON.stringify(plugin);
     assert.doesNotMatch(pluginClaims, /(?:\/hw:)?(?:setup|dashboard|watchdog|rules)|53\s+commands|six[- ]platform/i);
+    assert.ok(Array.isArray(plugin.interface.defaultPrompt));
+    assert.ok(plugin.interface.defaultPrompt.length <= 3, "Codex supports at most three default prompts");
+    assert.ok(
+      plugin.interface.defaultPrompt.every((prompt) => (
+        typeof prompt === "string" && prompt.trim().length > 0 && prompt.length <= 128
+      )),
+      "Codex default prompts must be non-empty strings within the Host limit",
+    );
   });
 
   for (const [path, source] of docs) {

@@ -37,8 +37,7 @@
     "defaultPrompt": [
       "Initialize this repository with Hypo-Workflow.",
       "Define and run one bounded delivery Goal.",
-      "Set up and manage a reproducible experiment lane.",
-      "Resume the active Hypo-Workflow delivery."
+      "Set up and manage a reproducible experiment lane."
     ],
     "websiteURL": "https://github.com/HypoxanthineOvO/Hypo-Workflow"
   }
