@@ -1,0 +1,12 @@
+{
+  "schema_version": "1",
+  "contract_version": "1",
+  "release": {
+    "version": "14.0.0-alpha.3",
+    "source_commit": "6a43a1c8eb4b1b76f27086f0fc3695993a111a8a"
+  },
+  "command_manifest": {
+    "path": "contracts/host/v1/command-manifest.json",
+    "sha256": "46f7476dd9c99fc3d8127cbac88b5968eded8d8ddafc67379013fff77847dd56"
+  }
+}
