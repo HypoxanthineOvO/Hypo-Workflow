@@ -10,6 +10,7 @@ import {
   renderKnowledgeCompact,
   shouldOpenCodeAutoContinue,
 } from "../src/index.js";
+import { temporaryCurrentWorkspace, writeText } from "./fixtures/c21-m2/helpers.js";
 
 test("F001 gate has a real Knowledge Ledger record and generated context", async (t) => {
   const records = await loadKnowledgeRecords(".");
@@ -38,11 +39,15 @@ test("F001 gate has a real Knowledge Ledger record and generated context", async
     ".opencode/runtime/hypo-workflow-hooks.js",
   ]);
 
-  const liveCompactPath = ".pipeline/knowledge/knowledge.compact.md";
+  const mixedRoot = await temporaryCurrentWorkspace(t, "hw-f001-knowledge-mixed-", {
+    withLegacySentinels: true,
+  });
+  const liveCompactPath = join(mixedRoot, ".pipeline/knowledge/knowledge.compact.md");
+  await writeText(liveCompactPath, "existing compact fixture\n");
   const liveCompactBefore = await readFile(liveCompactPath);
   const liveCompactStatBefore = await stat(liveCompactPath, { bigint: true });
   await assert.rejects(
-    renderKnowledgeCompact(".", { records }),
+    renderKnowledgeCompact(mixedRoot, { records }),
     {
       code: "ERR_LEGACY_WORKSPACE_WRITE_BLOCKED",
       message: /legacy\.knowledge.*mixed_current_with_legacy_residue/,
