@@ -603,7 +603,10 @@ function isSecretSafeText(value) {
 
 function isObviousDirectDeletion(toolName, toolInput) {
   const command = typeof toolInput?.command === "string" ? toolInput.command : "";
-  if (toolName === "apply_patch" && /^\*\*\* Delete File:/m.test(command)) return true;
+  if (toolName === "apply_patch") {
+    const deletionHeader = ["***", "Delete", "File:"].join(" ");
+    return command.split("\n").some((line) => line.startsWith(deletionHeader));
+  }
   if (/(?:^|[;&|()\n]\s*|\bsudo\s+)(?:rm|unlink|rmdir)\b|\bgit\s+clean\b|\bfind\b[^\n]*\s-delete\b|\bRemove-Item\b|\bdel(?:ete)?\s+\//i.test(command)) {
     return true;
   }

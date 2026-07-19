@@ -149,6 +149,17 @@ export async function refreshHostStatusProjection(root, options = {}) {
   } catch (error) {
     if (!new Set(["ERR_AUTHORITY_OBJECT_NOT_FOUND", "ERR_DELIVERY_NOT_FOUND"]).has(error?.code)) throw error;
   }
+  const currentCandidate = compileHostStatusProjection({
+    generated_at: generatedAt,
+    generation: existing.projection?.generation ?? 0,
+    manifest,
+    delivery,
+    continuation,
+  });
+  if (
+    existing.status === "current"
+    && sameHostProjectionState(existing.projection, currentCandidate)
+  ) return existing.projection;
   const projection = compileHostStatusProjection({
     generated_at: generatedAt,
     generation,
@@ -159,9 +170,20 @@ export async function refreshHostStatusProjection(root, options = {}) {
   await commitWorkspaceTransaction(root, {
     id,
     manifest,
+    recoverPending: true,
     writes: [{ path: HOST_STATUS_PATH, content: `${JSON.stringify(projection, null, 2)}\n` }],
   });
   return projection;
+}
+
+function sameHostProjectionState(left, right) {
+  const withoutVolatileFields = (value) => {
+    const comparable = clone(value);
+    delete comparable.generated_at;
+    delete comparable.generation;
+    return comparable;
+  };
+  return JSON.stringify(withoutVolatileFields(left)) === JSON.stringify(withoutVolatileFields(right));
 }
 
 export async function verifyPortableBundle({ root, manifest }) {

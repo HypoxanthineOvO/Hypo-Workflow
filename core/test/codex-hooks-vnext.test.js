@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import * as api from "../src/index.js";
 import {
@@ -88,6 +89,24 @@ test("PreToolUse is only a guardrail and write-capable events require a unique o
   }
 });
 
+test("PreToolUse distinguishes apply_patch source code from an actual file deletion directive", async (t) => {
+  const root = await temporaryGitWorkspace(t, "hw-m7-hooks-apply-patch-deletion-");
+  const base = await officialHookCase(root, "PreToolUse");
+  const sourceEdit = await api.evaluateCodexHookEvent(root, {
+    ...base,
+    tool_name: "apply_patch",
+    tool_input: { command: "*** Begin Patch\n*** Update File: core/example.js\n+  await rm(path);\n*** End Patch" },
+  });
+  assert.deepEqual(sourceEdit, {});
+
+  const deleteFile = await api.evaluateCodexHookEvent(root, {
+    ...base,
+    tool_name: "apply_patch",
+    tool_input: { command: "*** Begin Patch\n*** Delete File: docs/obsolete.md\n*** End Patch" },
+  });
+  assert.equal(deleteFile.hookSpecificOutput.permissionDecision, "deny");
+});
+
 test("compact hooks seal a valid Pack, record the outcome, and restore bounded context", async (t) => {
   const root = await temporaryGitWorkspace(t, "hw-m7-hooks-compact-");
   requireHookApi();
@@ -111,6 +130,31 @@ test("compact hooks seal a valid Pack, record the outcome, and restore bounded c
   assert.match(context, /seal_recovery_pack_from_verified_capsule/);
   assert.ok(Buffer.byteLength(context) < 16_384, "restored context must stay bounded");
   assert.doesNotMatch(context, /full transcript|raw_journal|transcript_path/i);
+});
+
+test("repeated SessionStart projection refresh is a byte-stable no-op", async (t) => {
+  const root = await temporaryGitWorkspace(t, "hw-m7-hooks-session-start-noop-");
+  await seedActiveRecovery(root, "m7-session-start-noop");
+  const payload = { ...await officialHookCase(root, "SessionStart"), source: "resume" };
+  await api.evaluateCodexHookEvent(root, payload, {
+    id: "m7-session-start-noop-first",
+    clock: () => "2026-07-19T12:58:09.635Z",
+  });
+  const statusPath = join(root, ".pipeline/runtime/host-status-v1.json");
+  const before = await readFile(statusPath, "utf8");
+
+  await api.evaluateCodexHookEvent(root, payload, {
+    id: "m7-session-start-noop-second",
+    clock: () => "2026-07-19T12:58:09.636Z",
+  });
+  assert.equal(await readFile(statusPath, "utf8"), before);
+  const transactions = await readdir(join(root, ".pipeline/runtime/transactions"), {
+    withFileTypes: true,
+  }).catch((error) => {
+    if (error?.code === "ENOENT") return [];
+    throw error;
+  });
+  assert.equal(transactions.some((entry) => entry.isDirectory()), false);
 });
 
 test("Subagent streams remain distinct and repeated documentation/Record reminders deduplicate", async (t) => {

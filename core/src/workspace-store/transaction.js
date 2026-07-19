@@ -1,13 +1,16 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import {
+  link,
   lstat,
   mkdir,
   readFile,
   readdir,
+  realpath,
   rename,
   rm,
   writeFile,
 } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import {
   WORKSPACE_MANIFEST_PATH,
@@ -24,8 +27,15 @@ import {
 import { assertWorkspacePathAllowed, normalizeWorkspacePath } from "./path-guard.js";
 
 const TRANSACTION_ROOT = ".pipeline/runtime/transactions";
+const TRANSACTION_LOCK_ROOT = [
+  "hypo-workflow",
+  typeof process.getuid === "function" ? process.getuid() : "user",
+  "transaction-locks",
+].join("-");
 const TRANSACTION_SCHEMA_VERSION = "1";
 const HOST_STATUS_PATH = ".pipeline/runtime/host-status-v1.json";
+const TRANSACTION_LOCK_TIMEOUT_MS = 25_000;
+const TRANSACTION_LOCK_RETRY_MS = 10;
 
 export async function commitWorkspaceTransaction(root, input = {}) {
   return commitWorkspaceTransactionInternal(root, input, { bootstrapAcceptance: false });
@@ -57,6 +67,8 @@ async function commitWorkspaceTransactionInternal(root, input, internal) {
   }
   const manifest = normalizeManifest(input.manifest);
   const writes = await includeFailClosedHostProjection(workspaceRoot, requestedWrites, manifest, id);
+  const recoverPending = input.recoverPending ?? false;
+  if (typeof recoverPending !== "boolean") throw new TypeError("recoverPending must be a boolean");
   const faultInjector = input.faultInjector;
   if (faultInjector !== undefined && typeof faultInjector !== "function") {
     throw new TypeError("faultInjector must be a function");
@@ -68,13 +80,21 @@ async function commitWorkspaceTransactionInternal(root, input, internal) {
     await assertBootstrapAcceptanceWriteAllowed(workspaceRoot);
   }
 
-  const pendingIds = await pendingTransactionIds(workspaceRoot);
-  if (pendingIds.length) {
-    throw transactionError(
-      "ERR_WORKSPACE_TRANSACTION_PENDING",
-      `Workspace transaction pending (${pendingIds.join(", ")}); recover it before starting ${id}`,
-    );
-  }
+  const lock = await acquireWorkspaceTransactionLock(workspaceRoot, id);
+  try {
+    let pendingIds = await pendingTransactionIds(workspaceRoot);
+    if (pendingIds.length && recoverPending) {
+      for (const pendingId of pendingIds) {
+        await recoverWorkspaceTransactionUnlocked(workspaceRoot, { id: pendingId });
+      }
+      pendingIds = await pendingTransactionIds(workspaceRoot);
+    }
+    if (pendingIds.length) {
+      throw transactionError(
+        "ERR_WORKSPACE_TRANSACTION_PENDING",
+        `Workspace transaction pending (${pendingIds.join(", ")}); recover it before starting ${id}`,
+      );
+    }
 
   const txRelative = `${TRANSACTION_ROOT}/${id}`;
   const txGuard = await assertWorkspacePathAllowed(workspaceRoot, txRelative, {
@@ -169,6 +189,9 @@ async function commitWorkspaceTransactionInternal(root, input, internal) {
     if (!prepared) await rm(txDir, { recursive: true, force: true }).catch(() => {});
     throw error;
   }
+  } finally {
+    await releaseWorkspaceTransactionLock(lock);
+  }
 }
 
 async function includeFailClosedHostProjection(root, writes, manifest, transactionId) {
@@ -236,6 +259,18 @@ function assertBootstrapAcceptanceTransactionInput(input) {
 
 export async function recoverWorkspaceTransaction(root, options = {}) {
   const workspaceRoot = resolve(root || ".");
+  const lockId = options.id === undefined
+    ? `recover-${randomUUID()}`
+    : `recover-${validateTransactionId(options.id)}`;
+  const lock = await acquireWorkspaceTransactionLock(workspaceRoot, lockId);
+  try {
+    return await recoverWorkspaceTransactionUnlocked(workspaceRoot, options);
+  } finally {
+    await releaseWorkspaceTransactionLock(lock);
+  }
+}
+
+async function recoverWorkspaceTransactionUnlocked(workspaceRoot, options = {}) {
   const id = options.id === undefined
     ? await firstPendingTransactionId(workspaceRoot)
     : validateTransactionId(options.id);
@@ -268,16 +303,21 @@ export async function recoverWorkspaceTransaction(root, options = {}) {
   validateTransactionMarker(marker, id);
   await verifyPrivateTransactionFiles(txDir, marker);
 
-  const dataStates = [];
-  for (const entry of marker.writes) {
-    const guarded = await assertWorkspacePathAllowed(workspaceRoot, entry.path);
-    dataStates.push(await inspectTargetState(guarded.path, entry, id));
-  }
   const manifestGuard = await assertWorkspacePathAllowed(workspaceRoot, WORKSPACE_MANIFEST_PATH, {
     allowedRoots: [".pipeline"],
     allowTransactionPaths: true,
   });
   const manifestState = await inspectManifestRecoveryState(manifestGuard.path, marker.manifest, id);
+  if (await canFinalizeSupersededHostProjection(workspaceRoot, txDir, marker, manifestState)) {
+    await rm(txDir, { recursive: true, force: true });
+    return { id, action: "finalized" };
+  }
+
+  const dataStates = [];
+  for (const entry of marker.writes) {
+    const guarded = await assertWorkspacePathAllowed(workspaceRoot, entry.path);
+    dataStates.push(await inspectTargetState(guarded.path, entry, id));
+  }
   const allDataInstalled = dataStates.every((state) => state.staged);
 
   if (allDataInstalled && manifestState.staged) {
@@ -484,6 +524,191 @@ async function installTransactionFile(txDir, sourceRelative, target, label, expe
   await mkdir(dirname(target), { recursive: true });
   await writeFile(installPath, content);
   await rename(installPath, target);
+}
+
+async function acquireWorkspaceTransactionLock(root, id) {
+  const canonicalRoot = await realpath(root);
+  const workspaceKey = createHash("sha256").update(canonicalRoot).digest("hex");
+  const lockRoot = join(tmpdir(), TRANSACTION_LOCK_ROOT);
+  await mkdir(lockRoot, { recursive: true, mode: 0o700 });
+  const lockRootStats = await lstat(lockRoot);
+  if (
+    !lockRootStats.isDirectory()
+    || lockRootStats.isSymbolicLink()
+    || (typeof process.getuid === "function" && lockRootStats.uid !== process.getuid())
+  ) {
+    throw transactionError(
+      "ERR_WORKSPACE_TRANSACTION_CONFLICT",
+      "Workspace transaction lock root is unsafe",
+    );
+  }
+  const token = randomUUID();
+  const lockPath = join(lockRoot, `${workspaceKey}.lock`);
+  const temporaryPath = join(lockRoot, `${workspaceKey}.${token}.tmp`);
+  const owner = {
+    schema_version: "1",
+    token,
+    id,
+    pid: process.pid,
+    created_at: new Date().toISOString(),
+  };
+  await writeFile(temporaryPath, `${JSON.stringify(owner)}\n`, { encoding: "utf8", flag: "wx" });
+  const deadline = Date.now() + TRANSACTION_LOCK_TIMEOUT_MS;
+  try {
+    while (true) {
+      try {
+        await link(temporaryPath, lockPath);
+        await rm(temporaryPath, { force: true });
+        return { lockPath, token };
+      } catch (error) {
+        if (error?.code !== "EEXIST") throw error;
+        const current = await readWorkspaceTransactionLock(lockPath);
+        if (!current) continue;
+        if (!isProcessAlive(current.pid)) {
+          await rm(lockPath, { force: true });
+          continue;
+        }
+        if (Date.now() >= deadline) {
+          throw transactionError(
+            "ERR_WORKSPACE_TRANSACTION_BUSY",
+            `Workspace transaction lock is busy (${current.id}) while starting ${id}`,
+          );
+        }
+        await new Promise((resolveDelay) => setTimeout(resolveDelay, TRANSACTION_LOCK_RETRY_MS));
+      }
+    }
+  } catch (error) {
+    await rm(temporaryPath, { force: true }).catch(() => {});
+    throw error;
+  }
+}
+
+async function releaseWorkspaceTransactionLock(lock) {
+  const current = await readWorkspaceTransactionLock(lock.lockPath).catch((error) => {
+    if (error?.code === "ENOENT") return null;
+    throw error;
+  });
+  if (current && current.token !== lock.token) {
+    throw transactionError(
+      "ERR_WORKSPACE_TRANSACTION_CONFLICT",
+      "Workspace transaction lock ownership changed before release",
+    );
+  }
+  if (current) await rm(lock.lockPath, { force: true });
+}
+
+async function readWorkspaceTransactionLock(path) {
+  const stats = await optionalLstat(path);
+  if (!stats) return null;
+  if (!stats.isFile() || stats.isSymbolicLink()) {
+    throw transactionError(
+      "ERR_WORKSPACE_TRANSACTION_CONFLICT",
+      "Workspace transaction lock is missing or unsafe",
+    );
+  }
+  let owner;
+  try {
+    owner = JSON.parse(await readFile(path, "utf8"));
+  } catch (error) {
+    if (error?.code === "ENOENT") return null;
+    throw transactionError(
+      "ERR_WORKSPACE_TRANSACTION_CONFLICT",
+      `Workspace transaction lock is unreadable: ${error.message || error}`,
+    );
+  }
+  if (
+    owner?.schema_version !== "1"
+    || typeof owner.token !== "string"
+    || typeof owner.id !== "string"
+    || !Number.isSafeInteger(owner.pid)
+    || owner.pid <= 0
+    || typeof owner.created_at !== "string"
+    || !Number.isFinite(Date.parse(owner.created_at))
+  ) {
+    throw transactionError(
+      "ERR_WORKSPACE_TRANSACTION_CONFLICT",
+      "Workspace transaction lock owner is invalid",
+    );
+  }
+  return owner;
+}
+
+function isProcessAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error?.code !== "ESRCH";
+  }
+}
+
+async function canFinalizeSupersededHostProjection(root, txDir, marker, manifestState) {
+  if (
+    marker.writes.length !== 1
+    || marker.writes[0].path !== HOST_STATUS_PATH
+    || (!manifestState.old && !manifestState.staged)
+  ) return false;
+  const entry = marker.writes[0];
+  const target = await assertWorkspacePathAllowed(root, entry.path);
+  const current = await readExistingFile(target.path);
+  if (current === null) return false;
+  const staged = await readVerifiedPrivateFile(
+    txDir,
+    entry.staged,
+    entry.staged_hash,
+    marker.id,
+    "staged",
+  );
+  const currentProjection = parseComparableHostProjection(current);
+  const stagedProjection = parseComparableHostProjection(staged);
+  if (!currentProjection || !stagedProjection) return false;
+  return currentProjection.generation >= stagedProjection.generation
+    && currentProjection.semantic === stagedProjection.semantic;
+}
+
+function parseComparableHostProjection(content) {
+  let parsed;
+  try {
+    parsed = JSON.parse(content.toString("utf8"));
+  } catch {
+    return null;
+  }
+  const expectedKeys = [
+    "schema_version",
+    "contract_version",
+    "projection_status",
+    "generated_at",
+    "generation",
+    "workspace",
+    "delivery",
+    "continuation",
+    "invalidation",
+  ];
+  if (
+    !parsed
+    || typeof parsed !== "object"
+    || Array.isArray(parsed)
+    || Object.keys(parsed).sort().join("\0") !== [...expectedKeys].sort().join("\0")
+    || parsed.schema_version !== "1"
+    || parsed.contract_version !== "1"
+    || !new Set(["current", "invalidated"]).has(parsed.projection_status)
+    || typeof parsed.generated_at !== "string"
+    || !Number.isFinite(Date.parse(parsed.generated_at))
+    || !Number.isSafeInteger(parsed.generation)
+    || parsed.generation < 0
+  ) return null;
+  const semantic = { ...parsed };
+  delete semantic.generated_at;
+  delete semantic.generation;
+  return { generation: parsed.generation, semantic: stableJson(semantic) };
+}
+
+function stableJson(value) {
+  if (Array.isArray(value)) return `[${value.map(stableJson).join(",")}]`;
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableJson(value[key])}`).join(",")}}`;
+  }
+  return JSON.stringify(value);
 }
 
 async function firstPendingTransactionId(root) {

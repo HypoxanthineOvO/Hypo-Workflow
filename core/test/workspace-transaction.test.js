@@ -64,6 +64,69 @@ test("workspace transaction installs allowed zones and activates manifest last",
   assert.doesNotMatch(await allText(root), /FAULT-SEAM-MUST-NOT-PERSIST/);
 });
 
+test("concurrent workspace transactions serialize instead of creating competing prepared markers", async (t) => {
+  const root = await temporaryRoot(t, "hw-transaction-concurrent-");
+  let releaseFirst;
+  let markFirstPrepared;
+  const firstPrepared = new Promise((resolvePrepared) => { markFirstPrepared = resolvePrepared; });
+  const firstGate = new Promise((resolveGate) => { releaseFirst = resolveGate; });
+  const first = commitWorkspaceTransaction(root, {
+    id: "tx-concurrent-a",
+    writes: [{ path: ".pipeline/runtime/concurrent-a.txt", content: "a\n" }],
+    manifest: manifest(),
+    faultInjector: async (event) => {
+      if (event.phase !== "after_prepare") return;
+      markFirstPrepared();
+      await firstGate;
+    },
+  });
+  await firstPrepared;
+
+  const second = commitWorkspaceTransaction(root, {
+    id: "tx-concurrent-b",
+    writes: [{ path: ".pipeline/runtime/concurrent-b.txt", content: "b\n" }],
+    manifest: manifest(),
+  }).then(
+    (value) => ({ value, error: null }),
+    (error) => ({ value: null, error }),
+  );
+  const early = await Promise.race([
+    second.then(() => "settled"),
+    new Promise((resolveDelay) => setTimeout(() => resolveDelay("waiting"), 25)),
+  ]);
+  assert.equal(early, "waiting", "the second transaction must wait for the active owner");
+
+  releaseFirst();
+  const [firstResult, secondOutcome] = await Promise.all([first, second]);
+  assert.equal(firstResult.action, "committed");
+  assert.equal(secondOutcome.error, null);
+  assert.equal(secondOutcome.value.action, "committed");
+  assert.equal(await readFile(join(root, ".pipeline/runtime/concurrent-a.txt"), "utf8"), "a\n");
+  assert.equal(await readFile(join(root, ".pipeline/runtime/concurrent-b.txt"), "utf8"), "b\n");
+});
+
+test("a burst of workspace transactions leaves every write committed and no pending marker", async (t) => {
+  const root = await temporaryRoot(t, "hw-transaction-burst-");
+  const count = 32;
+  const results = await Promise.all(Array.from({ length: count }, (_, index) => (
+    commitWorkspaceTransaction(root, {
+      id: `tx-burst-${String(index).padStart(2, "0")}`,
+      writes: [{
+        path: `.pipeline/runtime/burst/${String(index).padStart(2, "0")}.txt`,
+        content: `${index}\n`,
+      }],
+      manifest: manifest(),
+    })
+  )));
+  assert.equal(results.every((result) => result.action === "committed"), true);
+  for (let index = 0; index < count; index += 1) {
+    const path = join(root, `.pipeline/runtime/burst/${String(index).padStart(2, "0")}.txt`);
+    assert.equal(await readFile(path, "utf8"), `${index}\n`);
+  }
+  const pending = await readdir(join(root, ".pipeline/runtime/transactions"), { withFileTypes: true });
+  assert.equal(pending.some((entry) => entry.isDirectory()), false);
+});
+
 test("recovery rolls back a crash after prepare and before install", async (t) => {
   const root = await temporaryRoot(t, "hw-transaction-after-prepare-");
   await seedWorkspaceFiles(root, OLD);
@@ -157,6 +220,38 @@ test("recovery fails closed when a prepared target drifts from its recorded hash
   );
   assert.equal(await readFile(join(root, driftedPath), "utf8"), "concurrent-external-change\n");
   assert.equal(await exists(join(root, ".pipeline", "manifest.yaml")), false);
+});
+
+test("recovery finalizes a host-only transaction superseded by an equivalent concurrent projection", async (t) => {
+  const root = await temporaryRoot(t, "hw-transaction-host-projection-race-");
+  await writeManifestData(root, manifest());
+  const hostPath = ".pipeline/runtime/host-status-v1.json";
+  const original = hostProjection("2026-07-19T12:57:48.794Z", 992);
+  const staged = hostProjection("2026-07-19T12:58:09.635Z", 993);
+  const concurrent = hostProjection("2026-07-19T12:58:09.636Z", 993);
+  await writeText(join(root, hostPath), `${JSON.stringify(original, null, 2)}\n`);
+
+  await assert.rejects(
+    commitWorkspaceTransaction(root, {
+      id: "tx-host-projection-race",
+      writes: [{ path: hostPath, content: `${JSON.stringify(staged, null, 2)}\n` }],
+      manifest: manifest(),
+      faultInjector: async (event) => {
+        if (event.phase !== "after_prepare") return;
+        await writeFile(join(root, hostPath), `${JSON.stringify(concurrent, null, 2)}\n`, "utf8");
+        throw new Error("injected equivalent Host projection race");
+      },
+    }),
+    /injected equivalent Host projection race/,
+  );
+
+  const recovered = await recoverWorkspaceTransaction(root, { id: "tx-host-projection-race" });
+  assert.equal(recovered.action, "finalized");
+  assert.deepEqual(JSON.parse(await readFile(join(root, hostPath), "utf8")), concurrent);
+  assert.equal(
+    await exists(join(root, ".pipeline/runtime/transactions/tx-host-projection-race")),
+    false,
+  );
 });
 
 test("a stale prepared transaction cannot be overwritten by reusing its id", async (t) => {
@@ -445,6 +540,25 @@ function manifest(overrides = {}) {
     created_at: FIXED_NOW,
     ...overrides,
   });
+}
+
+function hostProjection(generatedAt, generation) {
+  return {
+    schema_version: "1",
+    contract_version: "1",
+    projection_status: "current",
+    generated_at: generatedAt,
+    generation,
+    workspace: { format_version: "1", status: "ready" },
+    delivery: {
+      kind: "cycle",
+      id: "release-workflow-alpha3-vsp-10-alpha1",
+      status: "executing",
+      revision: 0,
+    },
+    continuation: { available: true, safe_resume_command: "/hw:resume" },
+    invalidation: null,
+  };
 }
 
 async function writeManifestData(root, value) {
