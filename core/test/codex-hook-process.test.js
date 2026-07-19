@@ -51,6 +51,20 @@ test("wrapper emits exactly one JSON object on stdout and keeps diagnostics on s
   assert.match(invalid.stderr, /json|parse|invalid/i);
 });
 
+test("wrapper accepts a VSP subagent PostToolUse command input", async (t) => {
+  const root = await temporaryGitWorkspace(t, "hw-m3a-subagent-post-tool-");
+  const payload = {
+    ...await officialHookCase(root, "PostToolUse"),
+    agent_id: "vsp-test-worker-1",
+    agent_type: "test",
+  };
+  const child = spawnHook(root, payload, { operation_id: "m3a-subagent-post-tool" });
+  assert.equal(child.status, 0, child.stderr);
+  const lines = child.stdout.split(/\r?\n/).filter(Boolean);
+  assert.equal(lines.length, 1, `stdout must contain one JSON line, got: ${child.stdout}`);
+  assert.doesNotThrow(() => JSON.parse(lines[0]));
+});
+
 test("concurrent PostToolUse processes claim one reminder marker while Stop retains main Recovery", async (t) => {
   const root = await temporaryGitWorkspace(t, "hw-m7-hook-concurrent-reminder-");
   const { recovery } = await seedActiveRecovery(root, "m7-hook-concurrent-reminder");

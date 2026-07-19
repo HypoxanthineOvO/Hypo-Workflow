@@ -48,6 +48,14 @@ const PERMISSION_MODE_EVENTS = new Set([
   "SubagentStop",
   "Stop",
 ]);
+const SUBAGENT_CONTEXT_EVENTS = new Set([
+  "UserPromptSubmit",
+  "PreToolUse",
+  "PermissionRequest",
+  "PostToolUse",
+  "PreCompact",
+  "PostCompact",
+]);
 const COMMON_KEYS = ["session_id", "transcript_path", "cwd", "hook_event_name", "model"];
 const EVENT_KEYS = Object.freeze({
   SessionStart: ["permission_mode", "source"],
@@ -76,7 +84,8 @@ export function validateCodexHookInput(input) {
   if (!EVENT_SET.has(event)) {
     throw hookError("ERR_CODEX_HOOK_EVENT_UNSUPPORTED", "Codex Hook event is unsupported");
   }
-  assertExactKeys(input, [...COMMON_KEYS, ...EVENT_KEYS[event]], "Codex Hook input");
+  const subagentContextKeys = SUBAGENT_CONTEXT_EVENTS.has(event) ? ["agent_id", "agent_type"] : [];
+  assertExactKeys(input, [...COMMON_KEYS, ...EVENT_KEYS[event], ...subagentContextKeys], "Codex Hook input");
   requireText(input.session_id, "session_id");
   requireNullableText(input.transcript_path, "transcript_path");
   requireText(input.cwd, "cwd");
@@ -87,6 +96,7 @@ export function validateCodexHookInput(input) {
     }
   }
   if (event !== "SessionStart") validateOptionalHookIdentifier(input, "turn_id");
+  if (SUBAGENT_CONTEXT_EVENTS.has(event)) validateOptionalAgentContext(input);
 
   switch (event) {
     case "SessionStart":
@@ -907,6 +917,15 @@ function requireToolInput(input) {
 function requireAgentFields(input) {
   requireText(input.agent_id, "agent_id");
   requireText(input.agent_type, "agent_type");
+}
+
+function validateOptionalAgentContext(input) {
+  const hasAgentId = Object.hasOwn(input, "agent_id");
+  const hasAgentType = Object.hasOwn(input, "agent_type");
+  if (hasAgentId !== hasAgentType) {
+    throw hookError("ERR_CODEX_HOOK_INPUT_INVALID", "Codex Hook agent_id and agent_type must be provided together");
+  }
+  if (hasAgentId) requireAgentFields(input);
 }
 
 function normalizeJsonValue(value, field) {

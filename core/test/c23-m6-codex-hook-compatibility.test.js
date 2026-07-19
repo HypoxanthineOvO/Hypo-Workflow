@@ -20,6 +20,53 @@ const OPTIONAL_TURN_EVENTS = Object.freeze([
   "Stop",
 ]);
 
+const VSP_SUBAGENT_CONTEXT_EVENTS = Object.freeze([
+  "UserPromptSubmit",
+  "PreToolUse",
+  "PermissionRequest",
+  "PostToolUse",
+  "PreCompact",
+  "PostCompact",
+]);
+
+test("M3a accepts main-thread and paired VSP subagent command inputs", async (t) => {
+  for (const event of VSP_SUBAGENT_CONTEXT_EVENTS) {
+    await t.test(event, async () => {
+      const payload = await officialHookCase(REPOSITORY_ROOT, event);
+      assert.doesNotThrow(() => api.validateCodexHookInput(payload));
+
+      const subagentPayload = {
+        ...payload,
+        agent_id: "vsp-test-worker-1",
+        agent_type: "test",
+      };
+      assert.deepEqual(api.validateCodexHookInput(subagentPayload), subagentPayload);
+    });
+  }
+});
+
+test("M3a rejects one-sided or invalid VSP subagent context", async (t) => {
+  const invalidContexts = [
+    { agent_id: "vsp-test-worker-1" },
+    { agent_type: "test" },
+    { agent_id: "", agent_type: "test" },
+    { agent_id: "vsp-test-worker-1", agent_type: "" },
+    { agent_id: 42, agent_type: "test" },
+    { agent_id: "vsp-test-worker-1", agent_type: ["test"] },
+  ];
+  for (const event of VSP_SUBAGENT_CONTEXT_EVENTS) {
+    await t.test(event, async () => {
+      const payload = await officialHookCase(REPOSITORY_ROOT, event);
+      for (const context of invalidContexts) {
+        assert.throws(
+          () => api.validateCodexHookInput({ ...payload, ...context }),
+          /agent_id|agent_type|provided together|text/i,
+        );
+      }
+    });
+  }
+});
+
 test("C23 M6 accepts host-compatible payloads that omit optional turn identifiers", async (t) => {
   for (const event of OPTIONAL_TURN_EVENTS) {
     await t.test(event, async () => {
