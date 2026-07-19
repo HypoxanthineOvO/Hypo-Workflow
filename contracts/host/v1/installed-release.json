@@ -3,7 +3,7 @@
   "contract_version": "1",
   "release": {
     "version": "14.0.0-alpha.3",
-    "source_commit": "19058094e8ec762ea0e294a2bd34570c3e7dd2ad"
+    "source_commit": "5d2db02016840a764c69465514e2dd77e378f160"
   },
   "command_manifest": {
     "path": "contracts/host/v1/command-manifest.json",

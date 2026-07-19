@@ -3,7 +3,7 @@
   "contract_version": "1",
   "release": {
     "version": "14.0.0-alpha.3",
-    "source_commit": "19058094e8ec762ea0e294a2bd34570c3e7dd2ad"
+    "source_commit": "5d2db02016840a764c69465514e2dd77e378f160"
   },
   "command_manifest": {
     "path": "command-manifest.json",
@@ -11,16 +11,16 @@
   },
   "installed_descriptor": {
     "path": "contracts/host/v1/installed-release.json",
-    "sha256": "e1c16bbff1d68937fffd3b595f1266f0df8b63c87441d7b73b1bbcc094ec6c84"
+    "sha256": "e3d6a2b7170aaa7e0efb1e4ca1f0292e5d5cb4e3e66c0b2c861fcd6af0ca2b51"
   },
   "artifacts": {
     "codex_plugin": {
       "path": "dist/hypo-workflow-14.0.0-alpha.3-codex-plugin.zip",
-      "sha256": "31b5bd66ec4d759af97def56ee9712649cdfd66c16e49aad9da5958a4f194f3a"
+      "sha256": "60eacea76e4950bdd817fe21b286b6f735f49cdd16c0283a55cb46247912ccb5"
     },
     "portable_bundle": {
       "path": "dist/hypo-workflow-14.0.0-alpha.3-portable.zip",
-      "sha256": "314035d470d390244547a08724f1bb1e2d77ece6c1b932e4e97f20094f909bfe"
+      "sha256": "48267f697df475a2c26e540d53f6c45572c7b0c5f8ae236ddab0436c70501bfb"
     }
   }
 }
