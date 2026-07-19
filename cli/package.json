@@ -1,6 +1,6 @@
 {
   "name": "@hypo-workflow/cli",
-  "version": "14.0.0-alpha.2",
+  "version": "14.0.0-alpha.3",
   "private": true,
   "type": "module",
   "description": "Hypo-Workflow setup CLI and global Ink TUI. This package is not a pipeline runner.",

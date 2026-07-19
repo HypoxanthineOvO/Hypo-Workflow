@@ -1,6 +1,6 @@
 {
   "name": "hypo-workflow",
-  "version": "14.0.0-alpha.2",
+  "version": "14.0.0-alpha.3",
   "description": "Manifest-based Goal, Cycle, and Experiment workflows with durable project memory, semantic Worker Routing, restart-safe recovery, and Receipt-controlled actions for Codex.",
   "author": {
     "name": "Hypoxanthine",

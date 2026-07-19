@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readdir, rmdir, symlink } from "node:fs/promises";
 import { join } from "node:path";
 import * as api from "../src/index.js";
 import {
@@ -239,6 +240,62 @@ test("PostToolUse suppresses no-new-effect repeats but reminds after the same pa
     clock: () => FIXED_NOW,
   });
   assert.match(changedAgain.systemMessage, /src\/live\.js/, "a materially changed effect may remind again");
+});
+
+test("PostToolUse fails through the Hook error contract when reminder markers cannot be created", async (t) => {
+  const root = await temporaryGitWorkspace(t, "hw-m7-r2-reminder-io-");
+  await seedActiveRecovery(root, "m7-r2-reminder-io");
+  await writeText(join(root, ".pipeline/runtime/codex-hooks"), "blocks the marker directory\n");
+
+  await assert.rejects(
+    () => api.evaluateCodexHookEvent(root, postToolPayload(root, "io-1"), {
+      id: "m7-r2-reminder-io-1",
+      clock: () => FIXED_NOW,
+    }),
+    (error) => error?.code === "ERR_CODEX_HOOK_REMINDER_MARKER_FAILED",
+  );
+});
+
+test("PostToolUse rejects a reminder marker parent symlink that escapes the workspace", async (t) => {
+  const root = await temporaryGitWorkspace(t, "hw-m7-r2-reminder-symlink-");
+  const outside = await temporaryCurrentWorkspace(t, "hw-m7-r2-reminder-outside-");
+  await seedActiveRecovery(root, "m7-r2-reminder-symlink");
+  await symlink(outside, join(root, ".pipeline/runtime/codex-hooks"), process.platform === "win32" ? "junction" : "dir");
+
+  await assert.rejects(
+    () => api.evaluateCodexHookEvent(root, postToolPayload(root, "symlink-1"), {
+      id: "m7-r2-reminder-symlink-1",
+      clock: () => FIXED_NOW,
+    }),
+    (error) => error?.code === "ERR_CODEX_HOOK_REMINDER_MARKER_FAILED",
+  );
+});
+
+test("PostToolUse rejects an ordinary file that replaces the final reminder marker", async (t) => {
+  const root = await temporaryGitWorkspace(t, "hw-m7-r2-reminder-file-");
+  await seedActiveRecovery(root, "m7-r2-reminder-file");
+  const payload = postToolPayload(root, "file-1");
+  const first = await api.evaluateCodexHookEvent(root, payload, {
+    id: "m7-r2-reminder-file-1",
+    clock: () => FIXED_NOW,
+  });
+  assert.equal(typeof first.systemMessage, "string");
+
+  const markerRoot = join(root, ".pipeline/runtime/codex-hooks/reminders");
+  const entries = await readdir(markerRoot, { withFileTypes: true });
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].isDirectory(), true);
+  const markerPath = join(markerRoot, entries[0].name);
+  await rmdir(markerPath);
+  await writeText(markerPath, "not a marker directory\n");
+
+  await assert.rejects(
+    () => api.evaluateCodexHookEvent(root, postToolPayload(root, "file-2"), {
+      id: "m7-r2-reminder-file-2",
+      clock: () => FIXED_NOW,
+    }),
+    (error) => error?.code === "ERR_CODEX_HOOK_REMINDER_MARKER_FAILED",
+  );
 });
 
 function userPromptPayload(root, prompt) {

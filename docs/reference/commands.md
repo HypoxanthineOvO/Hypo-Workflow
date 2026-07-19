@@ -1,6 +1,6 @@
 # 命令参考
 
-v14.0.0-alpha.2 的 Official Codex 公共发现面与 Host Contract v1 严格包含十个入口。Root Router 负责 namespace normalization 与 backend availability；每个入口只加载一个普通、非 symlink 的 Child Skill。Codex plugin ZIP 和 portable ZIP 均包含同一组入口。
+v14.0.0-alpha.3 的 Official Codex 公共发现面与 Host Contract v1 严格包含十个入口。Root Router 负责 namespace normalization 与 backend availability；每个入口只加载一个普通、非 symlink 的 Child Skill。Codex plugin ZIP 和 portable ZIP 均包含同一组入口。
 
 | 命令 | Child Skill | 何时使用 |
 | --- | --- | --- |

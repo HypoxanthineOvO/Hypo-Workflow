@@ -1,12 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
+  OBJECT_REF,
   REPOSITORY_ROOT,
   officialHookCase,
+  seedActiveRecovery,
   spawnHook,
   temporaryGitWorkspace,
+  WRAPPER_PATH,
 } from "./fixtures/c21-m7/helpers.js";
 
 const EVENTS = [
@@ -46,3 +50,104 @@ test("wrapper emits exactly one JSON object on stdout and keeps diagnostics on s
   assert.equal(invalid.stdout.trim(), "", "invalid-input diagnostics must not leak onto stdout");
   assert.match(invalid.stderr, /json|parse|invalid/i);
 });
+
+test("concurrent PostToolUse processes claim one reminder marker while Stop retains main Recovery", async (t) => {
+  const root = await temporaryGitWorkspace(t, "hw-m7-hook-concurrent-reminder-");
+  const { recovery } = await seedActiveRecovery(root, "m7-hook-concurrent-reminder");
+  const preCompact = spawnHookWithDeadline(
+    root,
+    await officialHookCase(root, "PreCompact"),
+    "concurrent-reminder-pre-compact",
+  );
+  t.after(() => killChild(preCompact.child));
+  const preCompactResult = await preCompact.result;
+  assert.equal(preCompactResult.code, 0, preCompactResult.stderr);
+
+  const sessionId = "session-hook-concurrent-reminder";
+  const postToolPayload = {
+    ...await officialHookCase(root, "PostToolUse"),
+    session_id: sessionId,
+  };
+  const operations = [
+    ...Array.from({ length: 16 }, (_, index) => ({
+      id: `concurrent-post-tool-${index}`,
+      payload: postToolPayload,
+    })),
+    {
+      id: "concurrent-stop",
+      payload: {
+        ...await officialHookCase(root, "Stop"),
+        session_id: sessionId,
+        turn_id: "turn-concurrent-stop",
+      },
+    },
+  ];
+  const children = operations.map(({ id, payload }) => spawnHookWithDeadline(root, payload, id));
+  t.after(() => children.forEach(({ child }) => killChild(child)));
+
+  const results = await Promise.all(children.map(({ result }) => result));
+  const outputs = [];
+  for (const result of results) {
+    assert.equal(result.code, 0, result.stderr);
+    const lines = result.stdout.split(/\r?\n/).filter(Boolean);
+    assert.equal(lines.length, 1, result.stdout);
+    outputs.push(JSON.parse(lines[0]));
+  }
+  assert.equal(outputs.filter((output) => typeof output.systemMessage === "string").length, 1);
+
+  const replay = await recovery.replayRecoveryJournal(root, { object_ref: OBJECT_REF });
+  assert.equal(replay.events.some((event) => event.type === "tool.completed"), false);
+  const events = replay.events.filter((event) => event.session_id === sessionId);
+  assert.equal(events.length, 1);
+  assert.equal(events[0].type, "turn.agent");
+  assert.deepEqual(events[0].writer, { kind: "main", id: "main" });
+  const cursorStreams = replay.cursor.streams.filter((stream) => stream.session_id === sessionId);
+  assert.equal(cursorStreams.length, 1);
+  assert.deepEqual(cursorStreams[0].writer, { kind: "main", id: "main" });
+  assert.equal(cursorStreams[0].sequence, 1);
+
+  const restore = await recovery.planRecoveryRestore(root, {
+    object_ref: OBJECT_REF,
+    budget_bytes: 12_288,
+  });
+  assert.ok(restore.selected_pack_ref);
+  assert.equal(typeof restore.next_action, "string");
+});
+
+function killChild(child) {
+  if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL");
+}
+
+function spawnHookWithDeadline(root, payload, operationId, timeoutMs = 15_000) {
+  const child = spawn(process.execPath, [WRAPPER_PATH], {
+    cwd: root,
+    stdio: ["pipe", "pipe", "pipe"],
+    env: {
+      ...process.env,
+      PLUGIN_ROOT: REPOSITORY_ROOT,
+      HYPO_WORKFLOW_TEST_OPERATION_ID: operationId,
+    },
+  });
+  let stdout = "";
+  let stderr = "";
+  child.stdout.setEncoding("utf8");
+  child.stderr.setEncoding("utf8");
+  child.stdout.on("data", (chunk) => { stdout += chunk; });
+  child.stderr.on("data", (chunk) => { stderr += chunk; });
+  child.stdin.end(`${JSON.stringify(payload)}\n`);
+  const result = new Promise((resolveResult, rejectResult) => {
+    const timer = setTimeout(() => {
+      child.kill("SIGKILL");
+      rejectResult(new Error(`Hook process deadline exceeded after ${timeoutMs}ms: ${operationId}`));
+    }, timeoutMs);
+    child.once("error", (error) => {
+      clearTimeout(timer);
+      rejectResult(error);
+    });
+    child.once("close", (code, signal) => {
+      clearTimeout(timer);
+      resolveResult({ code, signal, stdout, stderr });
+    });
+  });
+  return { child, result };
+}

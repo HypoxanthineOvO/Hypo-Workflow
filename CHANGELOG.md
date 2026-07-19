@@ -1,5 +1,17 @@
 # Changelog
 
+## v14.0.0-alpha.3 - 2026-07-19
+
+### Fixes
+
+- Codex `PostToolUse` 不再追加 `tool.completed` Recovery Journal 事件，也不再 replay Journal 做 reminder 去重。
+- 相同 reminder 现在通过 workspace runtime 中按 active object、worktree effect 和提示内容生成的 digest marker 去重；最终 marker directory 使用原子 `mkdir` claim。只有 `EEXIST` 后重新校验为 workspace 内普通 marker directory 才表示 dedupe loser；普通文件、symlink 或其他非法节点按 Hook error 失败。
+- `Stop`、`PreCompact`、`PostCompact` 保持 `main/main` Recovery writer 语义；Subagent、Ambient Maintain 和 Recovery Journal Core 不变。
+
+### Tests
+
+- 新增真实 multi-process wrapper 回归，并发执行相同 `PostToolUse` 和单个 `Stop`，验证单次 reminder、唯一 `turn.agent` 事件以及 12288-byte Recovery restore。
+
 ## v14.0.0-alpha.2 - 2026-07-18
 
 ### Features

@@ -1,6 +1,6 @@
 {
   "name": "@hypo-workflow/core",
-  "version": "14.0.0-alpha.2",
+  "version": "14.0.0-alpha.3",
   "private": true,
   "type": "module",
   "description": "Shared deterministic helpers for Hypo-Workflow platform adapters. This package is not a runner.",

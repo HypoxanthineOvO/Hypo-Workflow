@@ -2,7 +2,7 @@
 
 [中文](../../platforms/codex.md) | English
 
-Hypo-Workflow v14.0.0-alpha.2 ships as a Codex plugin with ten focused Skills and ten lifecycle Hook events. It is not a runner: the Codex Agent implements, runs experiments, tests, and reviews work, while Core validates and persists authority. Host Contract v1 and both ZIP artifacts include `/hw:experiment`.
+Hypo-Workflow v14.0.0-alpha.3 ships as a Codex plugin with ten focused Skills and ten lifecycle Hook events. It is not a runner: the Codex Agent implements, runs experiments, tests, and reviews work, while Core validates and persists authority. Host Contract v1 and both ZIP artifacts include `/hw:experiment`.
 
 ## Installation Shapes
 

@@ -1,12 +1,14 @@
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { basename, resolve } from "node:path";
+import { lstat, mkdir } from "node:fs/promises";
+import { basename, join, resolve } from "node:path";
 import { createAmbientMaintainStore } from "../maintain/index.js";
 import { createRecoveryStore } from "../recovery/index.js";
 import { readActivePointer, readRuntimeObject } from "../runtime/index.js";
 import { canonicalHash } from "../serialization/index.js";
 import { refreshHostStatusProjection } from "../host-contract/index.js";
 import { validateWorkerRoutingDecision } from "../worker-routing/index.js";
+import { assertWorkspacePathAllowed } from "../workspace-store/index.js";
 import {
   assertExactKeys,
   assertNoRawSecrets,
@@ -171,7 +173,7 @@ export async function evaluateCodexHookEvent(root, rawInput, options = {}) {
       output = evaluatePermissionRequest(input);
       break;
     case "PostToolUse":
-      output = await evaluatePostToolUse(workspaceRoot, input, operation, recovery);
+      output = await evaluatePostToolUse(workspaceRoot, input, operation);
       break;
     case "PreCompact":
       output = await evaluatePreCompact(workspaceRoot, input, operation, recovery);
@@ -271,37 +273,55 @@ function evaluatePermissionRequest(input) {
   };
 }
 
-async function evaluatePostToolUse(root, input, operation, recovery) {
+async function evaluatePostToolUse(root, input, operation) {
   const objectRef = await readActiveObjectRef(root);
   if (!objectRef) return {};
   const changedPaths = extractChangedPaths(root, input);
   const worktreeEffect = collectReminderWorktreeEffect(root, changedPaths);
   const reminderKey = reminderDigest(input.tool_name, changedPaths, input.tool_input, worktreeEffect.digest);
-  const replay = await recovery.replayRecoveryJournal(root, { object_ref: objectRef });
-  const alreadyReminded = replay.events.some((event) => event.payload?.reminder_key === reminderKey);
-  await recovery.appendRecoveryEvent(root, {
-    object_ref: objectRef,
-    session_id: input.session_id,
-    writer: { kind: "main", id: "main" },
-    turn_id: input.turn_id,
-    type: "tool.completed",
-    summary: `Codex completed ${input.tool_name}.`,
-    payload: {
-      operation_id: operation.id,
-      tool_name: input.tool_name,
-      tool_use_id: input.tool_use_id,
-      changed_paths: changedPaths,
-      worktree_effect_digest: worktreeEffect.digest,
-      reminder_key: reminderKey,
-      evidence_refs: [],
-    },
-  });
   await refreshProjectionIfCurrent(root, operation, "post-tool");
-  if (alreadyReminded || !shouldRemind(input.tool_name, changedPaths)) return {};
+  if (!shouldRemind(input.tool_name, changedPaths)) return {};
   const target = changedPaths.length ? changedPaths.join(", ") : input.tool_name;
+  const systemMessage = `Review documentation affected by ${target}; stage a Record only for durable requirements or decisions.`;
+  const claimed = await claimReminderMarker(root, objectRef, reminderKey, systemMessage);
+  if (!claimed) return {};
   return {
-    systemMessage: `Review documentation affected by ${target}; stage a Record only for durable requirements or decisions.`,
+    systemMessage,
   };
+}
+
+async function claimReminderMarker(root, objectRef, reminderKey, systemMessage) {
+  const markerRootRelative = ".pipeline/runtime/codex-hooks/reminders";
+  const digest = canonicalHash({ object_ref: objectRef, reminder_key: reminderKey, system_message: systemMessage });
+  let markerRoot;
+  try {
+    markerRoot = await assertWorkspacePathAllowed(root, markerRootRelative, { allowRoot: true });
+    await mkdir(markerRoot.path, { recursive: true });
+    markerRoot = await assertWorkspacePathAllowed(root, markerRootRelative, { allowRoot: true });
+  } catch {
+    throw hookError("ERR_CODEX_HOOK_REMINDER_MARKER_FAILED", "Codex Hook reminder marker parent creation failed");
+  }
+  let marker;
+  try {
+    marker = await assertWorkspacePathAllowed(root, `${markerRoot.relativePath}/${digest}`);
+  } catch {
+    throw hookError("ERR_CODEX_HOOK_REMINDER_MARKER_FAILED", "Codex Hook reminder marker path is forbidden");
+  }
+  try {
+    await mkdir(marker.path);
+    return true;
+  } catch (error) {
+    if (error?.code === "EEXIST") {
+      try {
+        const existing = await assertWorkspacePathAllowed(root, marker.relativePath);
+        const stats = await lstat(existing.path);
+        if (stats.isDirectory() && !stats.isSymbolicLink()) return false;
+      } catch {
+        // Fall through to the stable Hook error below.
+      }
+    }
+    throw hookError("ERR_CODEX_HOOK_REMINDER_MARKER_FAILED", "Codex Hook reminder marker claim failed");
+  }
 }
 
 async function refreshProjectionIfCurrent(root, operation, suffix) {
