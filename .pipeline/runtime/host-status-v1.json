@@ -1,0 +1,22 @@
+{
+  "schema_version": "1",
+  "contract_version": "1",
+  "projection_status": "current",
+  "generated_at": "2026-07-23T15:41:39.426Z",
+  "generation": 56,
+  "workspace": {
+    "format_version": "1",
+    "status": "ready"
+  },
+  "delivery": {
+    "kind": "cycle",
+    "id": "vspi-symbiotic-workflow-core",
+    "status": "proposed",
+    "revision": 0
+  },
+  "continuation": {
+    "available": true,
+    "safe_resume_command": "/hw:resume"
+  },
+  "invalidation": null
+}

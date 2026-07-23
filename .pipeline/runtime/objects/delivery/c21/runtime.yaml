@@ -1,0 +1,109 @@
+completed_milestones:
+  - M1
+  - M2
+  - M3
+  - M4
+  - M5
+  - M6
+  - M7
+  - M8
+current_milestone: M8
+current_step: cycle_accepted
+cycle_id: C21
+delivery_kind: cycle
+milestones:
+  - depends_on: []
+    id: M1
+    order: 1
+    outcome: M1 accepted C21 delivery outcome
+    status: verified
+    title: Workspace format, transaction kernel, and legacy write fence
+    verification_criteria:
+      - M1 completion and independent validation evidence is recorded under .pipeline/reviews/C21/M1
+  - depends_on:
+      - M1
+    id: M2
+    order: 2
+    outcome: M2 accepted C21 delivery outcome
+    status: verified
+    title: Runtime, Records, Receipts, and Snapshots
+    verification_criteria:
+      - M2 completion and independent validation evidence is recorded under .pipeline/reviews/C21/M2
+  - depends_on:
+      - M2
+    id: M3
+    order: 3
+    outcome: M3 accepted C21 delivery outcome
+    status: verified
+    title: Recovery Journal, Capsule, and Pack engine
+    verification_criteria:
+      - M3 completion and independent validation evidence is recorded under .pipeline/reviews/C21/M3
+  - depends_on:
+      - M3
+    id: M4
+    order: 4
+    outcome: M4 accepted C21 delivery outcome
+    status: verified
+    title: Init, workspace adoption, and minimal Skill router
+    verification_criteria:
+      - M4 completion and independent validation evidence is recorded under .pipeline/reviews/C21/M4
+  - depends_on:
+      - M4
+    id: M5
+    order: 5
+    outcome: M5 accepted C21 delivery outcome
+    status: verified
+    title: Reference repository bootstrap and schema activation
+    verification_criteria:
+      - M5 completion and independent validation evidence is recorded under .pipeline/reviews/C21/M5
+  - depends_on:
+      - M5
+    id: M6
+    order: 6
+    outcome: M6 accepted C21 delivery outcome
+    status: verified
+    title: Goal/Cycle Delivery Core and adaptive Plan
+    verification_criteria:
+      - M6 completion and independent validation evidence is recorded under .pipeline/reviews/C21/M6
+  - depends_on:
+      - M6
+    id: M7
+    order: 7
+    outcome: M7 accepted C21 delivery outcome
+    status: verified
+    title: Ambient Maintain and Codex Hook adapter
+    verification_criteria:
+      - M7 completion and independent validation evidence is recorded under .pipeline/reviews/C21/M7
+  - depends_on:
+      - M7
+    id: M8
+    order: 8
+    outcome: M8 accepted C21 delivery outcome
+    status: verified
+    title: Surface cleanup, deletion gate, and release-ready regression
+    verification_criteria:
+      - M8 completion and independent validation evidence is recorded under .pipeline/reviews/C21/M8
+object_ref:
+  id: c21
+  kind: delivery
+plan_hash: 92fe9595e1a3562a9bd39a380471d6a597b5f7949901baa7f747f30618662fd2
+revision: 0
+schema_version: '1'
+status: accepted
+topology:
+  identity_constraints:
+    - - test
+      - implement
+    - - test
+      - audit
+    - - implement
+      - audit
+  profile: strict
+  required_roles:
+    - test
+    - implement
+    - audit
+  schema_version: '1'
+  separation_required: true
+  verification_required: true
+updated_at: 2026-07-12T14:30:41.922Z

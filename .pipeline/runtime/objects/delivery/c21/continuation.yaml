@@ -1,0 +1,12 @@
+current_milestone: M8
+next_action: >-
+  C21 is accepted. Discuss and explicitly plan a separate release and integration Cycle before changing VSP-Codex or
+  VSP-OpenCode.
+next_milestone: Release and integration planning
+object_ref:
+  id: c21
+  kind: delivery
+plan_hash: 92fe9595e1a3562a9bd39a380471d6a597b5f7949901baa7f747f30618662fd2
+revision: 0
+schema_version: '1'
+updated_at: 2026-07-12T14:30:41.922Z

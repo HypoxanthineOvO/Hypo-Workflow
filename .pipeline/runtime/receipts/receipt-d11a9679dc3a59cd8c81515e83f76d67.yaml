@@ -1,0 +1,18 @@
+actor:
+  id: operator
+  type: user
+authority_role: receipt
+consumed_at: 2026-07-18T07:40:41.294Z
+expires_at: 2099-01-01T00:00:00Z
+intent: delivery.approve
+issued_at: 2026-07-18T07:40:41.294Z
+object_ref:
+  id: c23-experiment-management
+  kind: delivery
+plan_hash: dc63837d450c3006b9ba106027f1fafdf218e9a13e1c185ae03dd1f952821c0e
+receipt_id: receipt-d11a9679dc3a59cd8c81515e83f76d67
+reserved_at: 2026-07-18T07:40:41.294Z
+reserved_by: tool-c23-r1-approve
+schema_version: '1'
+scope_hash: a29cfa60a46dd709cf9de68198b6863bfd0bfe2292bb3ca843554e20d7b70c20
+state: consumed

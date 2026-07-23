@@ -1,0 +1,154 @@
+{
+  "schema_version": "1",
+  "skill_name": "hypo-workflow",
+  "status": "draft_not_run",
+  "comparison": {
+    "candidate": "post-M8 Codex Skill bundle",
+    "baseline": "pre-M8 snapshot captured before cleanup",
+    "run_policy": "Run candidate and baseline from identical disposable fixtures; do not grade this draft until M8 implementation is complete."
+  },
+  "evals": [
+    {
+      "id": 1,
+      "name": "onboarding-guide-init-brownfield",
+      "prompt": "我刚接手一个已经能启动、但没有任何 .pipeline 的 Node.js 库存 API。目标是先把现状和项目目标纳入 Hypo-Workflow，后面再决定开 Goal 还是 Cycle。请先用 Guide 判断入口，然后按这个已明确的目标执行 Init：保留现有源码和 Git 改动，不要替我创建 Goal/Cycle，也不要修改业务代码。",
+      "expected_output": "Guide recommends Init, Init adopts the brownfield repository into the current manifest format, and the final chat explains what was recorded and which delivery route is appropriate next.",
+      "files": [],
+      "fixture_contract": {
+        "workspace": "Disposable brownfield Git repository with package.json, src/, tests/, one uncommitted user file, and no .pipeline directory.",
+        "comparison_reset": "Restore identical Git and filesystem bytes before each candidate/baseline run."
+      },
+      "expectations": [
+        "The route chosen before mutation is /hw:init, not setup or an implicit Goal/Cycle.",
+        "A valid .pipeline/manifest.yaml is activated and workspace detection reports current format.",
+        "The Adoption Brief and initial project Records describe only evidence present in the fixture and the supplied outcome.",
+        "No active Delivery reference is created and no Goal/Cycle Runtime object exists.",
+        "Existing source, test, and uncommitted user-file hashes are unchanged.",
+        "The final chat states the adoption result, recorded project purpose, limitations, and one recommended next route."
+      ],
+      "human_review": {
+        "required": true,
+        "question": "Does the onboarding explanation make the Guide -> Init distinction and the next choice understandable without exposing obsolete setup/platform machinery?"
+      }
+    },
+    {
+      "id": 2,
+      "name": "goal-single-bounded-outcome",
+      "prompt": "这个 CLI 已经有 text 输出。我只想增加一个 --json 选项：成功时输出稳定 JSON，参数错误保持现有退出码，现有 text 模式不能回归。请用 /hw:goal 把验收目标讨论清楚并生成提案；现在先不要实现，等我看完具体 Design 和确认绑定后再开始。",
+      "expected_output": "One Goal proposal with one Design and explicit acceptance criteria is persisted, while implementation waits behind separate approval and start gates.",
+      "files": [],
+      "fixture_contract": {
+        "workspace": "Current-format disposable CLI repository with no active delivery and passing text-mode tests.",
+        "comparison_reset": "Restore the same manifest, Records, source tree, and Git state before each run."
+      },
+      "expectations": [
+        "Exactly one Goal Delivery is proposed with one Design and no milestones field or milestone objects.",
+        "Acceptance criteria cover stable JSON, existing error exit codes, text-mode regression, and an executable test method.",
+        "Runtime remains proposed; no approval/start Receipt is issued or consumed before a displayed binding and later confirmation.",
+        "No product source or test file changes during proposal generation.",
+        "The selected execution topology is justified from scope instead of always forcing worker separation.",
+        "The chat displays the concrete Design, assumptions, acceptance criteria, and the exact next decision."
+      ],
+      "human_review": {
+        "required": true,
+        "question": "Is the Goal concise enough for a capable model while still giving you a concrete, trustworthy acceptance target before execution?"
+      }
+    },
+    {
+      "id": 3,
+      "name": "cycle-ordered-interface-migration",
+      "prompt": "我们要把用户资料接口从 v1 迁到 v2，顺序必须是：先确定新 schema 和兼容层，再迁移服务端调用，最后移除旧入口并跑整体验收。中间阶段可以验证，但只在整个迁移结束后让我做一次人工验收。请用 /hw:cycle 生成可执行计划，现在不要改代码。",
+      "expected_output": "One Cycle proposal contains dependency-ordered milestones and one aggregate final acceptance boundary, with no implementation before approval and start.",
+      "files": [],
+      "fixture_contract": {
+        "workspace": "Current-format disposable service repository with v1 routes, callers, tests, and no active delivery.",
+        "comparison_reset": "Restore identical workspace and Git bytes before candidate/baseline runs."
+      },
+      "expectations": [
+        "Exactly one Cycle is proposed with a non-empty ordered milestone list matching schema/compatibility -> caller migration -> old-entry removal and aggregate verification.",
+        "Milestone dependencies and verification criteria are explicit and mechanically consistent.",
+        "No milestone contains a user acceptance gate; only the aggregate Cycle has final manual acceptance.",
+        "Runtime remains proposed and no implementation files change before approval plus a separate start Receipt.",
+        "The plan identifies old-entry deletion as a separately controlled destructive boundary rather than assuming authorization.",
+        "The chat shows the milestone table, dependencies, verification plan, and the exact confirmation context."
+      ],
+      "human_review": {
+        "required": true,
+        "question": "Do the milestones reflect real dependency order without turning every technical checkpoint into another command or approval ceremony?"
+      }
+    },
+    {
+      "id": 4,
+      "name": "maintain-focused-preference-record",
+      "prompt": "记录一个长期项目偏好：管理后台的页面区块默认用无边框布局，不要把每个区块都套进卡片；只有重复条目、弹窗和真正需要边界的工具可以使用卡片。这个只是日常维护记录，不要开 Goal 或 Cycle。",
+      "expected_output": "One bounded preference Record is created without occupying the active Delivery pointer, and the saved substance is reported in chat.",
+      "files": [],
+      "fixture_contract": {
+        "workspace": "Current-format disposable frontend repository with no active delivery and an existing project Record index.",
+        "comparison_reset": "Restore the same Record store and indexes before each run."
+      },
+      "expectations": [
+        "Exactly one new preference Record contains the bounded layout rule and its user source.",
+        "Derived Record indexes include the new Record exactly once and remain rebuildable.",
+        "runtime/active.yaml is unchanged and no Goal, Cycle, Patch, or generic Rules authority is created.",
+        "Legacy state.yaml, cycle.yaml, rules.yaml, log.yaml, PROGRESS.md, and knowledge/ remain untouched.",
+        "No business/UI source file is edited because the request is to record a preference, not implement it.",
+        "The final chat restates the saved preference and its scope rather than returning only a file path."
+      ],
+      "human_review": {
+        "required": true,
+        "question": "Does Maintain preserve the practical design intent in a reusable form without inflating it into a global Rules system or a delivery?"
+      }
+    },
+    {
+      "id": 5,
+      "name": "resume-after-compaction-with-stale-pack",
+      "prompt": "刚才上下文压缩后断了，请继续当前的 Workflow。不要重新规划，也不要重复已经完成的步骤；先告诉我你恢复到了哪个 Delivery、当前状态和下一步。",
+      "expected_output": "Resume selects the active Delivery, treats Runtime and Continuation as authority, uses the stale Pack only for bounded context, and reports the exact next action without mutation.",
+      "files": [],
+      "fixture_contract": {
+        "workspace": "Current-format disposable Cycle with active.delivery, Runtime executing milestone 2, Continuation pointing to its next test step, Journal delta after a valid but stale Recovery Pack, and conflicting frozen legacy state files.",
+        "comparison_reset": "Restore identical Runtime, Continuation, Pack, Journal, legacy sentinels, and Git bytes before each run."
+      },
+      "expectations": [
+        "Resume selects only runtime/active.yaml active.delivery and does not choose an inactive object.",
+        "Returned lifecycle state and next_action match current Runtime/Continuation, not the older Pack or frozen legacy files.",
+        "Pack status is reported as stale and only the bounded Journal delta needed after its vector cursor is replayed.",
+        "The complete workspace tree is byte-for-byte unchanged by Resume.",
+        "No saved shell command is executed and no completed transition is replayed.",
+        "The chat names the Delivery, current milestone/state, recovery status, and exact next action before continuing."
+      ],
+      "human_review": {
+        "required": true,
+        "question": "Would this recovery summary let you trust continuation after compaction without reading raw Runtime, Pack, or transcript files yourself?"
+      }
+    },
+    {
+      "id": 6,
+      "name": "reject-pending-cycle-with-structured-feedback",
+      "prompt": "我拒绝这次验收。问题是移动端筛选抽屉打开后会遮住保存按钮；复现：390px 宽度打开筛选并滚到底部；预期保存按钮始终可见，实际按钮在遮罩层下面。请按 /hw:reject 处理。先把具体拒绝绑定讲清楚，评测 harness 会在看到完整绑定后单独回复“确认拒绝”。",
+      "expected_output": "After a separate exact confirmation, one rejection Receipt is consumed, one structured Feedback Record is written, and the pending Cycle moves to needs_revision without product edits or automatic restart.",
+      "files": [],
+      "interaction": {
+        "follow_up_after_gate": "确认拒绝",
+        "gate_must_precede_follow_up": true
+      },
+      "fixture_contract": {
+        "workspace": "Current-format disposable Cycle in pending_acceptance with verified evidence and unchanged product files.",
+        "comparison_reset": "Restore identical pending Runtime, plan hash, evidence, Records, and Git bytes before each run."
+      },
+      "expectations": [
+        "Before follow-up, the full actor/intent/object/scope/plan binding is displayed and Runtime remains pending_acceptance.",
+        "After follow-up, exactly one delivery.reject Receipt bound to the current Cycle and plan is issued and consumed once.",
+        "Exactly one Feedback Record contains problem, reproduce_steps, expected, actual, and relevant context.",
+        "Runtime moves to needs_revision and Continuation points to revised proposal work without starting execution.",
+        "No product file is edited and no replacement Design/Plan is silently approved or started.",
+        "The final chat explains the rejection, stored feedback, new lifecycle state, and next user decision."
+      ],
+      "human_review": {
+        "required": true,
+        "question": "Was the rejection gate concrete enough to confirm safely, and did the response preserve your feedback without treating it as permission to start rework?"
+      }
+    }
+  ]
+}

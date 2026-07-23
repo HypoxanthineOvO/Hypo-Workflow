@@ -1,0 +1,24 @@
+{
+  "captured_at": "2026-07-12T08:15:40+08:00",
+  "purpose": "C21-M5 pre-activation proof that legacy authority bytes and mtimes remain frozen through fresh-process restore",
+  "files": [
+    {
+      "path": ".pipeline/state.yaml",
+      "sha256": "8b97e6df7a2b78469008b776e65bebd6227eb660e6cba2953422aa38f5cf4d17",
+      "size_bytes": 39182,
+      "mtime_ns": "1783815360088171556"
+    },
+    {
+      "path": ".pipeline/cycle.yaml",
+      "sha256": "d5fdedd7e7d54da5c07687b814492a2d50c06df40fa8e4ff9e908bb4dda472cb",
+      "size_bytes": 606,
+      "mtime_ns": "1783815360286160870"
+    },
+    {
+      "path": ".pipeline/log.yaml",
+      "sha256": "14f108a6994130ec59f60e7a94169df80998ee7319dc4b5dd0f6fa2f8a268222",
+      "size_bytes": 690935,
+      "mtime_ns": "1783815360290160654"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+next_action: delivery_complete
+object_ref:
+  id: c23-experiment-management
+  kind: delivery
+plan_hash: dc63837d450c3006b9ba106027f1fafdf218e9a13e1c185ae03dd1f952821c0e
+revision: 1
+schema_version: '1'
+updated_at: 2026-07-18T15:10:22.604Z
+worker_routing:
+  assessment:
+    blast_radius: high
+    complexity: high
+    oracle_strength: mixed
+    reversibility: guarded
+    risk_flags:
+      - authority_change
+    schema_version: '1'
+    summary: >-
+      Independently audit the final frozen M7 contract and verify closure of the config, bounded-input, and
+      unrouted-worker findings.
+    uncertainty: low
+  failure_state:
+    distinct_failed_route_count: 0
+    distinct_failed_route_ids: []
+    escalation_threshold: 2
+  policy_version: worker-routing-v1
+  reason_codes:
+    - independent_audit
+  routing_class: critical
+  schema_version: '1'
+  source: host_task_assessment

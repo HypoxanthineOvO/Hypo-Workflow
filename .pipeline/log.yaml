@@ -1,4 +1,2623 @@
 entries:
+  - evidence_refs:
+      - .pipeline/prompts/04-reference-repository-bootstrap-and-schema-activation.md
+      - .pipeline/reviews/C21/M5/implementation-evidence.md
+    id: C21-M5-IMPLEMENT-WORKER-STARTED-20260712T0656520800
+    ref: C21-M5/implement
+    status: in_progress
+    summary: >-
+      Started independent production-only M5 implement worker for proposal topology, deterministic staging, cutover,
+      rollback, and restore APIs.
+    timestamp: 2026-07-12T06:56:52+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m5_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M5-RED-CONFIRMED-20260712T0656520800
+    ref: C21-M5/run_tests_red
+    status: completed
+    summary: Main independently confirmed the three M5 missing-API RED families with all existing behavior green.
+    timestamp: 2026-07-12T06:56:52+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - 24 total / 3 pass / 3 fail / 18 skip
+      - proposal API gate fail
+      - deterministic writer API gate fail
+      - cutover/recovery API gate fail
+  - id: C21-M5-RED-CONFIRMATION-STARTED-20260712T0655110800
+    ref: C21-M5/run_tests_red
+    status: in_progress
+    summary: Started main-thread confirmation of the three M5 missing-API RED gates.
+    timestamp: 2026-07-12T06:55:11+08:00
+    trigger: assistant
+    type: step_started
+    validations:
+      - 'target: 24 total / 3 pass / 3 fail / 18 skip'
+  - evidence_refs:
+      - .pipeline/reviews/C21/M5/test-evidence.md
+    id: C21-M5-TEST-WORKER-COMPLETE-20260712T0655110800
+    ref: C21-M5/write_tests
+    report: .pipeline/reviews/C21/M5/test-evidence.md
+    status: completed
+    summary: >-
+      M5 test worker completed proposal, deterministic writer, activation, rollback, single-writer, and fresh-process
+      RED contracts.
+    timestamp: 2026-07-12T06:55:11+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - focused 24 total / 3 pass / 3 fail / 18 skip
+      - full 907 pass / 3 fail / 18 skip
+      - M1 76/76; M2 61/61; M3 47/47; M4 44/44
+    worker:
+      id: /root/m5_test
+      lifecycle: closed
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/04-reference-repository-bootstrap-and-schema-activation.md
+      - .pipeline/reviews/C21/M5/test-evidence.md
+    id: C21-M5-TEST-WORKER-STARTED-20260712T0636230800
+    ref: C21-M5/write_tests
+    status: in_progress
+    summary: >-
+      Started independent M5 test worker for Bootstrap proposal, activation, single-writer, privacy, and fresh-process
+      recovery contracts.
+    timestamp: 2026-07-12T06:36:23+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m5_test
+      lifecycle: started
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/04-reference-repository-bootstrap-and-schema-activation.md
+    id: C21-M5-START-20260712T0636230800
+    ref: C21-M5
+    status: in_progress
+    summary: Started C21-M5 internal reference-repository Bootstrap Job and schema activation milestone.
+    timestamp: 2026-07-12T06:36:23+08:00
+    trigger: assistant
+    type: milestone_start
+  - evidence_refs:
+      - .pipeline/architecture.md
+      - .pipeline/prompts/04-reference-repository-bootstrap-and-schema-activation.md
+    id: C21-M4-PLAN-REVIEW-COMPLETE-20260712T0636230800
+    ref: C21-M4/plan-review
+    status: completed
+    summary: M4 Architecture Plan Review confirmed the baseline and found no stale assumptions requiring M5-M8 prompt patches.
+    timestamp: 2026-07-12T06:36:23+08:00
+    trigger: assistant
+    type: plan_review
+  - id: C21-M4-COMPLETE-20260712T0636230800
+    ref: C21-M4
+    report: .pipeline/reports/03-init-workspace-adoption-and-minimal-skill-router.report.md
+    status: completed
+    summary: Completed C21-M4 Init, Brownfield adoption, Legacy inspection, command exposure, and progressive Skill router.
+    timestamp: 2026-07-12T06:32:43+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - M4 44/44
+      - full 904/904
+      - M1 76/76
+      - M2 61/61
+      - M3 47/47
+      - log 7/7
+      - final audit PASS
+  - evidence_refs:
+      - .pipeline/reviews/C21/M4/final-audit.md
+    id: C21-M4-FINAL-REAUDIT-PASS-20260712T0629370800
+    ref: C21-M4/review_code
+    report: .pipeline/reviews/C21/M4/final-audit.md
+    status: completed
+    summary: Fresh cumulative M4 re-audit passed with zero findings and closed all three initial audit findings.
+    timestamp: 2026-07-12T06:29:37+08:00
+    trigger: subagent
+    type: audit_complete
+    validations:
+      - focused 44/44
+      - 0 Critical / 0 Warning / 0 Info
+      - 54 canonical / 53 legacy / 2 discoverable
+      - Skill quality 0 issues / 45 Skills
+    worker:
+      id: /root/m4_reaudit
+      lifecycle: closed
+      role: audit
+  - evidence_refs:
+      - .pipeline/reviews/C21/M4/audit.md
+      - .pipeline/reviews/C21/M4/test-evidence.md
+      - .pipeline/reviews/C21/M4/implementation-evidence.md
+      - .pipeline/reviews/C21/M4/final-audit.md
+    id: C21-M4-FINAL-REAUDIT-STARTED-20260712T0621480800
+    ref: C21-M4/review_code
+    status: in_progress
+    summary: Started fresh cumulative M4 re-audit after audit-driven Revision 4 and complete main-thread GREEN validation.
+    timestamp: 2026-07-12T06:21:48+08:00
+    trigger: assistant
+    type: audit_started
+    worker:
+      id: /root/m4_reaudit
+      lifecycle: started
+      role: audit
+  - id: C21-M4-FINAL-AUDIT-DRIVEN-GREEN-20260712T0621480800
+    ref: C21-M4/run_tests_green
+    status: completed
+    summary: M4 passed the cumulative audit-driven focused, full, compatibility, lifecycle, and static validation boundary.
+    timestamp: 2026-07-12T06:21:48+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - M4 44/44
+      - full 904/904
+      - M1 76/76
+      - M2 61/61
+      - M3 47/47
+      - log 7/7
+      - M4 exports 4/4
+      - command counts 54 canonical / 53 legacy / 2 discoverable
+      - Skill quality 0 issues / 45 Skills
+      - config/diff/syntax/whitespace/credential/TODO pass
+  - id: C21-M4-FINAL-AUDIT-DRIVEN-VALIDATION-STARTED-20260712T0614500800
+    ref: C21-M4/run_tests_green
+    status: in_progress
+    summary: Started final M4 audit-driven focused, full, compatibility, and static validation.
+    timestamp: 2026-07-12T06:14:50+08:00
+    trigger: assistant
+    type: step_started
+  - id: C21-M4-TEST-REVISION-3-COMPLETE-20260712T0614500800
+    ref: C21-M4/write_tests
+    report: .pipeline/reviews/C21/M4/test-evidence.md
+    status: completed
+    summary: >-
+      M4 test Revision 3 aligned basename probes with the declared bounded scan and proved non-scanned metadata
+      non-projection.
+    timestamp: 2026-07-12T06:14:50+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - M4 44/44
+      - M1 76/76
+      - M2 61/61
+      - M3 47/47
+    worker:
+      id: /root/m4_test
+      lifecycle: closed
+      role: test
+  - id: C21-M4-TEST-REVISION-3-STARTED-20260712T0611460800
+    ref: C21-M4/write_tests
+    status: in_progress
+    summary: Reopened /root/m4_test to align two basename probes with the bounded scanner scope.
+    timestamp: 2026-07-12T06:11:46+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m4_test
+      lifecycle: started
+      role: test
+  - id: C21-M4-AUDIT-GREEN-ATTEMPT-1-PARTIAL-20260712T0611460800
+    ref: C21-M4/run_tests_green
+    status: needs_changes
+    summary: M4 Revision 4 reached 41/44; two remaining leaves used paths outside the declared bounded scan.
+    timestamp: 2026-07-12T06:11:46+08:00
+    trigger: assistant
+    type: step_result
+    validations:
+      - unknown request keys green
+      - recursive package metadata green
+      - repoRoot symlink green
+      - legacy .pipeline ancestor green
+      - two out-of-scan basename fixtures require correction
+  - id: C21-M4-AUDIT-GREEN-VALIDATION-STARTED-20260712T0609050800
+    ref: C21-M4/run_tests_green
+    status: in_progress
+    summary: Started main-thread validation of the 44-case M4 audit-driven suite.
+    timestamp: 2026-07-12T06:09:05+08:00
+    trigger: assistant
+    type: step_started
+    validations:
+      - 'target: 44/44'
+  - id: C21-M4-IMPLEMENT-REVISION-4-COMPLETE-20260712T0609050800
+    ref: C21-M4/implement
+    report: .pipeline/reviews/C21/M4/implementation-evidence.md
+    status: completed
+    summary: M4 implement Revision 4 completed metadata sanitization and symlink trust-anchor fixes.
+    timestamp: 2026-07-12T06:09:05+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - C21_M4_REVISION4_SMOKE_OK
+      - all prior M4 production/registry/revision smokes pass
+      - 54/53/2 command layers
+      - Skill quality 0 issues / 45 Skills
+    worker:
+      id: /root/m4_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M4/implementation-evidence.md
+    id: C21-M4-IMPLEMENT-REVISION-4-STARTED-20260712T0556570800
+    ref: C21-M4/implement
+    status: in_progress
+    summary: Reopened /root/m4_implement for audit-driven metadata and path trust fixes.
+    timestamp: 2026-07-12T05:56:57+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m4_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M4-AUDIT-RED-CONFIRMED-20260712T0556570800
+    ref: C21-M4/run_tests_red
+    status: completed
+    summary: Main independently confirmed all four M4 audit-driven RED clusters.
+    timestamp: 2026-07-12T05:56:57+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - M4 44 total / 33 pass / 11 fail / 0 skip
+      - prior 25 contracts remain green
+      - M1 76/76
+      - M2 61/61
+      - M3 47/47
+  - id: C21-M4-AUDIT-RED-CONFIRMATION-STARTED-20260712T0555260800
+    ref: C21-M4/run_tests_red
+    status: in_progress
+    summary: Started main-thread confirmation of M4 audit-driven RED.
+    timestamp: 2026-07-12T05:55:26+08:00
+    trigger: assistant
+    type: step_started
+  - id: C21-M4-TEST-REVISION-2-COMPLETE-20260712T0555260800
+    ref: C21-M4/write_tests
+    report: .pipeline/reviews/C21/M4/test-evidence.md
+    status: completed
+    summary: M4 test Revision 2 completed four audit-driven adversarial RED clusters.
+    timestamp: 2026-07-12T05:55:26+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - M4 44 total / 33 pass / 11 fail / 0 skip
+      - prior 25 contracts remain green
+      - M1 76/76
+      - M2 61/61
+      - M3 47/47
+    worker:
+      id: /root/m4_test
+      lifecycle: closed
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M4/audit.md
+      - .pipeline/reviews/C21/M4/test-evidence.md
+    id: C21-M4-TEST-REVISION-2-STARTED-20260712T0548100800
+    ref: C21-M4/write_tests
+    status: in_progress
+    summary: Reopened /root/m4_test for three audit-driven adversarial RED clusters.
+    timestamp: 2026-07-12T05:48:10+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m4_test
+      lifecycle: started
+      role: test
+  - id: C21-M4-AUDIT-NEEDS-CHANGES-20260712T0548100800
+    ref: C21-M4/review_code
+    report: .pipeline/reviews/C21/M4/audit.md
+    status: needs_changes
+    summary: Independent M4 audit found one Critical and two Warning path/metadata trust gaps; returned milestone to TDD.
+    timestamp: 2026-07-12T05:48:10+08:00
+    trigger: subagent
+    type: audit_complete
+    validations:
+      - existing focused 25/25
+      - audit findings 1 Critical / 2 Warning
+    worker:
+      id: /root/m4_audit
+      lifecycle: closed
+      role: audit
+  - evidence_refs:
+      - .pipeline/reviews/C21/M4/test-evidence.md
+      - .pipeline/reviews/C21/M4/implementation-evidence.md
+    id: C21-M4-AUDIT-STARTED-20260712T0535070800
+    ref: C21-M4/review_code
+    status: in_progress
+    summary: Started fresh independent M4 audit after complete validation.
+    timestamp: 2026-07-12T05:35:07+08:00
+    trigger: assistant
+    type: audit_started
+    worker:
+      id: /root/m4_audit
+      lifecycle: started
+      role: audit
+  - id: C21-M4-FINAL-GREEN-20260712T0535070800
+    ref: C21-M4/run_tests_green
+    status: completed
+    summary: M4 passed focused, full, compatibility, lifecycle, and static validation.
+    timestamp: 2026-07-12T05:35:07+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - M4 25/25
+      - full 885/885
+      - M1 76/76
+      - M2 61/61
+      - M3 47/47
+      - log 7/7
+      - M4 exports 4/4
+      - command counts 54 canonical / 53 legacy / 2 discoverable
+      - Skill quality 45/45
+      - config/diff/syntax/whitespace/credential pass
+  - id: C21-M4-FINAL-VALIDATION-STARTED-20260712T0532440800
+    ref: C21-M4/run_tests_green
+    status: in_progress
+    summary: Started final M4 focused, full, compatibility, and static validation.
+    timestamp: 2026-07-12T05:32:44+08:00
+    trigger: assistant
+    type: step_started
+  - id: C21-M4-IMPLEMENT-REVISION-3-COMPLETE-20260712T0532440800
+    ref: C21-M4/implement
+    report: .pipeline/reviews/C21/M4/implementation-evidence.md
+    status: completed
+    summary: M4 implement Revision 3 completed one bounded Guide compatibility correction.
+    timestamp: 2026-07-12T05:32:44+08:00
+    trigger: subagent
+    type: step_complete
+    worker:
+      id: /root/m4_implement
+      lifecycle: closed
+      role: implement
+  - id: C21-M4-IMPLEMENT-REVISION-3-STARTED-20260712T0531020800
+    ref: C21-M4/implement
+    status: in_progress
+    summary: Reopened /root/m4_implement for one bounded Guide compatibility phrase.
+    timestamp: 2026-07-12T05:31:02+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m4_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M4-FULL-ATTEMPT-2-RED-20260712T0531020800
+    ref: C21-M4/run_tests_green
+    status: needs_changes
+    summary: M4 full Attempt 2 reached 884/885; only Guide one-next-path wording remains.
+    timestamp: 2026-07-12T05:31:02+08:00
+    trigger: assistant
+    type: step_result
+    validations:
+      - M4 focused 25/25
+      - full 884/885
+      - log 7/7
+      - Skill quality 0 issues
+  - id: C21-M4-VALIDATION-REVISION-2-STARTED-20260712T0528500800
+    ref: C21-M4/run_tests_green
+    status: in_progress
+    summary: Started main-thread focused and full validation for M4 Revision 2.
+    timestamp: 2026-07-12T05:28:50+08:00
+    trigger: assistant
+    type: step_started
+  - id: C21-M4-IMPLEMENT-REVISION-2-COMPLETE-20260712T0528500800
+    ref: C21-M4/implement
+    report: .pipeline/reviews/C21/M4/implementation-evidence.md
+    status: completed
+    summary: >-
+      M4 implement Revision 2 separated canonical and legacy command inventories and restored compact Skill
+      compatibility.
+    timestamp: 2026-07-12T05:28:50+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - canonical routes 54; legacy commandMap 53
+      - Cursor legacy bundle excludes Goal
+      - checkSkillQuality 0 issues / 45 Skills
+      - Root Skill 105 lines / 7183 bytes
+    worker:
+      id: /root/m4_implement
+      lifecycle: closed
+      role: implement
+  - id: C21-M4-IMPLEMENT-REVISION-2-STARTED-20260712T0524140800
+    ref: C21-M4/implement
+    status: in_progress
+    summary: Reopened /root/m4_implement for legacy commandMap and compact Skill compatibility corrections.
+    timestamp: 2026-07-12T05:24:14+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m4_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M4-FULL-ATTEMPT-1-RED-20260712T0524140800
+    ref: C21-M4/run_tests_green
+    status: needs_changes
+    summary: M4 focused passed 25/25; full regression reached 871/885 with 14 legacy projection and Skill-quality failures.
+    timestamp: 2026-07-12T05:24:14+08:00
+    trigger: assistant
+    type: step_result
+    validations:
+      - M4 25/25
+      - full 871/885
+      - M1 76/76
+      - M2 61/61
+      - M3 47/47
+      - log 7/7
+      - config/diff/syntax pass
+  - id: C21-M4-FOCUSED-REVISION-1-GREEN-20260712T0521450800
+    ref: C21-M4/run_tests_green
+    status: completed
+    summary: M4 Revision 1 focused suite reached 25/25; full validation started.
+    timestamp: 2026-07-12T05:21:45+08:00
+    trigger: assistant
+    type: step_checkpoint
+    validations:
+      - M4 focused 25/25
+      - Init, legacy inspection, router/discovery, exposure, and Skill contracts green
+  - id: C21-M4-VALIDATION-REVISION-1-STARTED-20260712T0521050800
+    ref: C21-M4/run_tests_green
+    status: in_progress
+    summary: Started main-thread M4 Revision 1 focused validation.
+    timestamp: 2026-07-12T05:21:05+08:00
+    trigger: assistant
+    type: step_started
+    validations:
+      - 'target: 25/25'
+  - id: C21-M4-IMPLEMENT-REVISION-1-COMPLETE-20260712T0521050800
+    ref: C21-M4/implement
+    report: .pipeline/reviews/C21/M4/implementation-evidence.md
+    status: completed
+    summary: M4 implement Revision 1 completed five narrow envelope and symlink-safety fixes.
+    timestamp: 2026-07-12T05:21:05+08:00
+    trigger: subagent
+    type: step_complete
+    worker:
+      id: /root/m4_implement
+      lifecycle: closed
+      role: implement
+  - id: C21-M4-TEST-REVISION-1-COMPLETE-20260712T0521050800
+    ref: C21-M4/write_tests
+    report: .pipeline/reviews/C21/M4/test-evidence.md
+    status: completed
+    summary: M4 test Revision 1 aligned semantic-purpose assertions with certified M2 Record kinds.
+    timestamp: 2026-07-12T05:21:05+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - interim focused 20/25
+      - M1 76/76
+      - M2 61/61
+      - M3 47/47
+    worker:
+      id: /root/m4_test
+      lifecycle: closed
+      role: test
+  - id: C21-M4-IMPLEMENT-REVISION-1-STARTED-20260712T0517330800
+    ref: C21-M4/implement
+    status: in_progress
+    summary: Reopened /root/m4_implement for five narrow envelope and symlink-safety corrections.
+    timestamp: 2026-07-12T05:17:33+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m4_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M4-TEST-REVISION-1-STARTED-20260712T0517330800
+    ref: C21-M4/write_tests
+    status: in_progress
+    summary: Reopened /root/m4_test to align semantic-purpose assertions with the certified M2 Record taxonomy.
+    timestamp: 2026-07-12T05:17:33+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m4_test
+      lifecycle: started
+      role: test
+  - id: C21-M4-FOCUSED-ATTEMPT-1-RED-20260712T0517330800
+    ref: C21-M4/run_tests_green
+    status: needs_changes
+    summary: M4 focused Attempt 1 reached 18/25; five production differences and two M2-incompatible test assumptions remain.
+    timestamp: 2026-07-12T05:17:33+08:00
+    trigger: assistant
+    type: step_result
+    validations:
+      - M4 25 tests / 18 pass / 7 fail
+      - router/discovery behavior and Root Skill scale green
+      - no-input, legacy raw inspection, transaction recovery, secret gates, isolated Init green
+  - id: C21-M4-VALIDATION-STARTED-20260712T0515380800
+    ref: C21-M4/run_tests_green
+    status: in_progress
+    summary: Started main-thread M4 focused validation.
+    timestamp: 2026-07-12T05:15:38+08:00
+    trigger: assistant
+    type: step_started
+    validations:
+      - 'target: 25/25'
+  - id: C21-M4-IMPLEMENT-WORKER-COMPLETE-20260712T0515380800
+    ref: C21-M4/implement
+    report: .pipeline/reviews/C21/M4/implementation-evidence.md
+    status: completed
+    summary: >-
+      M4 production implementation completed Init, inspector, router/discovery, exposure metadata, and focused Skill
+      rewrite.
+    timestamp: 2026-07-12T05:15:38+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - C21_M4_PRODUCTION_SMOKES_OK
+      - C21_M4_ADVERSARIAL_SMOKES_OK
+      - C21_M4_REGISTRY_SKILL_SMOKE_OK
+      - Root Skill 100 lines / 6779 bytes
+    worker:
+      id: /root/m4_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M4/implementation-evidence.md
+    id: C21-M4-IMPLEMENT-WORKER-STARTED-20260712T0453170800
+    ref: C21-M4/implement
+    status: in_progress
+    summary: Started /root/m4_implement for production-only Init, inspector, router, exposure, and focused Skill changes.
+    timestamp: 2026-07-12T04:53:17+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m4_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M4-RED-CONFIRMED-20260712T0453170800
+    ref: C21-M4/run_tests_red
+    status: completed
+    summary: Main independently confirmed M4 RED and exact seven missing production boundaries.
+    timestamp: 2026-07-12T04:53:17+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - M4 25 total / 0 pass / 7 fail / 18 skip
+      - no fixture or certified M1-M3 regression
+  - id: C21-M4-RED-CONFIRMATION-STARTED-20260712T0450590800
+    ref: C21-M4/run_tests_red
+    status: in_progress
+    summary: Started main-thread confirmation of M4 RED contracts.
+    timestamp: 2026-07-12T04:50:59+08:00
+    trigger: assistant
+    type: step_started
+  - id: C21-M4-TEST-WORKER-COMPLETE-20260712T0450590800
+    ref: C21-M4/write_tests
+    report: .pipeline/reviews/C21/M4/test-evidence.md
+    status: completed
+    summary: M4 test worker completed behavior-first Init, legacy, router, and exposure RED contracts.
+    timestamp: 2026-07-12T04:50:59+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - M4 25 total / 0 pass / 7 fail / 18 skip
+      - M1 76/76
+      - M2 61/61
+      - M3 47/47
+    worker:
+      id: /root/m4_test
+      lifecycle: closed
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M4/test-evidence.md
+    id: C21-M4-TEST-WORKER-STARTED-20260712T0435580800
+    ref: C21-M4/write_tests
+    status: in_progress
+    summary: Started /root/m4_test for real-filesystem Init, adoption, router, and exposure RED contracts.
+    timestamp: 2026-07-12T04:35:58+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m4_test
+      lifecycle: started
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/03-init-workspace-adoption-and-minimal-skill-router.md
+      - .pipeline/architecture.md
+    id: C21-M4-TEST-WORKER-REQUESTED-20260712T0435580800
+    ref: C21-M4/write_tests
+    status: requested
+    summary: Requested behavior-first M4 RED tests with legacy zero-write and progressive-disclosure routing.
+    timestamp: 2026-07-12T04:35:58+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: /root/m4_test
+      lifecycle: requested
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/03-init-workspace-adoption-and-minimal-skill-router.md
+      - .pipeline/architecture.md
+    id: C21-M4-START-20260712T0434560800
+    ref: C21-M4
+    status: in_progress
+    summary: Started C21-M4 Init, workspace adoption, and minimal Skill router.
+    timestamp: 2026-07-12T04:34:56+08:00
+    trigger: assistant
+    type: milestone_start
+  - id: C21-M3-PLAN-REVIEW-20260712T0434560800
+    ref: C21-M3/plan_review
+    report: .pipeline/reports/02-recovery-journal-capsule-and-pack-engine.report.md
+    status: completed
+    summary: M3 architecture baseline remains valid; M4-M8 prompts require no patches.
+    timestamp: 2026-07-12T04:34:56+08:00
+    trigger: assistant
+    type: plan_review
+  - id: C21-M3-COMPLETE-20260712T0434560800
+    ref: C21-M3
+    report: .pipeline/reports/02-recovery-journal-capsule-and-pack-engine.report.md
+    status: completed
+    summary: Completed C21-M3 Recovery Journal, Capsule, and Pack Engine after fresh audit PASS.
+    timestamp: 2026-07-12T04:34:56+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - focused 47/47
+      - full 860/860
+      - M1 76/76
+      - M2 61/61
+      - log 7/7
+      - final audit PASS 0 blocking / 0 warning
+  - id: C21-M3-FINAL-AUDIT-COMPLETE-20260712T0434560800
+    ref: C21-M3/review_code
+    report: .pipeline/reviews/C21/M3/final-audit.md
+    status: completed
+    summary: Fresh independent M3 audit passed and closed all six initial findings.
+    timestamp: 2026-07-12T04:34:56+08:00
+    trigger: subagent
+    type: audit_complete
+    worker:
+      id: /root/m3_final_audit
+      lifecycle: closed
+      role: audit
+  - evidence_refs:
+      - .pipeline/reviews/C21/M3/audit.md
+      - .pipeline/reviews/C21/M3/test-evidence.md
+      - .pipeline/reviews/C21/M3/implementation-evidence.md
+    id: C21-M3-FINAL-AUDIT-STARTED-20260712T0424560800
+    ref: C21-M3/review_code
+    status: in_progress
+    summary: Started fresh independent M3 final audit after complete validation.
+    timestamp: 2026-07-12T04:24:56+08:00
+    trigger: assistant
+    type: audit_started
+    worker:
+      id: /root/m3_final_audit
+      lifecycle: started
+      role: audit
+  - id: C21-M3-FINAL-GREEN-REVISION-5-20260712T0424560800
+    ref: C21-M3/run_tests_green
+    status: completed
+    summary: M3 Revision 5 passed focused, full, compatibility, lifecycle, and static validation.
+    timestamp: 2026-07-12T04:24:56+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - M3 focused 47/47
+      - full regression 860/860
+      - M1 76/76
+      - M2 61/61
+      - lifecycle log 7/7
+      - Recovery exports 14/14
+      - config, diff, syntax, whitespace, credential scans pass
+  - id: C21-M3-FOCUSED-REVISION-5-GREEN-20260712T0420570800
+    ref: C21-M3/run_tests_green
+    status: completed
+    summary: M3 Revision 5 focused suite reached 47/47; full validation started.
+    timestamp: 2026-07-12T04:20:57+08:00
+    trigger: assistant
+    type: step_checkpoint
+    validations:
+      - M3 focused 47/47
+      - all six audit clusters green
+      - same-segment and sealed-segment incremental paths green
+  - id: C21-M3-VALIDATION-REVISION-5-STARTED-20260712T0420170800
+    ref: C21-M3/run_tests_green
+    status: in_progress
+    summary: Started main-thread focused validation for M3 Revision 5.
+    timestamp: 2026-07-12T04:20:17+08:00
+    trigger: assistant
+    type: step_started
+    validations:
+      - 'target: focused 47/47'
+  - id: C21-M3-IMPLEMENT-REVISION-5-COMPLETE-20260712T0420170800
+    ref: C21-M3/implement
+    report: .pipeline/reviews/C21/M3/implementation-evidence.md
+    status: completed
+    summary: M3 implement Revision 5 completed selective cursor-segment replay.
+    timestamp: 2026-07-12T04:20:17+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - same-segment delta production smoke pass
+      - cursor-segment gap then rotate and Pack production smoke pass
+      - sealed corrupt cursor-segment skip production smoke pass
+    worker:
+      id: /root/m3_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M3/implementation-evidence.md
+    id: C21-M3-IMPLEMENT-REVISION-5-STARTED-20260712T0416540800
+    ref: C21-M3/implement
+    status: in_progress
+    summary: Reopened /root/m3_implement for selective cursor-segment delta replay.
+    timestamp: 2026-07-12T04:16:54+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m3_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M3-FOCUSED-ATTEMPT-4-RED-20260712T0416540800
+    ref: C21-M3/run_tests_green
+    status: needs_changes
+    summary: >-
+      Revision 4 focused validation reached 39/47; unconditional cursor-segment skipping regressed same-segment deltas
+      and Pack cursor binding.
+    timestamp: 2026-07-12T04:16:54+08:00
+    trigger: assistant
+    type: step_result
+    validations:
+      - M3 47 tests / 39 pass / 8 fail
+      - routing metadata gate 4/4 green
+      - unreadable sealed cursor-segment incremental contract green
+      - tampered and impossible Capsule cursors green
+      - remaining Pack failures are downstream cursor drift
+  - id: C21-M3-VALIDATION-REVISION-4-STARTED-20260712T0415230800
+    ref: C21-M3/run_tests_green
+    status: in_progress
+    summary: Started main-thread focused validation for M3 Revision 4.
+    timestamp: 2026-07-12T04:15:23+08:00
+    trigger: assistant
+    type: step_started
+    validations:
+      - 'target: focused 47/47'
+  - id: C21-M3-IMPLEMENT-REVISION-4-COMPLETE-20260712T0415230800
+    ref: C21-M3/implement
+    report: .pipeline/reviews/C21/M3/implementation-evidence.md
+    status: completed
+    summary: M3 implement Revision 4 completed the two remaining narrow production fixes.
+    timestamp: 2026-07-12T04:15:23+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - M3_R4_SKIP_CURSOR_SEGMENT_SMOKE_OK
+      - M3_R4_ROUTING_IDENTIFIER_SMOKE_OK
+      - Recovery syntax and 14 exports pass
+    worker:
+      id: /root/m3_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M3/implementation-evidence.md
+    id: C21-M3-IMPLEMENT-REVISION-4-STARTED-20260712T0412490800
+    ref: C21-M3/implement
+    status: in_progress
+    summary: Reopened /root/m3_implement for true incremental Capsule segment skipping and routing metadata sensitive gating.
+    timestamp: 2026-07-12T04:12:49+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m3_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M3-FOCUSED-ATTEMPT-3-RED-20260712T0412490800
+    ref: C21-M3/run_tests_green
+    status: needs_changes
+    summary: Revision 3 focused validation reached 41/47; only true incremental Capsule and routing metadata gates remain.
+    timestamp: 2026-07-12T04:12:49+08:00
+    trigger: assistant
+    type: step_result
+    validations:
+      - M3 47 tests / 41 pass / 6 fail
+      - Pack ancestry green
+      - blob concurrency green
+      - retention binding green
+      - append cursor green
+  - id: C21-M3-IMPLEMENT-REVISION-3-COMPLETE-20260712T0412490800
+    ref: C21-M3/implement
+    report: .pipeline/reviews/C21/M3/implementation-evidence.md
+    status: completed
+    summary: M3 implement Revision 3 closed four of six audit-driven production clusters and supplied production-only smokes.
+    timestamp: 2026-07-12T04:12:49+08:00
+    trigger: subagent
+    type: step_complete
+    worker:
+      id: /root/m3_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M3/implementation-evidence.md
+    id: C21-M3-IMPLEMENT-REVISION-3-STARTED-20260712T0358450800
+    ref: C21-M3/implement
+    status: in_progress
+    summary: Reopened /root/m3_implement for six audit-driven production fixes.
+    timestamp: 2026-07-12T03:58:45+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m3_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M3-AUDIT-RED-CONFIRMED-20260712T0358450800
+    ref: C21-M3/run_tests_red
+    status: completed
+    summary: Main independently confirmed all six M3 audit-driven RED clusters.
+    timestamp: 2026-07-12T03:58:45+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - M3 47 tests / 31 pass / 16 fail
+      - all prior 29 remain green
+      - M1 76/76
+      - M2 61/61
+  - id: C21-M3-TEST-REVISION-1-COMPLETE-20260712T0358450800
+    ref: C21-M3/write_tests
+    report: .pipeline/reviews/C21/M3/test-evidence.md
+    status: completed
+    summary: M3 test Revision 1 completed real-filesystem audit RED contracts.
+    timestamp: 2026-07-12T03:58:45+08:00
+    trigger: subagent
+    type: step_complete
+    worker:
+      id: /root/m3_test
+      lifecycle: closed
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M3/audit.md
+      - .pipeline/reviews/C21/M3/test-evidence.md
+    id: C21-M3-TEST-REVISION-1-STARTED-20260712T0346590800
+    ref: C21-M3/write_tests
+    status: in_progress
+    summary: Reopened /root/m3_test for six audit-driven adversarial RED contracts.
+    timestamp: 2026-07-12T03:46:59+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m3_test
+      lifecycle: started
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M3/audit.md
+    id: C21-M3-TEST-REVISION-1-REQUESTED-20260712T0346590800
+    ref: C21-M3/write_tests
+    status: requested
+    summary: >-
+      Requested RED coverage for generation ordering, blob concurrency, metadata gating, retention integrity,
+      incremental Capsule, and append cursor.
+    timestamp: 2026-07-12T03:46:59+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: /root/m3_test
+      lifecycle: requested
+      role: test
+  - id: C21-M3-AUDIT-NEEDS-CHANGES-20260712T0346590800
+    ref: C21-M3/review_code
+    report: .pipeline/reviews/C21/M3/audit.md
+    status: needs_changes
+    summary: Independent M3 audit found three Critical and three Warning gaps; returned milestone to TDD.
+    timestamp: 2026-07-12T03:46:59+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - existing focused 29/29
+      - 'audit adversarial result: 3 Critical / 3 Warning'
+    worker:
+      id: /root/m3_audit
+      lifecycle: closed
+      role: audit
+  - evidence_refs:
+      - .pipeline/reviews/C21/M3/test-evidence.md
+      - .pipeline/reviews/C21/M3/implementation-evidence.md
+      - .pipeline/reviews/C21/M3/audit.md
+    id: C21-M3-AUDIT-STARTED-20260712T0337130800
+    ref: C21-M3/review_code
+    status: in_progress
+    summary: Started fresh strict read-only M3 audit worker /root/m3_audit.
+    timestamp: 2026-07-12T03:37:13+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m3_audit
+      lifecycle: started
+      role: audit
+  - evidence_refs:
+      - .pipeline/prompts/02-recovery-journal-capsule-and-pack-engine.md
+    id: C21-M3-AUDIT-REQUESTED-20260712T0337130800
+    ref: C21-M3/review_code
+    status: requested
+    summary: Requested independent M3 Journal/Capsule/Pack/fallback/budget/retention certification.
+    timestamp: 2026-07-12T03:37:13+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: /root/m3_audit
+      lifecycle: requested
+      role: audit
+  - id: C21-M3-FINAL-GREEN-COMPLETE-20260712T0337130800
+    ref: C21-M3/run_tests_green
+    status: completed
+    summary: M3 final validation passed focused, full regression, M1/M2 baselines, lifecycle log, and static checks.
+    timestamp: 2026-07-12T03:37:13+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - M3 29/29
+      - full 842/842
+      - M1 76/76
+      - M2 61/61
+      - log 7/7
+      - config/diff/syntax/credential scan pass
+  - id: C21-M3-IMPLEMENT-REVISION-2-COMPLETE-20260712T0337130800
+    ref: C21-M3/implement
+    report: .pipeline/reviews/C21/M3/implementation-evidence.md
+    status: completed
+    summary: M3 production Revision 2 completed recovery-specific corrupt Pack classification.
+    timestamp: 2026-07-12T03:37:13+08:00
+    trigger: subagent
+    type: step_complete
+    worker:
+      id: /root/m3_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M3/implementation-evidence.md
+    id: C21-M3-IMPLEMENT-REVISION-2-STARTED-20260712T0334030800
+    ref: C21-M3/implement
+    status: in_progress
+    summary: Reopened /root/m3_implement for one recovery-specific corrupt Pack classification fix.
+    timestamp: 2026-07-12T03:34:03+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m3_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M3-FOCUSED-GREEN-ATTEMPT-2-RED-20260712T0334030800
+    ref: C21-M3/run_tests_green
+    status: needs_changes
+    summary: M3 focused Attempt 2 passed 28/29; only malformed Pack classification remains.
+    timestamp: 2026-07-12T03:34:03+08:00
+    trigger: assistant
+    type: step_progress
+    validations:
+      - 'M3 focused: 28/29 passing'
+      - fallback selection succeeds; rejected error code is too generic
+  - id: C21-M3-IMPLEMENT-REVISION-1-COMPLETE-20260712T0334030800
+    ref: C21-M3/implement
+    report: .pipeline/reviews/C21/M3/implementation-evidence.md
+    status: completed
+    summary: M3 Revision 1 closed eight public-envelope gaps with production-only smokes.
+    timestamp: 2026-07-12T03:34:03+08:00
+    trigger: subagent
+    type: step_complete
+    worker:
+      id: /root/m3_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M3/implementation-evidence.md
+    id: C21-M3-IMPLEMENT-REVISION-1-STARTED-20260712T0326410800
+    ref: C21-M3/implement
+    status: in_progress
+    summary: Reopened /root/m3_implement for eight narrow public-envelope corrections.
+    timestamp: 2026-07-12T03:26:41+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m3_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M3-FOCUSED-GREEN-ATTEMPT-1-RED-20260712T0326410800
+    ref: C21-M3/run_tests_green
+    status: needs_changes
+    summary: M3 focused Attempt 1 passed 21/29; eight production public-contract gaps remain.
+    timestamp: 2026-07-12T03:26:41+08:00
+    trigger: assistant
+    type: step_progress
+    validations:
+      - 'M3 focused: 21/29 passing'
+      - M1/M2 authority and fault contracts otherwise pass
+  - id: C21-M3-IMPLEMENT-INITIAL-COMPLETE-20260712T0326410800
+    ref: C21-M3/implement
+    report: .pipeline/reviews/C21/M3/implementation-evidence.md
+    status: completed
+    summary: Initial production-only M3 implementation completed Journal, Capsule, Pack, restore, and retention smokes.
+    timestamp: 2026-07-12T03:26:41+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - Journal/Capsule/Pack/restore/retention production smokes pass
+      - 6 syntax checks and 14 exports pass
+    worker:
+      id: /root/m3_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/prompts/02-recovery-journal-capsule-and-pack-engine.md
+      - .pipeline/reviews/C21/M3/implementation-evidence.md
+    id: C21-M3-IMPLEMENT-WORKER-STARTED-20260712T0304000800
+    ref: C21-M3/implement
+    status: in_progress
+    summary: Started /root/m3_implement for production-only Recovery implementation; M3 tests are forbidden.
+    timestamp: 2026-07-12T03:04:00+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m3_implement
+      lifecycle: started
+      role: implement
+  - evidence_refs:
+      - .pipeline/prompts/02-recovery-journal-capsule-and-pack-engine.md
+    id: C21-M3-IMPLEMENT-WORKER-REQUESTED-20260712T0304000800
+    ref: C21-M3/implement
+    status: requested
+    summary: >-
+      Requested segmented Journal, Capsule reducer, validated Pack, bounded restore, and last-valid retention
+      implementation.
+    timestamp: 2026-07-12T03:04:00+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: /root/m3_implement
+      lifecycle: requested
+      role: implement
+  - id: C21-M3-RED-CONFIRMED-20260712T0304000800
+    ref: C21-M3/run_tests_red
+    status: completed
+    summary: Main independently confirmed the M3 RED boundary.
+    timestamp: 2026-07-12T03:04:00+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - 'M3: 24 total / 4 fail / 20 skip'
+      - 'M1 certification: 76/76'
+      - 'M2 certification: 61/61'
+  - id: C21-M3-TEST-WORKER-COMPLETE-20260712T0304000800
+    ref: C21-M3/write_tests
+    report: .pipeline/reviews/C21/M3/test-evidence.md
+    status: completed
+    summary: M3 test worker completed real-filesystem API, property, fault, and compatibility contracts.
+    timestamp: 2026-07-12T03:04:00+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'M3 RED stable: 4 API boundary failures / 20 skips'
+      - syntax, scope, diff, whitespace, and credential checks pass
+    worker:
+      id: /root/m3_test
+      lifecycle: closed
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/02-recovery-journal-capsule-and-pack-engine.md
+      - .pipeline/reviews/C21/M3/test-evidence.md
+    id: C21-M3-TEST-WORKER-STARTED-20260712T0245490800
+    ref: C21-M3/write_tests
+    status: in_progress
+    summary: Started /root/m3_test for real-filesystem Journal, Capsule, Pack, and restore RED contracts.
+    timestamp: 2026-07-12T02:45:49+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m3_test
+      lifecycle: started
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/02-recovery-journal-capsule-and-pack-engine.md
+    id: C21-M3-TEST-WORKER-REQUESTED-20260712T0245490800
+    ref: C21-M3/write_tests
+    status: requested
+    summary: Requested independent M3 test worker with production implementation forbidden.
+    timestamp: 2026-07-12T02:45:49+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: /root/m3_test
+      lifecycle: requested
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/02-recovery-journal-capsule-and-pack-engine.md
+    id: C21-M3-START-20260712T0245490800
+    ref: C21-M3
+    status: in_progress
+    summary: Started C21-M3 Recovery Journal, Capsule, and Pack Engine on the certified M1/M2 authority boundaries.
+    timestamp: 2026-07-12T02:45:49+08:00
+    trigger: assistant
+    type: milestone_start
+  - id: C21-M2-COMPLETE-20260712T0245490800
+    ref: C21-M2
+    report: .pipeline/reports/01-runtime-records-receipts-and-snapshots.report.md
+    status: completed
+    summary: Completed C21-M2 object Runtime, Records, Receipts, and Snapshots after audit-driven TDD and fresh certification.
+    timestamp: 2026-07-12T02:45:49+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - focused 61/61
+      - full 813/813
+      - M1 76/76
+      - fresh re-audit PASS
+  - id: C21-M2-REAUDIT-COMPLETE-20260712T0245490800
+    ref: C21-M2/review_code
+    report: .pipeline/reviews/C21/M2/reaudit.md
+    status: completed
+    summary: Fresh read-only M2 re-audit passed with all seven initial findings closed.
+    timestamp: 2026-07-12T02:45:49+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - focused 61/61
+      - targeted 21/21
+      - 0 Critical / 0 Warning
+    worker:
+      id: /root/m2_reaudit
+      lifecycle: closed
+      role: audit
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/audit.md
+      - .pipeline/reviews/C21/M2/reaudit.md
+    id: C21-M2-REAUDIT-STARTED-20260712T0232160800
+    ref: C21-M2/review_code
+    status: in_progress
+    summary: Started fresh strict read-only M2 cumulative closure auditor /root/m2_reaudit.
+    timestamp: 2026-07-12T02:32:16+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m2_reaudit
+      lifecycle: started
+      role: audit
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/audit.md
+      - .pipeline/reviews/C21/M2/test-evidence.md
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-REAUDIT-REQUESTED-20260712T0232160800
+    ref: C21-M2/review_code
+    status: requested
+    summary: Requested fresh M2 re-audit for cumulative closure of the initial four Critical and three Warning findings.
+    timestamp: 2026-07-12T02:32:16+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: /root/m2_reaudit
+      lifecycle: requested
+      role: audit
+  - id: C21-M2-REVISION-5-GREEN-COMPLETE-20260712T0232160800
+    ref: C21-M2/run_tests_green
+    status: completed
+    summary: M2 Revision 5 passed focused, full regression, lifecycle log, M1 baseline, and all static checks.
+    timestamp: 2026-07-12T02:32:16+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - 'M2 focused: 61/61 passing'
+      - 'full regression: 813/813 passing'
+      - 'lifecycle log: 7/7 passing'
+      - 'M1 baseline: 76/76 passing'
+      - git diff --check, config, syntax, and scoped credential scan pass
+  - id: C21-M2-IMPLEMENT-REVISION-5-COMPLETE-20260712T0232160800
+    ref: C21-M2/implement
+    report: .pipeline/reviews/C21/M2/implementation-evidence.md
+    status: completed
+    summary: Production-only Revision 5 closed the Receipt terminal Clock and hidden-scope gaps.
+    timestamp: 2026-07-12T02:32:16+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - two Revision 5 production smokes pass
+      - node --check, 20 exports, and git diff --check pass
+    worker:
+      id: /root/m2_implement
+      lifecycle: closed
+      role: implement
+  - id: C21-M2-LOG-STATUS-SCHEMA-REPAIR-20260712T0230470800
+    ref: C21-M2/run_tests_green
+    status: warning
+    summary: >-
+      Corrected two orchestration-only log statuses from unsupported needs_revision to supported needs_changes before
+      full rerun.
+    timestamp: 2026-07-12T02:30:47+08:00
+    trigger: assistant
+    type: step_progress
+    validations:
+      - M2 focused remains 61/61
+      - product/static/config/diff checks passed
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-IMPLEMENT-REVISION-5-STARTED-20260712T0225580800
+    ref: C21-M2/implement
+    status: in_progress
+    summary: Reopened /root/m2_implement for two narrow Receipt store envelope fixes.
+    timestamp: 2026-07-12T02:25:58+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m2_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M2-FOCUSED-GREEN-ATTEMPT-5-RED-20260712T0225580800
+    ref: C21-M2/run_tests_green
+    status: needs_changes
+    summary: Revision 4 focused validation passed 59/61; two Receipt factory envelope gaps remain.
+    timestamp: 2026-07-12T02:25:58+08:00
+    trigger: assistant
+    type: step_progress
+    validations:
+      - 'M2 focused: 59/61 passing'
+      - 'remaining: store terminal Clock and hidden-reasoning scope rejection'
+  - id: C21-M2-IMPLEMENT-REVISION-4-COMPLETE-20260712T0225580800
+    ref: C21-M2/implement
+    report: .pipeline/reviews/C21/M2/implementation-evidence.md
+    status: completed
+    summary: Production-only Revision 4 completed six audit contracts and 20 explicit root exports.
+    timestamp: 2026-07-12T02:25:58+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - six production-only smoke groups pass
+      - node --check, 20 exports, and git diff --check pass
+    worker:
+      id: /root/m2_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-IMPLEMENT-REVISION-4-STARTED-20260712T0213330800
+    ref: C21-M2/implement
+    status: in_progress
+    summary: Reopened /root/m2_implement for production-only Revision 4 against the published audit contracts.
+    timestamp: 2026-07-12T02:13:33+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m2_implement
+      lifecycle: started
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/audit.md
+    id: C21-M2-IMPLEMENT-REVISION-4-REQUESTED-20260712T0213330800
+    ref: C21-M2/implement
+    status: requested
+    summary: Requested M2 authority, trusted-clock, Snapshot portability/path identity, and recursive ownership fixes.
+    timestamp: 2026-07-12T02:13:33+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: /root/m2_implement
+      lifecycle: requested
+      role: implement
+  - id: C21-M2-REVISION-3-RED-CONFIRMED-20260712T0213330800
+    ref: C21-M2/run_tests_red
+    status: completed
+    summary: Main independently confirmed the audit-driven M2 RED boundary.
+    timestamp: 2026-07-12T02:13:33+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - 'M2: 54 tests / 34 pass / 11 fail / 9 skip'
+      - 'M1 baseline: 76/76 passing'
+  - id: C21-M2-TEST-REVISION-3-COMPLETE-20260712T0213330800
+    ref: C21-M2/write_tests
+    report: .pipeline/reviews/C21/M2/test-evidence.md
+    status: completed
+    summary: M2 test worker completed Revision 3 real-filesystem audit contracts and closed with RED_READY.
+    timestamp: 2026-07-12T02:13:33+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'M2 RED: 34 pass / 11 fail / 9 skip'
+      - syntax and git diff --check pass
+    worker:
+      id: /root/m2_test
+      lifecycle: closed
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/audit.md
+      - .pipeline/reviews/C21/M2/test-evidence.md
+    id: C21-M2-TEST-REVISION-3-STARTED-20260712T0157490800
+    ref: C21-M2/write_tests
+    status: in_progress
+    summary: Reopened /root/m2_test for audit-driven Revision 3 RED contracts; production code remains untouched.
+    timestamp: 2026-07-12T01:57:49+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m2_test
+      lifecycle: started
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/audit.md
+    id: C21-M2-TEST-REVISION-3-REQUESTED-20260712T0157490800
+    ref: C21-M2/write_tests
+    status: requested
+    summary: Requested M2 RED coverage for all four audit blockers and precise warning contracts.
+    timestamp: 2026-07-12T01:57:49+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: /root/m2_test
+      lifecycle: requested
+      role: test
+  - id: C21-M2-AUDIT-NEEDS-CHANGES-20260712T0157490800
+    ref: C21-M2/review_code
+    report: .pipeline/reviews/C21/M2/audit.md
+    status: needs_changes
+    summary: Independent M2 audit found four Critical authority/fail-closed gaps and three warnings; returned milestone to TDD.
+    timestamp: 2026-07-12T01:57:49+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'existing M2 focused: 49/49 passing'
+      - 'main full regression evidence: 801/801 passing'
+      - 'audit adversarial result: 4 Critical / 3 Warning'
+    worker:
+      id: /root/m2_audit
+      lifecycle: closed
+      role: audit
+  - evidence_refs:
+      - .pipeline/prompts/01-runtime-records-receipts-and-snapshots.md
+      - .pipeline/reviews/C21/M2/test-evidence.md
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-AUDIT-STARTED-20260712T014231+0800
+    ref: C21-M2/review_code
+    status: in_progress
+    summary: Started fresh independent strict read-only M2 audit worker /root/m2_audit.
+    timestamp: 2026-07-12T01:42:31+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m2_audit
+      lifecycle: started
+      role: audit
+  - id: C21-M2-RUN-GREEN-COMPLETE-20260712T014120+0800
+    ref: C21-M2/run_tests_green
+    status: completed
+    summary: M2 validation passed focused, full regression, lifecycle-log, syntax, config, diff, and scoped secret checks.
+    timestamp: 2026-07-12T01:41:20+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - 'M2 focused: 49/49 passing'
+      - 'full regression: 801/801 passing'
+      - 'lifecycle log: 7/7 passing'
+      - git diff --check and config validation pass
+      - all 8 M2/root production syntax checks pass
+      - 'scoped credential-pattern scan: no matches'
+  - evidence_refs:
+      - .pipeline/prompts/01-runtime-records-receipts-and-snapshots.md
+      - .pipeline/reviews/C21/M2/test-evidence.md
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-AUDIT-REQUESTED-20260712T014120+0800
+    ref: C21-M2/review_code
+    status: requested
+    summary: Requested a fresh strict read-only M2 audit identity; auditor may not write the repository.
+    timestamp: 2026-07-12T01:41:20+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: null
+      lifecycle: requested
+      role: audit
+  - id: C21-M2-FULL-VALIDATION-LOG-SCHEMA-REPAIR-20260712T013941+0800
+    ref: C21-M2/run_tests_green
+    status: warning
+    summary: >-
+      First full regression was 800/801 because orchestration emitted unsupported log type validation; repaired it to
+      step_progress before rerun.
+    timestamp: 2026-07-12T01:39:41+08:00
+    trigger: assistant
+    type: step_progress
+    validations:
+      - M2 focused remains 49/49
+      - product/static/config/diff checks passed
+      - only log-evidence rejected the unsupported orchestration event type
+  - id: C21-M2-FOCUSED-GREEN-ATTEMPT-4-20260712T013745+0800
+    ref: C21-M2/run_tests_green
+    status: in_progress
+    summary: M2 focused GREEN Attempt 4 passed all 49 test/subtest nodes; full validation started.
+    timestamp: 2026-07-12T01:37:45+08:00
+    trigger: assistant
+    type: step_progress
+    validations:
+      - 'M2 focused: 49/49 passing'
+      - 0 failed / 0 skipped
+  - id: C21-M2-IMPLEMENT-REVISION-3-COMPLETE-20260712T013629+0800
+    ref: C21-M2/implement
+    report: .pipeline/reviews/C21/M2/implementation-evidence.md
+    status: completed
+    summary: Production-only M2 Revision 3 completed Receipt read-view/security edges and the non-empty Snapshot contract.
+    timestamp: 2026-07-12T01:36:29+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - M2_REVISION_3_PRODUCTION_SMOKE_OK
+      - node --check, 19 exports, and git diff --check pass
+    worker:
+      id: /root/m2_implement
+      lifecycle: closed
+      role: implement
+  - id: C21-M2-TEST-REVISION-2-COMPLETE-20260712T013629+0800
+    ref: C21-M2/write_tests
+    report: .pipeline/reviews/C21/M2/test-evidence.md
+    status: completed
+    summary: >-
+      Test-only M2 Revision 2 now sources Snapshot Records through the public Record writer/readRecord contract and
+      fixes one synchronous rejection assertion.
+    timestamp: 2026-07-12T01:36:29+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'Snapshot focused: 9/9 passing'
+      - 'M1 baseline: 76/76 passing'
+      - node --check and git diff --check pass
+    worker:
+      id: /root/m2_test
+      lifecycle: closed
+      role: test
+  - id: C21-M2-RUN-GREEN-ATTEMPT-4-START-20260712T013629+0800
+    ref: C21-M2/run_tests_green
+    status: in_progress
+    summary: Started unchanged complete M2 focused GREEN Attempt 4 after both revisions closed.
+    timestamp: 2026-07-12T01:36:29+08:00
+    trigger: assistant
+    type: step_start
+  - id: C21-M2-IMPLEMENT-REVISION-3-STARTED-20260712T013115+0800
+    ref: C21-M2/implement
+    status: in_progress
+    summary: Reopened production-only M2 implement worker for Receipt public/security edges and non-empty Snapshot records.
+    timestamp: 2026-07-12T01:31:15+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m2_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M2-TEST-REVISION-2-STARTED-20260712T013115+0800
+    ref: C21-M2/write_tests
+    status: in_progress
+    summary: Reopened test-only M2 worker to align Snapshot fixtures with the published readRecord() contract.
+    timestamp: 2026-07-12T01:31:15+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m2_test
+      lifecycle: started
+      role: test
+  - id: C21-M2-GREEN-ATTEMPT-3-RED-20260712T012948+0800
+    ref: C21-M2/run_tests_green
+    status: failed
+    summary: >-
+      M2 focused GREEN Attempt 3 improved to 31/49 and exposed four narrow production edges plus one self-inconsistent
+      Snapshot test fixture shape.
+    timestamp: 2026-07-12T01:29:48+08:00
+    trigger: regression
+    type: step_complete
+    validations:
+      - 'M2 focused: 49 tests/subtests; 31 pass / 18 fail'
+      - Runtime and Records are fully green
+      - 'production: Receipt read view/drift text/raw-secret detection and empty Snapshot records'
+      - 'test: Snapshot fixture contradicts its published readRecord() shape contract'
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-IMPLEMENT-REVISION-3-REQUESTED-20260712T012948+0800
+    ref: C21-M2/implement
+    status: requested
+    summary: Requested production-only M2 Revision 3 for four narrow Receipt/Snapshot edges.
+    timestamp: 2026-07-12T01:29:48+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: /root/m2_implement
+      lifecycle: requested
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/test-evidence.md
+    id: C21-M2-TEST-REVISION-2-REQUESTED-20260712T012948+0800
+    ref: C21-M2/write_tests
+    status: requested
+    summary: >-
+      Requested test-only M2 Revision 2 to replace simplified Snapshot Record fixtures with the already published
+      readRecord() shape.
+    timestamp: 2026-07-12T01:29:48+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: /root/m2_test
+      lifecycle: requested
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-IMPLEMENT-REVISION-2-COMPLETE-20260712T012815+0800
+    ref: C21-M2/implement
+    report: .pipeline/reviews/C21/M2/implementation-evidence.md
+    status: completed
+    summary: Production-only M2 Revision 2 completed the remaining Receipt, Record index, and Snapshot object contracts.
+    timestamp: 2026-07-12T01:28:15+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - M2_REVISION_2_PRODUCTION_SMOKE_OK
+      - full Receipt lifecycle/API envelope smoke passes
+      - machine/human Record active/superseded index smoke passes
+      - Goal accepted and Cycle checkpoint exact-object Snapshot smoke passes
+      - node --check, 19 exports, and git diff --check pass
+    worker:
+      id: /root/m2_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/test-evidence.md
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-RUN-GREEN-ATTEMPT-3-START-20260712T012815+0800
+    ref: C21-M2/run_tests_green
+    status: in_progress
+    summary: Started unchanged M2 focused GREEN Attempt 3 after implement Revision 2 closure.
+    timestamp: 2026-07-12T01:28:15+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-IMPLEMENT-REVISION-2-STARTED-20260712T012253+0800
+    ref: C21-M2/implement
+    status: in_progress
+    summary: >-
+      Reopened production-only implement worker /root/m2_implement for M2 Revision 2; test-source access remains
+      forbidden.
+    timestamp: 2026-07-12T01:22:53+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m2_implement
+      lifecycle: started
+      role: implement
+  - id: C21-M2-GREEN-ATTEMPT-2-RED-20260712T012150+0800
+    ref: C21-M2/run_tests_green
+    status: failed
+    summary: M2 focused GREEN Attempt 2 improved to 26/49 and isolated three remaining production contract clusters.
+    timestamp: 2026-07-12T01:21:50+08:00
+    trigger: regression
+    type: step_complete
+    validations:
+      - 'M2 focused: 49 tests/subtests; 26 pass / 23 fail'
+      - Runtime is fully green
+      - Record core is green except derived active metadata/human superseded listing
+      - 'remaining blockers: Receipt structured actor/API envelope and Snapshot object_type/object_ref contract'
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-IMPLEMENT-REVISION-2-REQUESTED-20260712T012150+0800
+    ref: C21-M2/implement
+    status: requested
+    summary: Requested production-only M2 Revision 2 for the three remaining contract clusters; test sources remain forbidden.
+    timestamp: 2026-07-12T01:21:50+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: /root/m2_implement
+      lifecycle: requested
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-IMPLEMENT-REVISION-1-COMPLETE-20260712T012013+0800
+    ref: C21-M2/implement
+    report: .pipeline/reviews/C21/M2/implementation-evidence.md
+    status: completed
+    summary: >-
+      Production-only M2 Revision 1 aligned Record shapes, Receipt path bindings, Runtime required fields, and Snapshot
+      local-context exclusion.
+    timestamp: 2026-07-12T01:20:13+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - M2_REVISION_1_PRODUCTION_SMOKE_OK
+      - M2_R1_RECORD_DEDUPE_BYTES_OK
+      - all new modules pass node --check
+      - 19 explicit root exports and git diff --check pass
+    worker:
+      id: /root/m2_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/test-evidence.md
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-RUN-GREEN-ATTEMPT-2-START-20260712T012013+0800
+    ref: C21-M2/run_tests_green
+    status: in_progress
+    summary: Started unchanged M2 focused GREEN Attempt 2 after both Revision 1 roles closed.
+    timestamp: 2026-07-12T01:20:13+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/test-evidence.md
+    id: C21-M2-TEST-REVISION-1-COMPLETE-20260712T011745+0800
+    ref: C21-M2/write_tests
+    report: .pipeline/reviews/C21/M2/test-evidence.md
+    status: completed
+    summary: >-
+      Test-only Revision 1 corrected the over-strong post-recovery empty-directory assumption while preserving all
+      file-byte and transaction-residue checks.
+    timestamp: 2026-07-12T01:17:45+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'M1 transaction: 19/19 passing'
+      - helper smoke rejects any extra runtime descendant directory
+      - all pre-transaction zero-write assertions unchanged
+      - 'shared M2 interim: 25 pass / 24 fail while production Revision 1 remains active'
+    worker:
+      id: /root/m2_test
+      lifecycle: closed
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-IMPLEMENT-REVISION-1-STARTED-20260712T011400+0800
+    ref: C21-M2/implement
+    status: in_progress
+    summary: Reopened production-only implement worker /root/m2_implement for M2 Revision 1 without test-source access.
+    timestamp: 2026-07-12T01:14:00+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m2_implement
+      lifecycle: started
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/test-evidence.md
+    id: C21-M2-TEST-REVISION-1-STARTED-20260712T011400+0800
+    ref: C21-M2/write_tests
+    status: in_progress
+    summary: Reopened test-only worker /root/m2_test for the narrow M1 post-recovery directory-contract correction.
+    timestamp: 2026-07-12T01:14:00+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m2_test
+      lifecycle: started
+      role: test
+  - id: C21-M2-GREEN-ATTEMPT-1-RED-20260712T011230+0800
+    ref: C21-M2/run_tests_green
+    status: failed
+    summary: >-
+      First independent M2 focused GREEN attempt exposed four clustered production contract mismatches and one
+      over-strong M1 rollback test assumption.
+    timestamp: 2026-07-12T01:12:30+08:00
+    trigger: regression
+    type: step_complete
+    validations:
+      - 'M2 focused: 49 tests/subtests; 18 pass / 31 fail'
+      - >-
+        production clusters: Record public shapes, Receipt path binding, Runtime schema validation, Snapshot
+        local-context exclusion
+      - 'test-contract correction: certified M1 rollback may retain empty runtime/transactions infrastructure directories'
+  - evidence_refs:
+      - .pipeline/prompts/01-runtime-records-receipts-and-snapshots.md
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-IMPLEMENT-REVISION-1-REQUESTED-20260712T011230+0800
+    ref: C21-M2/implement
+    status: requested
+    summary: >-
+      Requested production-only M2 Revision 1 against summarized failure contracts; test sources and test evidence
+      remain forbidden.
+    timestamp: 2026-07-12T01:12:30+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: /root/m2_implement
+      lifecycle: requested
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/test-evidence.md
+      - .pipeline/reviews/C21/M1/final-audit.md
+    id: C21-M2-TEST-REVISION-1-REQUESTED-20260712T011230+0800
+    ref: C21-M2/write_tests
+    status: requested
+    summary: >-
+      Requested a narrow test-only correction for post-recovery empty infrastructure directories without weakening
+      file-byte or zero-write guarantees.
+    timestamp: 2026-07-12T01:12:30+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: /root/m2_test
+      lifecycle: requested
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/test-evidence.md
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-RUN-GREEN-START-20260712T010902+0800
+    ref: C21-M2/run_tests_green
+    status: in_progress
+    summary: Started main-thread independent M2 focused GREEN validation against the sealed test-worker contracts.
+    timestamp: 2026-07-12T01:09:02+08:00
+    trigger: assistant
+    type: step_start
+  - evidence_refs:
+      - .pipeline/prompts/01-runtime-records-receipts-and-snapshots.md
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-IMPLEMENT-WORKER-COMPLETE-20260712T010902+0800
+    ref: C21-M2/implement
+    report: .pipeline/reviews/C21/M2/implementation-evidence.md
+    status: completed
+    summary: Production-only M2 implement worker delivered Runtime, Records, Receipts, Snapshots, and 19 explicit root exports.
+    timestamp: 2026-07-12T01:09:02+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - all new production modules pass node --check and dynamic import
+      - production disk/transaction/secret/concurrency smokes pass
+      - git diff --check passes on owned production paths
+      - M2 tests and test evidence remained unread and unmodified
+    worker:
+      id: /root/m2_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/prompts/01-runtime-records-receipts-and-snapshots.md
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-IMPLEMENT-WORKER-STARTED-20260712T004709+0800
+    ref: C21-M2/implement
+    status: in_progress
+    summary: Started fresh production-only M2 implement worker /root/m2_implement; M2 tests and test evidence are forbidden.
+    timestamp: 2026-07-12T00:47:09.762+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m2_implement
+      lifecycle: started
+      role: implement
+  - evidence_refs:
+      - .pipeline/prompts/01-runtime-records-receipts-and-snapshots.md
+      - .pipeline/reviews/C21/M2/implementation-evidence.md
+    id: C21-M2-IMPLEMENT-WORKER-REQUESTED-20260712T004540+0800
+    ref: C21-M2/implement
+    status: requested
+    summary: >-
+      Requested a fresh production-only M2 implement worker for object runtime, Markdown Records, scoped Receipts,
+      Snapshots, and explicit exports.
+    timestamp: 2026-07-12T00:45:40.281+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: null
+      lifecycle: requested
+      role: implement
+  - id: C21-M2-RED-CONFIRMED-20260712T004540+0800
+    ref: C21-M2/run_tests_red
+    status: completed
+    summary: Main orchestration confirmed the controlled M2 module-boundary RED without M1 regression.
+    timestamp: 2026-07-12T00:45:40.281+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - 'M2: 37 tests; 0 pass / 5 fail / 32 skip'
+      - 'failure classes: runtime, records, receipts, snapshots, authority/root exports missing'
+      - 'M1 compatibility: 76/76 passing'
+  - evidence_refs:
+      - .pipeline/reviews/C21/M2/test-evidence.md
+      - .pipeline/prompts/01-runtime-records-receipts-and-snapshots.md
+    id: C21-M2-TEST-WORKER-COMPLETE-20260712T004409+0800
+    ref: C21-M2/write_tests
+    report: .pipeline/reviews/C21/M2/test-evidence.md
+    status: completed
+    summary: >-
+      Independent M2 test worker completed 37 top-level Runtime/Records/Receipts/Snapshots/authority RED contracts with
+      controlled missing-module failures.
+    timestamp: 2026-07-12T00:44:09.942+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 'M2 RED: 37 tests; 0 pass / 5 fail / 32 skip'
+      - six new JS syntax checks pass
+      - 'M1 compatibility: 76/76 passing'
+      - diff, whitespace, and secret scan pass
+    worker:
+      id: /root/m2_test
+      lifecycle: closed
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/01-runtime-records-receipts-and-snapshots.md
+      - .pipeline/reviews/C21/M2/test-evidence.md
+    id: C21-M2-TEST-WORKER-STARTED-20260712T002628+0800
+    ref: C21-M2/write_tests
+    status: in_progress
+    summary: >-
+      Started fresh independent M2 test worker /root/m2_test for Runtime, Records, Receipts, Snapshots, and authority
+      non-duplication RED contracts.
+    timestamp: 2026-07-12T00:26:28.963+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m2_test
+      lifecycle: started
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/01-runtime-records-receipts-and-snapshots.md
+      - .pipeline/reviews/C21/M2/test-evidence.md
+    id: C21-M2-TEST-WORKER-REQUESTED-20260712T002449+0800
+    ref: C21-M2/write_tests
+    status: requested
+    summary: >-
+      Requested a fresh independent M2 test worker for object runtime, Markdown Records, scoped Receipts, Snapshots, and
+      authority non-duplication RED contracts.
+    timestamp: 2026-07-12T00:24:49.511+08:00
+    trigger: auto
+    type: worker_requested
+    worker:
+      id: null
+      lifecycle: requested
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/01-runtime-records-receipts-and-snapshots.md
+    id: C21-M2-START-20260712T002449+0800
+    ref: C21-M2
+    status: in_progress
+    summary: Started C21-M2 Runtime Objects, Records, Receipts, and Snapshots on the certified M1 transaction boundary.
+    timestamp: 2026-07-12T00:24:49.511+08:00
+    trigger: auto
+    type: milestone_start
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/final-audit.md
+      - .pipeline/reports/00-workspace-format-transaction-kernel-and-legacy-write-fence.report.md
+    id: C21-M1-COMPLETE-20260712T002449+0800
+    ref: C21-M1
+    report: .pipeline/reports/00-workspace-format-transaction-kernel-and-legacy-write-fence.report.md
+    status: completed
+    summary: >-
+      Completed C21-M1: canonical serialization, workspace manifest/detection, recoverable manifest-last transactions,
+      and the 22-family legacy writer fence are certified.
+    timestamp: 2026-07-12T00:24:49.511+08:00
+    trigger: assistant
+    type: milestone_complete
+    validations:
+      - 'focused M1: 76/76 passing'
+      - 'full npm test: 752/752 passing'
+      - 'final independent audit: PASS'
+      - 'git diff, syntax, config, log, and secret-safety checks: passing'
+  - id: C21-M1-PLAN-REVIEW-20260712T002449+0800
+    ref: C21-M1
+    report: .pipeline/architecture.md
+    status: completed
+    summary: M1 Plan Review confirmed the architecture baseline and all downstream prompts remain valid without patching.
+    timestamp: 2026-07-12T00:24:49.511+08:00
+    trigger: assistant
+    type: plan_review
+    validations:
+      - M2-M8 prompts safe unchanged
+      - no prompt patch queue required
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/final-audit.md
+    id: C21-M1-FINAL-AUDIT-COMPLETE-20260712T002449+0800
+    ref: C21-M1/review_code
+    report: .pipeline/reviews/C21/M1/final-audit.md
+    status: completed
+    summary: Third fresh independent M1 audit passed cumulative blocker closure with no blocking or warning findings.
+    timestamp: 2026-07-12T00:24:49.511+08:00
+    trigger: audit
+    type: audit
+    worker:
+      id: /root/m1_final_audit
+      lifecycle: closed
+      role: audit
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/audit.md
+      - .pipeline/reviews/C21/M1/reaudit.md
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-FINAL-AUDIT-STARTED-20260712T001409+0800
+    ref: C21-M1/review_code
+    status: in_progress
+    summary: Started third fresh independent read-only final M1 audit worker /root/m1_final_audit.
+    timestamp: 2026-07-12T00:14:09.694+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m1_final_audit
+      lifecycle: started
+      role: audit
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/audit.md
+      - .pipeline/reviews/C21/M1/reaudit.md
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-FINAL-AUDIT-REQUESTED-20260712T001322+0800
+    ref: C21-M1/review_code
+    status: requested
+    summary: >-
+      Requested a third fresh independent read-only audit identity for final cumulative M1 blocker closure after
+      Revision 4 GREEN.
+    timestamp: 2026-07-12T00:13:22.379+08:00
+    trigger: regression
+    type: worker_requested
+    worker:
+      id: null
+      lifecycle: requested
+      role: audit
+  - id: C21-M1-RUN-GREEN-REVISION-4-COMPLETE-20260712T001322+0800
+    ref: C21-M1/run_tests_green
+    status: completed
+    summary: M1 Revision 4 expanded GREEN completed after prefix-free write-set validation.
+    timestamp: 2026-07-12T00:13:22.379+08:00
+    trigger: regression
+    type: step_complete
+    validations:
+      - 'focused M1: 76/76 passing'
+      - 'full npm test: 752/752 passing'
+      - 'git diff --check, transaction syntax, and config validation: passing'
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+      - .pipeline/reviews/C21/M1/reaudit.md
+    id: C21-M1-IMPLEMENT-REVISION-4-COMPLETE-20260712T001214+0800
+    ref: C21-M1/implement
+    report: .pipeline/reviews/C21/M1/implementation-evidence.md
+    status: completed
+    summary: >-
+      Implement worker completed narrow M1 Revision 4 with deterministic segment-boundary prefix-free validation before
+      any filesystem I/O.
+    timestamp: 2026-07-12T00:12:14.809+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - transaction.js syntax passes
+      - ancestor-first and descendant-first zero-write rejection smokes pass
+      - lexical siblings and normal multi-zone commit smokes pass
+    worker:
+      id: /root/m1_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/reaudit.md
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-IMPLEMENT-REVISION-4-STARTED-20260712T000832+0800
+    ref: C21-M1/implement
+    report: .pipeline/reviews/C21/M1/reaudit.md
+    status: in_progress
+    summary: Started narrow transaction-only implement Revision 4 for prefix-free write-set preflight before staging.
+    timestamp: 2026-07-12T00:08:32.220+08:00
+    trigger: regression
+    type: worker_started
+    worker:
+      id: /root/m1_implement
+      lifecycle: started
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/reaudit.md
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-IMPLEMENT-REVISION-4-REQUESTED-20260712T000752+0800
+    ref: C21-M1/implement
+    report: .pipeline/reviews/C21/M1/reaudit.md
+    status: requested
+    summary: >-
+      Requested narrow production-only Revision 4 to reject ancestor/descendant write paths before any transaction
+      staging or workspace mutation.
+    timestamp: 2026-07-12T00:07:52.802+08:00
+    trigger: regression
+    type: worker_requested
+    worker:
+      id: /root/m1_implement
+      lifecycle: requested
+      role: implement
+  - id: C21-M1-RED-REVISION-3-CONFIRMED-20260712T000752+0800
+    ref: C21-M1/run_tests_red
+    status: completed
+    summary: Main orchestration independently confirmed the two-order prefix-collision RED boundary.
+    timestamp: 2026-07-12T00:07:52.802+08:00
+    trigger: regression
+    type: step_complete
+    validations:
+      - 'focused Revision 3: 76 total / 73 pass / 3 fail'
+      - all prior 73 cases remain green
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/test-evidence.md
+      - .pipeline/reviews/C21/M1/reaudit.md
+    id: C21-M1-TEST-REVISION-3-COMPLETE-20260712T000658+0800
+    ref: C21-M1/write_tests
+    report: .pipeline/reviews/C21/M1/test-evidence.md
+    status: completed
+    summary: Independent test worker completed narrow M1 Revision 3 with two-order prefix-collision zero-write RED coverage.
+    timestamp: 2026-07-12T00:06:58.295+08:00
+    trigger: audit
+    type: step_complete
+    validations:
+      - 'focused RED: 76 total / 73 pass / 3 fail'
+      - prior 73 cases remain green
+      - syntax, diff, and whitespace checks pass
+    worker:
+      id: /root/m1_test
+      lifecycle: closed
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/reaudit.md
+      - .pipeline/reviews/C21/M1/test-evidence.md
+    id: C21-M1-TEST-REVISION-3-STARTED-20260712T000358+0800
+    ref: C21-M1/write_tests
+    report: .pipeline/reviews/C21/M1/reaudit.md
+    status: in_progress
+    summary: Started narrow independent test Revision 3 for two-order ancestor/descendant write-set rejection before staging.
+    timestamp: 2026-07-12T00:03:58.015+08:00
+    trigger: audit
+    type: worker_started
+    worker:
+      id: /root/m1_test
+      lifecycle: started
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/reaudit.md
+      - .pipeline/reviews/C21/M1/test-evidence.md
+    id: C21-M1-TEST-REVISION-3-REQUESTED-20260712T000251+0800
+    ref: C21-M1/write_tests
+    report: .pipeline/reviews/C21/M1/reaudit.md
+    status: requested
+    summary: >-
+      Reopened the independent M1 test worker for a narrow two-order ancestor/descendant write-set RED contract before
+      production Revision 4.
+    timestamp: 2026-07-12T00:02:51.084+08:00
+    trigger: audit
+    type: worker_requested
+    worker:
+      id: /root/m1_test
+      lifecycle: requested
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/reaudit.md
+    id: C21-M1-REAUDIT-NEEDS-CHANGES-20260712T000251+0800
+    ref: C21-M1/review_code
+    report: .pipeline/reviews/C21/M1/reaudit.md
+    status: blocked
+    summary: >-
+      Fresh M1 re-audit closed all prior blockers but reproduced one Critical prefix-colliding write-set failure that
+      leaves an unrecoverable partial installation.
+    timestamp: 2026-07-12T00:02:51.084+08:00
+    trigger: audit
+    type: audit
+    validations:
+      - 'prior seven blockers: closed'
+      - focused 73/73 and full 749/749 evidence remain green
+      - 'prefix collision: commit and recovery both fail after partial install'
+    worker:
+      id: /root/m1_reaudit
+      lifecycle: closed
+      role: audit
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/audit.md
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-REAUDIT-STARTED-20260711T235109+0800
+    ref: C21-M1/review_code
+    status: in_progress
+    summary: Started fresh independent read-only M1 re-audit worker /root/m1_reaudit after Revision 3 GREEN.
+    timestamp: 2026-07-11T23:51:09.661+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m1_reaudit
+      lifecycle: started
+      role: audit
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/audit.md
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-REAUDIT-REQUESTED-20260711T235015+0800
+    ref: C21-M1/review_code
+    status: requested
+    summary: >-
+      Requested a fresh independent read-only M1 re-audit identity after Revision 3 GREEN; the original auditor will not
+      certify the repair.
+    timestamp: 2026-07-11T23:50:15.157+08:00
+    trigger: regression
+    type: worker_requested
+    worker:
+      id: null
+      lifecycle: requested
+      role: audit
+  - id: C21-M1-RUN-GREEN-REVISION-3-COMPLETE-20260711T235015+0800
+    ref: C21-M1/run_tests_green
+    status: completed
+    summary: M1 Revision 3 GREEN completed with expanded focused and repository-wide suites fully passing.
+    timestamp: 2026-07-11T23:50:15.157+08:00
+    trigger: regression
+    type: step_complete
+    validations:
+      - 'focused M1: 73/73 passing'
+      - 'full npm test: 749/749 passing'
+      - 'git diff --check, shell syntax, and config validation: passing'
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+      - .pipeline/reviews/C21/M1/audit.md
+    id: C21-M1-IMPLEMENT-REVISION-3-COMPLETE-20260711T234855+0800
+    ref: C21-M1/implement
+    report: .pipeline/reviews/C21/M1/implementation-evidence.md
+    status: completed
+    summary: >-
+      Implement worker completed M1 Revision 3 with disk-fact transaction invariants, workspace-wide pending exclusion,
+      missing-root classification, and 22 project-writer fence families.
+    timestamp: 2026-07-11T23:48:55.420+08:00
+    trigger: subagent
+    type: step_complete
+    validations:
+      - 10/10 production syntax checks pass
+      - 22/22 inventory import check passes
+      - transaction and eight real-writer/global-exemption smokes pass
+    worker:
+      id: /root/m1_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/audit.md
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-IMPLEMENT-REVISION-3-STARTED-20260711T233645+0800
+    ref: C21-M1/implement
+    report: .pipeline/reviews/C21/M1/audit.md
+    status: in_progress
+    summary: >-
+      Started production-only implement worker /root/m1_implement for M1 Revision 3; test sources and assertion details
+      remain forbidden.
+    timestamp: 2026-07-11T23:36:45.140+08:00
+    trigger: regression
+    type: worker_started
+    worker:
+      id: /root/m1_implement
+      lifecycle: started
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/audit.md
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-IMPLEMENT-REVISION-3-REQUESTED-20260711T233530+0800
+    ref: C21-M1/implement
+    report: .pipeline/reviews/C21/M1/audit.md
+    status: requested
+    summary: >-
+      Requested production-only M1 Revision 3 for transaction integrity, workspace-level pending exclusion, missing-root
+      classification, and eight new project-writer fence families.
+    timestamp: 2026-07-11T23:35:30.542+08:00
+    trigger: regression
+    type: worker_requested
+    worker:
+      id: /root/m1_implement
+      lifecycle: requested
+      role: implement
+  - id: C21-M1-RED-REVISION-2-CONFIRMED-20260711T233530+0800
+    ref: C21-M1/run_tests_red
+    status: completed
+    summary: >-
+      Main orchestration independently confirmed the audit-driven M1 RED boundary before returning work to
+      implementation.
+    timestamp: 2026-07-11T23:35:30.542+08:00
+    trigger: regression
+    type: step_complete
+    validations:
+      - 'focused Revision 2: 73 tests; 54 pass / 19 fail'
+      - 17 intended failing leaves plus aggregate parent failures
+      - previous behavior remains green except the deliberately expanded inventory contract
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/test-evidence.md
+      - .pipeline/reviews/C21/M1/audit.md
+    id: C21-M1-TEST-REVISION-2-COMPLETE-20260711T233414+0800
+    ref: C21-M1/write_tests
+    report: .pipeline/reviews/C21/M1/test-evidence.md
+    status: completed
+    summary: >-
+      Independent test worker completed M1 Revision 2 RED expansion with seven top-level adversarial contracts and a
+      22-family project-writer expectation.
+    timestamp: 2026-07-11T23:34:14.204+08:00
+    trigger: audit
+    type: step_complete
+    validations:
+      - 'focused RED: 73 tests; 54 pass / 19 fail'
+      - 17 intended failing leaves plus 2 aggregate parent failures
+      - syntax, git diff --check, and whitespace checks pass
+    worker:
+      id: /root/m1_test
+      lifecycle: closed
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/audit.md
+      - .pipeline/reviews/C21/M1/test-evidence.md
+    id: C21-M1-TEST-REVISION-2-STARTED-20260711T232314+0800
+    ref: C21-M1/write_tests
+    report: .pipeline/reviews/C21/M1/audit.md
+    status: in_progress
+    summary: >-
+      Started reopened independent test worker /root/m1_test to encode audit-confirmed transaction and real
+      public-writer bypasses as filesystem RED tests.
+    timestamp: 2026-07-11T23:23:14.505+08:00
+    trigger: audit
+    type: worker_started
+    worker:
+      id: /root/m1_test
+      lifecycle: started
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/audit.md
+      - .pipeline/reviews/C21/M1/test-evidence.md
+    id: C21-M1-TEST-REVISION-2-REQUESTED-20260711T232200+0800
+    ref: C21-M1/write_tests
+    report: .pipeline/reviews/C21/M1/audit.md
+    status: requested
+    summary: >-
+      Reopened the independent M1 test worker to convert confirmed transaction-integrity and public-writer bypass
+      findings into real filesystem RED tests before any production fix.
+    timestamp: 2026-07-11T23:22:00.824+08:00
+    trigger: audit
+    type: worker_requested
+    worker:
+      id: /root/m1_test
+      lifecycle: requested
+      role: test
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/audit.md
+    id: C21-M1-AUDIT-NEEDS-CHANGES-20260711T232200+0800
+    ref: C21-M1/review_code
+    report: .pipeline/reviews/C21/M1/audit.md
+    status: blocked
+    summary: >-
+      Independent M1 audit reproduced four blocking authority/integrity failures; M1 returned to TDD revision with
+      diff_score 4 above threshold 3.
+    timestamp: 2026-07-11T23:22:00.824+08:00
+    trigger: audit
+    type: audit
+    validations:
+      - focused suite remained 52/52 but lacked adversarial coverage
+      - >-
+        commit drift, manifest-loss finalize, cross-id pending, and public-writer bypasses reproduced in temporary
+        workspaces
+    worker:
+      id: /root/m1_audit
+      lifecycle: closed
+      role: audit
+  - evidence_refs:
+      - .pipeline/prompts/00-workspace-format-transaction-kernel-and-legacy-write-fence.md
+      - .pipeline/reviews/C21/M1/test-evidence.md
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-AUDIT-STARTED-20260711T230909+0800
+    ref: C21-M1/review_code
+    status: in_progress
+    summary: >-
+      Started fresh independent read-only audit worker /root/m1_audit for M1 transaction, writer-fence, compatibility,
+      separation, and dirty-worktree evidence.
+    timestamp: 2026-07-11T23:09:09.192+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m1_audit
+      lifecycle: started
+      role: audit
+  - evidence_refs:
+      - .pipeline/prompts/00-workspace-format-transaction-kernel-and-legacy-write-fence.md
+      - .pipeline/reviews/C21/M1/test-evidence.md
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-AUDIT-REQUESTED-20260711T230810+0800
+    ref: C21-M1/review_code
+    status: requested
+    summary: >-
+      Requested a fresh independent read-only audit worker for transaction recovery, all 14 legacy writer families,
+      CLI/notify enforcement, strict role separation, and unrelated dirty-worktree preservation.
+    timestamp: 2026-07-11T23:08:10.519+08:00
+    trigger: assistant
+    type: worker_requested
+    worker:
+      id: null
+      lifecycle: requested
+      role: audit
+  - id: C21-M1-RUN-GREEN-COMPLETE-20260711T230810+0800
+    ref: C21-M1/run_tests_green
+    status: completed
+    summary: M1 GREEN validation completed with all focused and repository-wide tests passing after Revision 2.
+    timestamp: 2026-07-11T23:08:10.519+08:00
+    trigger: assistant
+    type: step_complete
+    validations:
+      - 'focused M1 suite: 52/52 passing'
+      - 'full npm test: 728/728 passing'
+      - 'git diff --check: passing'
+      - 'CLI and log module syntax checks: passing'
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-IMPLEMENT-REVISION-2-COMPLETE-20260711T230641+0800
+    ref: C21-M1/implement
+    status: completed
+    summary: >-
+      Implement worker completed M1 Revision 2: init-project preserves missing-directory initialization while applying
+      the format fence, and lifecycle log validation now accepts requested worker states without accepting unknown
+      statuses.
+    timestamp: 2026-07-11T23:06:41.247+08:00
+    trigger: subagent
+    type: step_complete
+    worker:
+      id: /root/m1_implement
+      lifecycle: closed
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/test-evidence.md
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-IMPLEMENT-REVISION-2-20260711T230458+0800
+    ref: C21-M1/implement
+    status: in_progress
+    summary: >-
+      Focused M1 validation reached 52/52, while full regression reached 725/728. Reopened the production-only implement
+      worker for missing-directory init compatibility and requested worker-lifecycle status validation.
+    timestamp: 2026-07-11T23:04:58.609+08:00
+    trigger: regression
+    type: step_revision
+    validations:
+      - 'focused M1 suite: 52/52 passing'
+      - 'full regression: 725/728 passing; 3 failures classified into 2 production regressions'
+    worker:
+      id: /root/m1_implement
+      lifecycle: started
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/test-evidence.md
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-TEST-REVISION-1-20260711T225842+0800
+    ref: C21-M1/run_tests_green
+    status: revised
+    summary: >-
+      GREEN round 2 reached 51/52. Reopened the independent test worker to fix its qualified-entrypoint
+      handoff/assertion inconsistency; production already matches the published contract and is not being changed for
+      this test bug.
+    timestamp: 2026-07-11T22:58:42+08:00
+    trigger: regression
+    type: step_revision
+    validations:
+      - 'focused GREEN round 2: 51 pass / 1 fail'
+      - 'implement worker: IMPLEMENTED and released'
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-IMPLEMENT-REVISION-1-20260711T225630+0800
+    ref: C21-M1/implement
+    status: revised
+    summary: >-
+      Focused GREEN reached 50/52; returned two public-contract gaps to the same implement worker: the notify/log-append
+      inventory entrypoint label and the successful transaction ok:true result.
+    timestamp: 2026-07-11T22:56:30+08:00
+    trigger: regression
+    type: step_revision
+    validations:
+      - 'focused GREEN round 1: 50 pass / 2 fail'
+  - evidence_refs:
+      - .pipeline/prompts/00-workspace-format-transaction-kernel-and-legacy-write-fence.md
+      - .pipeline/reviews/C21/M1/implementation-evidence.md
+    id: C21-M1-IMPLEMENT-WORKER-STARTED-20260711T223723+0800
+    ref: C21-M1/implement
+    status: in_progress
+    summary: Started independent production-only M1 implement worker /root/m1_implement with test sources forbidden.
+    timestamp: 2026-07-11T22:37:23+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m1_implement
+      lifecycle: started
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/test-evidence.md
+      - .pipeline/state.yaml
+    id: C21-M1-IMPLEMENT-REQUESTED-20260711T223416+0800
+    ref: C21-M1/implement
+    status: requested
+    summary: >-
+      M1 RED was independently confirmed at 11 pass / 3 expected missing-module failures; requested a separate implement
+      worker with production-only scope and no access to test sources or assertions.
+    timestamp: 2026-07-11T22:34:16+08:00
+    trigger: assistant
+    type: worker_requested
+    validations:
+      - 'test worker: RED_READY and auto-released'
+      - 'focused RED: 11 pass / 3 fail, all ERR_MODULE_NOT_FOUND for manifest module'
+    worker:
+      id: null
+      lifecycle: requested
+      role: implement
+  - evidence_refs:
+      - .pipeline/reviews/C21/M1/test-evidence.md
+    id: C21-M1-TEST-WORKER-CLOSED-20260711T223416+0800
+    ref: C21-M1/write_tests
+    status: completed
+    summary: Test worker /root/m1_test completed and was released with RED_READY evidence.
+    timestamp: 2026-07-11T22:34:16+08:00
+    trigger: subagent
+    type: worker_complete
+    worker:
+      id: /root/m1_test
+      lifecycle: closed
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/00-workspace-format-transaction-kernel-and-legacy-write-fence.md
+      - .pipeline/reviews/C21/M1/test-evidence.md
+    id: C21-M1-TEST-WORKER-STARTED-20260711T221945+0800
+    ref: C21-M1/write_tests
+    status: in_progress
+    summary: Started strict-separation test worker /root/m1_test for M1 RED tests and review evidence.
+    timestamp: 2026-07-11T22:19:45+08:00
+    trigger: assistant
+    type: worker_started
+    worker:
+      id: /root/m1_test
+      lifecycle: started
+      role: test
+  - evidence_refs:
+      - .pipeline/prompts/00-workspace-format-transaction-kernel-and-legacy-write-fence.md
+      - .pipeline/state.yaml
+      - .pipeline/.lock
+    id: C21-M1-WRITE-TESTS-REQUESTED-20260711T221822+0800
+    ref: C21-M1/write_tests
+    status: requested
+    summary: >-
+      Requested the strict-separation M1 test worker to author real filesystem RED tests for workspace formats,
+      recoverable transactions, damaged-manifest fail-closed behavior, and the legacy writer fence.
+    timestamp: 2026-07-11T22:18:22+08:00
+    trigger: user
+    type: worker_requested
+    worker:
+      id: null
+      lifecycle: requested
+      role: test
+      write_scope:
+        - core/test/workspace-format.test.js
+        - core/test/workspace-transaction.test.js
+        - core/test/legacy-write-fence.test.js
+        - .pipeline/reviews/C21/M1/test-evidence.md
+  - evidence_refs:
+      - .plan-state/c21-generate.yaml
+      - .pipeline/architecture.md
+      - .pipeline/config.yaml
+      - .pipeline/state.yaml
+      - .pipeline/cycle.yaml
+      - .pipeline/prompts/00-workspace-format-transaction-kernel-and-legacy-write-fence.md
+      - .pipeline/prompts/01-runtime-records-receipts-and-snapshots.md
+      - .pipeline/prompts/02-recovery-journal-capsule-and-pack-engine.md
+      - .pipeline/prompts/03-init-workspace-adoption-and-minimal-skill-router.md
+      - .pipeline/prompts/04-reference-repository-bootstrap-and-schema-activation.md
+      - .pipeline/prompts/05-goal-cycle-delivery-core-and-adaptive-plan.md
+      - .pipeline/prompts/06-ambient-maintain-and-codex-hook-adapter.md
+      - .pipeline/prompts/07-surface-cleanup-deletion-gate-and-release-ready-regression.md
+    id: C21-GENERATE-COMPLETE-20260711T221538+0800
+    ref: C21/plan/generate
+    status: completed
+    summary: >-
+      Generated the confirmed eight C21 execution prompts, replaced the architecture baseline with the Skill-first
+      design, enabled strict worker separation and safety confirmations, and prepared protected Cycle/state metadata.
+      Product implementation remains blocked on the post-Generate execution confirmation.
+    timestamp: 2026-07-11T22:15:38+08:00
+    trigger: assistant
+    type: plan_generate
+    validations:
+      - >-
+        8 prompts generated with technical route, research, alternatives, validation, audit, and worker assignment
+        sections
+      - 'protected state/cycle commit: passing'
+      - 'next gate: execution_confirmation'
+  - evidence_refs:
+      - .plan-state/c21-decompose.yaml
+      - .plan-state/c21-technical-route.md
+      - .pipeline/reports/C21-unified-architecture-design.md
+      - .pipeline/reports/C21-core-cutover-bootstrap-scope.md
+      - .pipeline/reports/C21-recovery-journal-compaction-design.md
+      - .pipeline/PROGRESS.md
+    id: C21-DECOMPOSE-PROPOSED-20260711T220548+0800
+    ref: C21/plan/decompose
+    status: proposed
+    summary: >-
+      Proposed an eight-Milestone Skill-first cutover plan after independent storage, command-surface, and Codex
+      recovery scans. The route separates transaction authority, Records/Receipts, recovery, Init, repository bootstrap,
+      Goal/Cycle delivery, Maintain/Codex Hooks, and deletion-gated cleanup; Generate remains blocked on explicit user
+      confirmation.
+    timestamp: 2026-07-11T22:05:48+08:00
+    trigger: assistant
+    type: plan_decompose
+    validations:
+      - 'c21-decompose.yaml: parsed; 8/8 Milestones contain all required technical-route fields'
+      - 'Codex Hooks design: checked against current official Hooks documentation'
+      - 'plugin baseline validator: failed with known manifest and resume metadata gaps assigned to C21-M7'
+      - 'git diff --check: passing'
+  - evidence_refs:
+      - .pipeline/reports/C21-recovery-journal-compaction-design.md
+      - .pipeline/PROGRESS.md
+    id: C21-D-RECOVERY-001
+    ref: C21/design/recovery-journal-compaction
+    report: .pipeline/reports/C21-recovery-journal-compaction-design.md
+    status: confirmed
+    summary: >-
+      Confirmed the complete recovery architecture: a replayable local journal, effect receipts, incremental context
+      capsules, validated recovery packs, and Codex compact failure fallback without reinjecting full transcripts.
+    timestamp: 2026-07-11T20:49:59+08:00
+    trigger: user
+    type: chat_entry
+  - evidence_refs:
+      - .pipeline/reports/C21-core-cutover-bootstrap-scope.md
+      - .pipeline/PROGRESS.md
+    id: C21-D-SCOPE-001
+    ref: C21/design/core-cutover-bootstrap
+    report: .pipeline/reports/C21-core-cutover-bootstrap-scope.md
+    status: confirmed
+    summary: >-
+      Confirmed the C21 core-only rewrite and bootstrap cutover: define the new writer first, migrate necessary history
+      with staged Terra record patches, use this repository as the first reference workspace, and clean legacy surfaces
+      through a deletion manifest.
+    timestamp: 2026-07-11T20:39:36+08:00
+    trigger: user
+    type: chat_entry
+  - evidence_refs:
+      - .pipeline/reports/C21-unified-architecture-design.md
+      - .pipeline/PROGRESS.md
+    id: C21-D-ARCH-001
+    ref: C21/design/unified-architecture
+    report: .pipeline/reports/C21-unified-architecture-design.md
+    status: confirmed
+    summary: >-
+      Confirmed the vNext unified architecture with one main delivery, an optional foreground activity, single-owner
+      authorities, receipt-driven transitions, ambient Maintain, isolated Explore, and accepted snapshots.
+    timestamp: 2026-07-11T20:24:08+08:00
+    trigger: user
+    type: chat_entry
+  - evidence_refs:
+      - .pipeline/reports/C21-stash-suspend-reconciliation-design.md
+      - .pipeline/PROGRESS.md
+    id: C21-D-STASH-001
+    ref: C21/design/workflow-stash
+    report: .pipeline/reports/C21-stash-suspend-reconciliation-design.md
+    status: confirmed
+    summary: >-
+      Confirmed the semi-visible Workflow Stash design, superseding the initial Git snapshot draft: suspend state
+      without storing code, resume through forward reconciliation, and use adaptive or strict conflict gates.
+    timestamp: 2026-07-11T20:09:41+08:00
+    trigger: user
+    type: chat_entry
+  - evidence_refs:
+      - .pipeline/audits/audit-002.md
+      - .pipeline/audits/audit-002-summary.md
+      - .pipeline/cycle.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: AUDIT-002
+    ref: C21/preflight-global-design-scan
+    report: .pipeline/audits/audit-002.md
+    status: blocked
+    summary: >-
+      Completed the C21 research-only global design audit: authority, generated artifacts, runtime effects, platform
+      capabilities, Rules, command observability, and Maintain require architectural closure before implementation.
+    timestamp: 2026-07-10T21:24:32+08:00
+    trigger: user
+    type: audit
+    validations:
+      - 'npm test: 687/687 passing'
+      - 'scenario regression: 62/68 passing'
+      - 'config validation: passing (shallow contract only)'
+      - 'audit verdict: BLOCKED, 6 Critical / 7 Warning / 3 Info'
+  - evidence_refs:
+      - .pipeline/cycle.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: C21-SCOPE-EXPANSION-20260710T205827+0800
+    ref: C21/preflight-audit
+    status: active
+    summary: >-
+      Expanded C21 into a vNext architecture, platform capability, and effectiveness governance Cycle; retained the
+      prior Stash/Maintain draft as background and started a research-only preflight audit.
+    timestamp: 2026-07-10T20:58:27+08:00
+    trigger: user
+    type: cycle_scope_update
+  - evidence_refs:
+      - .pipeline/cycle.yaml
+      - .pipeline/state.yaml
+      - .pipeline/PROGRESS.md
+    id: CYCLE-NEW-C21-20260706T215230+0800
+    previous_cycle: C20
+    ref: C21
+    status: active
+    summary: >-
+      Created C21 for the stash feature (pipeline state + git workspace snapshot with conflict-checked restore) and the
+      maintain core model redesign (unified queue state machine, simplified run, plan/run boundary, path decoupling).
+    timestamp: 2026-07-06T21:52:30+08:00
+    trigger: user
+    type: cycle_new
+  - evidence_refs:
+      - .pipeline/archives/C20-consultation-first-action-boundary/summary.md
+    id: CYCLE-ARCHIVED-C20-20260706T215230+0800
+    ref: C20
+    status: completed
+    summary: >-
+      Archived accepted C20 runtime artifacts (state, cycle, PROGRESS, prompts, reports, architecture snapshot,
+      knowledge summary) to archives/C20-consultation-first-action-boundary before creating C21.
+    timestamp: 2026-07-06T21:52:30+08:00
+    trigger: user
+    type: cycle_archive
   - id: RELEASE-v13.1.0-beta.2-20260630T223800+0800
     ref: v13.1.0-beta.2
     report: .pipeline/release/v13.1.0-beta.2.md
@@ -13097,3 +15716,730 @@ entries:
       - 'node --test core/test/docs-governance.test.js: 8/8 passing'
       - 'git diff --check: passing'
       - 'rg -n ''/home/heyx'' core/src scripts: no matches'
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/test-evidence.md
+      role: test
+      worker_id: /root/m5_test
+    id: C21-M5-TEST-WORKER-REOPENED-20260712T0701340800
+    ref: C21-M5/write_tests
+    status: active
+    summary: >-
+      Reopened M5 test worker Revision 1 to correct the fixture route from M6 Maintain/Hooks to M6 Goal/Cycle/adaptive
+      Plan and reconfirm RED.
+    timestamp: 2026-07-12T07:01:34+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c01-c04.md
+      reconstructed_after_compaction: true
+      role: extractor
+      worker_id: /root/m5_extract_c01_c04
+    id: C21-M5-EXTRACT-C01-C04-LIFECYCLE-RECOVERED-20260712T0701340800
+    ref: C21-M5/extract-c01-c04
+    status: active
+    summary: >-
+      Recorded active read-only C1-C4 Extractor after context recovery; proposal evidence only and no authoritative
+      writes.
+    timestamp: 2026-07-12T07:01:34+08:00
+    trigger: assistant
+    type: worker_started
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c05-c08.md
+      reconstructed_after_compaction: true
+      role: extractor
+      worker_id: /root/m5_extract_c05_c08
+    id: C21-M5-EXTRACT-C05-C08-LIFECYCLE-RECOVERED-20260712T0701340800
+    ref: C21-M5/extract-c05-c08
+    status: active
+    summary: >-
+      Recorded active read-only C5-C8 Extractor after context recovery; proposal evidence only and no authoritative
+      writes.
+    timestamp: 2026-07-12T07:01:34+08:00
+    trigger: assistant
+    type: worker_started
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/test-evidence.md
+      validations:
+        - focused 3 pass / 3 fail / 18 skip
+        - full 907 pass / 3 fail / 18 skip
+        - M1-M4 green
+      worker_id: /root/m5_test
+    id: C21-M5-TEST-REVISION-1-COMPLETE-20260712T0705340800
+    ref: C21-M5/write_tests
+    status: completed
+    summary: >-
+      M5 test Revision 1 corrected the M6 Goal/Cycle/adaptive Plan route and reconfirmed the exact three
+      publication-gate RED families.
+    timestamp: 2026-07-12T07:05:34+08:00
+    trigger: assistant
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extractors/c01-c04.json
+      worker_id: /root/m5_extract_c01_c04
+    id: C21-M5-EXTRACT-C01-C04-COMPLETE-20260712T0705340800
+    ref: C21-M5/extract-c01-c04
+    status: completed
+    summary: >-
+      C1-C4 bounded Extractor produced six proposal candidates and eight exclusions with source digests and safety
+      scans.
+    timestamp: 2026-07-12T07:05:34+08:00
+    trigger: assistant
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extractors/c05-c08.json
+      worker_id: /root/m5_extract_c05_c08
+    id: C21-M5-EXTRACT-C05-C08-INITIAL-COMPLETE-20260712T0705340800
+    ref: C21-M5/extract-c05-c08
+    status: completed
+    summary: >-
+      C5-C8 bounded Extractor produced six proposal candidates; strict M2 Record Patch schema normalization was
+      requested before curation.
+    timestamp: 2026-07-12T07:05:34+08:00
+    trigger: assistant
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extractors/c05-c08.json
+      worker_id: /root/m5_extract_c05_c08
+    id: C21-M5-EXTRACT-C05-C08-REVISION-1-START-20260712T0705340800
+    ref: C21-M5/extract-c05-c08
+    status: active
+    summary: Reopened C5-C8 Extractor for strict Record kind and source-ref schema normalization.
+    timestamp: 2026-07-12T07:05:34+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c09-c12.md
+      worker_id: /root/m5_extract_c09_c12
+    id: C21-M5-EXTRACT-C09-C12-START-20260712T0705340800
+    ref: C21-M5/extract-c09-c12
+    status: active
+    summary: Started bounded read-only C9-C12 history Extractor for proposal evidence only.
+    timestamp: 2026-07-12T07:05:34+08:00
+    trigger: assistant
+    type: worker_started
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c13-c16.md
+      worker_id: /root/m5_extract_c13_c16
+    id: C21-M5-EXTRACT-C13-C16-START-20260712T0705340800
+    ref: C21-M5/extract-c13-c16
+    status: active
+    summary: Started bounded read-only C13-C16 history Extractor for proposal evidence only.
+    timestamp: 2026-07-12T07:05:34+08:00
+    trigger: assistant
+    type: worker_started
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c17-c20.md
+      worker_id: /root/m5_extract_c17_c20
+    id: C21-M5-EXTRACT-C17-C20-START-20260712T0705340800
+    ref: C21-M5/extract-c17-c20
+    status: active
+    summary: Started bounded read-only C17-C20 history Extractor for proposal evidence only.
+    timestamp: 2026-07-12T07:05:34+08:00
+    trigger: assistant
+    type: worker_started
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c21-current.md
+      worker_id: /root/m5_extract_c21_current
+    id: C21-M5-EXTRACT-C21-CURRENT-START-20260712T0705340800
+    ref: C21-M5/extract-c21-current
+    status: active
+    summary: >-
+      Started bounded read-only current C21 Extractor for approved design, M1-M5 context, exact M6-M8 route, and
+      deferred-scope proposals.
+    timestamp: 2026-07-12T07:05:34+08:00
+    trigger: assistant
+    type: worker_started
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extractors/c05-c08.json
+      role: extractor
+      worker_id: /root/m5_extract_c05_c08
+    id: C21-M5-EXTRACT-C05-C08-REVISION-1-COMPLETE-20260712T0713090800
+    ref: C21-M5/extract-c05-c08
+    status: completed
+    summary: >-
+      C5-C8 Extractor Revision 1 normalized all six candidates to strict M2 Record Patch schema; 6/6 patches and 12/12
+      source digests pass.
+    timestamp: 2026-07-12T07:13:09+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c09-c12.md
+      role: extractor
+      worker_id: /root/m5_extract_c09_c12
+    id: C21-M5-EXTRACT-C09-C12-COMPLETE-20260712T0713090800
+    ref: C21-M5/extract-c09-c12
+    status: completed
+    summary: >-
+      C9-C12 bounded Extractor produced 13 strict M2 proposal candidates with source, schema, privacy, and path checks
+      passing.
+    timestamp: 2026-07-12T07:13:09+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c13-c16.md
+      role: extractor
+      worker_id: /root/m5_extract_c13_c16
+    id: C21-M5-EXTRACT-C13-C16-COMPLETE-20260712T0713090800
+    ref: C21-M5/extract-c13-c16
+    status: completed
+    summary: >-
+      C13-C16 bounded Extractor produced 11 strict M2 proposal candidates with pending-acceptance conflicts explicitly
+      unreviewed.
+    timestamp: 2026-07-12T07:13:09+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c17-c20.md
+      role: extractor
+      worker_id: /root/m5_extract_c17_c20
+    id: C21-M5-EXTRACT-C17-C20-COMPLETE-20260712T0713090800
+    ref: C21-M5/extract-c17-c20
+    status: completed
+    summary: >-
+      C17-C20 bounded Extractor produced 14 strict M2 proposal candidates and flagged obsolete Rules authority for C21
+      reconciliation.
+    timestamp: 2026-07-12T07:13:09+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c09-c12.md
+      role: extractor
+      worker_id: /root/m5_extract_c09_c12
+    id: C21-M5-EXTRACT-C09-C12-REVISION-1-START-20260712T0715390800
+    ref: C21-M5/extract-c09-c12
+    status: active
+    summary: Reopened Extractor Revision 1 to normalize 13 candidates to the exact createBootstrapProposal envelope.
+    timestamp: 2026-07-12T07:15:39+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c13-c16.md
+      role: extractor
+      worker_id: /root/m5_extract_c13_c16
+    id: C21-M5-EXTRACT-C13-C16-REVISION-1-START-20260712T0715390800
+    ref: C21-M5/extract-c13-c16
+    status: active
+    summary: Reopened Extractor Revision 1 to normalize 11 candidates to the exact createBootstrapProposal envelope.
+    timestamp: 2026-07-12T07:15:39+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c17-c20.md
+      role: extractor
+      worker_id: /root/m5_extract_c17_c20
+    id: C21-M5-EXTRACT-C17-C20-REVISION-1-START-20260712T0715390800
+    ref: C21-M5/extract-c17-c20
+    status: active
+    summary: Reopened Extractor Revision 1 to normalize 14 candidates to the exact createBootstrapProposal envelope.
+    timestamp: 2026-07-12T07:15:39+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c09-c12.md
+      role: extractor
+      worker_id: /root/m5_extract_c09_c12
+    id: C21-M5-EXTRACT-C09-C12-REVISION-1-COMPLETE-20260712T0720020800
+    ref: C21-M5/extract-c09-c12
+    status: completed
+    summary: >-
+      C09-C12 Extractor Revision 1 normalized 13 candidates to the exact proposal envelope; strict Record schema and
+      safety checks pass.
+    timestamp: 2026-07-12T07:20:02+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c13-c16.md
+      role: extractor
+      worker_id: /root/m5_extract_c13_c16
+    id: C21-M5-EXTRACT-C13-C16-REVISION-1-COMPLETE-20260712T0720020800
+    ref: C21-M5/extract-c13-c16
+    status: completed
+    summary: >-
+      C13-C16 Extractor Revision 1 normalized 11 candidates to the exact proposal envelope; strict Record schema and
+      safety checks pass.
+    timestamp: 2026-07-12T07:20:02+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c17-c20.md
+      role: extractor
+      worker_id: /root/m5_extract_c17_c20
+    id: C21-M5-EXTRACT-C17-C20-REVISION-1-COMPLETE-20260712T0720020800
+    ref: C21-M5/extract-c17-c20
+    status: completed
+    summary: >-
+      C17-C20 Extractor Revision 1 normalized 14 candidates to the exact proposal envelope; strict Record schema and
+      safety checks pass.
+    timestamp: 2026-07-12T07:20:02+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extractors/c01-c04.json
+      role: extractor
+      worker_id: /root/m5_extract_c01_c04
+    id: C21-M5-EXTRACT-C01-C04-SOURCE-CONTRACT-REVISION-1-START-20260712T0726420800
+    ref: C21-M5/extract-c01-c04
+    status: active
+    summary: >-
+      Reopened C01-C04 Extractor revision 1 so source locator is the readable repo-relative file path and fine-grained
+      provenance moves to ref.
+    timestamp: 2026-07-12T07:26:42+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extractors/c05-c08.json
+      role: extractor
+      worker_id: /root/m5_extract_c05_c08
+    id: C21-M5-EXTRACT-C05-C08-SOURCE-CONTRACT-REVISION-2-START-20260712T0726420800
+    ref: C21-M5/extract-c05-c08
+    status: active
+    summary: >-
+      Reopened C05-C08 Extractor revision 2 so source locator is the readable repo-relative file path and fine-grained
+      provenance moves to ref.
+    timestamp: 2026-07-12T07:26:42+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c09-c12.md
+      role: extractor
+      worker_id: /root/m5_extract_c09_c12
+    id: C21-M5-EXTRACT-C09-C12-SOURCE-CONTRACT-REVISION-2-START-20260712T0726420800
+    ref: C21-M5/extract-c09-c12
+    status: active
+    summary: >-
+      Reopened C09-C12 Extractor revision 2 so source locator is the readable repo-relative file path and fine-grained
+      provenance moves to ref.
+    timestamp: 2026-07-12T07:26:42+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c13-c16.md
+      role: extractor
+      worker_id: /root/m5_extract_c13_c16
+    id: C21-M5-EXTRACT-C13-C16-SOURCE-CONTRACT-REVISION-2-START-20260712T0726420800
+    ref: C21-M5/extract-c13-c16
+    status: active
+    summary: >-
+      Reopened C13-C16 Extractor revision 2 so source locator is the readable repo-relative file path and fine-grained
+      provenance moves to ref.
+    timestamp: 2026-07-12T07:26:42+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c17-c20.md
+      role: extractor
+      worker_id: /root/m5_extract_c17_c20
+    id: C21-M5-EXTRACT-C17-C20-SOURCE-CONTRACT-REVISION-2-START-20260712T0726420800
+    ref: C21-M5/extract-c17-c20
+    status: active
+    summary: >-
+      Reopened C17-C20 Extractor revision 2 so source locator is the readable repo-relative file path and fine-grained
+      provenance moves to ref.
+    timestamp: 2026-07-12T07:26:42+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c21-current.md
+      role: extractor
+      worker_id: /root/m5_extract_c21_current
+    id: C21-M5-EXTRACT-C21-CURRENT-SOURCE-CONTRACT-REVISION-1-START-20260712T0726420800
+    ref: C21-M5/extract-c21-current
+    status: active
+    summary: >-
+      Reopened C21-CURRENT Extractor revision 1 so source locator is the readable repo-relative file path and
+      fine-grained provenance moves to ref.
+    timestamp: 2026-07-12T07:26:42+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/implementation-evidence.md
+      role: implement
+      worker_id: /root/m5_implement
+    id: C21-M5-IMPLEMENT-COMPLETE-20260712T0730150800
+    ref: C21-M5/implement
+    status: completed
+    summary: M5 implement worker delivered nine Bootstrap APIs with extended production-only smokes and static scans passing.
+    timestamp: 2026-07-12T07:30:15+08:00
+    trigger: subagent
+    type: worker_completed
+  - id: C21-M5-GREEN-ATTEMPT-1-START-20260712T0730150800
+    ref: C21-M5/run_tests_green
+    status: active
+    summary: Started main-thread M5 focused GREEN Attempt 1 against the independent test contract.
+    timestamp: 2026-07-12T07:30:15+08:00
+    trigger: assistant
+    type: step_started
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extractors/c05-c08.json
+      role: extractor
+      worker_id: /root/m5_extract_c05_c08
+    id: C21-M5-EXTRACT-C05-C08-SOURCE-CONTRACT-COMPLETE-20260712T0730150800
+    ref: C21-M5/extract-c05-c08
+    status: completed
+    summary: C05-C08 source-contract revision completed; 6 candidates now use readable file locators with verified hashes.
+    timestamp: 2026-07-12T07:30:15+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c09-c12.md
+      role: extractor
+      worker_id: /root/m5_extract_c09_c12
+    id: C21-M5-EXTRACT-C09-C12-SOURCE-CONTRACT-COMPLETE-20260712T0730150800
+    ref: C21-M5/extract-c09-c12
+    status: completed
+    summary: C09-C12 source-contract revision completed; 13 candidates now use readable file locators with verified hashes.
+    timestamp: 2026-07-12T07:30:15+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c13-c16.md
+      role: extractor
+      worker_id: /root/m5_extract_c13_c16
+    id: C21-M5-EXTRACT-C13-C16-SOURCE-CONTRACT-COMPLETE-20260712T0730150800
+    ref: C21-M5/extract-c13-c16
+    status: completed
+    summary: C13-C16 source-contract revision completed; 11 candidates now use readable file locators with verified hashes.
+    timestamp: 2026-07-12T07:30:15+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c17-c20.md
+      role: extractor
+      worker_id: /root/m5_extract_c17_c20
+    id: C21-M5-EXTRACT-C17-C20-SOURCE-CONTRACT-COMPLETE-20260712T0730150800
+    ref: C21-M5/extract-c17-c20
+    status: completed
+    summary: C17-C20 source-contract revision completed; 14 candidates now use readable file locators with verified hashes.
+    timestamp: 2026-07-12T07:30:15+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c21-current.md
+      role: extractor
+      worker_id: /root/m5_extract_c21_current
+    id: C21-M5-EXTRACT-C21-CURRENT-SOURCE-CONTRACT-COMPLETE-20260712T0731190800
+    ref: C21-M5/extract-c21-current
+    status: completed
+    summary: >-
+      Current C21 Extractor source revision completed; 16 candidates and 30 source pairs now use readable file locators
+      with 18-source inventory coverage.
+    timestamp: 2026-07-12T07:31:19+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extractors/c01-c04.json
+      role: extractor
+      worker_id: /root/m5_extract_c01_c04
+    id: C21-M5-EXTRACT-C01-C04-SOURCE-CONTRACT-COMPLETE-20260712T0732090800
+    ref: C21-M5/extract-c01-c04
+    status: completed
+    summary: >-
+      C1-C4 source-contract revision completed; six candidates and eleven source pairs now use readable file locators
+      with verified hashes.
+    timestamp: 2026-07-12T07:32:09+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      cluster: type/ref/locator/digest source envelope rejected before behavior
+    id: C21-M5-GREEN-ATTEMPT-1-RED-20260712T0733280800
+    ref: C21-M5/run_tests_green
+    status: needs_changes
+    summary: >-
+      M5 focused Attempt 1 reached 36 tests / 7 pass / 29 fail; every failure was truncated by one strict
+      source-envelope compatibility cluster.
+    timestamp: 2026-07-12T07:33:28+08:00
+    trigger: assistant
+    type: step_progress
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/implementation-evidence.md
+      role: implement
+      worker_id: /root/m5_implement
+    id: C21-M5-IMPLEMENT-REVISION-1-START-20260712T0733280800
+    ref: C21-M5/implement
+    status: active
+    summary: >-
+      Reopened the production-only M5 implement worker to accept and validate the strict type/ref/locator/digest source
+      envelope.
+    timestamp: 2026-07-12T07:33:28+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extraction-coverage.md
+      role: coverage
+      worker_id: /root/m5_extraction_coverage
+    id: C21-M5-EXTRACTION-COVERAGE-START-20260712T0735130800
+    ref: C21-M5/extraction-coverage
+    status: active
+    summary: Started independent read-only coverage compiler for 66 proposal candidates and 115 source references.
+    timestamp: 2026-07-12T07:35:13+08:00
+    trigger: assistant
+    type: worker_started
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/implementation-evidence.md
+      role: implement
+      worker_id: /root/m5_implement
+    id: C21-M5-IMPLEMENT-REVISION-1-COMPLETE-20260712T0738490800
+    ref: C21-M5/implement
+    status: completed
+    summary: M5 implement Revision 1 completed canonical type/ref/locator/digest source binding and strict safety checks.
+    timestamp: 2026-07-12T07:38:49+08:00
+    trigger: subagent
+    type: worker_completed
+  - id: C21-M5-GREEN-ATTEMPT-2-START-20260712T0738490800
+    ref: C21-M5/run_tests_green
+    status: active
+    summary: Started M5 focused GREEN Attempt 2 after source-envelope Revision 1.
+    timestamp: 2026-07-12T07:38:49+08:00
+    trigger: assistant
+    type: step_progress
+  - id: C21-M5-GREEN-ATTEMPT-2-RED-20260712T0741430800
+    ref: C21-M5/run_tests_green
+    status: needs_changes
+    summary: >-
+      M5 focused Attempt 2 remained 7 pass / 29 fail after source repair and exposed five proposal-topology clusters
+      before activation behavior.
+    timestamp: 2026-07-12T07:41:43+08:00
+    trigger: assistant
+    type: step_progress
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/implementation-evidence.md
+      role: implement
+      worker_id: /root/m5_implement
+    id: C21-M5-IMPLEMENT-REVISION-2-START-20260712T0741430800
+    ref: C21-M5/implement
+    status: active
+    summary: >-
+      Reopened production-only implement Revision 2 for support, exclusion, merge, active-leaf, and sanitized
+      audit-marker topology.
+    timestamp: 2026-07-12T07:41:43+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extraction-coverage.md
+      role: coverage
+      worker_id: /root/m5_extraction_coverage
+    id: C21-M5-EXTRACTION-COVERAGE-COMPLETE-20260712T0744380800
+    ref: C21-M5/extraction-coverage
+    status: completed
+    summary: >-
+      Independent extraction coverage completed: 66 candidates, 115 refs, 57 verified locators, no intake blocker, and a
+      defined Curator conflict queue.
+    timestamp: 2026-07-12T07:44:38+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/implementation-evidence.md
+      role: implement
+      worker_id: /root/m5_implement
+    id: C21-M5-IMPLEMENT-REVISION-2-COMPLETE-20260712T0750300800
+    ref: C21-M5/implement
+    status: completed
+    summary: M5 implement Revision 2 completed five proposal-topology contracts with production suite green.
+    timestamp: 2026-07-12T07:50:30+08:00
+    trigger: subagent
+    type: worker_completed
+  - id: C21-M5-GREEN-ATTEMPT-3-START-20260712T0750300800
+    ref: C21-M5/run_tests_green
+    status: active
+    summary: Started M5 focused GREEN Attempt 3 after proposal-topology Revision 2.
+    timestamp: 2026-07-12T07:50:30+08:00
+    trigger: assistant
+    type: step_progress
+  - id: C21-M5-GREEN-ATTEMPT-3-RED-20260712T0753030800
+    ref: C21-M5/run_tests_green
+    status: needs_changes
+    summary: M5 focused Attempt 3 reached 35/36; only the activation result candidate-key to Record-ID mapping is missing.
+    timestamp: 2026-07-12T07:53:03+08:00
+    trigger: assistant
+    type: step_progress
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/implementation-evidence.md
+      role: implement
+      worker_id: /root/m5_implement
+    id: C21-M5-IMPLEMENT-REVISION-3-START-20260712T0753030800
+    ref: C21-M5/implement
+    status: active
+    summary: Reopened production-only implement Revision 3 for the deterministic activation-result Record mapping only.
+    timestamp: 2026-07-12T07:53:03+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/implementation-evidence.md
+      role: implement
+      worker_id: /root/m5_implement
+    id: C21-M5-IMPLEMENT-REVISION-3-COMPLETE-20260712T0755170800
+    ref: C21-M5/implement
+    status: completed
+    summary: >-
+      M5 implement Revision 3 added a deterministic candidate-key to Record-ID activation result mapping with production
+      suite green.
+    timestamp: 2026-07-12T07:55:17+08:00
+    trigger: subagent
+    type: worker_completed
+  - id: C21-M5-GREEN-ATTEMPT-4-START-20260712T0755170800
+    ref: C21-M5/run_tests_green
+    status: active
+    summary: Started M5 focused GREEN Attempt 4 after activation-result Revision 3.
+    timestamp: 2026-07-12T07:55:17+08:00
+    trigger: assistant
+    type: step_progress
+  - details:
+      validations:
+        - focused 36/36
+    id: C21-M5-FOCUSED-GREEN-20260712T0756360800
+    ref: C21-M5/run_tests_green
+    status: completed
+    summary: M5 focused Attempt 4 passed all 36 tests; full regression and compatibility/static validation started.
+    timestamp: 2026-07-12T07:56:36+08:00
+    trigger: assistant
+    type: step_progress
+  - details:
+      validations:
+        - M5 36/36
+        - full 940/940
+        - M1 76/76
+        - M2 61/61
+        - M3 47/47
+        - M4 44/44
+        - log 7/7
+        - syntax/diff/credential clean
+    id: C21-M5-FULL-GREEN-20260712T0758240800
+    ref: C21-M5/run_tests_green
+    status: completed
+    summary: >-
+      M5 full validation passed focused 36/36, full 940/940, M1-M4 compatibility, lifecycle log, syntax, diff, and
+      credential scans.
+    timestamp: 2026-07-12T07:58:24+08:00
+    trigger: assistant
+    type: step_complete
+  - id: C21-M5-REVIEW-CURATION-START-20260712T0758240800
+    ref: C21-M5/review_code
+    status: active
+    summary: Started real proposal curation, independent source/privacy audit, activation, and final code review phase.
+    timestamp: 2026-07-12T07:58:24+08:00
+    trigger: assistant
+    type: step_start
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c09-c12.md
+      role: extractor
+      worker_id: /root/m5_extract_c09_c12
+    id: C21-M5-EXTRACT-C09-C12-SEMANTIC-ENUM-REVISION-3-START-20260712T0801310800
+    ref: C21-M5/extract-c09-c12
+    status: active
+    summary: >-
+      Reopened C09-C12 Extractor revision 3 to normalize source class, material risk, and reviewed semantics against the
+      real proposal API.
+    timestamp: 2026-07-12T08:01:31+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c13-c16.md
+      role: extractor
+      worker_id: /root/m5_extract_c13_c16
+    id: C21-M5-EXTRACT-C13-C16-SEMANTIC-ENUM-REVISION-3-START-20260712T0801310800
+    ref: C21-M5/extract-c13-c16
+    status: active
+    summary: >-
+      Reopened C13-C16 Extractor revision 3 to normalize source class, material risk, and reviewed semantics against the
+      real proposal API.
+    timestamp: 2026-07-12T08:01:31+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c17-c20.md
+      role: extractor
+      worker_id: /root/m5_extract_c17_c20
+    id: C21-M5-EXTRACT-C17-C20-SEMANTIC-ENUM-REVISION-3-START-20260712T0801310800
+    ref: C21-M5/extract-c17-c20
+    status: active
+    summary: >-
+      Reopened C17-C20 Extractor revision 3 to normalize source class, material risk, and reviewed semantics against the
+      real proposal API.
+    timestamp: 2026-07-12T08:01:31+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c21-current.md
+      role: extractor
+      worker_id: /root/m5_extract_c21_current
+    id: C21-M5-EXTRACT-C21-CURRENT-SEMANTIC-ENUM-REVISION-2-START-20260712T0801310800
+    ref: C21-M5/extract-c21-current
+    status: active
+    summary: >-
+      Reopened C21-CURRENT Extractor revision 2 to normalize source class, material risk, and reviewed semantics against
+      the real proposal API.
+    timestamp: 2026-07-12T08:01:31+08:00
+    trigger: assistant
+    type: worker_reopened
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c09-c12.md
+      role: extractor
+      worker_id: /root/m5_extract_c09_c12
+    id: C21-M5-EXTRACT-C09-C12-SEMANTIC-ENUM-COMPLETE-20260712T0806580800
+    ref: C21-M5/extract-c09-c12
+    status: completed
+    summary: C09-C12 semantic enum revision completed with 13 included and zero excluded through the production proposal API.
+    timestamp: 2026-07-12T08:06:58+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c13-c16.md
+      role: extractor
+      worker_id: /root/m5_extract_c13_c16
+    id: C21-M5-EXTRACT-C13-C16-SEMANTIC-ENUM-COMPLETE-20260712T0806580800
+    ref: C21-M5/extract-c13-c16
+    status: completed
+    summary: C13-C16 semantic enum revision completed with 11 included and zero excluded through the production proposal API.
+    timestamp: 2026-07-12T08:06:58+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c17-c20.md
+      role: extractor
+      worker_id: /root/m5_extract_c17_c20
+    id: C21-M5-EXTRACT-C17-C20-SEMANTIC-ENUM-COMPLETE-20260712T0806580800
+    ref: C21-M5/extract-c17-c20
+    status: completed
+    summary: C17-C20 semantic enum revision completed with 14 included and zero excluded through the production proposal API.
+    timestamp: 2026-07-12T08:06:58+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/extract-c21-current.md
+      role: extractor
+      worker_id: /root/m5_extract_c21_current
+    id: C21-M5-EXTRACT-C21-CURRENT-SEMANTIC-ENUM-COMPLETE-20260712T0806580800
+    ref: C21-M5/extract-c21-current
+    status: completed
+    summary: >-
+      C21-CURRENT semantic enum revision completed with 16 included and zero excluded through the production proposal
+      API.
+    timestamp: 2026-07-12T08:06:58+08:00
+    trigger: subagent
+    type: worker_completed
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/curation-evidence.md
+      role: curator
+      worker_id: /root/m5_curator
+    id: C21-M5-CURATOR-START-20260712T0813490800
+    ref: C21-M5/review_code/curation
+    status: active
+    summary: >-
+      Started a fresh proposal-only Curator to reconcile 66 extracted candidates, preserve scoped
+      directives/authorization without reviving generic Rules, and validate the candidate graph through production APIs.
+    timestamp: 2026-07-12T08:13:49+08:00
+    trigger: assistant
+    type: worker_started
+  - details:
+      evidence_ref: .pipeline/reviews/C21/M5/audit.md
+      role: audit
+      worker_id: /root/m5_auditor
+    id: C21-M5-AUDIT-PREP-START-20260712T0815400800
+    ref: C21-M5/review_code/audit
+    status: active
+    summary: >-
+      Registered the fresh independent M5 Auditor before the final legacy-source freeze; actual audit waits for the
+      Curator proposal and cannot stage or activate.
+    timestamp: 2026-07-12T08:15:40+08:00
+    trigger: assistant
+    type: worker_started

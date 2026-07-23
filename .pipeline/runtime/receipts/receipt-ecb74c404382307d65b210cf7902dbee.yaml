@@ -1,0 +1,18 @@
+actor:
+  id: workspace-user
+  type: user
+authority_role: receipt
+consumed_at: 2026-07-13T02:09:48.031Z
+expires_at: 2026-07-13T02:19:48.031Z
+intent: delivery.accept
+issued_at: 2026-07-13T02:09:48.031Z
+object_ref:
+  id: g22-vsp-distribution-contract
+  kind: delivery
+plan_hash: 40dc2bc8862244511206bc4b5762e225a444b6e01150bc8e549666ae96c6d90c
+receipt_id: receipt-ecb74c404382307d65b210cf7902dbee
+reserved_at: 2026-07-13T02:09:48.031Z
+reserved_by: g22-accept-confirmed
+schema_version: '1'
+scope_hash: 1bd7d2ff5ead8eb25e3840d773983a1a4fe20e3bbf46716beccb0999b282a0a9
+state: consumed

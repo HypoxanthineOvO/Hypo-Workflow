@@ -1,0 +1,17 @@
+actor:
+  id: heyx
+  type: user
+authority_role: deletion_execution_report
+deleted_paths:
+  - redskill-package/hypo-workflow-noexec.zip
+  - redskill-package/hypo-workflow.zip
+git:
+  head: 0373266f32a15903c275816707bb03a92ba435e6
+  target_state_hash: 35336023f5507a853b2d35b92fd8a000a4c42c642dd53597a2e8f32e33c01048
+  tree: e2ee6b0cf78fd424c96fe586b04be1dba6b2c79c
+manifest_hash: c3ee2d03748e3d358063004a792f750c1397f348ecd92a5d427bf66e1f601ad9
+outcome: applied
+receipt_id: receipt-52d21fbc1c7afdf6b84f013c50066243
+recorded_at: 2026-07-12T18:09:47.012Z
+schema_version: '1'
+tool_use_id: g22-delete-hypo
