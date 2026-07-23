@@ -1,6 +1,6 @@
 # VSPi 0.2.0 Target Goal Input
 
-Status: `source contract pending final validation / target-local Goal required`.
+Status: `source contract verified / target-local Goal required`.
 
 本文件只准备 `/home/heyx/VSPi` 的后续本地 Goal 输入。本 source Goal 不修改 `~/VSPi`，不复制 Hypo-Workflow 的 runtime state，也不声称 VSPi `0.2.0` 已经实现。
 

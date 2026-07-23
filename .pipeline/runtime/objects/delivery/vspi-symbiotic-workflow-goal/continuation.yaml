@@ -1,11 +1,11 @@
-next_action: complete_and_verify_goal
+next_action: await_manual_acceptance
 object_ref:
   id: vspi-symbiotic-workflow-goal
   kind: delivery
 plan_hash: 923764ac3ef31d8d49acce7c8957ac70abe9e31d43d9663007257fe6432b7b1d
 revision: 0
 schema_version: '1'
-updated_at: 2026-07-23T16:04:29.356Z
+updated_at: 2026-07-23T16:53:55.445Z
 worker_routing:
   assessment:
     blast_radius: high

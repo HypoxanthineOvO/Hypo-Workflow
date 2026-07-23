@@ -2,8 +2,8 @@
   "schema_version": "1",
   "contract_version": "1",
   "projection_status": "current",
-  "generated_at": "2026-07-23T16:04:29.585Z",
-  "generation": 63,
+  "generated_at": "2026-07-23T16:53:55.479Z",
+  "generation": 66,
   "workspace": {
     "format_version": "1",
     "status": "ready"
@@ -11,7 +11,7 @@
   "delivery": {
     "kind": "goal",
     "id": "vspi-symbiotic-workflow-goal",
-    "status": "executing",
+    "status": "pending_acceptance",
     "revision": 0
   },
   "continuation": {

@@ -2,9 +2,10 @@ schema_version: '1'
 integration: vspi-0.2.0
 source_workspace: /home/heyx/Hypo-Workflow
 target_workspace: /home/heyx/VSPi
-source_status: pending_final_validation
+source_status: source_goal_verified
 target_status: pending_target_local_goal
 target_writes_in_source_goal: false
+source_commit: efef329bf2ab5234c3a261f9e6396dfa8e8c5cf6
 authority:
   plan: hypo-workflow
   process_execution: vspi-pi

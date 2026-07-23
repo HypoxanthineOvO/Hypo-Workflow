@@ -8,7 +8,7 @@ plan_record_ref:
   semantic_hash: a2d4390ad9175886f5dbce69a7ce14d9619dcfc8aeb2fe803f42836c02cc2433
 revision: 0
 schema_version: '1'
-status: executing
+status: pending_acceptance
 topology:
   identity_constraints:
     - - test
@@ -25,7 +25,22 @@ topology:
   schema_version: '1'
   separation_required: true
   verification_required: true
-updated_at: 2026-07-23T16:04:29.356Z
+updated_at: 2026-07-23T16:53:55.445Z
+verification:
+  evidence_refs:
+    - digest: sha256:c451691eb5fa078a1fc704baa885aa6ca3a29b1b7ea0a2ee00248dc57a143f6b
+      path: .pipeline/runtime/objects/delivery/vspi-symbiotic-workflow-goal/evidence/test.md
+      type: file
+    - digest: sha256:1178bb5f464445b57c3608fade99e95792079a17680b491549d5d8845332706d
+      path: .pipeline/runtime/objects/delivery/vspi-symbiotic-workflow-goal/evidence/implementation.md
+      type: file
+    - digest: sha256:2b785b9c4128f8dac729d3afc12783a7dd5e11aac2cafcc02ca9f7fc9d3ab6cd
+      path: .pipeline/runtime/objects/delivery/vspi-symbiotic-workflow-goal/evidence/audit.md
+      type: file
+  roles:
+    - test
+    - implement
+    - audit
 worker_routing:
   assessment:
     blast_radius: high
