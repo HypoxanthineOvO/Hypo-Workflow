@@ -1,5 +1,5 @@
 active:
   delivery:
-    id: vspi-symbiotic-workflow-core
+    id: vspi-symbiotic-workflow-goal
     kind: delivery
 schema_version: '1'

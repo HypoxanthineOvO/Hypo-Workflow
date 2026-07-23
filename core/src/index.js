@@ -111,6 +111,9 @@ export {
   buildDeliveryReceiptContext,
 } from "./delivery/index.js";
 export {
+  createWorkstreamStore,
+} from "./workstreams/index.js";
+export {
   createExperimentStore,
   buildExperimentReceiptContext,
 } from "./experiment/index.js";
@@ -169,6 +172,8 @@ export {
   readHostStatusProjection,
   refreshHostStatusProjection,
   verifyPortableBundle,
+  compileVspiIntegrationContract,
+  parseVspiIntegrationContract,
 } from "./host-contract/index.js";
 export {
   inspectLegacyWorkspace,

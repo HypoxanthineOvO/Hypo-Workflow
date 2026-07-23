@@ -280,30 +280,21 @@ test("recovery rolls forward after an activated manifest is deleted or restored 
   }
 });
 
-test("a different transaction id cannot bypass another pending workspace transaction", async (t) => {
+test("a different transaction id automatically recovers an abandoned pending transaction", async (t) => {
   const root = await temporaryRoot(t, "hw-transaction-different-id-");
   await seedWorkspaceFiles(root, OLD);
   await expectInjectedCrash(root, "tx-a", "after_install_file", { index: 0 });
-  const beforeSecondCommit = await snapshotTree(root);
 
-  const error = await captureError(() => commitWorkspaceTransaction(root, {
+  const committed = await commitWorkspaceTransaction(root, {
     id: "tx-b",
     writes: [{ path: ".pipeline/runtime/non-overlap-b.txt", content: "tx-b-content\n" }],
     manifest: manifest({ workspace_id: "different-tx-b-workspace" }),
-  }));
+  });
 
-  assert.deepEqual(
-    await snapshotTree(root),
-    beforeSecondCommit,
-    "a competing transaction must fail before staging or installing any bytes",
-  );
-  assert.equal(error?.code, "ERR_WORKSPACE_TRANSACTION_PENDING");
-  assert.equal(await exists(join(root, ".pipeline", "runtime", "non-overlap-b.txt")), false);
-  assert.equal(await exists(join(root, ".pipeline", "manifest.yaml")), false);
-
-  const recovered = await recoverWorkspaceTransaction(root, { id: "tx-a" });
-  assert.equal(recovered.action, "rolled_back");
+  assert.equal(committed.action, "committed");
+  assert.equal(await readFile(join(root, ".pipeline", "runtime", "non-overlap-b.txt"), "utf8"), "tx-b-content\n");
   assert.deepEqual(await readWorkspaceFiles(root, Object.keys(OLD)), OLD);
+  assert.equal((await recoverWorkspaceTransaction(root, { id: "tx-a" })).action, "none");
 });
 
 test("transaction rejects ancestor and descendant file paths before any workspace mutation", async (t) => {

@@ -1,5 +1,7 @@
 delivery_kind: cycle
 delivery_mode: plan
+feedback_record_ref:
+  id: feedback-2127b84c8d5667c43f93f06baa8c128a
 milestones:
   - depends_on: []
     id: M1
@@ -106,7 +108,10 @@ plan_record_ref:
   semantic_hash: 7abb9842e8e446a8968aab7e3bd8f36605f17898689074aa29c8fd2adfaa946f
 revision: 0
 schema_version: '1'
-status: proposed
+status: superseded
+superseded_by:
+  id: vspi-symbiotic-workflow-goal
+  kind: delivery
 topology:
   identity_constraints:
     - - test
@@ -123,4 +128,4 @@ topology:
   schema_version: '1'
   separation_required: true
   verification_required: true
-updated_at: 2026-07-23T15:41:39.042Z
+updated_at: 2026-07-23T16:02:49.196Z

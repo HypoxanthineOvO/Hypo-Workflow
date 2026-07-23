@@ -1,0 +1,53 @@
+delivery_kind: goal
+object_ref:
+  id: vspi-symbiotic-workflow-goal
+  kind: delivery
+plan_hash: 923764ac3ef31d8d49acce7c8957ac70abe9e31d43d9663007257fe6432b7b1d
+plan_record_ref:
+  id: decision-a2d4390ad9175886f5dbce69a7ce14d9
+  semantic_hash: a2d4390ad9175886f5dbce69a7ce14d9619dcfc8aeb2fe803f42836c02cc2433
+revision: 0
+schema_version: '1'
+status: executing
+topology:
+  identity_constraints:
+    - - test
+      - implement
+    - - test
+      - audit
+    - - implement
+      - audit
+  profile: strict
+  required_roles:
+    - test
+    - implement
+    - audit
+  schema_version: '1'
+  separation_required: true
+  verification_required: true
+updated_at: 2026-07-23T16:04:29.356Z
+worker_routing:
+  assessment:
+    blast_radius: high
+    complexity: high
+    oracle_strength: strong
+    reversibility: guarded
+    risk_flags:
+      - authority_change
+      - concurrency
+      - recovery
+    schema_version: '1'
+    summary: >-
+      Design independent failure-first tests for concurrent Workflow authority, crash-safe writer fencing, automatic
+      recovery, and portable host contracts.
+    uncertainty: medium
+  failure_state:
+    distinct_failed_route_count: 0
+    distinct_failed_route_ids: []
+    escalation_threshold: 2
+  policy_version: worker-routing-v1
+  reason_codes:
+    - high_blast_radius
+  routing_class: critical
+  schema_version: '1'
+  source: host_task_assessment

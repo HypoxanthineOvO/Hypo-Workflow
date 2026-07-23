@@ -33,6 +33,7 @@ Manifest
 ```
 
 - **Runtime** 保存 Goal/Plan 生命周期，并兼容读取既有 Cycle；**Continuation** 只保存下一步。
+- **Delivery / Workstream** 支持同一项目中的多个任务与 Session 并行；`active.delivery` 只保留为旧宿主 foreground pointer。
 - **Records** 保存 requirement、preference、decision 和 feedback；它们替代通用 Rules 系统。
 - **Experiment events / status projection** 保存可 Git 合并的实验事实，并提供无需扫描结果树的即时状态。
 - **Worker Routing** 在 Worker 启动前显示任务评估并输出语义能力档，不选择具体模型或 Provider。
@@ -145,6 +146,7 @@ Plugin 默认从 `hooks/hooks.json` 加载十类事件：
 - [Codex 指南](docs/platforms/codex.md)
 - [平台状态](docs/reference/platforms.md)
 - [当前产物与 authority](docs/reference/generated-artifacts.md)
+- [VSPi 0.2.0 集成合同](docs/reference/vspi-integration.md)
 - [命令规范](references/commands-spec.md)
 - [状态契约](references/state-contract.md)
 

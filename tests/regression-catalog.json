@@ -490,6 +490,22 @@
           ]
         },
         {
+          "path": "core/test/workspace-concurrency-recovery.test.js",
+          "classification": "maintained",
+          "reason": "Crash-safe writer serialization, automatic pending-transaction recovery, and stale-owner fencing contract for the VSPi symbiotic Workflow Goal.",
+          "covers": [
+            "vspi-symbiotic-workflow-goal"
+          ]
+        },
+        {
+          "path": "core/test/vspi-workstream-contract.test.js",
+          "classification": "maintained",
+          "reason": "Concurrent Delivery, Workstream, milestone claim, and portable VSPi integration contracts for the symbiotic Workflow Goal.",
+          "covers": [
+            "vspi-symbiotic-workflow-goal"
+          ]
+        },
+        {
           "path": "core/test/yaml-parser-unification.test.js",
           "classification": "maintained",
           "reason": "Executable current C21 behavior or protection contract used by the maintained release gate.",

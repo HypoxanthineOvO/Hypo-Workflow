@@ -11,6 +11,11 @@ import {
 } from "../runtime/internal.js";
 import { commitWorkspaceTransaction } from "../workspace-store/index.js";
 
+export {
+  compileVspiIntegrationContract,
+  parseVspiIntegrationContract,
+} from "./vspi.js";
+
 export const HOST_CONTRACT_VERSION = "1";
 export const HOST_STATUS_PATH = ".pipeline/runtime/host-status-v1.json";
 export const HOST_STATUS_RELATIVE_PATH = HOST_STATUS_PATH;

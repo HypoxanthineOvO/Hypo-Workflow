@@ -27,6 +27,7 @@ Derived view. Individual Markdown Records remain authoritative.
 | decision-861cb23500113ed79b04c1b99f29ee2e | active | decision | cycle:c23-experiment-management | cycle.c23-experiment-management.plan | decision-eb4cf6e1b6a7f306e53be993cd17e90c |
 | decision-884fd919aa8a5fb6b64bdb00e7d2405e | active | decision | project:project:hypo-workflow | project:vspi:concurrent-workstream-crashsafe-architecture | - |
 | decision-9a6060d4567e684b182e3d0823e9f8b9 | active | decision | project:project:hypo-workflow | project:analysis:durable-lane-and-execution-boundaries | - |
+| decision-a2d4390ad9175886f5dbce69a7ce14d9 | active | decision | goal:vspi-symbiotic-workflow-goal | goal.vspi-symbiotic-workflow-goal.plan | - |
 | decision-af3afd6b32d3a919d8f20f803280f856 | active | decision | project:project:hypo-workflow | project:c21:m3-accepted-recovery-baseline | - |
 | decision-b00efe9e0c4f436329957788887099e8 | active | decision | goal:g22-vsp-distribution-contract | goal.g22-vsp-distribution-contract.plan | - |
 | decision-b909f6e5663b65dc0fb2099067e42d3c | active | decision | project:project:hypo-workflow | project:c21:m2-accepted-authority-baseline | - |
@@ -41,6 +42,7 @@ Derived view. Individual Markdown Records remain authoritative.
 | decision-f8e8e63dd30d8a90c572e1a699a19f21 | inactive (superseded) | decision | project:project:hypo-workflow | project:stash:implementation-model | - |
 | decision-f94caf102e67e22abc3ed3b57d439e41 | active | decision | project:project:hypo-workflow | project:hypo-workflow:decision:audit-quality-optimize-separation | - |
 | feedback-00e4158e15cc6c1ee730296a9b776f53 | active | feedback | project:project:hypo-workflow | c16-delivered-but-not-human-accepted | - |
+| feedback-2127b84c8d5667c43f93f06baa8c128a | active | feedback | delivery:vspi-symbiotic-workflow-core | delivery:vspi-symbiotic-workflow-core:replace-plan-with-goal | - |
 | feedback-542a04ff0c7db58769911941cc18aedb | active | feedback | cycle:c23-experiment-management | cycle.c23-experiment-management.feedback.492b5eb524d3d0ec | - |
 | feedback-8442e50a859a28f7393182f66666ac79 | active | feedback | project:project:hypo-workflow | migration/c12-archive-status-conflict | - |
 | feedback-91a4f46046c59794010afce14819f010 | active | feedback | project:project:hypo-workflow | project:validation:external-effects-and-release-evidence | - |
@@ -62,4 +64,4 @@ Derived view. Individual Markdown Records remain authoritative.
 | requirement-c364ecf8e0d7b70a766ea730613f256b | active | requirement | project:project:hypo-workflow | project:hypo-workflow:requirement:consultation-first-action-boundary | - |
 | requirement-f96524166e1a8217674e9480be062afc | active | requirement | project:project:hypo-workflow | privacy/evidence-redact-before-persist-render | - |
 
-Records: 57
+Records: 59

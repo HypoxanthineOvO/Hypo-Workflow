@@ -1,8 +1,11 @@
-next_action: request_delivery_approval
+next_action: superseded_by_goal
 object_ref:
   id: vspi-symbiotic-workflow-core
   kind: delivery
 plan_hash: 3a1354c86bb00437f911a1bab017a592ab4b1ef30b500d1bb5903cfa06952ce0
+replacement_ref:
+  id: vspi-symbiotic-workflow-goal
+  kind: delivery
 revision: 0
 schema_version: '1'
-updated_at: 2026-07-23T15:41:39.042Z
+updated_at: 2026-07-23T16:02:49.196Z

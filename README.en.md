@@ -33,6 +33,7 @@ Manifest
 ```
 
 - **Runtime** owns Goal/Plan lifecycle and remains compatible with existing Cycles; **Continuation** owns only the next action.
+- **Delivery / Workstream** allow multiple tasks and Sessions to run in one project; `active.delivery` remains only as a legacy foreground pointer.
 - **Records** store requirements, preferences, decisions, and feedback. They replace the generic Rules system.
 - **Experiment events / status projection** store Git-mergeable experiment facts and provide instant status without rescanning result trees.
 - **Worker Routing** shows a task assessment before Worker start and emits a semantic capability class without choosing a model or provider.
@@ -145,6 +146,7 @@ Deletion requires the full exact Deletion Manifest in chat, fresh user approval,
 - [Codex Guide](docs/en/platforms/codex.md)
 - [Platform Status](docs/en/reference/platforms.md)
 - [Current Artifacts and Authority](docs/en/reference/generated-artifacts.md)
+- [VSPi 0.2.0 Integration Contract](docs/en/reference/vspi-integration.md)
 - [Command Spec](references/commands-spec.md)
 - [State Contract](references/state-contract.md)
 

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import * as ROOT_API from "../src/index.js";
 import {
   expectZeroWriteRejection,
+  listFiles,
   snapshotTree,
 } from "./fixtures/c21-m2/helpers.js";
 import {
@@ -89,7 +90,7 @@ preflightTest("an accepted Goal cannot be overwritten by a Cycle with the same o
   assert.deepEqual(await api.readRecord(root, accepted.plan_record_ref.id), originalRecord);
 });
 
-preflightTest("a different Delivery id is rejected while the active Delivery is nonterminal", async (t) => {
+preflightTest("a different Delivery id coexists while the foreground pointer switches atomically", async (t) => {
   const root = await temporaryCurrentWorkspace(t, "hw-m6-preflight-active-nonterminal-");
   const api = combinedApi();
   const { store } = createDeliveryTestStore(api);
@@ -99,23 +100,79 @@ preflightTest("a different Delivery id is rejected while the active Delivery is 
     topology,
   }, { id: "m6-preflight-active-seed" });
   const originalRecord = await api.readRecord(root, original.plan_record_ref.id);
+  const originalRuntime = await api.readRuntimeObject(root, GOAL_REF);
   const next = api.compileGoalDesign(goalDesignInput({
     id: "goal-beta",
     title: "Second Goal",
-    outcome: "The second Goal must wait until the active Goal is terminal.",
+    outcome: "The second Goal coexists while becoming the legacy foreground Delivery.",
   }));
 
-  await expectZeroWriteRejection(
+  const proposed = await store.proposeGoal(
     root,
-    () => store.proposeGoal(root, { design: next, topology }, { id: "m6-preflight-active-second" }),
-    /active|nonterminal|another|delivery|state/i,
+    { design: next, topology },
+    { id: "m6-preflight-active-second" },
   );
 
   const active = await api.readActivePointer(root);
   assert.equal(active.schema_version, "1");
-  assert.deepEqual(active.active.delivery, GOAL_REF);
+  assert.deepEqual(active.active.delivery, proposed.object_ref);
+  assert.equal(proposed.status, "proposed");
   assert.deepEqual(await store.read(root, GOAL_REF), original);
+  assert.deepEqual(await api.readRuntimeObject(root, GOAL_REF), originalRuntime);
   assert.deepEqual(await api.readRecord(root, original.plan_record_ref.id), originalRecord);
+});
+
+preflightTest("concurrent proposals for one new Delivery id create exactly one authority", async (t) => {
+  const root = await temporaryCurrentWorkspace(t, "hw-m6-preflight-concurrent-same-id-");
+  const api = combinedApi();
+  const { store } = createDeliveryTestStore(api);
+  const topology = api.selectExecutionTopology(soloTopologyInput());
+  const first = api.compileGoalDesign(goalDesignInput({
+    id: "goal-concurrent",
+    title: "Concurrent proposal A",
+    outcome: "Proposal A wins or rejects atomically without being overwritten.",
+  }));
+  const second = api.compileGoalDesign(goalDesignInput({
+    id: "goal-concurrent",
+    title: "Concurrent proposal B",
+    outcome: "Proposal B wins or rejects atomically without being overwritten.",
+  }));
+
+  const settled = await Promise.allSettled([
+    store.proposeGoal(root, { design: first, topology }, { id: "m6-preflight-concurrent-a" }),
+    store.proposeGoal(root, { design: second, topology }, { id: "m6-preflight-concurrent-b" }),
+  ]);
+  const successes = settled.filter((result) => result.status === "fulfilled");
+  const failures = settled.filter((result) => result.status === "rejected");
+  assert.equal(successes.length, 1, "exactly one concurrent proposal may create the Delivery");
+  assert.equal(failures.length, 1, "the losing proposal must reject instead of overwriting authority");
+  assert.match(
+    `${failures[0].reason?.code || ""} ${failures[0].reason?.message || failures[0].reason}`,
+    /object|exists|precondition|conflict|active|transaction/i,
+  );
+
+  const winner = successes[0].value;
+  const authority = await api.readRuntimeObject(root, winner.object_ref);
+  assert.equal(authority.runtime.plan_hash, winner.plan_hash);
+  assert.equal(authority.continuation.plan_hash, winner.plan_hash);
+  assert.deepEqual((await api.readActivePointer(root)).active.delivery, winner.object_ref);
+  assert.deepEqual(await store.read(root, winner.object_ref), winner);
+  assert.equal(
+    (await api.readRecord(root, winner.plan_record_ref.id)).attributes.semantic_hash,
+    winner.plan_record_ref.semantic_hash,
+  );
+
+  const files = await listFiles(root);
+  assert.equal(
+    files.filter((path) => path.includes("/runtime/objects/delivery/goal-concurrent/") && path.endsWith(".yaml")).length,
+    2,
+    "one Runtime and one Continuation file must own the Delivery authority",
+  );
+  assert.equal(
+    files.filter((path) => path.includes("/memory/records/goal-") && path.includes("/decision/decision-")).length,
+    1,
+    "the losing proposal must not leave a second Plan Record",
+  );
 });
 
 preflightTest("an accepted Goal allows a new Goal id and atomically switches the active pointer", async (t) => {

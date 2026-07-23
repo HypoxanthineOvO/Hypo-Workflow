@@ -113,6 +113,12 @@ export function createDeliveryStore(input = {}) {
     reject(root, request, options = {}) {
       return reject(root, request, options, clock, receipts, "delivery.reject");
     },
+    claimMilestone(root, request, options = {}) {
+      return claimMilestone(root, request, options, clock);
+    },
+    releaseMilestoneClaim(root, request, options = {}) {
+      return releaseMilestoneClaim(root, request, options, clock);
+    },
     resume,
   });
 }
@@ -184,9 +190,9 @@ async function propose(root, deliveryKind, proposal, options, clock) {
     faultInjector: operation.faultInjector,
     manifest,
     writes: [
-      { path, content: renderRecordDocument(planRecord.attributes, planRecord.body) },
-      { path: docs.runtime_path, content: renderYaml(docs.runtime) },
-      { path: docs.continuation_path, content: renderYaml(docs.continuation) },
+      { path, content: renderRecordDocument(planRecord.attributes, planRecord.body), expected_hash: null },
+      { path: docs.runtime_path, content: renderYaml(docs.runtime), expected_hash: null },
+      { path: docs.continuation_path, content: renderYaml(docs.continuation), expected_hash: null },
       { path: ".pipeline/runtime/active.yaml", content: renderYaml(pointer) },
     ],
   });
@@ -261,14 +267,9 @@ async function assertProposalCreateAllowed(root, objectRef, pointer) {
     throw deliveryError("ERR_DELIVERY_OBJECT_EXISTS", `Delivery object ${objectRef.id} already exists; revisions must use recordRevision`);
   }
 
-  const activeRef = pointer.active.delivery;
-  if (!activeRef) return;
-  if (sameObjectRef(activeRef, objectRef)) {
+  const foregroundRef = pointer.active.delivery;
+  if (foregroundRef && sameObjectRef(foregroundRef, objectRef)) {
     throw deliveryError("ERR_DELIVERY_ACTIVE_EXISTS", `Active Delivery ${objectRef.id} cannot be replaced by a proposal`);
-  }
-  const active = await read(root, activeRef);
-  if (active.status !== "accepted") {
-    throw deliveryError("ERR_DELIVERY_ACTIVE_EXISTS", `Another Delivery is already active in non-terminal state ${active.status}`);
   }
 }
 
@@ -382,31 +383,46 @@ async function recordRevision(root, request, options, clock) {
 async function verifyMilestone(root, request, options, clock) {
   assertPlainObject(request, "Milestone verification request");
   assertExactKeys(request, ["object_ref", "milestone_id", "evidence"], "Milestone verification request");
-  const current = await read(root, request.object_ref);
-  if (current.delivery_kind !== "cycle" || current.status !== "executing") {
-    throw deliveryError("ERR_DELIVERY_STATE_INVALID", "Milestone verification requires an executing Cycle");
-  }
   const milestoneId = normalizeSafeIdentifier(request.milestone_id, "milestone_id");
-  const activeIndex = current.milestones.findIndex((item) => item.status === "executing");
-  if (activeIndex < 0 || current.milestones[activeIndex].id !== milestoneId) {
-    const expected = current.milestones[activeIndex]?.id || "the next dependency-satisfied milestone";
-    throw deliveryError("ERR_DELIVERY_MILESTONE_ORDER", `Milestone order requires ${expected} before ${milestoneId}`);
+  const objectRef = storedObjectRef(normalizeAuthorityObjectRef(request.object_ref));
+  const operation = transactionOptions(options, "delivery-verify-milestone");
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const current = await read(root, objectRef);
+    if (current.delivery_kind !== "cycle" || current.status !== "executing") {
+      throw deliveryError("ERR_DELIVERY_STATE_INVALID", "Milestone verification requires an executing Cycle");
+    }
+    const activeIndex = current.milestones.findIndex((item) => item.id === milestoneId && item.status === "executing");
+    if (activeIndex < 0) {
+      throw deliveryError("ERR_DELIVERY_MILESTONE_ORDER", `Milestone ${milestoneId} is not currently executing`);
+    }
+    const verification = await validateEvidence(root, current.topology, request.evidence);
+    const activeMilestone = current.milestones[activeIndex];
+    const requiresStone = Boolean(activeMilestone.stone);
+    const claimed = Boolean(activeMilestone.workstream_ref);
+    let milestones = current.milestones.map((item, index) => {
+      if (index !== activeIndex) return item;
+      if (requiresStone) return { ...item, status: "pending_stone", verification };
+      const { workstream_ref: _released, ...verified } = item;
+      return { ...verified, status: "verified", verification };
+    });
+    if (!requiresStone && !claimed) milestones = startNextDependencyReadyMilestone(milestones);
+    const next = normalizeView({
+      ...current,
+      status: requiresStone ? "waiting_for_stone" : "executing",
+      milestones,
+      updated_at: now(clock),
+    });
+    try {
+      await persistRuntimeCas(root, current, next, {
+        id: `${operation.id}-${attempt + 1}`,
+        faultInjector: operation.faultInjector,
+      });
+      return clone(next);
+    } catch (error) {
+      if (error?.code !== "ERR_WORKSPACE_TRANSACTION_CONFLICT" || attempt === 4) throw error;
+    }
   }
-  const verification = await validateEvidence(root, current.topology, request.evidence);
-  const requiresStone = Boolean(current.milestones[activeIndex].stone);
-  const milestones = current.milestones.map((item, index) => {
-    if (index === activeIndex) return { ...item, status: requiresStone ? "pending_stone" : "verified", verification };
-    if (!requiresStone && index === activeIndex + 1) return { ...item, status: "executing" };
-    return item;
-  });
-  const next = {
-    ...current,
-    status: requiresStone ? "waiting_for_stone" : "executing",
-    milestones,
-    updated_at: now(clock),
-  };
-  await persistRuntime(root, next, options);
-  return clone(next);
+  throw deliveryError("ERR_DELIVERY_MILESTONE_CLAIM_CONFLICT", "Milestone verification retry budget was exhausted");
 }
 
 async function verify(root, request, options, clock) {
@@ -472,15 +488,14 @@ async function reject(root, request, options, clock, receipts, intent) {
 async function resume(root, input = {}) {
   assertPlainObject(input, "Delivery resume input");
   assertExactKeys(input, ["object_ref"], "Delivery resume input");
-  const pointer = await readActivePointer(root);
-  if (!pointer.active.delivery) throw deliveryError("ERR_DELIVERY_NOT_FOUND", "No active Delivery is available to resume");
-  const activeRef = pointer.active.delivery;
-  if (input.object_ref && !sameObjectRef(input.object_ref, activeRef)) {
-    throw deliveryError("ERR_DELIVERY_RESUME_OBJECT_MISMATCH", "Resume object does not match the active Delivery");
-  }
-  const authority = await readRuntimeObject(root, activeRef);
+  const selectedRef = input.object_ref
+    ? storedObjectRef(normalizeAuthorityObjectRef(input.object_ref))
+    : (await readActivePointer(root)).active.delivery;
+  if (!selectedRef) throw deliveryError("ERR_DELIVERY_NOT_FOUND", "No Delivery is available to resume");
+  if (selectedRef.kind !== "delivery") throw deliveryError("ERR_DELIVERY_OBJECT_MISMATCH", "Resume object is not a Delivery");
+  const authority = await readRuntimeObject(root, selectedRef);
   const delivery = fromRuntime(authority.runtime);
-  const selected = await selectLatestValidRecoveryPack(root, { object_ref: activeRef });
+  const selected = await selectLatestValidRecoveryPack(root, { object_ref: selectedRef });
   if (!selected.pack_ref) {
     return {
       delivery,
@@ -505,6 +520,115 @@ async function resume(root, input = {}) {
       rejected_packs: selected.rejected_packs,
     },
   };
+}
+
+async function claimMilestone(root, request, options, clock) {
+  return mutateMilestoneClaim(root, request, options, clock, "claim");
+}
+
+async function releaseMilestoneClaim(root, request, options, clock) {
+  return mutateMilestoneClaim(root, request, options, clock, "release");
+}
+
+async function mutateMilestoneClaim(root, request, options, clock, action) {
+  assertPlainObject(request, `Milestone ${action} request`);
+  assertExactKeys(
+    request,
+    ["object_ref", "milestone_id", "workstream_ref", "expected_plan_hash"],
+    `Milestone ${action} request`,
+  );
+  const objectRef = storedObjectRef(normalizeAuthorityObjectRef(request.object_ref));
+  const milestoneId = normalizeSafeIdentifier(request.milestone_id, "milestone_id");
+  const workstreamRef = storedObjectRef(normalizeAuthorityObjectRef(request.workstream_ref));
+  if (objectRef.kind !== "delivery" || workstreamRef.kind !== "activity") {
+    throw deliveryError("ERR_DELIVERY_OBJECT_MISMATCH", "Milestone claims require Delivery and Workstream references");
+  }
+  if (typeof request.expected_plan_hash !== "string" || !/^[a-f0-9]{64}$/.test(request.expected_plan_hash)) {
+    throw deliveryError("ERR_DELIVERY_PLAN_STALE", "Milestone claim expected_plan_hash is invalid");
+  }
+  const operation = transactionOptions(options, `delivery-milestone-${action}`);
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const current = await read(root, objectRef);
+    if (current.delivery_kind !== "cycle" || current.status !== "executing") {
+      throw deliveryError("ERR_DELIVERY_STATE_INVALID", "Milestone claims require an executing Cycle");
+    }
+    if (current.plan_hash !== request.expected_plan_hash) {
+      throw deliveryError("ERR_DELIVERY_PLAN_STALE", "Milestone claim Plan hash is stale");
+    }
+    const workstream = await readRuntimeObject(root, workstreamRef);
+    const binding = workstream.runtime.session_binding;
+    if (
+      workstream.runtime.activity_kind !== "workstream"
+      || workstream.runtime.status !== "active"
+      || !sameObjectRef(workstream.runtime.delivery_ref, objectRef)
+      || !binding
+      || !sameObjectRef(binding.delivery_ref, objectRef)
+      || binding.plan_hash !== current.plan_hash
+      || binding.revision !== current.revision
+    ) {
+      throw deliveryError("ERR_DELIVERY_WORKSTREAM_INVALID", "Milestone claim requires an active Workstream bound to this Delivery");
+    }
+    const index = current.milestones.findIndex((item) => item.id === milestoneId);
+    if (index < 0) throw deliveryError("ERR_DELIVERY_MILESTONE_NOT_FOUND", `Milestone ${milestoneId} was not found`);
+    const milestone = current.milestones[index];
+    let replacement;
+    if (action === "claim") {
+      const dependenciesReady = (milestone.depends_on || []).every((dependencyId) => (
+        current.milestones.some((candidate) => candidate.id === dependencyId && candidate.status === "verified")
+      ));
+      if (!dependenciesReady) throw deliveryError("ERR_DELIVERY_MILESTONE_ORDER", `Milestone ${milestoneId} dependencies are not verified`);
+      if (!["pending", "executing"].includes(milestone.status)) throw deliveryError("ERR_DELIVERY_MILESTONE_CLAIM_CONFLICT", `Milestone ${milestoneId} cannot be claimed from ${milestone.status}`);
+      if (milestone.workstream_ref && !sameObjectRef(milestone.workstream_ref, workstreamRef)) {
+        throw deliveryError("ERR_DELIVERY_MILESTONE_CLAIM_CONFLICT", `Milestone ${milestoneId} is claimed by another Workstream`);
+      }
+      replacement = { ...milestone, status: "executing", workstream_ref: workstreamRef };
+    } else {
+      if (!milestone.workstream_ref || !sameObjectRef(milestone.workstream_ref, workstreamRef)) {
+        throw deliveryError("ERR_DELIVERY_MILESTONE_CLAIM_CONFLICT", `Milestone ${milestoneId} is not claimed by this Workstream`);
+      }
+      const { workstream_ref: _released, ...unclaimed } = milestone;
+      replacement = { ...unclaimed, status: "pending" };
+    }
+    const next = normalizeView({
+      ...current,
+      milestones: current.milestones.map((item, itemIndex) => itemIndex === index ? replacement : item),
+      updated_at: now(clock),
+    });
+    try {
+      await persistRuntimeCas(root, current, next, {
+        id: `${operation.id}-${attempt + 1}`,
+        faultInjector: operation.faultInjector,
+      });
+      return clone(next);
+    } catch (error) {
+      if (error?.code !== "ERR_WORKSPACE_TRANSACTION_CONFLICT" || attempt === 4) throw error;
+    }
+  }
+  throw deliveryError("ERR_DELIVERY_MILESTONE_CLAIM_CONFLICT", "Milestone claim retry budget was exhausted");
+}
+
+async function persistRuntimeCas(root, current, next, options) {
+  const currentDocs = compileRuntimeObjectDocuments(toRuntimeDocuments(current));
+  const nextDocs = compileRuntimeObjectDocuments(toRuntimeDocuments(next));
+  const manifest = await readCurrentManifest(root);
+  await commitWorkspaceTransaction(root, {
+    id: options.id,
+    faultInjector: options.faultInjector,
+    manifest,
+    writes: [
+      {
+        path: nextDocs.runtime_path,
+        content: renderYaml(nextDocs.runtime),
+        expected_hash: sha256(renderYaml(currentDocs.runtime)),
+      },
+      {
+        path: nextDocs.continuation_path,
+        content: renderYaml(nextDocs.continuation),
+        expected_hash: sha256(renderYaml(currentDocs.continuation)),
+      },
+    ],
+  });
 }
 
 async function persistRuntime(root, delivery, options) {
@@ -790,12 +914,26 @@ function pendingStoneScope(delivery) {
 function acceptPendingStone(delivery) {
   const activeIndex = delivery.milestones?.findIndex((item) => item.status === "pending_stone") ?? -1;
   if (activeIndex < 0) throw deliveryError("ERR_DELIVERY_STATE_INVALID", "No pending Stone is available for acceptance");
-  const milestones = delivery.milestones.map((item, index) => {
-    if (index === activeIndex) return { ...item, status: "verified" };
-    if (index === activeIndex + 1) return { ...item, status: "executing" };
-    return item;
+  const claimed = Boolean(delivery.milestones[activeIndex].workstream_ref);
+  let milestones = delivery.milestones.map((item, index) => {
+    if (index !== activeIndex) return item;
+    const { workstream_ref: _released, ...verified } = item;
+    return { ...verified, status: "verified" };
   });
+  if (!claimed) milestones = startNextDependencyReadyMilestone(milestones);
   return { ...delivery, status: "executing", milestones };
+}
+
+function startNextDependencyReadyMilestone(milestones) {
+  const next = milestones.findIndex((item) => (
+    item.status === "pending"
+    && (item.depends_on || []).every((dependencyId) => (
+      milestones.some((candidate) => candidate.id === dependencyId && candidate.status === "verified")
+    ))
+  ));
+  return next < 0
+    ? milestones
+    : milestones.map((item, index) => index === next ? { ...item, status: "executing" } : item);
 }
 
 function nextAction(delivery) {
@@ -839,6 +977,10 @@ function now(clock) {
 
 function renderYaml(value) {
   return `${stringifyYaml(value).trimEnd()}\n`;
+}
+
+function sha256(content) {
+  return createHash("sha256").update(content).digest("hex");
 }
 
 function clone(value) {
