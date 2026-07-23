@@ -89,7 +89,9 @@ export {
 } from "./deletion/index.js";
 export {
   compileGoalDesign,
+  compilePlan,
   compileCyclePlan,
+  selectDeliveryMode,
   selectAdaptivePlan,
   assessPlanReadiness,
 } from "./planning/index.js";

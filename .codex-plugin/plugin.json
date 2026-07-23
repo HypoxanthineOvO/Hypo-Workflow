@@ -1,7 +1,7 @@
 {
   "name": "hypo-workflow",
-  "version": "14.0.0-alpha.2",
-  "description": "Manifest-based Goal, Cycle, and Experiment workflows with durable project memory, semantic Worker Routing, restart-safe recovery, and Receipt-controlled actions for Codex.",
+  "version": "14.0.0-alpha.2+codex.20260723142011",
+  "description": "Discussion-first Goal, Plan, and Experiment workflows with manual Stones, adaptive Worker use, restart-safe recovery, and Receipt-controlled actions for Codex.",
   "author": {
     "name": "Hypoxanthine",
     "url": "https://github.com/HypoxanthineOvO"
@@ -21,14 +21,14 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Hypo-Workflow",
-    "shortDescription": "Durable Goal, Cycle, and Experiment workflows for Codex.",
-    "longDescription": "Hypo-Workflow gives Codex a manifest-based project workspace with bounded Goal and Cycle delivery, nonlinear Experiment management, ambient Maintain records, semantic Worker Routing, restart-safe recovery, explicit human acceptance, and Receipt-backed control for destructive operations.",
+    "shortDescription": "Discussion-first Goal, Plan, and Experiment workflows for Codex.",
+    "longDescription": "Hypo-Workflow gives Codex a manifest-based project workspace with deep Discussion before delivery selection, autonomous zero-Stone Goals, Plans with explicit manual Stones, nonlinear Experiment management, adaptive Worker use, restart-safe recovery, and Receipt-backed control for high-impact operations.",
     "developerName": "Hypoxanthine",
     "category": "Productivity",
     "capabilities": [
       "Ten focused workflow Skills",
       "Official Codex lifecycle Hooks",
-      "Goal and Cycle delivery",
+      "Discussion-first Goal and Stone-based Plan delivery",
       "Reproducible Experiment management and instant status",
       "Semantic Worker Routing",
       "Project memory and recovery",
@@ -36,7 +36,7 @@
     ],
     "defaultPrompt": [
       "Initialize this repository with Hypo-Workflow.",
-      "Define and run one bounded delivery Goal.",
+      "Discuss this delivery thoroughly, then choose Goal or Plan by Stone count.",
       "Set up and manage a reproducible experiment lane.",
       "Resume the active Hypo-Workflow delivery."
     ],

@@ -1,24 +1,28 @@
 ---
 name: plan
-description: Build an evidence-driven Goal Design or Cycle Plan. Use for /hw:plan and planning requests that need questions, architecture choices, ordered decomposition, or durable research before execution.
+description: Discuss requirements, technical stack, and architecture, then deliver a Milestone Plan containing at least one user-reviewed Stone. Use for /hw:plan when execution needs an intermediate manual checkpoint.
 ---
 
-# Adaptive Plan
+# Discussion And Plan Delivery
 
 ## 输出语言规则
 
 用户可见内容遵循项目 `output.language`；缺失时跟随当前对话语言。Schema key、配置 key、命令和路径保持英文。
 
-`/hw:plan` owns all planning depth. Deep Plan, Discover, Technical Stack, Architecture, Decompose, Generate, Extend, and Review are internal phases, not separate commands or Child Skills.
+`/hw:plan` is the Plan Delivery route. A Plan is selected only when execution contains at least one **Stone**: a Milestone checkpoint where the user must inspect a concrete artifact or make a decision. Complexity, file count, acceptance-criteria count, and internal implementation phases do not by themselves justify Plan.
 
-## Select Depth
+Deep Plan, Discover, Technical Stack, Architecture, Decompose, Generate, Extend, and Review remain internal phases, not separate public commands or Child Skills.
 
-Call `selectAdaptivePlan` and use evidence, not fixed rounds:
+## Discussion First
 
-- Goal: one `design` phase. Clarify the outcome, acceptance criteria, constraints, evidence, and real verification method.
-- Standard Cycle: use `discover -> technical_stack -> architecture -> decompose -> generate`, but omit a phase when its decision is already established and the visible artifact can prove that.
-- Deep Cycle: prepend durable `deep_plan` research when requirements, product shape, architecture, or long-term sequencing are not ready for decomposition.
-- Challenge questions absorb the useful Grill Me behavior. Ask them only for unresolved material ambiguity, weak source-of-truth ownership, lifecycle risk, or assumptions that could invalidate the plan.
+Do not choose Goal or Plan before Discussion has resolved the relevant product and technical questions. Discussion proceeds in this order:
+
+1. **Discover** discusses requirements only: desired effect, users, behaviors, scope, non-goals, acceptance criteria, and unresolved product decisions.
+2. **Technical Stack** discusses the existing stack, dependencies, compatibility, validation tools, and material implementation choices. Skip with explicit evidence when no stack decision exists.
+3. **Architecture** discusses ownership, components, data/control flow, integration points, failure boundaries, migration, and downstream effects. State explicitly when the change is local and architecture-neutral.
+4. **Delivery Selection** lists proposed Stones. Call `selectDeliveryMode`: zero Stones routes to Goal; one or more Stones routes to Plan.
+
+Readiness is evidence-based, never round-count based. Continue Discussion while a material ambiguity could change scope, architecture, a Stone, or acceptance. The user may explicitly end Discussion and request generation once those decisions are sufficiently bounded.
 
 `assessPlanReadiness` rejects `min_rounds`. Continue asking only while a material ambiguity remains.
 
@@ -28,28 +32,35 @@ Call `selectAdaptivePlan` and use evidence, not fixed rounds:
 2. **Discover**: establish desired effect, non-goals, constraints, acceptance boundary, exact validation path, and material ambiguities. Separate confirmed repository facts from inference.
 3. **Technical Stack**: run only when language, framework, dependency, platform, compatibility, or validation tooling choices are material. Resolve unknown external capabilities from primary evidence or keep them blocking.
 4. **Architecture**: show components, ownership, data/control flow, integration points, failure boundaries, and downstream impact. Include a compact diagram when relationships would otherwise be ambiguous.
-5. **Decompose**: only Cycle work becomes ordered Milestones. Each Milestone has one outcome, earlier-only dependencies, verification criteria, technical route, risks, and audit focus. Prefer independently runnable vertical slices.
-6. **Generate**: compile the approved result with `compileGoalDesign` or `compileCyclePlan`. The content-derived `plan_hash` binds approval, start, acceptance, and revision Receipts.
-7. **Extend**: append dependent Milestones through a superseding Cycle Plan. Never renumber or rewrite completed history.
+5. **Decompose**: Plan work becomes ordered Milestones. Each Milestone has one outcome, earlier-only dependencies, verification criteria, technical route, risks, and audit focus. Mark at least one Milestone with a Stone containing its review artifact and acceptance criteria.
+6. **Generate**: compile with `compilePlan`. The compiler rejects zero-Stone Plans. The content-derived `plan_hash` binds approval, Stone acceptance, final acceptance, and revision Receipts.
+7. **Extend**: append dependent Milestones through a superseding Plan. Never renumber or rewrite completed history.
 8. **Review**: after execution changes reality, compare actual architecture with the approved Plan and propose downstream revisions before changing them.
 
 Show the relevant phase artifact in chat before every material decision gate: facts and ambiguities, choice table, architecture map, Milestone table, or generated Design/Plan summary. The Ask card is only the gate after this explanation.
 
-## Proposal And Start Boundary
+## Proposal And Start
 
-Planning approval persists a proposal and moves the Delivery only to `waiting_to_start`. It does not authorize implementation. Directional feedback produces a revised proposal first. Begin only after the user explicitly instructs execution and a separate `delivery.start` Receipt is issued against the current state and `plan_hash`.
+After showing the complete Plan, offer exactly these meanings:
 
-A Goal has one final manual acceptance. A Cycle has ordered Milestones with verification but no per-Milestone acceptance gates; only the aggregate Cycle enters final manual acceptance.
+- **确认并开始**: issue one scoped `delivery.approve_and_start` Receipt and call `approveAndStart`; this is the default meaning of 可以、确认、OK、go ahead、apply it、按这个做.
+- **确认但不开始**: issue `delivery.approve`, persist `waiting_to_start`, and wait for Resume or explicit start.
+- **不确认 / 继续讨论**: make no authority write and return to Discussion.
+
+Do not add a second start turn after ordinary confirmation. Destructive actions, remote writes, releases, service restarts, protected-file writes, or scope growth may still require their own local gate.
+
+After each ordinary Milestone verifies, continue automatically. When a Stone Milestone verifies, persist `pending_stone`, set Delivery to `waiting_for_stone`, and show the real artifact and criteria. Acceptance issues scoped `stone.accept` and continues; rejection issues scoped `stone.reject`, records structured feedback, and returns to `needs_revision`. A rejected Stone never silently continues.
 
 ## Worker Topology And Routing
 
-Use `selectExecutionTopology` from actual complexity and risk:
+Use `selectExecutionTopology` from coordination value, coupling, and oracle strength:
 
-- `solo-verified` for a trivial reversible change with an objective check.
-- `separated` when material implementation benefits from independent test and audit identities.
+- `solo-verified` whenever the main Agent can maintain coherence and verify objectively, including material but tightly coupled work.
+- `independent-audit` when a genuinely independent oracle adds value.
+- `strict` or custom separated roles only when subproblems are bounded, parallelizable, and cheaper to coordinate than to keep together.
 - Add bounded research, challenge, curation, design, or visual-audit roles when the domain requires them.
 
-When separation is required, show the role boundaries and expected evidence before start. If the host cannot provide required independence, stop for an explicit degraded-mode decision rather than silently self-certifying.
+Do not derive Worker count from Plan, Milestone, Stone, file count, or acceptance-criteria count. When separation is selected, show why its independence or parallel value exceeds coordination cost.
 
 Topology chooses identities; Worker Routing chooses only a semantic capability class after identities are fixed. The host Agent generates a visible Task Assessment from repository evidence, including complexity, uncertainty, oracle strength, blast radius, reversibility, risk flags, and a bounded summary. Validate it with `validateTaskAssessment`, then call `selectWorkerRouting`; do not invoke another classifier or persist its prompt.
 

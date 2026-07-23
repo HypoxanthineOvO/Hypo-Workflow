@@ -12,9 +12,9 @@ The v14.0.0-alpha.2 Official Codex release exposes ten focused routes. Each rout
 | --- | --- |
 | `/hw:guide` | inspect the repository and recommend one Workflow path |
 | `/hw:init` | initialize or inspect a manifest-based workspace |
-| `/hw:goal` | deliver one outcome with a clear acceptance target |
-| `/hw:plan` | design work that needs clarification, architecture choices, or decomposition |
-| `/hw:cycle` | deliver Milestones with real dependency order |
+| `/hw:goal` | autonomously deliver a complete zero-Stone requirement after Discussion |
+| `/hw:plan` | deliver Milestones containing at least one Stone after Discussion |
+| `/hw:cycle` | compatibility route for existing Cycle deliveries |
 | `/hw:maintain` | persist one focused requirement, preference, decision, or feedback item |
 | `/hw:experiment` | manage nonlinear experiments, baselines, environments, scans, Attempts, review, and instant status |
 | `/hw:resume` | restore the current Delivery after restart or compaction |
@@ -23,10 +23,12 @@ The v14.0.0-alpha.2 Official Codex release exposes ten focused routes. Each rout
 
 Ordinary conversation does not require a route choice. Status, reports, explanation, consistency checks, debugging, knowledge lookup, and compaction are semantic Agent behaviors rather than additional public commands.
 
-## Goal, Cycle, Maintain, And Experiment
+## Discussion, Goal, Plan, Maintain, And Experiment
 
-- Goal fits one bounded result with one final acceptance.
-- Cycle is reserved for stages with real dependency order. A Milestone is an independently verifiable stage outcome, not a mechanical task list.
+- New Delivery work discusses requirements, technical stack, and architecture changes before selecting a mode.
+- Goal has no manual intermediate checkpoint. It may still be complex and have many acceptance criteria, and the built-in `/Goal` mechanism executes it continuously.
+- Plan contains at least one Stone. A Milestone is a verifiable stage outcome; a Stone is a user inspection or decision checkpoint. Ordinary Milestones continue without pausing.
+- `0 Stones -> Goal`; `1+ Stones -> Plan`. Complexity, file count, and acceptance count do not decide this.
 - Maintain records day-to-day project facts without opening a Delivery.
 - Experiment is a durable nonlinear lane for project knowledge, environments, code snapshots, machines, datasets, baselines, scans, Attempts, metrics, exceptions, trash/restore history, and next actions.
 
@@ -88,7 +90,7 @@ These decisions remain separate:
 Workflow shape -> Worker topology -> Task Assessment -> semantic routing class -> host model mapping
 ```
 
-Topology decides whether the main thread can finish the work or whether independent test, implement, audit, or other identities are needed. The host AI generates and shows a Task Assessment from repository evidence before Worker start:
+Topology decides whether Workers provide enough value from bounded independence, parallelism, or an independent oracle to justify coordination cost. Goal, Plan, Milestone, Stone, file count, and acceptance count never determine Worker count. The host AI generates and shows a Task Assessment from repository evidence before Worker start:
 
 | Field | Meaning | Mandatory current signal |
 | --- | --- | --- |
@@ -115,7 +117,7 @@ Workflow does not emit Luna/Sol, providers, credentials, reasoning effort, token
 
 ## Execution And Acceptance
 
-Material delivery is driven by verifiable effects. Topology determines whether test, implement, audit, or other independent identities are required; role separation and acceptance evidence do not depend on a concrete model. Starting after approval is a contextual transition rather than another public route.
+Material delivery is driven by verifiable effects. The proposal gate offers confirm and start, confirm without starting, or do not confirm. Plain affirmative replies atomically use `delivery.approve_and_start`; only confirm-without-start enters `waiting_to_start`. High-impact side effects retain local gates.
 
 Runtime owns lifecycle authority, Continuation owns the next action, and a Recovery Pack only supplies bounded recovery context. If no Pack exists, Runtime and Continuation still permit a degraded resume. Legacy `.pipeline` lifecycle files are never fallback authority.
 

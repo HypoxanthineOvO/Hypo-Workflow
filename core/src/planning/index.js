@@ -34,67 +34,90 @@ export function compileGoalDesign(input) {
   });
 }
 
+export function compilePlan(input) {
+  return compileMilestonePlan(input, {
+    field: "Plan",
+    deliveryMode: "plan",
+    requireStone: true,
+  });
+}
+
 export function compileCyclePlan(input) {
-  const common = normalizePlanInput(input, [...COMMON_KEYS, "milestones"], "Cycle Plan");
+  return compileMilestonePlan(input, {
+    field: "Cycle Plan",
+    deliveryMode: "cycle",
+    requireStone: false,
+  });
+}
+
+function compileMilestonePlan(input, options) {
+  const { field, deliveryMode, requireStone } = options;
+  const common = normalizePlanInput(input, [...COMMON_KEYS, "milestones"], field);
   if (!Array.isArray(input.milestones) || input.milestones.length === 0) {
-    throw deliverySchemaError("Cycle Plan milestones must be a non-empty array");
+    throw deliverySchemaError(`${field} milestones must be a non-empty array`);
   }
   const known = new Set();
   const milestones = input.milestones.map((value, index) => {
-    assertPlainObject(value, `Cycle Plan milestones[${index}]`);
-    assertExactKeys(value, ["id", "title", "outcome", "verification_criteria", "depends_on"], `Cycle Plan milestones[${index}]`);
-    const id = normalizeSafeIdentifier(value.id, `Cycle Plan milestones[${index}].id`);
-    if (known.has(id)) throw deliverySchemaError(`Cycle Plan milestone ${id} is duplicated`);
-    const dependsOn = stringArray(value.depends_on, `Cycle Plan milestones[${index}].depends_on`, { allowEmpty: true, identifiers: true });
+    const milestoneField = `${field} milestones[${index}]`;
+    assertPlainObject(value, milestoneField);
+    assertExactKeys(value, ["id", "title", "outcome", "verification_criteria", "depends_on", "stone"], milestoneField);
+    const id = normalizeSafeIdentifier(value.id, `${milestoneField}.id`);
+    if (known.has(id)) throw deliverySchemaError(`${field} milestone ${id} is duplicated`);
+    const dependsOn = stringArray(value.depends_on, `${milestoneField}.depends_on`, { allowEmpty: true, identifiers: true });
     if (dependsOn.some((dependency) => !known.has(dependency))) {
-      throw deliverySchemaError(`Cycle Plan milestone ${id} depends on a missing or later milestone`);
+      throw deliverySchemaError(`${field} milestone ${id} depends on a missing or later milestone`);
     }
     known.add(id);
     return {
       id,
       order: index + 1,
-      title: text(value.title, `Cycle Plan milestones[${index}].title`),
-      outcome: text(value.outcome, `Cycle Plan milestones[${index}].outcome`),
-      verification_criteria: stringArray(value.verification_criteria, `Cycle Plan milestones[${index}].verification_criteria`),
+      title: text(value.title, `${milestoneField}.title`),
+      outcome: text(value.outcome, `${milestoneField}.outcome`),
+      verification_criteria: stringArray(value.verification_criteria, `${milestoneField}.verification_criteria`),
       depends_on: dependsOn,
+      ...(value.stone === undefined ? {} : { stone: normalizeStone(value.stone, `${milestoneField}.stone`) }),
     };
   });
+  const stoneCount = milestones.filter((milestone) => milestone.stone).length;
+  if (requireStone && stoneCount === 0) {
+    throw deliverySchemaError("Plan requires at least one Stone for manual inspection");
+  }
   return finalizePlan({
     schema_version: "1",
     delivery_kind: "cycle",
+    delivery_mode: deliveryMode,
     status: "draft",
     ...common,
     milestones,
     acceptance: {
-      scope: "cycle",
+      scope: deliveryMode,
       criteria: common.acceptance_criteria,
     },
   });
 }
 
+export function selectDeliveryMode(input) {
+  assertPlainObject(input, "delivery mode input");
+  assertExactKeys(input, ["stones"], "delivery mode input");
+  if (!Array.isArray(input.stones)) throw deliverySchemaError("delivery mode stones must be an array");
+  return {
+    delivery_kind: input.stones.length === 0 ? "goal" : "plan",
+    stone_count: input.stones.length,
+    reason: input.stones.length === 0 ? "no_manual_intermediate_check" : "manual_intermediate_check_required",
+  };
+}
+
 export function selectAdaptivePlan(input) {
   assertPlainObject(input, "adaptive plan input");
   assertExactKeys(input, ["delivery_kind", "model_capability", "complexity", "durable_research"], "adaptive plan input");
-  if (input.delivery_kind === "goal") {
-    return {
-      mode: "goal_design",
-      internal_phases: ["design"],
-      discoverable_command: null,
-    };
-  }
-  if (input.delivery_kind !== "cycle") throw deliverySchemaError("adaptive plan delivery_kind must be goal or cycle");
-  if (input.durable_research === true) {
-    return {
-      mode: "cycle_deep",
-      durable: true,
-      internal_phases: ["deep_plan", "discover", "technical_stack", "architecture", "decompose", "generate"],
-      discoverable_command: null,
-    };
-  }
+  const deliveryKind = input.delivery_kind === "cycle" ? "plan" : input.delivery_kind;
+  if (!["goal", "plan"].includes(deliveryKind)) throw deliverySchemaError("adaptive plan delivery_kind must be goal or plan");
+  const discussion = ["discover", "technical_stack", "architecture"];
+  const generation = deliveryKind === "goal" ? ["generate_goal"] : ["decompose", "generate_plan"];
   return {
-    mode: "cycle_standard",
-    durable: false,
-    internal_phases: ["discover", "technical_stack", "architecture", "decompose", "generate"],
+    mode: deliveryKind === "goal" ? "discussion_to_goal" : "discussion_to_plan",
+    durable: input.durable_research === true,
+    internal_phases: [...(input.durable_research === true ? ["deep_plan"] : []), ...discussion, "select_delivery", ...generation],
     discoverable_command: null,
   };
 }
@@ -105,7 +128,7 @@ export function assessPlanReadiness(input) {
     throw deliverySchemaError("min_rounds is unsupported; readiness is evidence-based rather than round-based");
   }
   assertExactKeys(input, ["delivery_kind", "evidence", "ambiguities"], "plan readiness input");
-  if (!["goal", "cycle"].includes(input.delivery_kind)) throw deliverySchemaError("plan readiness delivery_kind must be goal or cycle");
+  if (!["goal", "plan", "cycle"].includes(input.delivery_kind)) throw deliverySchemaError("plan readiness delivery_kind must be goal or plan");
   if (!Array.isArray(input.evidence)) throw deliverySchemaError("plan readiness evidence must be an array");
   if (!Array.isArray(input.ambiguities)) throw deliverySchemaError("plan readiness ambiguities must be an array");
   const unresolved = input.ambiguities.map((value, index) => {
@@ -124,6 +147,16 @@ export function assessPlanReadiness(input) {
     unresolved_material: unresolved.map((item) => item.id),
     questions: unresolved.map((item) => item.prompt),
     challenge_questions: unresolved.map((item) => item.challenge),
+  };
+}
+
+function normalizeStone(value, field) {
+  assertPlainObject(value, field);
+  assertExactKeys(value, ["id", "review", "acceptance_criteria"], field);
+  return {
+    id: normalizeSafeIdentifier(value.id, `${field}.id`),
+    review: text(value.review, `${field}.review`),
+    acceptance_criteria: stringArray(value.acceptance_criteria, `${field}.acceptance_criteria`),
   };
 }
 

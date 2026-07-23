@@ -32,7 +32,7 @@ Manifest
   -> accepted/checkpoint Snapshots
 ```
 
-- **Runtime** 保存 Goal/Cycle 生命周期；**Continuation** 只保存下一步。
+- **Runtime** 保存 Goal/Plan 生命周期，并兼容读取既有 Cycle；**Continuation** 只保存下一步。
 - **Records** 保存 requirement、preference、decision 和 feedback；它们替代通用 Rules 系统。
 - **Experiment events / status projection** 保存可 Git 合并的实验事实，并提供无需扫描结果树的即时状态。
 - **Worker Routing** 在 Worker 启动前显示任务评估并输出语义能力档，不选择具体模型或 Provider。
@@ -55,19 +55,21 @@ codex plugin marketplace add /absolute/path/to/Hypo-Workflow
 
 ## 交付工作流与实验通道
 
-一个明确结果使用 Goal：
+所有新交付先经过 Discussion：需求发掘 -> 技术栈 -> 架构变化。随后只根据执行过程中是否需要人工中途检查选择 Goal 或 Plan。
+
+没有人工中途检查点时使用 Goal；复杂度和验收点数量不影响这个选择：
 
 ```text
-/hw:init -> /hw:goal -> 讨论并批准 Design -> 明确“开始执行”
-         -> 验证 -> /hw:accept 或 /hw:reject
+/hw:init -> Discussion -> Goal Design -> 确认并开始
+         -> 内置 /Goal 自主连续执行 -> 验证 -> /hw:accept 或 /hw:reject
 ```
 
-存在真实先后依赖时使用 Cycle：
+至少有一个中间产物必须由用户检查或决定时使用 Plan。Plan 拆 Milestone，但只有标记为 Stone 的节点暂停：
 
 ```text
-/hw:init -> /hw:cycle -> /hw:plan（按需要）
-         -> 批准有序 Milestones -> 明确“开始执行”
-         -> 逐 Milestone 验证 -> 一次最终人工验收
+/hw:init -> Discussion -> /hw:plan -> Milestones + 至少一个 Stone
+         -> 确认并开始 -> 普通 Milestone 自动连续执行
+         -> Stone 人工验收 -> 继续执行 -> 最终验收
 ```
 
 没有线性终点、需要持续重跑、参数扫描和结果判断时使用 Experiment：
@@ -77,7 +79,7 @@ codex plugin marketplace add /absolute/path/to/Hypo-Workflow
          -> 追加 immutable events -> 读取物化状态 -> 持续迭代
 ```
 
-批准只进入 `waiting_to_start`，不会自动实现。中断后使用 `/hw:resume`；日常写作、偏好、需求和反馈使用 `/hw:maintain`。Experiment 是非线性实验记录与状态通道，不是 runner 或后台调度器。
+提案门提供三种明确语义：`确认并开始`、`确认但不开始`、`不确认/继续讨论`。普通的“可以”“确认”“OK”“go ahead”默认签发 `delivery.approve_and_start` 并立即执行；只有“确认但不开始”进入 `waiting_to_start`。删除、远程写入、发布、服务重启等高影响操作仍保留局部门禁。中断后使用 `/hw:resume`。
 
 ### Experiment 能力
 
@@ -94,9 +96,9 @@ codex plugin marketplace add /absolute/path/to/Hypo-Workflow
 | --- | --- |
 | `/hw:guide` | 不确定下一步时推荐一个流程 |
 | `/hw:init` | 初始化、接手或检查工作区 |
-| `/hw:goal` | 交付一个有明确验收目标的结果 |
-| `/hw:plan` | 根据证据自适应规划深度 |
-| `/hw:cycle` | 交付有先后依赖的多个 Milestone |
+| `/hw:goal` | Discussion 后自主交付没有 Stone 的完整需求 |
+| `/hw:plan` | Discussion 后交付含至少一个 Stone 的 Milestone Plan |
+| `/hw:cycle` | 兼容既有 Cycle Delivery，新工作不默认推荐 |
 | `/hw:maintain` | 保存一个日常项目事实 |
 | `/hw:experiment` | 管理环境、扫描、重跑、科学审查与即时实验状态 |
 | `/hw:resume` | 从 Runtime、Continuation 和 Recovery Pack 恢复 |
@@ -107,7 +109,7 @@ Chat、Explain、Status、Report、Log、Check、Compact、Knowledge、Sync、De
 
 ## Semantic Worker Routing
 
-Topology 决定是否需要独立 test、implement、audit 身份；Routing 只决定某个已选 Worker 需要的语义能力档。宿主 AI 显示 `complexity`、`uncertainty`、`oracle_strength`、`blast_radius`、`reversibility` 和 `risk_flags`，Core 再确定性输出：
+Topology 根据耦合度、可并行性、独立 oracle 和协调成本决定是否使用 Worker；Goal、Plan、Milestone、Stone 和验收点数量都不决定 Worker 数量。紧耦合但规模较大的工作也可以由主 Agent 端到端完成。Routing 只决定某个已经选定的 Worker 需要的语义能力档。
 
 | 档位 | 典型任务 |
 | --- | --- |
@@ -132,7 +134,7 @@ Plugin 默认从 `hooks/hooks.json` 加载十类事件：
 ## 执行纪律
 
 - 讨论、背景、想法、抱怨和方案反馈先回复“我的理解 -> 问题原因 -> 推荐方案”，不直接编辑。
-- 小且可逆的修复可用 `solo-verified`；重要实现按风险分离 test、implement、audit 或其他更合适的角色。
+- 紧耦合且可客观验证的工作优先由主 Agent 连续完成；只有独立 oracle、真实并行收益或风险足以覆盖协调成本时才拆 Worker。
 - 完成报告必须在会话中讲清结论、方法、改动、测试、结果、问题和风险，不能只给文件路径。
 - 保留 dirty worktree 中不相关的用户修改。
 

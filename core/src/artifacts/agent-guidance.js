@@ -20,6 +20,12 @@ Clear imperative requests with a concrete target may use direct execution: when 
 
 Post-plan affirmative replies authorize execution. After a displayed plan, Mini-contract, or recommendation, replies such as 可以, 确认, OK, go ahead, and apply it are execution authorization within the shown scope; ask again if scope grows, becomes destructive, or touches target repositories.
 
+Before choosing a Delivery, run Discussion as requirements discovery -> technical stack -> architecture. Choose Goal when execution has no manual intermediate checkpoint, regardless of complexity or acceptance-criteria count. Choose Plan only when at least one Milestone contains a Stone, meaning a concrete intermediate artifact the user must inspect or decide on. Ordinary Milestones verify automatically; only Stones pause execution.
+
+At the final proposal gate, expose three meanings: confirm and start, confirm without starting, or do not confirm and return to Discussion. Plain affirmative replies mean confirm and start. Keep separate confirmation only for destructive, remote, release, restart, protected-file, or other explicitly gated side effects.
+
+Worker use is an execution optimization, not a Delivery requirement. Keep tightly coupled work with the main Agent; delegate only when bounded independence, parallel value, or an independent oracle justifies the coordination cost. Goal/Plan selection never determines Worker count.
+
 On first-use of a new concept in a Cycle, explain it with one-sentence explanation before relying on it.
 
 Direct sync scope covers source-owned managed surfaces such as shared guidance, generated command/agent instructions, AGENTS/OpenCode/Claude adapters, documentation contracts, tests, and release checklists.

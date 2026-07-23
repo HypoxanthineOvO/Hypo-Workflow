@@ -36,10 +36,14 @@ export const TOPOLOGY_API_URL = new URL("../../../src/execution-topology/index.j
 
 export const DELIVERY_STORE_METHODS = Object.freeze([
   "proposeGoal",
+  "proposePlan",
   "proposeCycle",
   "read",
   "approve",
+  "approveAndStart",
   "start",
+  "acceptStone",
+  "rejectStone",
   "recordRevision",
   "verifyMilestone",
   "verify",
@@ -123,7 +127,7 @@ export function strictTopologyInput(overrides = {}) {
     task_kind: "engineering",
     change_size: "material",
     reversible: true,
-    policy: { profile: "auto", allow_solo_verified: false },
+    policy: { profile: "strict", allow_solo_verified: false },
     ...overrides,
   };
 }
@@ -144,6 +148,9 @@ export function migrationTopologyInput(overrides = {}) {
     change_size: "material",
     reversible: false,
     policy: { profile: "auto", allow_solo_verified: false },
+    coupling: "low",
+    parallelizable: true,
+    independent_oracle: true,
     ...overrides,
   };
 }

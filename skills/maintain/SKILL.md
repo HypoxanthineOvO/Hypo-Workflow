@@ -1,6 +1,6 @@
 ---
 name: maintain
-description: Persist focused day-to-day project facts without opening a Goal or Cycle. Use for /hw:maintain and for ambient capture of requirements, preferences, decisions, or feedback in a current workspace.
+description: Persist focused day-to-day project facts without opening a Goal or Plan. Use for /hw:maintain and for ambient capture of requirements, preferences, decisions, or feedback in a current workspace.
 ---
 
 # Maintain

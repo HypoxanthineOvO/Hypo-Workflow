@@ -32,7 +32,10 @@ import { validateWorkerRoutingDecision } from "../worker-routing/index.js";
 
 const TRANSITIONS = Object.freeze({
   "delivery.approve": { action: "approve", states: ["proposed", "needs_revision"] },
+  "delivery.approve_and_start": { action: "approve_and_start", states: ["proposed", "needs_revision"] },
   "delivery.start": { action: "start", states: ["waiting_to_start"] },
+  "stone.accept": { action: "accept_stone", states: ["waiting_for_stone"] },
+  "stone.reject": { action: "reject_stone", states: ["waiting_for_stone"] },
   "delivery.accept": { action: "accept", states: ["pending_acceptance"] },
   "delivery.reject": { action: "reject", states: ["pending_acceptance"] },
 });
@@ -50,6 +53,12 @@ export function createDeliveryStore(input = {}) {
     proposeCycle(root, proposal, options = {}) {
       return propose(root, "cycle", proposal, options, clock);
     },
+    proposePlan(root, proposal, options = {}) {
+      if (proposal?.plan?.delivery_mode !== "plan") {
+        throw deliveryError("ERR_DELIVERY_SCHEMA_INVALID", "Plan proposal requires a compiled Plan with at least one Stone");
+      }
+      return propose(root, "cycle", proposal, options, clock);
+    },
     promoteBootstrapCycle(root, proposal, options = {}) {
       return promoteBootstrapCycle(root, proposal, options, clock);
     },
@@ -61,13 +70,26 @@ export function createDeliveryStore(input = {}) {
         updated_at: now(clock),
       }));
     },
-    start(root, transition, options = {}) {
-      return receiptTransition(root, transition, options, clock, receipts, "delivery.start", (delivery) => ({
-        ...delivery,
-        status: "executing",
-        ...(delivery.delivery_kind === "cycle" ? { milestones: startFirstMilestone(delivery.milestones) } : {}),
+    approveAndStart(root, transition, options = {}) {
+      return receiptTransition(root, transition, options, clock, receipts, "delivery.approve_and_start", (delivery) => startApprovedDelivery({
+        ...withoutRevisionState(delivery),
         updated_at: now(clock),
       }));
+    },
+    start(root, transition, options = {}) {
+      return receiptTransition(root, transition, options, clock, receipts, "delivery.start", (delivery) => startApprovedDelivery({
+        ...delivery,
+        updated_at: now(clock),
+      }));
+    },
+    acceptStone(root, transition, options = {}) {
+      return receiptTransition(root, transition, options, clock, receipts, "stone.accept", (delivery) => acceptPendingStone({
+        ...delivery,
+        updated_at: now(clock),
+      }));
+    },
+    rejectStone(root, request, options = {}) {
+      return reject(root, request, options, clock, receipts, "stone.reject");
     },
     recordRevision(root, request, options = {}) {
       return recordRevision(root, request, options, clock);
@@ -89,7 +111,7 @@ export function createDeliveryStore(input = {}) {
       }));
     },
     reject(root, request, options = {}) {
-      return reject(root, request, options, clock, receipts);
+      return reject(root, request, options, clock, receipts, "delivery.reject");
     },
     resume,
   });
@@ -103,7 +125,7 @@ export function buildDeliveryReceiptContext(deliveryInput, input) {
   if (!definition || !definition.states.includes(delivery.status)) {
     throw deliveryError("ERR_DELIVERY_STATE_INVALID", `Receipt intent ${input.intent || "unknown"} is unsupported from Delivery state ${delivery.status}`);
   }
-  if (input.intent === "delivery.approve" && delivery.status === "needs_revision" && delivery.revision_state !== "proposal_ready") {
+  if (["delivery.approve", "delivery.approve_and_start"].includes(input.intent) && delivery.status === "needs_revision" && delivery.revision_state !== "proposal_ready") {
     throw deliveryError("ERR_DELIVERY_STATE_INVALID", "Delivery feedback is pending a revised proposal before approval");
   }
   const actor = normalizeActor(input.actor);
@@ -113,6 +135,7 @@ export function buildDeliveryReceiptContext(deliveryInput, input) {
     expected_state: delivery.status,
     revision: delivery.revision,
     state_hash: deliveryStateHash(delivery),
+    ...(["stone.accept", "stone.reject"].includes(input.intent) ? pendingStoneScope(delivery) : {}),
   };
   return {
     actor,
@@ -141,6 +164,7 @@ async function propose(root, deliveryKind, proposal, options, clock) {
     plan_hash: compiled.plan_hash,
     plan_record_ref: recordRef(planRecord),
     topology: proposal.topology,
+    ...(compiled.delivery_mode === undefined ? {} : { delivery_mode: compiled.delivery_mode }),
     ...(deliveryKind === "cycle" ? { milestones: compiled.milestones.map((item) => ({ ...item, status: "pending" })) } : {}),
     updated_at: updatedAt,
   };
@@ -321,13 +345,16 @@ async function recordRevision(root, request, options, clock) {
   assertExactKeys(request, ["object_ref", "actor", "feedback", "proposal"], "Delivery revision request");
   const objectRef = storedObjectRef(normalizeAuthorityObjectRef(request.object_ref));
   const current = await read(root, objectRef);
-  if (!["proposed", "waiting_to_start", "executing", "needs_revision"].includes(current.status)) {
+  if (!["proposed", "waiting_to_start", "executing", "waiting_for_stone", "needs_revision"].includes(current.status)) {
     throw deliveryError("ERR_DELIVERY_STATE_INVALID", `Delivery revision is not allowed from state ${current.status}`);
   }
   normalizeActor(request.actor);
   const feedback = normalizeFeedback(request.feedback);
   const proposal = request.proposal;
   validateCompiledPlan(proposal, current.delivery_kind);
+  if (current.delivery_mode === "plan" && proposal.delivery_mode !== "plan") {
+    throw deliveryError("ERR_DELIVERY_SCHEMA_INVALID", "A Plan revision must retain at least one Stone");
+  }
   if (proposal.id !== current.object_ref.id) throw deliveryError("ERR_DELIVERY_OBJECT_MISMATCH", "Revised proposal targets a different Delivery");
   if (proposal.revision !== current.revision + 1 || proposal.plan_hash === current.plan_hash) {
     throw deliveryError("ERR_DELIVERY_PLAN_STALE", "Revised proposal must increment revision and change plan_hash");
@@ -344,6 +371,7 @@ async function recordRevision(root, request, options, clock) {
     plan_hash: proposal.plan_hash,
     plan_record_ref: recordRef(planRecord),
     feedback_record_ref: recordRef(feedbackRecord),
+    ...(proposal.delivery_mode === undefined ? {} : { delivery_mode: proposal.delivery_mode }),
     ...(current.delivery_kind === "cycle" ? { milestones: proposal.milestones.map((item) => ({ ...item, status: "pending" })) } : {}),
     updated_at: updatedAt,
   };
@@ -365,12 +393,18 @@ async function verifyMilestone(root, request, options, clock) {
     throw deliveryError("ERR_DELIVERY_MILESTONE_ORDER", `Milestone order requires ${expected} before ${milestoneId}`);
   }
   const verification = await validateEvidence(root, current.topology, request.evidence);
+  const requiresStone = Boolean(current.milestones[activeIndex].stone);
   const milestones = current.milestones.map((item, index) => {
-    if (index === activeIndex) return { ...item, status: "verified", verification };
-    if (index === activeIndex + 1) return { ...item, status: "executing" };
+    if (index === activeIndex) return { ...item, status: requiresStone ? "pending_stone" : "verified", verification };
+    if (!requiresStone && index === activeIndex + 1) return { ...item, status: "executing" };
     return item;
   });
-  const next = { ...current, milestones, updated_at: now(clock) };
+  const next = {
+    ...current,
+    status: requiresStone ? "waiting_for_stone" : "executing",
+    milestones,
+    updated_at: now(clock),
+  };
   await persistRuntime(root, next, options);
   return clone(next);
 }
@@ -399,7 +433,7 @@ async function requestAcceptance(root, request, options, clock) {
   return clone(next);
 }
 
-async function reject(root, request, options, clock, receipts) {
+async function reject(root, request, options, clock, receipts, intent) {
   assertPlainObject(request, "Delivery rejection request");
   assertExactKeys(request, ["receipt_id", "actor", "intent", "object_ref", "scope", "plan_hash", "tool_use_id", "feedback"], "Delivery rejection request");
   const feedback = normalizeFeedback(request.feedback);
@@ -412,14 +446,14 @@ async function reject(root, request, options, clock, receipts) {
   });
   let expected;
   try {
-    expected = buildDeliveryReceiptContext(current, { actor: envelope.actor, intent: "delivery.reject" });
-    assertEnvelopeMatches(envelope, expected, "delivery.reject");
+    expected = buildDeliveryReceiptContext(current, { actor: envelope.actor, intent });
+    assertEnvelopeMatches(envelope, expected, intent);
   } catch (error) {
     await invalidateReservedReceipt(receipts, root, envelope, operation);
     throw error;
   }
   const updatedAt = now(clock);
-  const feedbackRecord = buildFeedbackRecord(current, feedback, envelope.actor, updatedAt, "reject");
+  const feedbackRecord = buildFeedbackRecord(current, feedback, envelope.actor, updatedAt, intent);
   const { verification: _staleVerification, ...rejectionBase } = current;
   const next = {
     ...rejectionBase,
@@ -531,6 +565,12 @@ function normalizeView(value) {
   if (!/^[a-f0-9]{64}$/.test(value.plan_hash)) throw deliveryError("ERR_DELIVERY_SCHEMA_INVALID", "Delivery plan_hash is invalid");
   if (value.delivery_kind === "goal" && Object.hasOwn(value, "milestones")) throw deliveryError("ERR_DELIVERY_SCHEMA_INVALID", "Goal must not expose milestones");
   if (value.delivery_kind === "cycle" && !Array.isArray(value.milestones)) throw deliveryError("ERR_DELIVERY_SCHEMA_INVALID", "Cycle milestones are required");
+  if (value.delivery_mode !== undefined && !["cycle", "plan"].includes(value.delivery_mode)) {
+    throw deliveryError("ERR_DELIVERY_SCHEMA_INVALID", "Delivery mode must be cycle or plan");
+  }
+  if (value.delivery_mode === "plan" && !value.milestones.some((milestone) => milestone.stone)) {
+    throw deliveryError("ERR_DELIVERY_SCHEMA_INVALID", "Plan Delivery requires at least one Stone");
+  }
   const workerRouting = value.worker_routing === undefined
     ? undefined
     : validateWorkerRoutingDecision(value.worker_routing);
@@ -553,6 +593,9 @@ function validateCompiledPlan(value, kind) {
   if (kind === "goal" && Object.hasOwn(value, "milestones")) throw deliveryError("ERR_DELIVERY_SCHEMA_INVALID", "Goal plan must not contain milestones");
   if (kind === "cycle" && (!Array.isArray(value.milestones) || value.milestones.length === 0)) {
     throw deliveryError("ERR_DELIVERY_SCHEMA_INVALID", "Cycle plan requires milestones");
+  }
+  if (value.delivery_mode === "plan" && !value.milestones.some((milestone) => milestone.stone)) {
+    throw deliveryError("ERR_DELIVERY_SCHEMA_INVALID", "Plan requires at least one Stone");
   }
   const withoutHash = { ...value };
   delete withoutHash.plan_hash;
@@ -695,7 +738,7 @@ function assertEnvelopeMatches(envelope, expected, intent) {
 }
 
 function assertTransitionPreflight(delivery, intent) {
-  if (intent === "delivery.approve" && delivery.status === "needs_revision" && delivery.revision_state !== "proposal_ready") {
+  if (["delivery.approve", "delivery.approve_and_start"].includes(intent) && delivery.status === "needs_revision" && delivery.revision_state !== "proposal_ready") {
     throw deliveryError("ERR_DELIVERY_STATE_INVALID", "Delivery feedback is pending a revised proposal before approval");
   }
 }
@@ -730,11 +773,37 @@ function startFirstMilestone(milestones) {
   return milestones.map((item, index) => index === next ? { ...item, status: "executing" } : item);
 }
 
+function startApprovedDelivery(delivery) {
+  return {
+    ...delivery,
+    status: "executing",
+    ...(delivery.delivery_kind === "cycle" ? { milestones: startFirstMilestone(delivery.milestones) } : {}),
+  };
+}
+
+function pendingStoneScope(delivery) {
+  const milestone = delivery.milestones?.find((item) => item.status === "pending_stone");
+  if (!milestone?.stone) throw deliveryError("ERR_DELIVERY_STATE_INVALID", "No pending Stone is available for acceptance");
+  return { milestone_id: milestone.id, stone_id: milestone.stone.id };
+}
+
+function acceptPendingStone(delivery) {
+  const activeIndex = delivery.milestones?.findIndex((item) => item.status === "pending_stone") ?? -1;
+  if (activeIndex < 0) throw deliveryError("ERR_DELIVERY_STATE_INVALID", "No pending Stone is available for acceptance");
+  const milestones = delivery.milestones.map((item, index) => {
+    if (index === activeIndex) return { ...item, status: "verified" };
+    if (index === activeIndex + 1) return { ...item, status: "executing" };
+    return item;
+  });
+  return { ...delivery, status: "executing", milestones };
+}
+
 function nextAction(delivery) {
   const actions = {
     proposed: "request_delivery_approval",
     needs_revision: delivery.revision_state === "feedback_pending" ? "prepare_revised_proposal" : "review_revised_proposal",
     waiting_to_start: "request_explicit_start",
+    waiting_for_stone: "await_stone_acceptance",
     executing: delivery.delivery_kind === "cycle" ? "continue_active_milestone" : "complete_and_verify_goal",
     verified: "request_manual_acceptance",
     pending_acceptance: "await_manual_acceptance",

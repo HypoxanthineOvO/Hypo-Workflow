@@ -361,6 +361,14 @@
           ]
         },
         {
+          "path": "core/test/plan-stone-lifecycle.test.js",
+          "classification": "maintained",
+          "reason": "Executable Discussion-to-Goal-or-Plan, Stone gate, and confirm-and-start behavior contract.",
+          "covers": [
+            "C21-M6"
+          ]
+        },
+        {
           "path": "core/test/receipt-store.test.js",
           "classification": "maintained",
           "reason": "Executable current C21 behavior or protection contract used by the maintained release gate.",

@@ -10,9 +10,9 @@ v14.0.0-alpha.2 的 Official Codex 发布包公开十个聚焦入口，每次只
 | --- | --- |
 | `/hw:guide` | 检查仓库并推荐一个合适的 Workflow 路径 |
 | `/hw:init` | 初始化或检查 manifest-based 工作区 |
-| `/hw:goal` | 交付一个有明确验收目标的结果 |
-| `/hw:plan` | 对需要澄清、架构选择或分解的工作形成可执行设计 |
-| `/hw:cycle` | 交付存在真实依赖顺序的多个 Milestone |
+| `/hw:goal` | Discussion 后自主交付没有 Stone 的完整需求 |
+| `/hw:plan` | Discussion 后交付含至少一个 Stone 的 Milestone Plan |
+| `/hw:cycle` | 兼容既有 Cycle Delivery，新工作不默认推荐 |
 | `/hw:maintain` | 保存一个聚焦的 requirement、preference、decision 或 feedback |
 | `/hw:experiment` | 管理非线性实验、基线、环境、扫描、Attempt、结果审查与即时状态 |
 | `/hw:resume` | 在重启或上下文压缩后恢复当前 Delivery |
@@ -21,10 +21,12 @@ v14.0.0-alpha.2 的 Official Codex 发布包公开十个聚焦入口，每次只
 
 普通对话不要求用户先选择入口。状态、报告、解释、检查、调试、知识索引和压缩属于 Agent 根据语义执行的内部行为，不是额外的公共命令。
 
-## Goal、Cycle、Maintain 与 Experiment
+## Discussion、Goal、Plan、Maintain 与 Experiment
 
-- Goal 适合一个边界清楚、只需一次最终验收的结果。
-- Cycle 只在阶段存在真实先后依赖时使用；Milestone 是可独立验证的阶段结果，不是机械任务清单。
+- 新交付先按需求发掘、技术栈、架构变化完成 Discussion，再选择 Delivery。
+- Goal 用于没有人工中途检查点的执行；它可以很复杂，也可以有很多验收点，并由内置 `/Goal` 自主连续完成。
+- Plan 必须含至少一个 Stone。Milestone 是可独立验证的阶段结果；Stone 是需要用户检查真实产物或作出决定的人工节点。普通 Milestone 不停，Stone 才停。
+- `0 Stone -> Goal`，`>= 1 Stone -> Plan`。复杂度、文件数和验收点数量不参与这个判断。
 - Maintain 保存日常项目事实，不开启 Delivery。
 - Experiment 是长期、非线性的实验记录面。它把项目知识、环境、代码快照、机器、数据集、baseline、scan、Attempt、指标、异常、trash/restore 与 next action 组织成可索引事实。
 
@@ -86,7 +88,7 @@ Workflow 不是 runner、队列系统或常驻扫描器，不创建一批只能�
 Workflow 形态 -> Worker topology -> Task Assessment -> semantic routing class -> 宿主模型映射
 ```
 
-Topology 决定主线程独立完成，还是需要 test、implement、audit 等独立身份。Task Assessment 由宿主 AI 根据仓库证据生成并在 Worker 启动前显示：
+Topology 根据任务耦合度、真实并行收益、独立 oracle 和协调成本决定由主线程完成还是使用 Worker。Goal、Plan、Milestone、Stone、文件数和验收点数量都不决定 Worker 数量。Task Assessment 由宿主 AI 根据仓库证据生成并在 Worker 启动前显示：
 
 | 字段 | 含义 | 当前强制信号 |
 | --- | --- | --- |
@@ -113,7 +115,7 @@ Workflow 不输出 Luna/Sol、Provider、凭据、reasoning effort、token 或�
 
 ## 执行与验收
 
-复杂交付由可验证效果驱动。Topology 决定是否需要 test、implement、audit 等独立身份；身份分离与验收证据不依赖具体模型。用户批准后的开始动作是上下文 transition，不是独立公共入口。
+复杂交付由可验证效果驱动。提案门提供“确认并开始 / 确认但不开始 / 不确认”三种语义，普通肯定回复默认原子执行 `delivery.approve_and_start`；只有“确认但不开始”进入 `waiting_to_start`。高影响副作用仍保留局部门禁。
 
 Runtime 是生命周期权威，Continuation 保存下一步，Recovery Pack 只提供有界恢复上下文。Pack 缺失时仍可从 Runtime 与 Continuation degraded resume；旧 `.pipeline` lifecycle 文件不作为回退权威。
 

@@ -5,7 +5,7 @@ description: Maintain a non-linear, reproducible experiment lane with project kn
 
 # Experiment
 
-Experiment is a durable project lane alongside Goal, Cycle, and Maintain. It is not a runner: the host Agent executes commands and monitors processes; Workflow validates and records the evidence.
+Experiment is a durable project lane alongside Goal, Plan, and Maintain. It is not a runner: the host Agent executes commands and monitors processes; Workflow validates and records the evidence.
 
 ## 输出语言规则
 

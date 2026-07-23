@@ -7,7 +7,16 @@ import {
 
 export function selectExecutionTopology(input) {
   assertPlainObject(input, "execution topology input");
-  assertExactKeys(input, ["task_kind", "change_size", "reversible", "policy", "custom_roles"], "execution topology input");
+  assertExactKeys(input, [
+    "task_kind",
+    "change_size",
+    "reversible",
+    "policy",
+    "custom_roles",
+    "coupling",
+    "parallelizable",
+    "independent_oracle",
+  ], "execution topology input");
   assertPlainObject(input.policy, "execution topology policy");
   assertExactKeys(input.policy, ["profile", "allow_solo_verified"], "execution topology policy");
   const taskKind = normalizeSafeIdentifier(input.task_kind, "execution topology task_kind");
@@ -16,20 +25,35 @@ export function selectExecutionTopology(input) {
   if (input.policy.profile === "custom") {
     profile = "custom";
     roles = normalizeRoles(input.custom_roles, "custom_roles");
-  } else if (taskKind === "migration") {
+  } else if (input.policy.profile === "strict") {
+    profile = "strict";
+    roles = ["test", "implement", "audit"];
+  } else if (
+    taskKind === "migration"
+    && input.parallelizable === true
+    && input.coupling !== "high"
+  ) {
     profile = "migration";
     roles = ["extractor", "curator", "auditor", "deterministic-writer"];
   } else if (
     input.policy.profile === "solo-verified"
     && input.policy.allow_solo_verified === true
-    && input.change_size === "trivial"
-    && input.reversible === true
   ) {
     profile = "solo-verified";
     roles = ["implement"];
-  } else {
+  } else if (
+    input.parallelizable === true
+    && input.coupling === "low"
+    && input.independent_oracle === true
+  ) {
     profile = "strict";
     roles = ["test", "implement", "audit"];
+  } else if (input.independent_oracle === true) {
+    profile = "independent-audit";
+    roles = ["implement", "audit"];
+  } else {
+    profile = "solo-verified";
+    roles = ["implement"];
   }
   const separation = profile !== "solo-verified";
   return {

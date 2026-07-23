@@ -16,20 +16,20 @@
     "delivery_kind": "goal"
   },
   {
-    "name": "cycle-natural",
-    "input": "这个项目要分成两个有顺序的阶段，最后整体验收",
+    "name": "plan-natural",
+    "input": "这个项目中途需要我人工检查一次交互原型，再继续实现",
     "context": { "workspace": "current", "active_delivery": null },
-    "canonical": "/hw:cycle",
-    "authority_intent": "delivery.propose_cycle",
-    "delivery_kind": "cycle"
+    "canonical": "/hw:plan",
+    "authority_intent": "delivery.propose_plan",
+    "delivery_kind": "plan"
   },
   {
-    "name": "cycle-command",
-    "input": "/hw:cycle new 两阶段队列服务",
+    "name": "plan-command",
+    "input": "/hw:plan 交互原型验收后完成实现",
     "context": { "workspace": "current", "active_delivery": null },
-    "canonical": "/hw:cycle",
-    "authority_intent": "delivery.propose_cycle",
-    "delivery_kind": "cycle"
+    "canonical": "/hw:plan",
+    "authority_intent": "delivery.propose_plan",
+    "delivery_kind": "plan"
   },
   {
     "name": "explicit-start-natural",

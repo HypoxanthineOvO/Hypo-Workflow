@@ -1,6 +1,6 @@
 ---
 name: accept
-description: Accept the active Goal or Cycle at its final pending acceptance gate. Use for /hw:accept or an explicit user acceptance statement.
+description: Accept the active Goal, Plan, or legacy Cycle at its final pending acceptance gate. Use for /hw:accept or an explicit user acceptance statement.
 ---
 
 # Accept Delivery
@@ -13,6 +13,6 @@ Require the active Delivery to be `pending_acceptance`. Build the exact `deliver
 
 Import Core from the installed bundle, pass the target workspace as `root`, and create Delivery/Receipt stores with the same explicit zero-argument Clock. Show the complete Receipt binding first; only after explicit user confirmation issue it, then call `accept` with a unique safe mutation `{ id }`.
 
-Reject stale plan, state, scope, actor, object, or reused Receipt bindings. Acceptance changes only final Delivery state to `accepted`; Cycle Milestones remain verified and have no individual acceptance state.
+Reject stale plan, state, scope, actor, object, or reused Receipt bindings. Acceptance changes only final Delivery state to `accepted`; Plan Stones have already been accepted at their scoped intermediate gates, while ordinary Milestones remain verification-only.
 
 Explain the delivered result, verification evidence, remaining risks, and acceptance effect directly in chat.
