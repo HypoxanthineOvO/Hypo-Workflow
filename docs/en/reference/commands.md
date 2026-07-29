@@ -2,7 +2,7 @@
 
 [中文](../../reference/commands.md) | English
 
-The v14.0.0-alpha.3 Official Codex surface and Host Contract v1 expose exactly ten public routes. The Root Router normalizes namespaces and checks backend availability; each route loads one ordinary, non-symlink Child Skill. The Codex plugin ZIP and portable ZIP contain the same route set.
+The v14.0.0-alpha.4 Official Codex surface and Host Contract v1 expose exactly ten public routes. The Root Router normalizes namespaces and checks backend availability; each route loads one ordinary, non-symlink Child Skill. The Codex plugin ZIP and portable ZIP contain the same route set.
 
 | Command | Child Skill | Use when |
 | --- | --- | --- |

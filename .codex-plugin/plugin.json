@@ -1,6 +1,6 @@
 {
   "name": "hypo-workflow",
-  "version": "14.0.0-alpha.3",
+  "version": "14.0.0-alpha.4",
   "description": "Discussion-first Goal, Plan, and Experiment workflows with manual Stones, adaptive Worker use, restart-safe recovery, and Receipt-controlled actions for Codex.",
   "author": {
     "name": "Hypoxanthine",
@@ -30,6 +30,7 @@
       "Official Codex lifecycle Hooks",
       "Discussion-first Goal and Stone-based Plan delivery",
       "Reproducible Experiment management and instant status",
+      "Concurrent Work Placement and Repository Targets",
       "Semantic Worker Routing",
       "Project memory and recovery",
       "Controlled destructive operations"

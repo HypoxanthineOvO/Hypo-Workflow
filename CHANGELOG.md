@@ -1,5 +1,22 @@
 # Changelog
 
+## v14.0.0-alpha.4 - 2026-07-29
+
+### Features
+
+- 同一 Project 可同时维护多个 Goal、Plan、兼容 Cycle 与 Experiment；每个 Session 必须显式选择一个 Work Item。
+- 新增 Repository Target 与 Work Placement registry，在启动前原子判定共享 checkout、独立 worktree、资源隔离或阻断，并以 lease/fencing 防止并发资源争用。
+- 源码变更必须通过绑定 registered checkout、branch ref、target HEAD 与 ancestry 的 integration evidence 后才能进入最终验收。
+
+### Fixes
+
+- 合入 v14.0.0-alpha.3 的 Codex Hook reminder 并发修复，并让 Host projection 的并发收尾兼容新增 Work Item/Session 字段。
+- 过期 Placement 不再让 Session 管理操作死锁；Experiment compact 在没有 Delivery Recovery Capsule 时安全降级。
+
+### Tests
+
+- Placement/Host/Hook/transaction 交叉回归 `59/59 PASS`；发布前 maintained suite `710/710 PASS`。
+
 ## v14.0.0-alpha.3 - 2026-07-19
 
 ### Fixes

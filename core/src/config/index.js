@@ -10,7 +10,7 @@ import { assertLegacyWorkspaceWritable } from "../workspace-format/index.js";
 export { parseYaml, stringifyYaml } from "../serialization/index.js";
 
 export const DEFAULT_GLOBAL_CONFIG = Object.freeze({
-  version: "14.0.0-alpha.3",
+  version: "14.0.0-alpha.4",
   agent: {
     platform: "codex",
     model: "default",
