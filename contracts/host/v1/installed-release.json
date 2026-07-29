@@ -2,8 +2,8 @@
   "schema_version": "1",
   "contract_version": "1",
   "release": {
-    "version": "14.0.0-alpha.3",
-    "source_commit": "2caacc868d8580e128c206baa29809793a05551e"
+    "version": "14.0.0-alpha.4",
+    "source_commit": "a2b26d5ca693cc8e8a639730b2e273161e804a0c"
   },
   "command_manifest": {
     "path": "contracts/host/v1/command-manifest.json",
