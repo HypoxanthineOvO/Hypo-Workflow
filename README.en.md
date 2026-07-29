@@ -16,7 +16,7 @@ Plan -> Execute -> Independently verify -> Human acceptance -> Resume safely
 
 Hypo-Workflow is a Skill protocol, not a runner or background service. The host Agent implements, tests, and reviews project work; `.pipeline/` preserves verifiable, recoverable project facts.
 
-[v14.0.0-alpha.4 Release Notes](docs/en/release/v14.0.0-alpha.4.md)
+[v14.0.0-alpha.5 Release Notes](docs/en/release/v14.0.0-alpha.5.md)
 
 This release supports **Official Codex** as its only current adapter. OpenCode, Claude Code, Cursor, GitHub Copilot, Trae, and custom Codex-fork adapters are deferred. Old platform artifacts that remain in the repository are not current support claims.
 

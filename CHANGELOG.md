@@ -1,5 +1,17 @@
 # Changelog
 
+## v14.0.0-alpha.5 - 2026-07-29
+
+### Fixes
+
+- Codex plugin 与 portable bundle 现在携带锁文件约束的 `js-yaml` 和 `argparse` 运行时依赖，解压后无需额外执行 `npm install` 即可运行 Hook。
+- `accepted` 或 `rejected` Delivery 没有 Context Capsule 时，`PreCompact` 与 `PostCompact` 安全返回成功，不再把终态对象当作恢复损坏。
+- 发布验证新增从 ZIP 解压后直接加载 serialization 模块的真实进程测试，避免只验证插件登记成功却未执行 Hook。
+
+### Upgrade
+
+- 更新插件时必须保留仍被存量 Session 引用的旧 cache；新版只对新 Session 生效，确认旧 Session 结束后才能清理旧版本。
+
 ## v14.0.0-alpha.4 - 2026-07-29
 
 ### Features

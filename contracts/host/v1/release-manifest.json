@@ -2,7 +2,7 @@
   "schema_version": "1",
   "contract_version": "1",
   "release": {
-    "version": "14.0.0-alpha.4",
+    "version": "14.0.0-alpha.5",
     "source_commit": "a2b26d5ca693cc8e8a639730b2e273161e804a0c"
   },
   "command_manifest": {
@@ -15,11 +15,11 @@
   },
   "artifacts": {
     "codex_plugin": {
-      "path": "dist/hypo-workflow-14.0.0-alpha.4-codex-plugin.zip",
+      "path": "dist/hypo-workflow-14.0.0-alpha.5-codex-plugin.zip",
       "sha256": "4b4299addeb4f61cd29ae43ee198f7f2d2c71e66929bba573579a4d2c4bd826b"
     },
     "portable_bundle": {
-      "path": "dist/hypo-workflow-14.0.0-alpha.4-portable.zip",
+      "path": "dist/hypo-workflow-14.0.0-alpha.5-portable.zip",
       "sha256": "8a0413a691ee7e670f1af9e87a94eb1d70546ca56ac344036cb72f4c406b4103"
     }
   }

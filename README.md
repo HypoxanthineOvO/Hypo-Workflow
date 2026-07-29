@@ -16,7 +16,7 @@
 
 Hypo-Workflow 是 Skill 协议，不是 runner 或后台服务。宿主 Agent 负责实现、测试和审查；`.pipeline/` 负责保存可验证、可恢复的项目事实。
 
-[v14.0.0-alpha.4 发布说明](docs/release/v14.0.0-alpha.4.md)
+[v14.0.0-alpha.5 发布说明](docs/release/v14.0.0-alpha.5.md)
 
 当前版本以 **Official Codex** 为唯一当前适配平台。OpenCode、Claude Code、Cursor、GitHub Copilot、Trae 和自定义 Codex fork 的适配器均延后，仓库中残留的旧平台产物不代表当前支持。
 

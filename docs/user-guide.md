@@ -4,7 +4,7 @@ Hypo-Workflow 是当前 Codex 宿主中的项目工作协议。`.pipeline/manife
 
 ## 当前入口
 
-v14.0.0-alpha.4 的 Official Codex 发布包公开十个聚焦入口，每次只路由到一个 Child Skill：
+v14.0.0-alpha.5 的 Official Codex 发布包公开十个聚焦入口，每次只路由到一个 Child Skill：
 
 | 入口 | 用途 |
 | --- | --- |
@@ -131,4 +131,4 @@ Runtime 是生命周期权威，Continuation 保存下一步，Recovery Pack 只
 
 ## 发布边界
 
-v14.0.0-alpha.4 的 Host Contract v1、Codex plugin ZIP 和 portable ZIP 均发布十个入口并包含 `/hw:experiment`。Official Codex 是当前唯一支持面；其他平台和 VSP-Codex 具体模型映射仍由各目标仓独立适配与验证。
+v14.0.0-alpha.5 的 Host Contract v1、Codex plugin ZIP 和 portable ZIP 均发布十个入口并包含 `/hw:experiment`。Official Codex 是当前唯一支持面；其他平台和 VSP-Codex 具体模型映射仍由各目标仓独立适配与验证。

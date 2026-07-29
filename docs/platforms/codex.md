@@ -1,6 +1,6 @@
 # Official Codex 指南
 
-Hypo-Workflow v14.0.0-alpha.4 以 Codex plugin + 十个 focused Skills + 十事件 Hooks 发布。它不是 runner；Codex Agent 执行实现、实验、测试和审查，Core 负责验证与持久化。Host Contract v1 与两个 ZIP 均包含 `/hw:experiment`。
+Hypo-Workflow v14.0.0-alpha.5 以 Codex plugin + 十个 focused Skills + 十事件 Hooks 发布。它不是 runner；Codex Agent 执行实现、实验、测试和审查，Core 负责验证与持久化。Host Contract v1 与两个 ZIP 均包含 `/hw:experiment`。
 
 ## 安装形态
 

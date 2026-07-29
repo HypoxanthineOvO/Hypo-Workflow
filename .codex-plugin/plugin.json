@@ -1,6 +1,6 @@
 {
   "name": "hypo-workflow",
-  "version": "14.0.0-alpha.4",
+  "version": "14.0.0-alpha.5",
   "description": "Discussion-first Goal, Plan, and Experiment workflows with manual Stones, adaptive Worker use, restart-safe recovery, and Receipt-controlled actions for Codex.",
   "author": {
     "name": "Hypoxanthine",
