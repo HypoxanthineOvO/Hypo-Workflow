@@ -9,7 +9,7 @@ description: Initialize or inspect a Hypo-Workflow workspace using the manifest-
 
 用户可见内容遵循项目 `output.language`；缺失时跟随当前对话语言。Schema key、配置 key、命令和路径保持英文。
 
-Init creates a recoverable bootstrap context, not a Goal or Cycle. Init has no user-global configuration or setup prerequisite.
+Init creates a recoverable bootstrap context, not a Goal or Plan. Init has no user-global configuration or setup prerequisite.
 
 Import `initializeWorkspace` from this installed bundle's `core/src/index.js` and pass the target project separately as `root`. Every mutation uses a unique safe final `{ id }` transaction option.
 
@@ -23,7 +23,7 @@ initializeWorkspace(root, { intent?, project_id?, workspace_id? }, { id?, faultI
 
 The ordinary form is `/hw:init <intended outcome>`. Treat trailing text as the intended project outcome.
 
-When no non-empty outcome is supplied, return the single `init_outcome` question and ask what the project should achieve. This branch is read-only. After the answer, summarize the understood outcome; that answer authorizes Init only, not a Goal, Cycle, or implementation.
+When no non-empty outcome is supplied, return the single `init_outcome` question and ask what the project should achieve. This branch is read-only. After the answer, summarize the understood outcome; that answer authorizes Init only, not a Goal, Plan, or implementation.
 
 ## Workspace Classes
 
@@ -47,7 +47,7 @@ A manifest-last transaction creates:
 - derived machine and human Record indexes
 - a derived Context Capsule
 
-`initial_snapshot` is `null`. Init does not fabricate a Goal, Cycle, Receipt, Journal event, Recovery Pack, accepted Snapshot, platform adapter, generic Rules store, or global configuration.
+`initial_snapshot` is `null`. Init does not fabricate a Goal, Plan, legacy Cycle, Receipt, Journal event, Recovery Pack, accepted Snapshot, platform adapter, generic Rules store, or global configuration.
 
 For brownfield adoption, every fact records basis, confidence, and an existing repository-relative locator. Inference is never labeled confirmed. Preserve source bytes and mtimes.
 
@@ -55,4 +55,4 @@ For brownfield adoption, every fact records basis, confidence, and an existing r
 
 Reject traversal, symlink evidence, secret-like values, raw credentials, and hidden reasoning before persistence. Errors must not echo rejected secrets. Preserve all repository files outside the staged `.pipeline` write set.
 
-Explain the workspace classification, project/workspace identity, bootstrap reference, Adoption Brief facts and confidence, and the next useful public route in chat. For legacy or damaged workspaces, explain why no write occurred and what evidence or repair is needed.
+Explain the workspace classification, project/workspace identity, bootstrap reference, and Adoption Brief facts and confidence in chat. Continue naturally into Discussion for the supplied outcome; do not insert Guide as a mandatory or default next step. Recommend `/hw:guide` only when the user is genuinely unsure what kind of work they want to do. For legacy or damaged workspaces, explain why no write occurred and what evidence or repair is needed.

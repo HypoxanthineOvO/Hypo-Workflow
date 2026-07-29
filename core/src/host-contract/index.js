@@ -11,6 +11,11 @@ import {
 } from "../runtime/internal.js";
 import { commitWorkspaceTransaction } from "../workspace-store/index.js";
 
+export {
+  compileVspiIntegrationContract,
+  parseVspiIntegrationContract,
+} from "./vspi.js";
+
 export const HOST_CONTRACT_VERSION = "1";
 export const HOST_STATUS_PATH = ".pipeline/runtime/host-status-v1.json";
 export const HOST_STATUS_RELATIVE_PATH = HOST_STATUS_PATH;
@@ -98,7 +103,7 @@ export function compileHostStatusProjection(input) {
       status: "ready",
     },
     delivery: runtime === null ? null : {
-      kind: runtime.delivery_kind,
+      kind: runtime.delivery_mode === "plan" ? "plan" : runtime.delivery_kind,
       id: runtime.object_ref?.id,
       status: runtime.status,
       revision: runtime.revision,
@@ -234,7 +239,7 @@ function parseWorkspace(value) {
 function parseDelivery(value) {
   assertObject(value, "Host status delivery");
   rejectUnknownKeys(value, DELIVERY_KEYS, "Host status delivery");
-  if (!new Set(["goal", "cycle"]).has(value.kind)) throw contractError("ERR_HOST_STATUS_INVALID", `Host status delivery.kind is invalid: ${JSON.stringify(value.kind)}`);
+  if (!new Set(["goal", "plan", "cycle"]).has(value.kind)) throw contractError("ERR_HOST_STATUS_INVALID", `Host status delivery.kind is invalid: ${JSON.stringify(value.kind)}`);
   requireText(value.id, "delivery.id");
   requireText(value.status, "delivery.status");
   if (!Number.isSafeInteger(value.revision) || value.revision < 0) throw contractError("ERR_HOST_STATUS_INVALID", "Host status delivery.revision is invalid");

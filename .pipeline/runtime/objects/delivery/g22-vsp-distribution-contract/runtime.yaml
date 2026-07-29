@@ -1,0 +1,43 @@
+delivery_kind: goal
+object_ref:
+  id: g22-vsp-distribution-contract
+  kind: delivery
+plan_hash: 40dc2bc8862244511206bc4b5762e225a444b6e01150bc8e549666ae96c6d90c
+plan_record_ref:
+  id: decision-b00efe9e0c4f436329957788887099e8
+  semantic_hash: b00efe9e0c4f436329957788887099e8f311a832d4b1bdf98b5d01556dc78476
+revision: 0
+schema_version: '1'
+status: accepted
+topology:
+  identity_constraints:
+    - - test
+      - implement
+    - - test
+      - audit
+    - - implement
+      - audit
+  profile: strict
+  required_roles:
+    - test
+    - implement
+    - audit
+  schema_version: '1'
+  separation_required: true
+  verification_required: true
+updated_at: 2026-07-13T02:09:48.031Z
+verification:
+  evidence_refs:
+    - digest: sha256:5ba9c50b614945621dad78d9e93e6efb2a71d3dc6aa819da0ee3d7f0251bdbfa
+      path: .pipeline/runtime/objects/delivery/g22-vsp-distribution-contract/evidence/test-worker.md
+      type: file
+    - digest: sha256:d206ef98b6c3b41af7c73b8e2e9858f0131e8f5b3cdf66e4bf935171472a6a92
+      path: .pipeline/runtime/objects/delivery/g22-vsp-distribution-contract/evidence/implementation.md
+      type: file
+    - digest: sha256:a34d3c68f8db477d226b624e7e473b716a57a3d6377bba4319fdabff50d807eb
+      path: .pipeline/runtime/objects/delivery/g22-vsp-distribution-contract/evidence/audit.md
+      type: file
+  roles:
+    - test
+    - implement
+    - audit

@@ -1,0 +1,52 @@
+actor:
+  id: operator
+  type: user
+authority_role: deletion_execution_report
+deleted_paths:
+  - skills/analysis
+  - skills/audit
+  - skills/chat
+  - skills/check
+  - skills/compact
+  - skills/debug
+  - skills/docs
+  - skills/explain
+  - skills/explore
+  - skills/help
+  - skills/knowledge
+  - skills/log
+  - skills/optimize
+  - skills/patch
+  - skills/plan-architecture
+  - skills/plan-confirm
+  - skills/plan-decompose
+  - skills/plan-deep
+  - skills/plan-discover
+  - skills/plan-extend
+  - skills/plan-generate
+  - skills/plan-review
+  - skills/plan-technical-stack
+  - skills/pr
+  - skills/quality
+  - skills/release
+  - skills/report
+  - skills/reset
+  - skills/rules
+  - skills/setup
+  - skills/showcase
+  - skills/skip
+  - skills/start
+  - skills/status
+  - skills/stop
+  - skills/sync
+  - skills/watchdog
+git:
+  head: 0373266f32a15903c275816707bb03a92ba435e6
+  target_state_hash: cebc929099d130559f23271dc2d639ec4e6b40d21ae3d831e6b54834f472069e
+  tree: e2ee6b0cf78fd424c96fe586b04be1dba6b2c79c
+manifest_hash: 2bbfa6ff4d1354bcdef2543c4d44bb8b844e7dd266fbc5f95cb5f6d1372176ac
+outcome: applied
+receipt_id: receipt-11f1630faba84b0bb53630fd2ee5c1df
+recorded_at: 2026-07-12T09:40:30.935Z
+schema_version: '1'
+tool_use_id: c21-m8-phase-a-deletion

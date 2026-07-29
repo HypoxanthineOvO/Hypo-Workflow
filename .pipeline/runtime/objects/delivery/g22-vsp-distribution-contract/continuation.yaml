@@ -1,0 +1,8 @@
+next_action: delivery_complete
+object_ref:
+  id: g22-vsp-distribution-contract
+  kind: delivery
+plan_hash: 40dc2bc8862244511206bc4b5762e225a444b6e01150bc8e549666ae96c6d90c
+revision: 0
+schema_version: '1'
+updated_at: 2026-07-13T02:09:48.031Z

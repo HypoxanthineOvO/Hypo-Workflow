@@ -89,7 +89,9 @@ export {
 } from "./deletion/index.js";
 export {
   compileGoalDesign,
+  compilePlan,
   compileCyclePlan,
+  selectDeliveryMode,
   selectAdaptivePlan,
   assessPlanReadiness,
 } from "./planning/index.js";
@@ -108,6 +110,9 @@ export {
   createDeliveryStore,
   buildDeliveryReceiptContext,
 } from "./delivery/index.js";
+export {
+  createWorkstreamStore,
+} from "./workstreams/index.js";
 export {
   createExperimentStore,
   buildExperimentReceiptContext,
@@ -167,6 +172,8 @@ export {
   readHostStatusProjection,
   refreshHostStatusProjection,
   verifyPortableBundle,
+  compileVspiIntegrationContract,
+  parseVspiIntegrationContract,
 } from "./host-contract/index.js";
 export {
   inspectLegacyWorkspace,

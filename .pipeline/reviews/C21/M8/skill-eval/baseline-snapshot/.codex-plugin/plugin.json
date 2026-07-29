@@ -1,0 +1,41 @@
+{
+  "name": "hypo-workflow",
+  "version": "13.1.0-beta.2",
+  "description": "Manifest-based project delivery, durable memory, recovery, and controlled execution for coding agents.",
+  "author": {
+    "name": "Hypoxanthine",
+    "url": "https://github.com/HypoxanthineOvO"
+  },
+  "homepage": "https://github.com/HypoxanthineOvO/Hypo-Workflow",
+  "repository": "https://github.com/HypoxanthineOvO/Hypo-Workflow",
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "planning",
+    "tdd",
+    "project-memory",
+    "ai-agent",
+    "recovery",
+    "codex"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Hypo-Workflow",
+    "shortDescription": "Durable Goal and Cycle delivery with project memory and recovery.",
+    "longDescription": "Hypo-Workflow gives coding agents a manifest-based project workspace with bounded Goal and Cycle delivery, ambient project memory, restart-safe recovery, explicit human acceptance, and Receipt-backed control for destructive operations.",
+    "developerName": "Hypoxanthine",
+    "category": "Productivity",
+    "capabilities": [
+      "Project memory",
+      "Goal and Cycle delivery",
+      "Restart-safe recovery",
+      "Controlled destructive operations"
+    ],
+    "defaultPrompt": [
+      "Initialize this repository with Hypo-Workflow.",
+      "Define and run one bounded delivery Goal.",
+      "Resume the active Hypo-Workflow delivery."
+    ],
+    "websiteURL": "https://github.com/HypoxanthineOvO/Hypo-Workflow"
+  }
+}

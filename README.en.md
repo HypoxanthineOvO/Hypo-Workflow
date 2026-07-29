@@ -32,7 +32,8 @@ Manifest
   -> accepted/checkpoint Snapshots
 ```
 
-- **Runtime** owns Goal/Cycle lifecycle; **Continuation** owns only the next action.
+- **Runtime** owns Goal/Plan lifecycle and remains compatible with existing Cycles; **Continuation** owns only the next action.
+- **Delivery / Workstream** allow multiple tasks and Sessions to run in one project; `active.delivery` remains only as a legacy foreground pointer.
 - **Records** store requirements, preferences, decisions, and feedback. They replace the generic Rules system.
 - **Experiment events / status projection** store Git-mergeable experiment facts and provide instant status without rescanning result trees.
 - **Worker Routing** shows a task assessment before Worker start and emits a semantic capability class without choosing a model or provider.
@@ -55,19 +56,21 @@ A symlink under `$CODEX_HOME/skills` loads Skills only. It does not load plugin-
 
 ## Delivery Workflows And The Experiment Lane
 
-Use Goal for one explicit outcome:
+Every new Delivery starts with Discussion: requirements discovery, technical stack, then architecture changes. Goal versus Plan is selected only by whether execution needs a manual intermediate checkpoint.
+
+Use Goal when there is no manual intermediate checkpoint; complexity and acceptance-criteria count do not change this:
 
 ```text
-/hw:init -> /hw:goal -> discuss and approve Design -> explicitly say “start”
-         -> verify -> /hw:accept or /hw:reject
+/hw:init -> Discussion -> Goal Design -> confirm and start
+         -> built-in /Goal executes continuously -> verify -> /hw:accept or /hw:reject
 ```
 
-Use Cycle when stages have real dependency order:
+Use Plan when at least one intermediate artifact needs user inspection or a decision. A Plan has Milestones, but only Stones pause execution:
 
 ```text
-/hw:init -> /hw:cycle -> /hw:plan when needed
-         -> approve ordered Milestones -> explicitly say “start”
-         -> verify each Milestone -> one final human acceptance
+/hw:init -> Discussion -> /hw:plan -> Milestones with at least one Stone
+         -> confirm and start -> ordinary Milestones continue automatically
+         -> accept Stone -> continue -> final acceptance
 ```
 
 Use Experiment when work has no linear finish and requires repeated runs, parameter scans, and result judgment:
@@ -77,7 +80,7 @@ Use Experiment when work has no linear finish and requires repeated runs, parame
          -> append immutable events -> read materialized status -> continue iterating
 ```
 
-Approval moves only to `waiting_to_start`; it does not implement. Use `/hw:resume` after interruption. Use `/hw:maintain` for everyday requirements, preferences, decisions, feedback, and writing context. Experiment is a non-linear record and status lane, not a runner or background scheduler.
+The proposal gate exposes three meanings: confirm and start, confirm without starting, or do not confirm and continue Discussion. Plain affirmative replies issue `delivery.approve_and_start`; only confirm-without-start enters `waiting_to_start`. Deletion, remote writes, releases, service restarts, and other high-impact actions retain local gates. Use `/hw:resume` after interruption.
 
 ### Experiment Capabilities
 
@@ -94,9 +97,9 @@ Real NeRF, AceSim, GitLab, SSH/SCP, large-trace, and multi-week behavior still n
 | --- | --- |
 | `/hw:guide` | recommend one workflow when the next step is unclear |
 | `/hw:init` | initialize, adopt, or inspect a workspace |
-| `/hw:goal` | deliver one outcome with explicit acceptance |
-| `/hw:plan` | adapt planning depth to available evidence |
-| `/hw:cycle` | deliver ordered dependent Milestones |
+| `/hw:goal` | autonomously deliver a complete zero-Stone requirement after Discussion |
+| `/hw:plan` | deliver Milestones containing at least one Stone after Discussion |
+| `/hw:cycle` | compatibility route for existing Cycle deliveries |
 | `/hw:maintain` | persist one day-to-day project fact |
 | `/hw:experiment` | manage environments, scans, reruns, scientific review, and instant experiment status |
 | `/hw:resume` | recover from Runtime, Continuation, and a Recovery Pack |
@@ -107,7 +110,7 @@ Chat, Explain, Status, Report, Log, Check, Compact, Knowledge, Sync, Debug, Star
 
 ## Semantic Worker Routing
 
-Topology decides whether independent test, implement, or audit identities are needed. Routing only states the semantic capability required by an already selected Worker. The host AI shows `complexity`, `uncertainty`, `oracle_strength`, `blast_radius`, `reversibility`, and `risk_flags`; Core then deterministically emits:
+Topology decides whether Workers create enough value from bounded independence, parallelism, or an independent oracle to justify coordination cost. Goal, Plan, Milestone, Stone, and acceptance count never determine Worker count; tightly coupled material work may stay with the main Agent. Routing only states the semantic capability required by an already selected Worker.
 
 | Class | Typical work |
 | --- | --- |
@@ -143,6 +146,7 @@ Deletion requires the full exact Deletion Manifest in chat, fresh user approval,
 - [Codex Guide](docs/en/platforms/codex.md)
 - [Platform Status](docs/en/reference/platforms.md)
 - [Current Artifacts and Authority](docs/en/reference/generated-artifacts.md)
+- [VSPi 0.2.0 Integration Contract](docs/en/reference/vspi-integration.md)
 - [Command Spec](references/commands-spec.md)
 - [State Contract](references/state-contract.md)
 

@@ -41,7 +41,7 @@ test("Host Contract v1 publishes one release manifest and exactly ten public com
 
   assert.equal(release.schema_version, "1");
   assert.equal(release.contract_version, "1");
-  assert.match(release.release.version, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
+  assert.match(release.release.version, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/);
   assert.match(release.release.source_commit, /^[0-9a-f]{40}$/);
   assert.equal(release.command_manifest.path, "command-manifest.json");
   assert.match(release.command_manifest.sha256, /^[0-9a-f]{64}$/);

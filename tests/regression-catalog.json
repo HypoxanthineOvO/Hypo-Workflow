@@ -361,6 +361,14 @@
           ]
         },
         {
+          "path": "core/test/plan-stone-lifecycle.test.js",
+          "classification": "maintained",
+          "reason": "Executable Discussion-to-Goal-or-Plan, Stone gate, and confirm-and-start behavior contract.",
+          "covers": [
+            "C21-M6"
+          ]
+        },
+        {
           "path": "core/test/receipt-store.test.js",
           "classification": "maintained",
           "reason": "Executable current C21 behavior or protection contract used by the maintained release gate.",
@@ -479,6 +487,22 @@
           "reason": "Executable current C21 behavior or protection contract used by the maintained release gate.",
           "covers": [
             "C21-M1"
+          ]
+        },
+        {
+          "path": "core/test/workspace-concurrency-recovery.test.js",
+          "classification": "maintained",
+          "reason": "Crash-safe writer serialization, automatic pending-transaction recovery, and stale-owner fencing contract for the VSPi symbiotic Workflow Goal.",
+          "covers": [
+            "vspi-symbiotic-workflow-goal"
+          ]
+        },
+        {
+          "path": "core/test/vspi-workstream-contract.test.js",
+          "classification": "maintained",
+          "reason": "Concurrent Delivery, Workstream, milestone claim, and portable VSPi integration contracts for the symbiotic Workflow Goal.",
+          "covers": [
+            "vspi-symbiotic-workflow-goal"
           ]
         },
         {

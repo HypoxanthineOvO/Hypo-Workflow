@@ -73,6 +73,47 @@ topologyTest("material engineering selects strict test/implement/audit separatio
   ]);
 });
 
+topologyTest("material work stays solo when delegation has no demonstrated parallel or audit value", () => {
+  const topology = TOPOLOGY_PROBE.api.selectExecutionTopology({
+    task_kind: "engineering",
+    change_size: "material",
+    reversible: true,
+    policy: { profile: "auto", allow_solo_verified: true },
+    coupling: "high",
+    parallelizable: false,
+    independent_oracle: false,
+  });
+  assert.equal(topology.profile, "solo-verified");
+  assert.deepEqual(topology.required_roles, ["implement"]);
+  assert.equal(topology.separation_required, false);
+});
+
+topologyTest("auto topology uses independent workers only when the task evidence justifies them", () => {
+  const audit = TOPOLOGY_PROBE.api.selectExecutionTopology({
+    task_kind: "engineering",
+    change_size: "material",
+    reversible: true,
+    policy: { profile: "auto", allow_solo_verified: true },
+    coupling: "high",
+    parallelizable: false,
+    independent_oracle: true,
+  });
+  assert.equal(audit.profile, "independent-audit");
+  assert.deepEqual(audit.required_roles, ["implement", "audit"]);
+
+  const parallel = TOPOLOGY_PROBE.api.selectExecutionTopology({
+    task_kind: "engineering",
+    change_size: "material",
+    reversible: true,
+    policy: { profile: "auto", allow_solo_verified: true },
+    coupling: "low",
+    parallelizable: true,
+    independent_oracle: true,
+  });
+  assert.equal(parallel.profile, "strict");
+  assert.deepEqual(parallel.required_roles, ["test", "implement", "audit"]);
+});
+
 topologyTest("migration selects extractor/curator/auditor/deterministic-writer roles", () => {
   const topology = TOPOLOGY_PROBE.api.selectExecutionTopology(migrationTopologyInput());
   assert.equal(topology.profile, "migration");

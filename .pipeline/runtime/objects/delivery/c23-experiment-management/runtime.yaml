@@ -1,0 +1,285 @@
+delivery_kind: cycle
+feedback_record_ref:
+  id: feedback-542a04ff0c7db58769911941cc18aedb
+  semantic_hash: 542a04ff0c7db58769911941cc18aedb161372a6c4cdcd1d83883c23c199c612
+milestones:
+  - depends_on: []
+    id: M1
+    order: 1
+    outcome: >-
+      Define the Experiment lane, logical experiment versus attempt identity, historical trash/restore semantics,
+      baseline changes, and pilot fixtures.
+    status: verified
+    title: Reference sandboxes, Experiment authority, and acceptance contracts
+    verification:
+      evidence_refs:
+        - digest: sha256:460f1ba10268fa20af053d39f7aa71166b28af9e571bb5cc32775c246101ce6f
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m1-recovery-remediation-retest.md
+          type: file
+        - digest: sha256:69ae6c5e9da78b19bfd787088a02f0d0363c58fa033f3f6d8f4794750978cf4e
+          path: >-
+            .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m1-recovery-remediation-implementation-main.md
+          type: file
+        - digest: sha256:eb5210fa3e0616be6d1dbcbe4e63d16bfa6169d65d55dbf383cb4aa25d0a88b4
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m1-recovery-remediation-audit.md
+          type: file
+      roles:
+        - test
+        - implement
+        - audit
+    verification_criteria:
+      - Reference NeRF-like and AceSim-like sandboxes exercise the core experiment record contract.
+  - depends_on:
+      - M1
+    id: M2
+    order: 2
+    outcome: >-
+      Record project principles, metric meanings, module roles, optimization locations, source/version references, and
+      stale knowledge detection.
+    status: verified
+    title: Project knowledge, metrics, and concept-to-code mapping
+    verification:
+      evidence_refs:
+        - digest: sha256:bc5efb3a087755e600aa859e922ffef426fafc38a0e8d2b6df9356598a3ecbe6
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m2-retest.md
+          type: file
+        - digest: sha256:61bb3650fa9d4755a5f4080e0287d687e8a87036d3f8af625ead02be834f654c
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m2-implementation-main.md
+          type: file
+        - digest: sha256:22b9924d2a6fd8555e7085df0c3247fafb64e683e45b2a7e607a4fdb8822f2db
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m2-reaudit.md
+          type: file
+      roles:
+        - test
+        - implement
+        - audit
+    verification_criteria:
+      - Knowledge fixtures resolve metric and semantic code questions and detect stale references.
+  - depends_on:
+      - M2
+    id: M3
+    order: 3
+    outcome: >-
+      Bind runs to code snapshots, uv environments, machines, datasets, commands, outputs, and explicit scan designs
+      including cross scans and resource limits.
+    status: verified
+    title: Reproducible context, experiment design, and parameter scans
+    verification:
+      evidence_refs:
+        - digest: sha256:09a90b38362270a1fc957be723da8816a9a933281a5d64c60eb960f65515be72
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m3-retest.md
+          type: file
+        - digest: sha256:a429e3f9db8927d37c05500091c930cc35796b0274b90c66c1d7ebb977cdd664
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m3-implementation-main.md
+          type: file
+        - digest: sha256:65973a1c5232912c6c14727773cdf230e7d062e4aa4f6c665b7fc9d8e91d3313
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m3-audit.md
+          type: file
+      roles:
+        - test
+        - implement
+        - audit
+    verification_criteria:
+      - >-
+        NeRF screening/full expansion and AceSim frequency/cache/trace scan fixtures pass, including deterministic OOM
+        evidence.
+  - depends_on:
+      - M3
+    id: M4
+    order: 4
+    outcome: >-
+      Support isolated tmux supervision, interruption evidence, restart-from-scratch fallback, operational completion,
+      and confirmation-gated scientific reasonableness review.
+    status: verified
+    title: Long-run supervision, recovery, and scientific review
+    verification:
+      evidence_refs:
+        - digest: sha256:ea944f190db515c44a638d4eccd4b60a8e36dec5fc05c73b870e1124059fe500
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m4-retest.md
+          type: file
+        - digest: sha256:622c42c693b21b8849a50a61f8095b3053f90c49b2a234d01916d430d57bb533
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m4-implementation-main.md
+          type: file
+        - digest: sha256:ef8c252a3ebc85f3913475330aa87d8ded8f4c514bcf1aee6e601c460b431741
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m4-audit.md
+          type: file
+      roles:
+        - test
+        - implement
+        - audit
+    verification_criteria:
+      - >-
+        Short-process and tmux smoke tests pass; suspicious and inconsistent results produce review requests instead of
+        silent conclusions.
+  - depends_on:
+      - M4
+    id: M5
+    order: 5
+    outcome: >-
+      Maintain append-friendly Git records and materialized summaries that explain baseline, datasets, scans, outcomes,
+      exceptions, and next actions without tree rescans.
+    status: verified
+    title: Instant status, record synchronization, and pilot-ready demo
+    verification:
+      evidence_refs:
+        - digest: sha256:8a410e323ebee47e648db29dc2fbeb5349b3d27b60aa958139b6bcddf766f5dc
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m5-remediation-retest.md
+          type: file
+        - digest: sha256:b70af5f16110da2541a524fa3bb602d4a62978272caf1f306e49d077040baf50
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m5-remediation-implementation-main.md
+          type: file
+        - digest: sha256:59cab3840f89d7a94fdc304f5464294417309e7e2f8c8c6dc3f49b84c1a43ad4
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m5-remediation-reaudit.md
+          type: file
+      roles:
+        - test
+        - implement
+        - audit
+    verification_criteria:
+      - >-
+        Two-clone GitLab-like sync and bounded status queries pass; the pilot-ready report states unvalidated real-world
+        behavior.
+  - depends_on:
+      - M5
+    id: M6
+    order: 6
+    outcome: >-
+      Repair optional turn-hook schema compatibility and independently audit the original C23 Experiment scope without
+      changing Hook enablement or trust policy.
+    status: verified
+    title: Codex Hook repair and independent Experiment audit
+    verification:
+      evidence_refs:
+        - digest: sha256:603ebaf3446c714c1b146a9ea26d177b623175a861a52012b80c3307664013e7
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m6-hook-retest.md
+          type: file
+        - digest: sha256:16a78de6949acd896ec0771229016876fd33644ba41b8ba8cf7dabfa5ca9df99
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m6-hook-implementation-main.md
+          type: file
+        - digest: sha256:e9fd1b33669515334bb498400b8b9fe314f8a67af5cffdb3cd2fa19eed2cf03e
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m6-hook-audit.md
+          type: file
+      roles:
+        - test
+        - implement
+        - audit
+    verification_criteria:
+      - Focused Hook regression, full relevant Experiment test suite, and an independent role-separated audit pass.
+  - depends_on:
+      - M6
+    id: M7
+    order: 7
+    outcome: >-
+      Add deterministic semantic Worker Routing, configuration modes, restart-safe routing state, and Codex adapter
+      guidance while keeping topology, provider resolution, and acceptance authority separate.
+    status: verified
+    title: Semantic Worker Routing and restart-safe host handoff
+    verification:
+      evidence_refs:
+        - digest: sha256:8feaafc0d844074053074320a3497ea771f53e86ab344e818b27d86e014c6a30
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m7-routing-p2-retest.md
+          type: file
+        - digest: sha256:d525e6ebce50ba0c1676b62a6715fe31ebfd8a6600eba9435e5e986472f61009
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m7-routing-implementation-main.md
+          type: file
+        - digest: sha256:c9606a3564a63002ef016db964805efafc1323ef154b3b5b46ab95be58317290
+          path: >-
+            .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m7-routing-remediation-implementation-main.md
+          type: file
+        - digest: sha256:dee77c782572238a890251035c281e076a8091e9b9a3b0a1a4769fbaaa16e17b
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m7-routing-p2-implementation-main.md
+          type: file
+        - digest: sha256:35c8e519d567886c8b5eaddb07817f49b41ef7ed8ed66512c2d844918c24c068
+          path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m7-routing-final-audit.md
+          type: file
+      roles:
+        - test
+        - implement
+        - audit
+    verification_criteria:
+      - >-
+        Mechanical, standard, explore, critical, and escalation classifications follow deterministic precedence and
+        reason codes.
+      - >-
+        Distinct failed routes escalate at threshold two while same-route retries, cancellations, startup failures, and
+        network failures do not.
+      - Advisory mode records an explicit host-capability fallback and required mode blocks unsupported Worker starts.
+      - >-
+        Runtime, Continuation, worker Journal events, and Recovery Capsule preserve routing class, reasons, failure
+        counts, and policy version across Resume and compaction.
+      - Worker evidence and acceptance remain role-based and unchanged by routing fields.
+      - >-
+        Core, managed guidance, documentation, and tests expose no concrete model, provider, credential, prompt, or
+        reasoning-effort selection; no plugin cachebuster is updated.
+object_ref:
+  id: c23-experiment-management
+  kind: delivery
+plan_hash: dc63837d450c3006b9ba106027f1fafdf218e9a13e1c185ae03dd1f952821c0e
+plan_record_ref:
+  id: decision-861cb23500113ed79b04c1b99f29ee2e
+  semantic_hash: 861cb23500113ed79b04c1b99f29ee2eb3bbcded9d9f39ba617bbea100bc5217
+revision: 1
+schema_version: '1'
+status: accepted
+topology:
+  identity_constraints:
+    - - test
+      - implement
+    - - test
+      - audit
+    - - implement
+      - audit
+  profile: strict
+  required_roles:
+    - test
+    - implement
+    - audit
+  schema_version: '1'
+  separation_required: true
+  verification_required: true
+updated_at: 2026-07-18T15:10:22.604Z
+verification:
+  evidence_refs:
+    - digest: sha256:8feaafc0d844074053074320a3497ea771f53e86ab344e818b27d86e014c6a30
+      path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m7-routing-p2-retest.md
+      type: file
+    - digest: sha256:d525e6ebce50ba0c1676b62a6715fe31ebfd8a6600eba9435e5e986472f61009
+      path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m7-routing-implementation-main.md
+      type: file
+    - digest: sha256:c9606a3564a63002ef016db964805efafc1323ef154b3b5b46ab95be58317290
+      path: >-
+        .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m7-routing-remediation-implementation-main.md
+      type: file
+    - digest: sha256:dee77c782572238a890251035c281e076a8091e9b9a3b0a1a4769fbaaa16e17b
+      path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m7-routing-p2-implementation-main.md
+      type: file
+    - digest: sha256:35c8e519d567886c8b5eaddb07817f49b41ef7ed8ed66512c2d844918c24c068
+      path: .pipeline/runtime/objects/delivery/c23-experiment-management/evidence/m7-routing-final-audit.md
+      type: file
+  roles:
+    - test
+    - implement
+    - audit
+worker_routing:
+  assessment:
+    blast_radius: high
+    complexity: high
+    oracle_strength: mixed
+    reversibility: guarded
+    risk_flags:
+      - authority_change
+    schema_version: '1'
+    summary: >-
+      Independently audit the final frozen M7 contract and verify closure of the config, bounded-input, and
+      unrouted-worker findings.
+    uncertainty: low
+  failure_state:
+    distinct_failed_route_count: 0
+    distinct_failed_route_ids: []
+    escalation_threshold: 2
+  policy_version: worker-routing-v1
+  reason_codes:
+    - independent_audit
+  routing_class: critical
+  schema_version: '1'
+  source: host_task_assessment

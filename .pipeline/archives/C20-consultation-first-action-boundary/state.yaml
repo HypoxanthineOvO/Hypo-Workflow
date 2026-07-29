@@ -1,0 +1,124 @@
+acceptance:
+  cycle_id: C20
+  mode: manual
+  scope: cycle
+  state: accepted
+  updated_at: 2026-06-30T21:43:36+08:00
+current:
+  phase: completed
+  prompt_file: .pipeline/prompts/03-target-cycle-input-and-distribution-boundary-package.md
+  prompt_index: 3
+  prompt_name: target-cycle-input-and-distribution-boundary-package
+  step: null
+  step_index: null
+history:
+  completed_prompts:
+    - completed_at: 2026-06-30T20:14:14+08:00
+      prompt_file: .pipeline/prompts/00-source-behavior-contract-and-scenario-fixtures.md
+      prompt_name: source-behavior-contract-and-scenario-fixtures
+      report: .pipeline/reports/00-source-behavior-contract-and-scenario-fixtures.report.md
+      result: pass
+    - completed_at: 2026-06-30T20:32:56+08:00
+      prompt_file: .pipeline/prompts/01-shared-guidance-projection-across-managed-instruction-surfaces.md
+      prompt_name: shared-guidance-projection-across-managed-instruction-surfaces
+      report: .pipeline/reports/01-shared-guidance-projection-across-managed-instruction-surfaces.report.md
+      result: pass
+    - completed_at: 2026-06-30T20:50:35+08:00
+      prompt_file: .pipeline/prompts/02-source-regression-and-managed-artifact-closure.md
+      prompt_name: source-regression-and-managed-artifact-closure
+      report: .pipeline/reports/02-source-regression-and-managed-artifact-closure.report.md
+      result: pass
+    - completed_at: 2026-06-30T21:07:50+08:00
+      prompt_file: .pipeline/prompts/03-target-cycle-input-and-distribution-boundary-package.md
+      prompt_name: target-cycle-input-and-distribution-boundary-package
+      report: .pipeline/reports/03-target-cycle-input-and-distribution-boundary-package.report.md
+      result: pass
+last_heartbeat: 2026-06-30T21:07:50+08:00
+milestones:
+  - name: 00-source-behavior-contract-and-scenario-fixtures
+    prompt_file: .pipeline/prompts/00-source-behavior-contract-and-scenario-fixtures.md
+    status: done
+  - name: 01-shared-guidance-projection-across-managed-instruction-surfaces
+    prompt_file: .pipeline/prompts/01-shared-guidance-projection-across-managed-instruction-surfaces.md
+    status: done
+  - name: 02-source-regression-and-managed-artifact-closure
+    prompt_file: .pipeline/prompts/02-source-regression-and-managed-artifact-closure.md
+    status: done
+  - name: 03-target-cycle-input-and-distribution-boundary-package
+    prompt_file: .pipeline/prompts/03-target-cycle-input-and-distribution-boundary-package.md
+    status: done
+pipeline:
+  finished: 2026-06-30T21:43:36+08:00
+  name: 协商优先的修改启动风格
+  prompts_completed: 4
+  prompts_total: 4
+  started: 2026-06-30T20:00:47+08:00
+  status: completed
+prompt_state:
+  code_quality: null
+  diff_score: null
+  finished_at: 2026-06-30T21:07:50+08:00
+  result: pass
+  started_at: 2026-06-30T20:50:35+08:00
+  steps:
+    - duration_seconds: 302
+      executor: subagent
+      finished_at: 2026-06-30T20:55:37+08:00
+      name: write_tests
+      notes: 'expected pre-implementation gap: C20 target package missing and matrix still C19'
+      reason: null
+      started_at: 2026-06-30T20:50:35+08:00
+      status: done
+      subagent_result: .pipeline/reviews/C20/M4/test-evidence.md
+      subagent_tool: codex
+    - duration_seconds: null
+      executor: subagent
+      finished_at: 2026-06-30T20:55:37+08:00
+      name: review_tests
+      notes: no separate test review required before implement
+      reason: test evidence is clear and directly actionable
+      started_at: null
+      status: skipped
+      subagent_result: null
+      subagent_tool: codex
+    - duration_seconds: null
+      executor: self
+      finished_at: 2026-06-30T20:55:37+08:00
+      name: run_tests_red
+      notes: 'RED accepted: C20-target-cycle-input missing; matrix needs C20 handoff update'
+      reason: null
+      started_at: 2026-06-30T20:55:37+08:00
+      status: done
+      subagent_result: .pipeline/reviews/C20/M4/test-evidence.md
+      subagent_tool: null
+    - duration_seconds: 410
+      executor: subagent
+      finished_at: 2026-06-30T21:02:27+08:00
+      name: implement
+      notes: created C20 target package and updated integration matrix; no target writes
+      reason: null
+      started_at: 2026-06-30T20:55:37+08:00
+      status: done
+      subagent_result: .pipeline/reviews/C20/M4/implementation-evidence.md
+      subagent_tool: codex
+    - duration_seconds: 51
+      executor: self
+      finished_at: 2026-06-30T21:03:18+08:00
+      name: run_tests_green
+      notes: M4 handoff validation passed
+      reason: null
+      started_at: 2026-06-30T21:02:27+08:00
+      status: done
+      subagent_result: package exists, matrix YAML parses, anchors present, git diff --check passing, target status recorded read-only
+      subagent_tool: null
+    - duration_seconds: 272
+      executor: subagent
+      finished_at: 2026-06-30T21:07:50+08:00
+      name: review_code
+      notes: audit PASS_WITH_WARNINGS, no blockers
+      reason: null
+      started_at: 2026-06-30T21:03:18+08:00
+      status: done
+      subagent_result: .pipeline/reviews/C20/M4/audit.md
+      subagent_tool: codex
+  updated_at: 2026-06-30T21:07:50+08:00

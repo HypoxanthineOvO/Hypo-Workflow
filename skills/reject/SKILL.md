@@ -1,6 +1,6 @@
 ---
 name: reject
-description: Reject the active Goal or Cycle at final manual acceptance with structured feedback. Use for /hw:reject or an explicit rejection of pending results.
+description: Reject the active Goal, Plan, or legacy Cycle at final manual acceptance with structured feedback. Use for /hw:reject or an explicit rejection of pending results.
 ---
 
 # Reject Delivery
@@ -13,4 +13,4 @@ Require `pending_acceptance` and collect `problem`, `reproduce_steps`, `expected
 
 Import Core from the installed bundle, pass the target workspace as `root`, and create Delivery/Receipt stores with the same explicit zero-argument Clock. Show the complete Receipt binding first; only after explicit user confirmation issue it, then call `reject` with a unique safe mutation `{ id }`.
 
-Rejection never edits product files, generates a replacement plan by itself, or starts execution. Present a revised Goal Design or Cycle Plan; renewed approval still moves only to `waiting_to_start`, followed by a separate explicit start.
+Rejection never edits product files, generates a replacement proposal by itself, or starts execution. Present a revised Goal Design or Plan. At the renewed gate, ordinary confirmation means `delivery.approve_and_start`; “确认但不开始” alone moves to `waiting_to_start`.

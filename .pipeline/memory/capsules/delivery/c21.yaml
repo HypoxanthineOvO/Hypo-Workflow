@@ -1,0 +1,1140 @@
+authority_role: derived
+context:
+  current_goal: Plan the separate Hypo-Workflow release and VSP integration workflow without changing target repositories yet.
+  next_action: >-
+    C21 is accepted. Discuss and explicitly plan a separate release and integration Cycle before changing VSP-Codex or
+    VSP-OpenCode.
+  non_goals:
+    - deletion before fresh exact Receipt
+    - OpenCode adapter
+    - Claude adapter redesign
+    - VSP-Codex changes
+    - telemetry
+    - automation jobs
+  recent_events:
+    - event_id: 2bb89c72be593bb2a4a942412839333a9b4cb19bcc313ec4de56a3f9549fb602
+      occurred_at: 2026-07-12T00:58:41.796Z
+      rationale_summary: >-
+        The cutover is valid, but recovery must not select a stale ancestor because equivalent ISO-8601 forms sort
+        differently as strings.
+      sequence: 6
+      summary: M5 opened a TDD repair for absolute-instant Recovery Pack ordering across timezone offsets.
+      type: plan.updated
+      writer:
+        id: root
+        kind: main
+    - event_id: 53f7db89adcf5e9f5b016cccabfe61d5d603b1bdec2d9f78415b27f2117b30ce
+      occurred_at: 2026-07-12T00:59:45.155Z
+      sequence: 7
+      summary: Started independent test worker for mixed-offset Recovery Pack ordering.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: ef46ab0821b7a9aaaf4a66c6b0463edf94d96f31f9658040eac52215f464ceb5
+      occurred_at: 2026-07-12T01:17:32.902Z
+      sequence: 8
+      summary: Independent test worker reproduced and specified mixed-offset Recovery Pack ordering.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 1d88c3a4d5b0148daaeb5603e5db5b32190f65045dca8e4969da6be57068fdf1
+      occurred_at: 2026-07-12T01:17:32.920Z
+      sequence: 9
+      summary: Independent implement worker received the bounded Recovery Pack comparator repair.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: b4c506ebcc1a75e08cd2582c723eaaeb481bb1af328ac1e5bfc7b580131be5a9
+      occurred_at: 2026-07-12T01:17:32.932Z
+      sequence: 10
+      summary: Independent implement worker completed the absolute-instant Pack ordering repair.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: abb9ce0dc8adba1225c5befc655cf97fb6b0db722b100e26a54e394a7b2abda0
+      occurred_at: 2026-07-12T01:17:32.943Z
+      sequence: 11
+      summary: Mixed-offset Pack ordering, live Pack selection, and fresh-process restore passed.
+      type: verification.completed
+      writer:
+        id: root
+        kind: main
+    - event_id: 14f5fc6d250ba6a8f0c2edb3b18e3c934ee2ed53f1e2234d7d529639306a6cdb
+      occurred_at: 2026-07-12T01:17:32.954Z
+      sequence: 12
+      summary: Independent test worker isolated the stale live Knowledge writer fixture after activation.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: 910c04d00c6685826562ca77db6103dcad6caa274635f8123be0b70457ac2d19
+      occurred_at: 2026-07-12T01:17:32.967Z
+      sequence: 13
+      summary: >-
+        Independent test worker moved legacy Knowledge generation to an isolated fixture and proved live fail-closed
+        behavior.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 21a74c2e8b77bb03b4580d91a61e35cc24f64050d585cc411ad9a5e614f0d874
+      occurred_at: 2026-07-12T01:17:32.983Z
+      sequence: 14
+      summary: C21-M1 through M5 baselines and the complete Core regression passed after activation.
+      type: verification.completed
+      writer:
+        id: root
+        kind: main
+    - event_id: a7584e5a47f8bfa7cf288b1d04c31dd2acdf747f1b842c572b3b8b0b7ad7a054
+      occurred_at: 2026-07-12T01:17:33.003Z
+      rationale_summary: >-
+        The schema cutover, Pack ancestry repair, live restore, legacy freeze, and post-activation regression now have
+        executable evidence.
+      sequence: 15
+      summary: C21-M5 advanced to a fresh independent final audit after complete GREEN validation.
+      type: plan.updated
+      writer:
+        id: root
+        kind: main
+    - event_id: c2fcfb0492e93df38a95b561a09f82c0f28c92e9768bde3a1f780989d69a3ab9
+      occurred_at: 2026-07-12T01:33:12.657Z
+      sequence: 16
+      summary: Fresh independent M5 final audit found one blocking Bootstrap rollback and acceptance lifecycle defect.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 0cdda2b60d084bc37f193fa84a214896e1dea54df39a01fa81054f9d23ac3836
+      occurred_at: 2026-07-12T01:33:12.677Z
+      sequence: 17
+      summary: A pending Bootstrap checkpoint failed real rollback after legal post-activation descendants were written.
+      type: verification.completed
+      writer:
+        id: root
+        kind: main
+    - event_id: b8577a5f33be42016426502f7ddde4c04e3816a90de7537de4b9e61d37076eca
+      occurred_at: 2026-07-12T01:33:12.691Z
+      rationale_summary: >-
+        Pending must mean rollback remains executable; accepted must be an explicit checkpoint-bound authority fact
+        before post-cutover writes proceed.
+      sequence: 18
+      summary: M5 returned to TDD for an explicit Bootstrap acceptance transition and pending write gate.
+      type: plan.updated
+      writer:
+        id: root
+        kind: main
+    - event_id: 248aa396bc44fcfaaaad8a3c63d4472eff89d432e1853174ddf69e6f6ce71a8c
+      occurred_at: 2026-07-12T03:38:38.532Z
+      rationale_summary: >-
+        The accepted companion now proves the exact checkpoint, verified evidence, legacy freeze inventory, and coherent
+        descendant recovery head.
+      sequence: 19
+      summary: C21-M5 Bootstrap acceptance passed Revision 2 authenticity checks and the third independent re-audit.
+      type: verification.completed
+      writer:
+        id: root
+        kind: main
+    - event_id: bd4c1acc78cd37840baf38d2cebc3501d5b9b6a6ea47f61a1f49735eda0c13d2
+      occurred_at: 2026-07-12T03:59:38.858Z
+      rationale_summary: >-
+        The new authority graph is accepted, independently validated, recoverable at its current head, and safe for M6
+        consumption.
+      sequence: 20
+      summary: C21-M5 completed after accepted Bootstrap activation, post-acceptance regression, and Architecture Plan Review.
+      type: verification.completed
+      writer:
+        id: root
+        kind: main
+    - event_id: 3a6fe366f937c19eb65dbbed0de5503893ebb6f1d8a966b665f81d2fbe1862ad
+      occurred_at: 2026-07-12T03:59:38.884Z
+      rationale_summary: >-
+        Architecture Plan Review found M6 safe unchanged; M7 and M8 protection changes remain proposals rather than
+        silent prompt edits.
+      sequence: 21
+      summary: C21 advanced from completed M5 to M6 Goal and Cycle Delivery Core with Adaptive Plan.
+      type: plan.updated
+      writer:
+        id: root
+        kind: main
+    - event_id: 8b20354d75dbbe847f20d7eccb0eeb11fe45e56aa9a383151c08e972901ab10a
+      occurred_at: 2026-07-12T05:42:31.767Z
+      sequence: 1
+      summary: C21-M6 implementation completed Goal/Cycle persistence, external routing, and restart-safe Resume.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 51557f6175d28d31fbd98163e23b983756465103c3d0fbec072ea90ab3bec313
+      occurred_at: 2026-07-12T05:42:32.767Z
+      sequence: 2
+      summary: C21-M6 independent TEST closed all usability regressions and the Full Core contract migration.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: d089a5d095a57ff87a2df84a4f7c6acbfae6374240dcc879ec6fde3983b4792c
+      occurred_at: 2026-07-12T05:42:33.767Z
+      sequence: 3
+      summary: C21-M6 independent AUDIT approved the external-project usable checkpoint with no blockers.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: f8cb60ab0c66785f529be62090cc79dbc4891a6e237aa4ea088f3abe8c6e2cbd
+      occurred_at: 2026-07-12T05:42:34.767Z
+      rationale_summary: >-
+        Other projects can now persist Maintain, Goal, and Cycle authority and recover without requiring a local copy of
+        the Skill backend.
+      sequence: 4
+      summary: C21-M6 usable checkpoint passed focused, external-project, fresh-process, and Full Core validation.
+      type: verification.completed
+      writer:
+        id: root
+        kind: main
+    - event_id: c6226578340c2921f8759e665cfe1d8071963bdd76b7a863b1e33f4883b3a384
+      occurred_at: 2026-07-12T05:42:35.767Z
+      rationale_summary: The user requested the usable persistence checkpoint first and deferred the remaining agreed work.
+      sequence: 5
+      summary: C21 completed M6 and paused before M7 ambient Maintain and Codex Hook work.
+      type: plan.updated
+      writer:
+        id: root
+        kind: main
+    - event_id: 4694dff62fe6aafd0822c31cc183d411554bba858d264fe518f2b9dd773ac289
+      occurred_at: 2026-07-12T06:34:57.609Z
+      rationale_summary: >-
+        The user explicitly deferred VSP-Codex adaptation and directed the current Hypo-Workflow version to continue
+        through its remaining core milestones.
+      sequence: 1
+      summary: C21 resumed from the M6 usable checkpoint and began M7 ambient Maintain and Official Codex Hook work.
+      type: plan.updated
+      writer:
+        id: root
+        kind: main
+    - event_id: 3bd4f0677a2373976cd72ad1e8fa57c06e3075769a873d65046bb74ed87f51b1
+      occurred_at: 2026-07-12T06:34:57.634Z
+      sequence: 2
+      summary: Started the independent M7 TEST worker on current Official Codex Hook and ambient persistence contracts.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: f191a98327f253ab136f7d2e27dd1ff5e36d852ab117a1387492b60bda9deb3d
+      occurred_at: 2026-07-12T06:35:51.931Z
+      sequence: 3
+      summary: Started a read-only M7 researcher to verify current Official Codex Hook and plugin contracts.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: da2366e10724c4e7d75bbe8d21cd030fec829800cca3d6ffab724a886bb6acc0
+      occurred_at: 2026-07-12T06:46:16.343Z
+      sequence: 4
+      summary: Independent C21-M7 TEST completed the behavior-first RED boundary with Recovery baseline intact.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: dfb08ecd3898533c2538d792d8dd510b2e18c6c9e3c4af12b2c1b66dadf3e14f
+      occurred_at: 2026-07-12T06:47:32.142Z
+      sequence: 5
+      summary: >-
+        Read-only C21-M7 research verified the current ten-event Official Codex contract and bounded local host
+        capability.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: a8e6555dd3602b19fcc88d0bf81d21903b8f8401d476514b1260c2ba6670aece
+      occurred_at: 2026-07-12T07:09:52.992Z
+      sequence: 6
+      summary: >-
+        C21-M7 IMPLEMENT completed the ambient Maintain, Codex Hook, compact recovery, reminder, and controlled deletion
+        production scope.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 780e920c9d4dbf4ea5ffe88554b2cd36c2f002258c4af7457853d3e0334aa8ba
+      occurred_at: 2026-07-12T07:10:48.371Z
+      sequence: 7
+      summary: Started a fresh independent C21-M7 TEST worker for regression and adversarial validation.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: f99d1f60f16890edfc6b8ebe74695ecf44a6b4c77c3444ec6b5c53b755b61a39
+      occurred_at: 2026-07-12T07:20:55.438Z
+      sequence: 8
+      summary: >-
+        Independent C21-M7 TEST passed all baseline suites but found two blocking policy defects in three adversarial
+        RED contracts.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: c60e28fe95ba2681945d917469f1a9ce555c253498aa3d73769f9ca18f52a565
+      occurred_at: 2026-07-12T07:21:23.949Z
+      sequence: 9
+      summary: Restarted the C21-M7 IMPLEMENT identity for the narrow adversarial policy revision.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: a3a841cf02fc517015f95b01a626353c952129052269742d3049d6db5b5cca28
+      occurred_at: 2026-07-12T07:27:51.484Z
+      sequence: 10
+      summary: C21-M7 IMPLEMENT Revision 1 closed Ambient secret persistence and deletion protected-descendant defects.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: a66a332679e6358d30ee91d258f37366b938de7d67bacc4fbafe11eb311a0355
+      occurred_at: 2026-07-12T07:28:27.853Z
+      sequence: 11
+      summary: Started a fresh independent C21-M7 Revision 1 RETEST worker.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: 4f80de138977023fb8ce196c8889c0f2ba77ee407b36bc0181b338270c445256
+      occurred_at: 2026-07-12T07:34:21.943Z
+      sequence: 12
+      summary: Fresh C21-M7 Revision 1 RETEST passed focused, adversarial, boundary, static, and full regression checks.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 3a4882682df4d7033fe23a89da97b88ed3c1002541b72c1063f05dfd48d54b51
+      occurred_at: 2026-07-12T07:34:56.125Z
+      sequence: 13
+      summary: Started the fresh independent C21-M7 architecture and security AUDIT.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: e1b0bbcdebf8c7b9f0c86b6a77d8390b00bef4780bcf11e842985de039aa3232
+      occurred_at: 2026-07-12T07:44:23.196Z
+      sequence: 14
+      summary: >-
+        Fresh C21-M7 AUDIT found Recovery blob deletion, raw-prompt persistence, Hook schema, and reminder targeting
+        defects.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 36c9eac4941edc498ea4526f433c5812f8873e6efbb4b86271088631430b9aab
+      occurred_at: 2026-07-12T07:45:08.759Z
+      sequence: 15
+      summary: Started the strict C21-M7 Revision 2 TEST worker against audit findings and the current Official Hooks contract.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: e2c9e46b26b3972a3837e48635e0769180d296a2cc982ffdc4cd69755df68b7e
+      occurred_at: 2026-07-12T07:51:49.989Z
+      sequence: 16
+      summary: C21-M7 Revision 2 TEST fixed the audit findings as 14 behavior-first RED contracts.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 9f67f81c52e81ceffa77d041daaa6214d6394c4e0eff961387f88e4a18cd2c38
+      occurred_at: 2026-07-12T07:52:23.624Z
+      sequence: 17
+      summary: Restarted the strict C21-M7 IMPLEMENT identity for the bounded Revision 2 audit repairs.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: 439fe626d6ff5ea2947bd2f5a0a65330c666073c1080d314c851177c2de45f57
+      occurred_at: 2026-07-12T08:03:36.484Z
+      sequence: 18
+      summary: C21-M7 IMPLEMENT Revision 2 closed Recovery, semantic extraction, Official schema, and reminder audit findings.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: f7ea6fd39d8a1a1e0b058d00218650a7e3af019e909a6ec74ee73c4a3cc8d1e4
+      occurred_at: 2026-07-12T08:04:11.936Z
+      sequence: 19
+      summary: Started the fresh independent C21-M7 Revision 2 RETEST.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: 7678eb0a13e6b0fbe65167cd694e2dfd233850b6e6566cf15e0795ab89f7f80e
+      occurred_at: 2026-07-12T08:12:20.906Z
+      sequence: 20
+      summary: Fresh C21-M7 Revision 2 RETEST passed all required focused, static, distribution, and full regression checks.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 11da49c102a2f0ba73f36efc42839117c00e474eff353307aa536f4fc32ca37e
+      occurred_at: 2026-07-12T08:13:00.818Z
+      sequence: 21
+      summary: Started the fresh cumulative C21-M7 Revision 2 RE-AUDIT.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: 5dabcb2bf2ee97b61a5470a87c3e7b4ece6b64e82c542c5fcdab8d3d066cbbc2
+      occurred_at: 2026-07-12T08:23:37.108Z
+      sequence: 22
+      summary: Fresh cumulative C21-M7 Revision 2 RE-AUDIT approved all prior finding closures.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: a4f1f2b5283ceab53c039dd0d2af3d566542b46799a5a9e19bc9a911407dcba4
+      occurred_at: 2026-07-12T08:23:37.109Z
+      rationale_summary: >-
+        Fresh TEST, two implementation revisions, fresh RETEST, and cumulative RE-AUDIT closed all blocking and warning
+        findings; M8 owns only surface cleanup and release readiness.
+      sequence: 23
+      summary: >-
+        C21-M7 ambient Maintain, Official Codex Hook adapter, compact recovery, reminders, and controlled deletion
+        passed cumulative verification.
+      type: verification.completed
+      writer:
+        id: root
+        kind: main
+    - event_id: 8615e813e397d6b78d42a924d5e16a8ad9c439de523dc26d2fa373ab152bbe9f
+      occurred_at: 2026-07-12T08:23:37.110Z
+      rationale_summary: >-
+        M7 is independently approved; M8 must rescan the live post-M7 graph and stop at the exact deletion authorization
+        gate before any cleanup.
+      sequence: 1
+      summary: C21 advanced from completed M7 to M8 surface cleanup and release-ready regression.
+      type: plan.updated
+      writer:
+        id: root
+        kind: main
+    - event_id: 3631330c1e6e023fb0763aed31b7bcd3bf376d443243854df565a3cb84814b59
+      occurred_at: 2026-07-12T08:26:19.791Z
+      sequence: 2
+      summary: Started C21-M8 TEST for nine-command discovery, non-revival, deletion drift, and Skill evaluation contracts.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: ba4f297ddd043f571c2412e8cddcde3ea173de0eb08b462c2d9a6e84b07405fb
+      occurred_at: 2026-07-12T08:26:19.792Z
+      sequence: 3
+      summary: Started the read-only C21-M8 post-M7 dependency and candidate classification scan.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: c40a2ebfa9ec3962fb29802d23bb482c1dc82b4b7c26a1df983d647d9a5837b9
+      occurred_at: 2026-07-12T08:40:55.344Z
+      rationale_summary: >-
+        The 23 expected failures isolate physical Skill discovery, five legacy regeneration writers, and current
+        documentation drift; deletion drift and router zero-write contracts are already green.
+      sequence: 4
+      summary: C21-M8 TEST completed with stable RED contracts and zero-write gate baselines.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: c6d80b0d95238b3bef3a0c6c3d30eac232134c91f12b84bab861889e868e9ff2
+      occurred_at: 2026-07-12T08:49:39.176Z
+      rationale_summary: >-
+        The live graph proves source routing and generator reachability must be changed before any derived artifact
+        deletion; the 497-file inventory remains scan evidence only.
+      sequence: 5
+      summary: C21-M8 post-M7 dependency scan classified all 46 Child Skills and twelve cleanup clusters.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 8d1743936f8a089da1e4b7c496d2f5013a6cc29cb43e1df26bced785318f5a48
+      occurred_at: 2026-07-12T08:49:39.236Z
+      rationale_summary: >-
+        TEST isolated 23 expected failures and SCAN identified the source-before-derived route; deletion remains a
+        separate exact user gate.
+      sequence: 6
+      summary: C21-M8 advanced from RED and dependency scan to non-destructive implementation.
+      type: plan.updated
+      writer:
+        id: root
+        kind: main
+    - event_id: 14f9ff3a88ceab488b00b040d60c07fb955c6e9bccc42667ea97f443acf017ff
+      occurred_at: 2026-07-12T08:51:49.086Z
+      sequence: 7
+      summary: Started C21-M8 non-destructive Core routing and generator-reachability implementation.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: 3f701609149224e637902d9ea6bed4cd571836d762b8342c67b4eea6812254a7
+      occurred_at: 2026-07-12T08:51:49.127Z
+      sequence: 8
+      summary: Started C21-M8 Skill snapshot, public surface, plugin metadata, and current Codex documentation implementation.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: 40f0a6bbd2551a1e060a8375b1054626e80847f7807135ba2d5fc8a62ce7a04d
+      occurred_at: 2026-07-12T09:07:42.326Z
+      sequence: 9
+      summary: C21-M8 Core implementation reduced the public registry to nine routes and fenced legacy writers before mutation.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 103c9bb5a1b210a5be834720e68ff3800a611176bb7d6cd7f99e470e45d7e230
+      occurred_at: 2026-07-12T09:07:42.386Z
+      sequence: 10
+      summary: C21-M8 Surface implementation sealed the pre-M8 Skill baseline and updated the primary Official Codex surface.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 8340e8a13b83a378814a0c5bdb534504492967928bee1ff15d3da0f370c9a05b
+      occurred_at: 2026-07-12T09:07:42.446Z
+      sequence: 11
+      summary: >-
+        Started fresh C21-M8 pre-delete verification against routing, writer, documentation, snapshot, and deletion
+        contracts.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: 3bc9054394fda738cd663d0b39d0eec13b39a5d53f955639fa771cc2541a052d
+      occurred_at: 2026-07-12T09:14:18.028Z
+      sequence: 12
+      summary: Started C21-M8 Core Revision 2 to fence direct Docs and README writers and update the nine-Skill quality model.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: ef637a4be8050cbffcb20ac109f76ca62fae6f2abde9bbb1bd7a9b80386debb5
+      occurred_at: 2026-07-12T09:15:23.735Z
+      rationale_summary: >-
+        Registry, primary docs, adapter writers, snapshot, and deletion gates pass; direct module imports must be fenced
+        before the exact Manifest is trustworthy.
+      sequence: 13
+      summary: >-
+        Fresh pre-delete TEST reduced M8 failures to one expected physical discovery gap but found direct Docs and
+        README writer revival.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 893051fa224fe07cadd09d6902f4a74ee494ac236b33f0aec4ebc29f0b28c6aa
+      occurred_at: 2026-07-12T09:19:31.492Z
+      sequence: 14
+      summary: C21-M8 Core Revision 2 fenced direct Docs and README writes and replaced the old Skill quality model.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: d2dc9e31553a61fcc1029293d76d541f46762cee1ff1f9a62ad91dde8ef3dc8c
+      occurred_at: 2026-07-12T09:19:31.532Z
+      sequence: 15
+      summary: Started bounded C21-M8 Surface Revision 2 for canonical output-language sections in three public Skills.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: b365d5f9fc3866bb6bc7b1dfe7f73404250b2e460c62143e05dc93f388fad442
+      occurred_at: 2026-07-12T09:21:14.805Z
+      sequence: 16
+      summary: C21-M8 Surface Revision 2 restored the canonical output-language contract in Init, Plan, and Maintain.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 72715b6ee67b42868d5d6c302b6fb7baf8d040441fee2bd95fec38a47a5c5448
+      occurred_at: 2026-07-12T09:21:14.839Z
+      sequence: 17
+      summary: Started fresh C21-M8 pre-delete retest after direct-writer and Skill-quality revisions.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: 3d46ee61b1fafb776c903c4748115c31150246c53c76dac8fc7d0455513ecee7
+      occurred_at: 2026-07-12T09:23:35.160Z
+      rationale_summary: >-
+        All source, routing, writer, documentation, snapshot, plugin, and deletion safety contracts pass; the only
+        remaining M8 failure is the exact 37-directory physical Skill cleanup.
+      sequence: 18
+      summary: C21-M8 Revision 2 pre-delete retest approved entry to the exact Manifest gate.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 206ef084d536530ab67332040197d349af0a8f51de469f5d1fbf104e15890387
+      occurred_at: 2026-07-12T09:25:52.406Z
+      rationale_summary: >-
+        A minimal 37-directory cleanup is sufficient to make Official Codex discovery exactly nine; the broader 497-file
+        repository cleanup remains deferred and outside this Receipt.
+      sequence: 19
+      summary: C21-M8 Phase A exact Deletion Manifest is validated and waiting for fresh user authorization.
+      type: plan.updated
+      writer:
+        id: root
+        kind: main
+    - event_id: c9b800345107334fcba6e7c4231863d30ae00f89c283245dcc60a4331a2fc67c
+      occurred_at: 2026-07-12T09:40:30.718Z
+      sequence: 20
+      summary: Issued the user-approved C21-M8 Phase A deletion.execute Receipt.
+      type: receipt.observed
+      writer:
+        id: root
+        kind: main
+    - event_id: b838d42231114b1c8fc3bdebb9496ad03f246436f09fa950333f98dac4d6820d
+      occurred_at: 2026-07-12T09:40:31.046Z
+      rationale_summary: Physical plugin discovery can now match the nine-route Registry; no broad repository cleanup path was included.
+      sequence: 21
+      summary: Applied the exact user-approved C21-M8 Phase A cleanup to 37 non-public Child Skill directories.
+      type: files.changed
+      writer:
+        id: root
+        kind: main
+    - event_id: 26ab913f631945c6e62e8abcbf1cf7716ec6afe4e8e293e6c4c190446866d57e
+      occurred_at: 2026-07-12T09:40:31.110Z
+      sequence: 22
+      summary: Consumed the single-use C21-M8 Phase A deletion Receipt after exact execution.
+      type: receipt.observed
+      writer:
+        id: root
+        kind: main
+    - event_id: e7a1183e5bbe46d8bb4aa375dcb1af2d06ea63331a6d1f4a52bc58a9c2e7e9ca
+      occurred_at: 2026-07-12T09:45:52.033Z
+      sequence: 23
+      summary: Started independent C21-M8 post-delete full regression and failure classification.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: 967f0bc97e73f0683038dd6da341cfca5f6a0306d5e36a178dcfa2eebb753630
+      occurred_at: 2026-07-12T10:01:42.353Z
+      sequence: 24
+      summary: >-
+        Started independent C21-M8 RED contracts for the skill-first CLI boundary and transparent maintained regression
+        catalog.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: 0ba9bca91f28e5bcfdfeacb1d00c8f43b43942b0fdd02f3310c4bdee0a4245f9
+      occurred_at: 2026-07-12T10:21:55.537Z
+      rationale_summary: >-
+        Current M5-M8 and deletion/package checks are green; 24 obsolete-only and seven mixed test modules plus legacy
+        scenarios must be explicitly classified or split before release regression can pass.
+      sequence: 25
+      summary: >-
+        Independent post-delete TEST found no current C21 product regression and required transparent historical test
+        curation.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: ecc39ea3ded324de161904a3b93512147eef7bcadfbe0640a22d5df9f1cb8c11
+      occurred_at: 2026-07-12T10:21:55.537Z
+      sequence: 26
+      summary: Started paired candidate and pre-M8 baseline Skill behavior evaluations in disposable fixtures.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: c2dd2d9f1c7a3ce8fb184560058e3a10db92d5bb86c2e5717819b82ebe7bba37
+      occurred_at: 2026-07-12T10:54:23.872Z
+      sequence: 27
+      summary: Independent TEST completed transparent regression RED contracts and eight maintained C21 scenarios.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 1212e3bb61fe2d4ed0acf8d94cba86df07d548dd7a16bb4e8b8de415ef4802a2
+      occurred_at: 2026-07-12T10:54:23.872Z
+      sequence: 28
+      summary: Started bounded IMPLEMENT for the explicit regression catalog and maintained/quarantine runners.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: 7b3c696d90ee90f7c351eed921029e7198df8ba1c8afd2a42b043a4fb5a9420a
+      occurred_at: 2026-07-12T10:57:23.973Z
+      sequence: 29
+      summary: Started the capacity-retried Guide/Init pair and the Reject pair for Skill behavior comparison.
+      type: worker.started
+      writer:
+        id: root
+        kind: main
+    - event_id: cd24ae5cd52a3e7d0ac618ae16e3bee0e78a4daef40d26858c46e228aff8b502
+      occurred_at: 2026-07-12T14:16:42.620Z
+      rationale_summary: The release gate now runs current behavior while historical failures remain explicit and executable.
+      sequence: 30
+      summary: C21-M8 regression catalog implementation completed with maintained and quarantine lanes.
+      type: worker.stopped
+      writer:
+        id: root
+        kind: main
+    - event_id: 20f0520081287d374e93507ff5ac60cef39504fd081eb500c30b072eeac83a16
+      occurred_at: 2026-07-12T14:16:42.665Z
+      rationale_summary: Both configurations passed all measured assertions, proving tested non-regression but not a quality advantage.
+      sequence: 31
+      summary: C21-M8 paired Skill evaluation completed all twelve canonical candidate and frozen-baseline runs.
+      type: verification.completed
+      writer:
+        id: root
+        kind: main
+    - event_id: b3a767a36b16d266e0dd6a6027dc54e2e734f4b4e136ee705069220843f6ba73
+      occurred_at: 2026-07-12T14:16:42.712Z
+      rationale_summary: >-
+        All current release gates are green; the installed Official Codex host remains an explicit unsupported-version
+        skip.
+      sequence: 32
+      summary: C21-M8 final maintained regression, packaging, Skill, Hook, config, and diff validation passed.
+      type: verification.completed
+      writer:
+        id: root
+        kind: main
+    - event_id: 5abf169643f63c196d1f12f71417e041e73e24a09c80e24b18832f5f907f2119
+      occurred_at: 2026-07-12T14:16:42.775Z
+      rationale_summary: >-
+        All eight ordered Milestones and aggregate release validation are complete; no Milestone-level acceptance
+        remains.
+      sequence: 33
+      summary: C21 completed M8 and advanced the aggregate Cycle to its one final manual acceptance gate.
+      type: plan.updated
+      writer:
+        id: root
+        kind: main
+    - event_id: d37a9d519b4e3209aac2305d843184f4a1eeda6c5ad0cc77551dd2d4b329f36e
+      occurred_at: 2026-07-12T14:30:41.830Z
+      sequence: 34
+      summary: Issued the exact user-approved C21 delivery.accept Receipt.
+      type: receipt.observed
+      writer:
+        id: root
+        kind: main
+    - event_id: 55e8510f56f536254e98918c48eaf12a06e871138814869ab4eccb780de4fb6d
+      occurred_at: 2026-07-12T14:30:41.956Z
+      sequence: 35
+      summary: Consumed the single-use C21 delivery.accept Receipt after the accepted state transition.
+      type: receipt.observed
+      writer:
+        id: root
+        kind: main
+    - event_id: 0afc3d452b7be774030e7019a664f3815b2ad818a306da8f5f947b559a71845e
+      occurred_at: 2026-07-12T14:30:42.006Z
+      rationale_summary: >-
+        Acceptance closes the core architecture Delivery only; release and VSP integrations remain a separately planned
+        high-impact workflow.
+      sequence: 36
+      summary: The user accepted C21 after reviewing the complete closure, validation, and residual-risk context.
+      type: decision.recorded
+      writer:
+        id: root
+        kind: main
+  recent_verification:
+    event_id: b3a767a36b16d266e0dd6a6027dc54e2e734f4b4e136ee705069220843f6ba73
+    evidence_refs:
+      - .pipeline/reviews/C21/M8/audit.md
+      - .pipeline/reports/07-surface-cleanup-deletion-gate-and-release-ready-regression.report.md
+      - .pipeline/reports/C21-final-closure.report.md
+    occurred_at: 2026-07-12T14:16:42.712Z
+    rationale_summary: >-
+      All current release gates are green; the installed Official Codex host remains an explicit unsupported-version
+      skip.
+    sequence: 32
+    status: pass
+    summary: C21-M8 final maintained regression, packaging, Skill, Hook, config, and diff validation passed.
+    type: verification.completed
+    writer:
+      id: root
+      kind: main
+  scope:
+    - tests/regression-catalog.json
+    - tests/run_core_tests.mjs
+    - tests/run_regression.py
+    - root and Core package test scripts
+  workers:
+    - evidence_refs: []
+      role: skill_eval
+      status: started
+      writer:
+        id: root
+        kind: main
+    - evidence_refs:
+        - .pipeline/reviews/C21/M5/curation-evidence.md
+      role: curator
+      status: stopped
+      writer:
+        id: m5-curator-c21
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M5/final-audit.md
+      role: audit
+      status: stopped
+      writer:
+        id: m5-final-audit
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M5/audit.md
+      role: audit
+      status: stopped
+      writer:
+        id: m5-independent-auditor
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M5/pack-order-implementation-evidence.md
+      role: implement
+      status: stopped
+      writer:
+        id: m5-pack-order-implement
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M5/pack-order-test-evidence.md
+      role: test
+      status: stopped
+      writer:
+        id: m5-pack-order-test
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M5/post-activation-test-evidence.md
+      role: test
+      status: stopped
+      writer:
+        id: m5-post-activation-test
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M6/audit.md
+      role: audit
+      status: stopped
+      writer:
+        id: m6-audit
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M6/implementation-evidence.md
+      role: implement
+      status: stopped
+      writer:
+        id: m6-implement
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M6/test-evidence.md
+      role: test
+      status: stopped
+      writer:
+        id: m6-test-r2
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M7/audit.md
+      role: audit
+      status: stopped
+      writer:
+        id: m7-audit
+        kind: subagent
+    - evidence_refs: []
+      role: research
+      status: stopped
+      writer:
+        id: m7-codex-research
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M7/implementation-evidence.md
+      role: implement
+      status: stopped
+      writer:
+        id: m7-implement
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M7/independent-test-evidence.md
+        - core/test/c21-m7-adversarial.test.js
+      role: test
+      status: stopped
+      writer:
+        id: m7-independent-test
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M7/r2-retest-evidence.md
+      role: test
+      status: stopped
+      writer:
+        id: m7-r2-retest
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M7/r2-test-evidence.md
+        - core/test/c21-m7-audit-findings.test.js
+      role: test
+      status: stopped
+      writer:
+        id: m7-r2-test
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M7/reaudit.md
+      role: audit
+      status: stopped
+      writer:
+        id: m7-reaudit
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M7/retest-evidence.md
+      role: test
+      status: stopped
+      writer:
+        id: m7-retest
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M7/test-evidence.md
+      role: test
+      status: stopped
+      writer:
+        id: m7-test
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M8/dependency-scan.md
+        - .pipeline/reviews/C21/M8/classification-proposal.json
+      role: scan
+      status: started
+      writer:
+        id: m8-dependency-scan
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M8/core-implementation-evidence.md
+      role: implement
+      status: stopped
+      writer:
+        id: m8-implement-core
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M8/surface-implementation-evidence.md
+      role: implement
+      status: stopped
+      writer:
+        id: m8-implement-surface
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M8/postdelete-test-evidence.md
+      role: test
+      status: stopped
+      writer:
+        id: m8-postdelete-test
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M8/predelete-test-evidence.md
+      role: test
+      status: stopped
+      writer:
+        id: m8-predelete-test
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M8/regression-catalog-implementation-evidence.md
+      role: implement
+      status: stopped
+      writer:
+        id: m8-regression-catalog-implement
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M8/regression-contract-test-evidence.md
+        - core/test/c21-m8-regression-contract.test.js
+        - tests/scenarios/c21
+      role: test
+      status: stopped
+      writer:
+        id: m8-regression-contract-test
+        kind: subagent
+    - evidence_refs:
+        - .pipeline/reviews/C21/M8/test-evidence.md
+      role: test
+      status: started
+      writer:
+        id: m8-test
+        kind: subagent
+cursor:
+  object_ref:
+    id: c21
+    kind: delivery
+  schema_version: '1'
+  streams:
+    - event_id: 3a6fe366f937c19eb65dbbed0de5503893ebb6f1d8a966b665f81d2fbe1862ad
+      segment_id: '00000001'
+      sequence: 21
+      session_id: c21-m5-cutover
+      writer:
+        id: root
+        kind: main
+    - event_id: c6226578340c2921f8759e665cfe1d8071963bdd76b7a863b1e33f4883b3a384
+      segment_id: '00000001'
+      sequence: 5
+      session_id: c21-m6-usable-checkpoint
+      writer:
+        id: root
+        kind: main
+    - event_id: a4f1f2b5283ceab53c039dd0d2af3d566542b46799a5a9e19bc9a911407dcba4
+      segment_id: '00000001'
+      sequence: 23
+      session_id: c21-m7
+      writer:
+        id: root
+        kind: main
+    - event_id: 0afc3d452b7be774030e7019a664f3815b2ad818a306da8f5f947b559a71845e
+      segment_id: '00000001'
+      sequence: 36
+      session_id: c21-m8
+      writer:
+        id: root
+        kind: main
+object_ref:
+  id: c21
+  kind: delivery
+schema_version: '1'
+semantic_hash: 4cdcaa7e051487208d2f2edef95549410a323e9c92c6a3da9bf41493505085cf
+sources:
+  continuation:
+    object_ref:
+      id: c21
+      kind: delivery
+    semantic_hash: 460cfe8190a7305b2fe45410e7d8e08fd01bbf928549f787c7a405d7bf545037
+    type: continuation
+  receipts:
+    - id: receipt-11f1630faba84b0bb53630fd2ee5c1df
+      plan_hash: 2bbfa6ff4d1354bcdef2543c4d44bb8b844e7dd266fbc5f95cb5f6d1372176ac
+      scope_hash: 77f98ba2ed55f2dfe1faa2f6a577c65fb616b4b020ce878477ebac1501ebdd79
+      state: consumed
+      type: receipt
+    - id: receipt-a0f5ec3cbaa673881847c261fad88404
+      plan_hash: 92fe9595e1a3562a9bd39a380471d6a597b5f7949901baa7f747f30618662fd2
+      scope_hash: 875b1ffe438fa2ac52b8494cd620751a09373bd9f5a122c42f603d1b96da83d2
+      state: consumed
+      type: receipt
+  records:
+    - id: decision-01879e62fb63a6e39f82d0acac18ea0b
+      semantic_hash: 01879e62fb63a6e39f82d0acac18ea0b0f6d3a1405d7d0503a8250feddb4cc3f
+      type: record
+    - id: decision-14ad4beb08b5947edf194f9ced4945e2
+      semantic_hash: 14ad4beb08b5947edf194f9ced4945e27044679e6c50f19c2b3f72deb808fc99
+      type: record
+    - id: decision-2781e42f50ffefa833b55042b3a799ee
+      semantic_hash: 2781e42f50ffefa833b55042b3a799ee023e1feaa3a3709a349921e14c3ea826
+      type: record
+    - id: decision-286fab099f28f9b92312fd13c0cc1a91
+      semantic_hash: 286fab099f28f9b92312fd13c0cc1a91062ea698010218fb16eda54330f7de54
+      type: record
+    - id: decision-31ef001746bad4f75cc16f906df033b6
+      semantic_hash: 31ef001746bad4f75cc16f906df033b6949e702963d78b43fd476f24849be23e
+      type: record
+    - id: decision-392888aac1a55531a870a4f2040a48f9
+      semantic_hash: 392888aac1a55531a870a4f2040a48f9a362763e0d232bfd5c8d4edec8c4884e
+      type: record
+    - id: decision-3e48a8089466f514641d26f4a9c6a94c
+      semantic_hash: 3e48a8089466f514641d26f4a9c6a94cfe894d17c9f059c34558b42b952055ef
+      type: record
+    - id: decision-4dcaf78c96a385a98a3228e44da69747
+      semantic_hash: 4dcaf78c96a385a98a3228e44da6974747a586b3dfd03aa37d1acbe710509318
+      type: record
+    - id: decision-4ecdd3bbde809617de5ad30b081373f2
+      semantic_hash: 4ecdd3bbde809617de5ad30b081373f24d5229ac790a5a42d3f1a4d92c3d3824
+      type: record
+    - id: decision-6220729afbd9f6fbce52c39c317c330d
+      semantic_hash: 6220729afbd9f6fbce52c39c317c330da0029c856ec7b48e7f23dc3f08c6c974
+      type: record
+    - id: decision-7356b0a9bd8eaa0cea04437082b0c010
+      semantic_hash: 7356b0a9bd8eaa0cea04437082b0c01032a61c937f9fcfaaa6af44c4722ea86d
+      type: record
+    - id: decision-7417f3deb203b117c5aaef25684c8533
+      semantic_hash: 7417f3deb203b117c5aaef25684c8533ab1287720362824ac30e40e6a4435716
+      type: record
+    - id: decision-795ced1ac2116be9b101b6abea1eb41f
+      semantic_hash: 795ced1ac2116be9b101b6abea1eb41fe8b16070e9c08168d476c83783166f03
+      type: record
+    - id: decision-7a63d8b82a42e5fbae1f8462542de1da
+      semantic_hash: 7a63d8b82a42e5fbae1f8462542de1da90fd2a971f5db30ada1a030d755173f5
+      type: record
+    - id: decision-7db62ec48d26f0a932ca534723106305
+      semantic_hash: 7db62ec48d26f0a932ca5347231063059352439043ba4d5bee19aff58831773c
+      type: record
+    - id: decision-9a6060d4567e684b182e3d0823e9f8b9
+      semantic_hash: 9a6060d4567e684b182e3d0823e9f8b9393ac8480a5d0ce2459e089a080197d0
+      type: record
+    - id: decision-af3afd6b32d3a919d8f20f803280f856
+      semantic_hash: af3afd6b32d3a919d8f20f803280f8565f99ec610994bb6fa22a9481e84fb15c
+      type: record
+    - id: decision-b909f6e5663b65dc0fb2099067e42d3c
+      semantic_hash: b909f6e5663b65dc0fb2099067e42d3c89cf875234c73c2b5fa94c9ff9436ef6
+      type: record
+    - id: decision-c14e95505c675841696d374f7dfb12f4
+      semantic_hash: c14e95505c675841696d374f7dfb12f4188827f72b1402e62b942bc4b780bf75
+      type: record
+    - id: decision-c4b2db75360785e04a5e0ee61100abf6
+      semantic_hash: c4b2db75360785e04a5e0ee61100abf6192ca626f12a6de3d887e3df631ee903
+      type: record
+    - id: decision-c4e0960f0e66eb2d26b63e12a1def59f
+      semantic_hash: c4e0960f0e66eb2d26b63e12a1def59f09dda02d010ae0009980fa89d17a451c
+      type: record
+    - id: decision-d797ec8b71f786fc4ff80b79bddaf7f1
+      semantic_hash: d797ec8b71f786fc4ff80b79bddaf7f18283724a88cf954c348aa9dd263a8df1
+      type: record
+    - id: decision-db88a448e1deb0918c1e61a1aba1e475
+      semantic_hash: db88a448e1deb0918c1e61a1aba1e4754a0fe78d1ee282ae402da4bc8fb8ea4b
+      type: record
+    - id: decision-eb18f86042fcffc6b3c94ef1e2684424
+      semantic_hash: eb18f86042fcffc6b3c94ef1e26844241e6a2ccd0d739c6c06a377eef010f42a
+      type: record
+    - id: decision-f8e8e63dd30d8a90c572e1a699a19f21
+      semantic_hash: f8e8e63dd30d8a90c572e1a699a19f217f372c903230c8d133bcddf70a968027
+      type: record
+    - id: decision-f94caf102e67e22abc3ed3b57d439e41
+      semantic_hash: f94caf102e67e22abc3ed3b57d439e4126c7bdec2aaedb8fbc097d2197c15204
+      type: record
+    - id: feedback-00e4158e15cc6c1ee730296a9b776f53
+      semantic_hash: 00e4158e15cc6c1ee730296a9b776f53129cf3f822629ab606c6fdb9cd2c00a6
+      type: record
+    - id: feedback-8442e50a859a28f7393182f66666ac79
+      semantic_hash: 8442e50a859a28f7393182f66666ac791e59065bbb21d5b4782a5f2f4b061fce
+      type: record
+    - id: feedback-91a4f46046c59794010afce14819f010
+      semantic_hash: 91a4f46046c59794010afce14819f0103cda743267367d1b3403fcae4b36e259
+      type: record
+    - id: feedback-9218e742beeacbd8adb9c2b0dccc645f
+      semantic_hash: 9218e742beeacbd8adb9c2b0dccc645fb396c630c4ebcf09b31bbe163f5fbde0
+      type: record
+    - id: feedback-c763ea6f517ad7059284d02910992828
+      semantic_hash: c763ea6f517ad7059284d029109928281c0d4f179839176d6ca2ae685864014a
+      type: record
+    - id: feedback-fc067d08fc454424981f2aa58aa0888d
+      semantic_hash: fc067d08fc454424981f2aa58aa0888d3f8b151c01f09d9f4a0e2b518205a86d
+      type: record
+    - id: preference-567f6bfd3bfee347fa1b0c96b47d8abe
+      semantic_hash: 567f6bfd3bfee347fa1b0c96b47d8abe5353cfce1b169a9eb77cac42daf7a9f7
+      type: record
+    - id: requirement-0718546aea18774ae04dbee96cef9c50
+      semantic_hash: 0718546aea18774ae04dbee96cef9c5009a8a2a81eeafd5312771b154c9dcc64
+      type: record
+    - id: requirement-0b44d0a7bf7713ab3abf4290cb265b6c
+      semantic_hash: 0b44d0a7bf7713ab3abf4290cb265b6c6f462c5bc72eeab8fcc31d9f1df79772
+      type: record
+    - id: requirement-3586d0c048712ec796f9d90fb75be8f0
+      semantic_hash: 3586d0c048712ec796f9d90fb75be8f0757922316536d5bc1a302f94d0ad32c0
+      type: record
+    - id: requirement-4867abfc7866a9f8d11677e284c4375b
+      semantic_hash: 4867abfc7866a9f8d11677e284c4375b18ece72be7a17f19498fbb6904c915af
+      type: record
+    - id: requirement-7a04b01fb7d3941f42b7c605b61a6de5
+      semantic_hash: 7a04b01fb7d3941f42b7c605b61a6de58119cb76a3340e8fdc7b95815aa05f43
+      type: record
+    - id: requirement-7afeee592a8ed10bda80e7344b981d88
+      semantic_hash: 7afeee592a8ed10bda80e7344b981d8834e7d1994e3f9b6b368446d83b2c7999
+      type: record
+    - id: requirement-7d0c723bd96e2dc4b5cebd990e72be76
+      semantic_hash: 7d0c723bd96e2dc4b5cebd990e72be76421d7e7ad60bafaa3dd88c5435704493
+      type: record
+    - id: requirement-aec5ac2b5d0b0f1cf2bd5a0f66d544ae
+      semantic_hash: aec5ac2b5d0b0f1cf2bd5a0f66d544ae57ffbd1e860e3261e5e0d1578b13d499
+      type: record
+    - id: requirement-c364ecf8e0d7b70a766ea730613f256b
+      semantic_hash: c364ecf8e0d7b70a766ea730613f256bad6379dada0a27b197c8db5a395fbce5
+      type: record
+    - id: requirement-f96524166e1a8217674e9480be062afc
+      semantic_hash: f96524166e1a8217674e9480be062afc7878210ed3d497e8a5250385d9edf971
+      type: record

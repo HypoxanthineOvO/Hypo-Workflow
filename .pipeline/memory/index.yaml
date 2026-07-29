@@ -1,0 +1,1401 @@
+active_by_dedupe_key:
+  c16-delivered-but-not-human-accepted: feedback-00e4158e15cc6c1ee730296a9b776f53
+  c21:m5:bootstrap-activation-accepted: decision-db88a448e1deb0918c1e61a1aba1e475
+  cycle.c23-experiment-management.feedback.492b5eb524d3d0ec: feedback-542a04ff0c7db58769911941cc18aedb
+  cycle.c23-experiment-management.plan: decision-861cb23500113ed79b04c1b99f29ee2e
+  cycle.vspi-symbiotic-workflow-core.plan: decision-7abb9842e8e446a8968aab7e3bd8f366
+  delivery:vspi-symbiotic-workflow-core:replace-plan-with-goal: feedback-2127b84c8d5667c43f93f06baa8c128a
+  goal.g22-vsp-distribution-contract.plan: decision-b00efe9e0c4f436329957788887099e8
+  goal.vspi-symbiotic-workflow-goal.plan: decision-a2d4390ad9175886f5dbce69a7ce14d9
+  hypo-workflow:externalizable-domain-pack-boundary: decision-14ad4beb08b5947edf194f9ced4945e2
+  localization/zh-cn-canonical-headings: requirement-7a04b01fb7d3941f42b7c605b61a6de5
+  migration/c12-archive-status-conflict: feedback-8442e50a859a28f7393182f66666ac79
+  privacy/evidence-redact-before-persist-render: requirement-f96524166e1a8217674e9480be062afc
+  project:adapters:capability-map-native-registration-and-hook-semantics: decision-01879e62fb63a6e39f82d0acac18ea0b
+  project:analysis:durable-lane-and-execution-boundaries: decision-9a6060d4567e684b182e3d0823e9f8b9
+  project:architecture:skill-first-single-authority: decision-3e48a8089466f514641d26f4a9c6a94c
+  project:authority:user-directives-and-grants: decision-286fab099f28f9b92312fd13c0cc1a91
+  project:c21:m1-accepted-kernel-baseline: decision-c4b2db75360785e04a5e0ee61100abf6
+  project:c21:m2-accepted-authority-baseline: decision-b909f6e5663b65dc0fb2099067e42d3c
+  project:c21:m3-accepted-recovery-baseline: decision-af3afd6b32d3a919d8f20f803280f856
+  project:c21:m4-accepted-init-router-baseline: decision-6220729afbd9f6fbce52c39c317c330d
+  project:c21:m5-reference-bootstrap-cutover-contract: requirement-0b44d0a7bf7713ab3abf4290cb265b6c
+  project:c21:m6-goal-cycle-adaptive-plan-route: requirement-3586d0c048712ec796f9d90fb75be8f0
+  project:c21:m7-maintain-codex-hook-route: requirement-0718546aea18774ae04dbee96cef9c50
+  project:c21:m8-cleanup-deletion-gate-route: requirement-aec5ac2b5d0b0f1cf2bd5a0f66d544ae
+  project:commands:c21-nine-command-public-surface: decision-c14e95505c675841696d374f7dfb12f4
+  project:concurrency:crash-safe-nonblocking-coordination: requirement-50d48cbaf43d48807074994ffa8db7ef
+  project:concurrency:multi-workstream-multi-model: requirement-1bd6c8a10c8798a85406759fc6cd32e2
+  project:delivery:peer-kinds-explicit-start-manual-acceptance: decision-c4e0960f0e66eb2d26b63e12a1def59f
+  project:execution:risk-based-worker-separation: requirement-4867abfc7866a9f8d11677e284c4375b
+  project:hypo-workflow:decision:audit-quality-optimize-separation: decision-f94caf102e67e22abc3ed3b57d439e41
+  project:hypo-workflow:decision:audit-source-id-closure-matrix: decision-4dcaf78c96a385a98a3228e44da69747
+  project:hypo-workflow:decision:integration-sync-internal-release-gate: decision-7a63d8b82a42e5fbae1f8462542de1da
+  project:hypo-workflow:decision:platform-neutral-readme: decision-eb18f86042fcffc6b3c94ef1e2684424
+  project:hypo-workflow:decision:portable-core-boundaries: decision-31ef001746bad4f75cc16f906df033b6
+  project:hypo-workflow:decision:source-managed-target-owned-boundary: decision-7417f3deb203b117c5aaef25684c8533
+  project:hypo-workflow:explore-worktree-isolation-and-dirty-gate: decision-392888aac1a55531a870a4f2040a48f9
+  project:hypo-workflow:feedback:c17-unresolved-architecture-quality-followups: feedback-9218e742beeacbd8adb9c2b0dccc645f
+  project:hypo-workflow:feedback:c20-target-local-continuations: feedback-c763ea6f517ad7059284d02910992828
+  project:hypo-workflow:requirement:consultation-first-action-boundary: requirement-c364ecf8e0d7b70a766ea730613f256b
+  project:lifecycle:transaction-and-derived-coherence: decision-795ced1ac2116be9b101b6abea1eb41f
+  project:maintain:path-helper-workspace-revalidation: feedback-fc067d08fc454424981f2aa58aa0888d
+  project:recovery:journal-capsule-pack-authority: decision-2781e42f50ffefa833b55042b3a799ee
+  project:roadmap:c21-deferred-scope: decision-7356b0a9bd8eaa0cea04437082b0c010
+  project:safety:high-impact-gates-and-scoped-automation: requirement-7d0c723bd96e2dc4b5cebd990e72be76
+  project:stash:implementation-model: decision-d797ec8b71f786fc4ff80b79bddaf7f1
+  project:ux:completion-report-substance-in-conversation: preference-567f6bfd3bfee347fa1b0c96b47d8abe
+  project:validation:dynamic-selection-localization-installed-freshness: requirement-7afeee592a8ed10bda80e7344b981d88
+  project:validation:external-effects-and-release-evidence: feedback-91a4f46046c59794010afce14819f010
+  project:vspi:concurrent-workstream-crashsafe-architecture: decision-884fd919aa8a5fb6b64bdb00e7d2405e
+  project:vspi:embedded-node-core-boundary: decision-72848fe812d37fe66a668df82930ec57
+  project:vspi:explicit-auto-group-switching: decision-65a61a9a8e0b3a9cd7b0e247f7024e38
+  project:vspi:model-group-tier-capability-contract: decision-632e54cd38ccd9e7f74858578dfc33ee
+  project:vspi:plan-binding-version-boundary: decision-2ac6733ee109b6f73b33d8627b7cac6d
+  project:vspi:uninitialized-plan-requires-explicit-init: decision-d95fcf9dbd4704b7cf3aba5a0735bfb7
+  project:vspi:workflow-symbiosis-scope: requirement-64814bf483a3132383329915eb163c58
+authority_role: derived
+records:
+  - active: true
+    confidence: high
+    created_at: 2026-05-14T23:30:00+08:00
+    dedupe_key: project:adapters:capability-map-native-registration-and-hook-semantics
+    id: decision-01879e62fb63a6e39f82d0acac18ea0b
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-01879e62fb63a6e39f82d0acac18ea0b.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 01879e62fb63a6e39f82d0acac18ea0b0f6d3a1405d7d0503a8250feddb4cc3f
+    source_refs:
+      - locator: .pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/knowledge-summary.md
+        ref: >-
+          .pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/knowledge-summary.md#Pitfalls /
+          C6-SYNC-claude-opencode-codex-interface-map-20260505
+        type: legacy_file
+      - locator: .pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/summary.md
+        ref: >-
+          .pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/summary.md#Cycle summary and
+          Milestone 摘要 / M02-M04
+        type: legacy_file
+      - locator: .pipeline/archives/C9-configuration-governance-pr-explain-claude-resume/cycle.yaml
+        ref: .pipeline/archives/C9-configuration-governance-pr-explain-claude-resume/cycle.yaml#cycle.lessons[2]
+        type: legacy_file
+      - locator: .pipeline/archives/C9-configuration-governance-pr-explain-claude-resume/summary.md
+        ref: >-
+          .pipeline/archives/C9-configuration-governance-pr-explain-claude-resume/summary.md#Summary and Milestones
+          M09-M10
+        type: legacy_file
+      - locator: .pipeline/reports/C21-core-cutover-bootstrap-scope.md
+        ref: .pipeline/reports/C21-core-cutover-bootstrap-scope.md#后续 Cycle; 当前版本目标; 兼容策略
+        type: legacy_file
+      - locator: .pipeline/archives/C20-consultation-first-action-boundary/knowledge-summary.md
+        ref: >-
+          legacy-file:.pipeline/archives/C20-consultation-first-action-boundary/knowledge-summary.md#Dependencies,
+          Pitfalls, and Decisions: C6-SYNC interface map
+        type: legacy_file
+      - locator: .pipeline/archives/C13-opencode-ux-enhancement/cycle.yaml
+        ref: legacy:C13/cycle#cycle.status
+        type: legacy_file
+      - locator: .pipeline/archives/C13-opencode-ux-enhancement/summary.md
+        ref: 'legacy:C13/summary#Knowledge summary: OpenCode command registration'
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-12T07:00:47+08:00
+    dedupe_key: hypo-workflow:externalizable-domain-pack-boundary
+    id: decision-14ad4beb08b5947edf194f9ced4945e2
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-14ad4beb08b5947edf194f9ced4945e2.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 14ad4beb08b5947edf194f9ced4945e27044679e6c50f19c2b3f72deb808fc99
+    source_refs:
+      - locator: .pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/knowledge-summary.md
+        ref: >-
+          .pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/knowledge-summary.md#Decisions /
+          C8-PLAN-domain-pack-boundary-and-review-rules-20260506
+        type: legacy_file
+      - locator: .pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md
+        ref: .pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md#Summary and Milestones / M07-M09
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T07:09:58+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-11T20:49:59+08:00
+    dedupe_key: project:recovery:journal-capsule-pack-authority
+    id: decision-2781e42f50ffefa833b55042b3a799ee
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-2781e42f50ffefa833b55042b3a799ee.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 2781e42f50ffefa833b55042b3a799ee023e1feaa3a3709a349921e14c3ea826
+    source_refs:
+      - locator: .pipeline/architecture.md
+        ref: .pipeline/architecture.md#Recovery Flow
+        type: legacy_file
+      - locator: .pipeline/reports/C21-recovery-journal-compaction-design.md
+        ref: >-
+          .pipeline/reports/C21-recovery-journal-compaction-design.md#核心判断; Recovery Journal; Incremental Context
+          Capsule; Recovery Pack; 存储与隐私
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-11T20:49:59+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-11T20:24:08+08:00
+    dedupe_key: project:authority:user-directives-and-grants
+    id: decision-286fab099f28f9b92312fd13c0cc1a91
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-286fab099f28f9b92312fd13c0cc1a91.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 286fab099f28f9b92312fd13c0cc1a91062ea698010218fb16eda54330f7de54
+    source_refs:
+      - locator: .pipeline/architecture.md
+        ref: .pipeline/architecture.md#Command Exposure
+        type: legacy_file
+      - locator: .pipeline/reports/01-runtime-records-receipts-and-snapshots.report.md
+        ref: >-
+          .pipeline/reports/01-runtime-records-receipts-and-snapshots.report.md#Completion Narrative; Delivered
+          Architecture
+        type: legacy_file
+      - locator: .pipeline/reports/C21-core-cutover-bootstrap-scope.md
+        ref: .pipeline/reports/C21-core-cutover-bootstrap-scope.md#兼容策略
+        type: legacy_file
+      - locator: .pipeline/reports/C21-unified-architecture-design.md
+        ref: .pipeline/reports/C21-unified-architecture-design.md#核心原则; 权威分配
+        type: legacy_file
+    supersedes:
+      - decision-7db62ec48d26f0a932ca534723106305
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-23T14:58:18.865Z
+    dedupe_key: project:vspi:plan-binding-version-boundary
+    id: decision-2ac6733ee109b6f73b33d8627b7cac6d
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-2ac6733ee109b6f73b33d8627b7cac6d.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 2ac6733ee109b6f73b33d8627b7cac6dd6d2d9d748d4bb27abb11933c39fcc3e
+    source_refs:
+      - locator: confirmed scope and model-group decision
+        ref: conversation/vspi-workflow-symbiosis-2026-07-23
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-07-23T14:58:18.865Z
+  - active: true
+    confidence: high
+    created_at: 2026-07-11T20:24:08+08:00
+    dedupe_key: project:hypo-workflow:decision:portable-core-boundaries
+    id: decision-31ef001746bad4f75cc16f906df033b6
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-31ef001746bad4f75cc16f906df033b6.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 31ef001746bad4f75cc16f906df033b6949e702963d78b43fd476f24849be23e
+    source_refs:
+      - locator: .pipeline/reports/01-runtime-records-receipts-and-snapshots.report.md
+        ref: >-
+          .pipeline/reports/01-runtime-records-receipts-and-snapshots.report.md#Completion Narrative; Delivered
+          Architecture
+        type: legacy_file
+      - locator: .pipeline/reports/C21-unified-architecture-design.md
+        ref: .pipeline/reports/C21-unified-architecture-design.md#核心原则; 权威分配
+        type: legacy_file
+      - locator: .pipeline/archives/C17-audit-remediation-and-architecture-debt-reduction/cycle.yaml
+        ref: >-
+          legacy-file:.pipeline/archives/C17-audit-remediation-and-architecture-debt-reduction/cycle.yaml#cycle.summary
+          and cycle.acceptance
+        type: legacy_file
+      - locator: .pipeline/archives/C17-audit-remediation-and-architecture-debt-reduction/summary.md
+        ref: >-
+          legacy-file:.pipeline/archives/C17-audit-remediation-and-architecture-debt-reduction/summary.md#Milestone 摘要,
+          关键结果, and 完成说明
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-12T07:00:44+08:00
+    dedupe_key: project:hypo-workflow:explore-worktree-isolation-and-dirty-gate
+    id: decision-392888aac1a55531a870a4f2040a48f9
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-392888aac1a55531a870a4f2040a48f9.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 392888aac1a55531a870a4f2040a48f9a362763e0d232bfd5c8d4edec8c4884e
+    source_refs:
+      - locator: .pipeline/archives/C4-knowledge-ledger-global-tui-acceptance-loop-explore-mode/summary.md
+        ref: .pipeline/archives/C4-knowledge-ledger-global-tui-acceptance-loop-explore-mode/summary.md#L28-L29
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T07:00:44+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-11T20:24:08+08:00
+    dedupe_key: project:architecture:skill-first-single-authority
+    id: decision-3e48a8089466f514641d26f4a9c6a94c
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-3e48a8089466f514641d26f4a9c6a94c.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 3e48a8089466f514641d26f4a9c6a94cfe894d17c9f059c34558b42b952055ef
+    source_refs:
+      - locator: .pipeline/architecture.md
+        ref: .pipeline/architecture.md#Product Boundary; Physical Layout
+        type: legacy_file
+      - locator: .pipeline/reports/C21-unified-architecture-design.md
+        ref: .pipeline/reports/C21-unified-architecture-design.md#核心原则; 权威分配
+        type: legacy_file
+    supersedes:
+      - decision-4ecdd3bbde809617de5ad30b081373f2
+    updated_at: 2026-07-11T20:24:08+08:00
+  - active: true
+    confidence: 0.99
+    created_at: 2026-07-12T07:08:38+08:00
+    dedupe_key: project:hypo-workflow:decision:audit-source-id-closure-matrix
+    id: decision-4dcaf78c96a385a98a3228e44da69747
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-4dcaf78c96a385a98a3228e44da69747.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 4dcaf78c96a385a98a3228e44da6974747a586b3dfd03aa37d1acbe710509318
+    source_refs:
+      - locator: .pipeline/archives/C17-audit-remediation-and-architecture-debt-reduction/cycle.yaml
+        ref: legacy-file:.pipeline/archives/C17-audit-remediation-and-architecture-debt-reduction/cycle.yaml#cycle.lessons
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T07:08:38+08:00
+  - active: false
+    confidence: high
+    created_at: 2026-05-21T01:30:00+08:00
+    dedupe_key: project:architecture:skill-first-single-authority
+    id: decision-4ecdd3bbde809617de5ad30b081373f2
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-4ecdd3bbde809617de5ad30b081373f2.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 4ecdd3bbde809617de5ad30b081373f24d5229ac790a5a42d3f1a4d92c3d3824
+    source_refs:
+      - locator: .pipeline/archives/C2-new-cycle/architecture-snapshot.md
+        ref: .pipeline/archives/C2-new-cycle/architecture-snapshot.md#L8-L9
+        type: legacy_file
+      - locator: .pipeline/archives/C3-opencode-multi-agent-matrix-and-v10-analysis-preset/architecture-snapshot.md
+        ref: .pipeline/archives/C3-opencode-multi-agent-matrix-and-v10-analysis-preset/architecture-snapshot.md#L8-L9
+        type: legacy_file
+      - locator: .pipeline/archives/C16-root-project-management-mode/cycle.yaml
+        ref: legacy:C16/cycle#cycle.status and cycle.acceptance.state
+        type: legacy_file
+      - locator: .pipeline/archives/C16-root-project-management-mode/summary.md
+        ref: 'legacy:C16/summary#Completion notes: technical approach and authority boundary'
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-12T06:32:43+08:00
+    dedupe_key: project:c21:m4-accepted-init-router-baseline
+    id: decision-6220729afbd9f6fbce52c39c317c330d
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-6220729afbd9f6fbce52c39c317c330d.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 6220729afbd9f6fbce52c39c317c330da0029c856ec7b48e7f23dc3f08c6c974
+    source_refs:
+      - locator: .pipeline/reports/03-init-workspace-adoption-and-minimal-skill-router.report.md
+        ref: >-
+          .pipeline/reports/03-init-workspace-adoption-and-minimal-skill-router.report.md#Completion Narrative;
+          Delivered Architecture; Architecture Plan Review
+        type: legacy_file
+      - locator: .pipeline/reviews/C21/M4/final-audit.md
+        ref: .pipeline/reviews/C21/M4/final-audit.md#结论; 通过的功能与架构边界; Residual Risks
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T06:32:43+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-23T14:58:18.865Z
+    dedupe_key: project:vspi:model-group-tier-capability-contract
+    id: decision-632e54cd38ccd9e7f74858578dfc33ee
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-632e54cd38ccd9e7f74858578dfc33ee.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 632e54cd38ccd9e7f74858578dfc33ee3b2225ad1db6e3ee8e5014451612f025
+    source_refs:
+      - locator: confirmed scope and model-group decision
+        ref: conversation/vspi-workflow-symbiosis-2026-07-23
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-07-23T14:58:18.865Z
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-23T15:10:50.676Z
+    dedupe_key: project:vspi:explicit-auto-group-switching
+    id: decision-65a61a9a8e0b3a9cd7b0e247f7024e38
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-65a61a9a8e0b3a9cd7b0e247f7024e38.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 65a61a9a8e0b3a9cd7b0e247f7024e382a8d6c84cff01e994fcab8a605367d7c
+    source_refs:
+      - locator: confirmed Explicit Auto Group behavior
+        ref: conversation/vspi-workflow-symbiosis-2026-07-23
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-07-23T15:10:50.676Z
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-23T14:58:18.865Z
+    dedupe_key: project:vspi:embedded-node-core-boundary
+    id: decision-72848fe812d37fe66a668df82930ec57
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-72848fe812d37fe66a668df82930ec57.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 72848fe812d37fe66a668df82930ec57f4f9732620e00868c9a7fef741ce8c36
+    source_refs:
+      - locator: confirmed scope and model-group decision
+        ref: conversation/vspi-workflow-symbiosis-2026-07-23
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-07-23T14:58:18.865Z
+  - active: true
+    confidence: high
+    created_at: 2026-07-11T20:39:36+08:00
+    dedupe_key: project:roadmap:c21-deferred-scope
+    id: decision-7356b0a9bd8eaa0cea04437082b0c010
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-7356b0a9bd8eaa0cea04437082b0c010.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 7356b0a9bd8eaa0cea04437082b0c01032a61c937f9fcfaaa6af44c4722ea86d
+    source_refs:
+      - locator: .pipeline/architecture.md
+        ref: .pipeline/architecture.md#Deferred Scope
+        type: legacy_file
+      - locator: .pipeline/reports/C21-core-cutover-bootstrap-scope.md
+        ref: .pipeline/reports/C21-core-cutover-bootstrap-scope.md#后续 Cycle; 当前版本目标; 兼容策略
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-11T20:39:36+08:00
+  - active: true
+    confidence: 0.99
+    created_at: 2026-07-12T07:08:38+08:00
+    dedupe_key: project:hypo-workflow:decision:source-managed-target-owned-boundary
+    id: decision-7417f3deb203b117c5aaef25684c8533
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-7417f3deb203b117c5aaef25684c8533.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 7417f3deb203b117c5aaef25684c8533ab1287720362824ac30e40e6a4435716
+    source_refs:
+      - locator: .pipeline/archives/C20-consultation-first-action-boundary/cycle.yaml
+        ref: >-
+          legacy-file:.pipeline/archives/C20-consultation-first-action-boundary/cycle.yaml#cycle.summary and
+          cycle.continuations
+        type: legacy_file
+      - locator: .pipeline/archives/C20-consultation-first-action-boundary/summary.md
+        ref: legacy-file:.pipeline/archives/C20-consultation-first-action-boundary/summary.md#改动摘要, C20-M4, and 风险与后续
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T07:08:38+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-12T00:21:05+08:00
+    dedupe_key: project:lifecycle:transaction-and-derived-coherence
+    id: decision-795ced1ac2116be9b101b6abea1eb41f
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-795ced1ac2116be9b101b6abea1eb41f.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 795ced1ac2116be9b101b6abea1eb41fe8b16070e9c08168d476c83783166f03
+    source_refs:
+      - locator: .pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/summary.md
+        ref: >-
+          .pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/summary.md#Milestone 摘要 / M03,
+          M07, M08
+        type: legacy_file
+      - locator: .pipeline/reports/00-workspace-format-transaction-kernel-and-legacy-write-fence.report.md
+        ref: >-
+          .pipeline/reports/00-workspace-format-transaction-kernel-and-legacy-write-fence.report.md#Completion
+          Narrative; Delivered Architecture; Test Results
+        type: legacy_file
+      - locator: .pipeline/reports/02-recovery-journal-capsule-and-pack-engine.report.md
+        ref: >-
+          .pipeline/reports/02-recovery-journal-capsule-and-pack-engine.report.md#Completion Narrative; Delivered
+          Architecture; Architecture Plan Review
+        type: legacy_file
+      - locator: .pipeline/archives/C20-consultation-first-action-boundary/knowledge-summary.md
+        ref: >-
+          legacy-file:.pipeline/archives/C20-consultation-first-action-boundary/knowledge-summary.md#Pitfalls: C4-M05
+          state/prompt_state drift
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: 0.99
+    created_at: 2026-07-12T07:08:38+08:00
+    dedupe_key: project:hypo-workflow:decision:integration-sync-internal-release-gate
+    id: decision-7a63d8b82a42e5fbae1f8462542de1da
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-7a63d8b82a42e5fbae1f8462542de1da.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 7a63d8b82a42e5fbae1f8462542de1da90fd2a971f5db30ada1a030d755173f5
+    source_refs:
+      - locator: .pipeline/archives/C18-instruction-quality-review-and-integration-sync-plan/cycle.yaml
+        ref: >-
+          legacy-file:.pipeline/archives/C18-instruction-quality-review-and-integration-sync-plan/cycle.yaml#cycle.summary
+        type: legacy_file
+      - locator: .pipeline/archives/C18-instruction-quality-review-and-integration-sync-plan/summary.md
+        ref: >-
+          legacy-file:.pipeline/archives/C18-instruction-quality-review-and-integration-sync-plan/summary.md#C18-M4
+          through C18-M6 and 完成说明
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T07:08:38+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-23T15:41:39.042Z
+    dedupe_key: cycle.vspi-symbiotic-workflow-core.plan
+    id: decision-7abb9842e8e446a8968aab7e3bd8f366
+    kind: decision
+    path: .pipeline/memory/records/cycle-9ff222eecf7f/decision/decision-7abb9842e8e446a8968aab7e3bd8f366.md
+    scope:
+      ref: vspi-symbiotic-workflow-core
+      type: cycle
+    semantic_hash: 7abb9842e8e446a8968aab7e3bd8f36605f17898689074aa29c8fd2adfaa946f
+    source_refs:
+      - locator: compiled-plan
+        ref: cycle:vspi-symbiotic-workflow-core:revision:0
+        type: delivery_plan
+    supersedes: []
+    updated_at: 2026-07-23T15:41:39.042Z
+  - active: false
+    confidence: high
+    created_at: 2026-07-12T07:00:47+08:00
+    dedupe_key: project:authority:user-directives-and-grants
+    id: decision-7db62ec48d26f0a932ca534723106305
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-7db62ec48d26f0a932ca534723106305.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 7db62ec48d26f0a932ca5347231063059352439043ba4d5bee19aff58831773c
+    source_refs:
+      - locator: .pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/knowledge-summary.md
+        ref: >-
+          .pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/knowledge-summary.md#Decisions /
+          C8-PLAN-domain-pack-boundary-and-review-rules-20260506
+        type: legacy_file
+      - locator: .pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md
+        ref: .pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md#Summary and Milestones / M01-M03
+        type: legacy_file
+      - locator: .pipeline/archives/C20-consultation-first-action-boundary/knowledge-summary.md
+        ref: >-
+          legacy-file:.pipeline/archives/C20-consultation-first-action-boundary/knowledge-summary.md#Decisions: C8-PLAN
+          structured Rules/Habits authority
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-18T07:34:45.334Z
+    dedupe_key: cycle.c23-experiment-management.plan
+    id: decision-861cb23500113ed79b04c1b99f29ee2e
+    kind: decision
+    path: .pipeline/memory/records/cycle-ba7549ec1a47/decision/decision-861cb23500113ed79b04c1b99f29ee2e.md
+    scope:
+      ref: c23-experiment-management
+      type: cycle
+    semantic_hash: 861cb23500113ed79b04c1b99f29ee2eb3bbcded9d9f39ba617bbea100bc5217
+    source_refs:
+      - locator: compiled-plan
+        ref: cycle:c23-experiment-management:revision:1
+        type: delivery_plan
+    supersedes:
+      - decision-eb4cf6e1b6a7f306e53be993cd17e90c
+    updated_at: 2026-07-18T07:34:45.334Z
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-23T15:41:38.768Z
+    dedupe_key: project:vspi:concurrent-workstream-crashsafe-architecture
+    id: decision-884fd919aa8a5fb6b64bdb00e7d2405e
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-884fd919aa8a5fb6b64bdb00e7d2405e.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 884fd919aa8a5fb6b64bdb00e7d2405e8a0fe561b3956f3c88e9998eef99c851
+    source_refs:
+      - locator: confirmed concurrent Workstream and crash-safe recovery architecture
+        ref: conversation/vspi-workflow-symbiosis-2026-07-23
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-07-23T15:41:38.768Z
+  - active: true
+    confidence: high
+    created_at: 2026-05-16T12:40:46+08:00
+    dedupe_key: project:analysis:durable-lane-and-execution-boundaries
+    id: decision-9a6060d4567e684b182e3d0823e9f8b9
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-9a6060d4567e684b182e3d0823e9f8b9.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 9a6060d4567e684b182e3d0823e9f8b9393ac8480a5d0ce2459e089a080197d0
+    source_refs:
+      - locator: .pipeline/archives/C3-opencode-multi-agent-matrix-and-v10-analysis-preset/architecture-snapshot.md
+        ref: .pipeline/archives/C3-opencode-multi-agent-matrix-and-v10-analysis-preset/architecture-snapshot.md#L129-L159
+        type: legacy_file
+      - locator: .pipeline/archives/C3-opencode-multi-agent-matrix-and-v10-analysis-preset/architecture-snapshot.md
+        ref: >-
+          .pipeline/archives/C3-opencode-multi-agent-matrix-and-v10-analysis-preset/architecture-snapshot.md#L35-L45;L84-L103
+        type: legacy_file
+      - locator: .pipeline/archives/C3-opencode-multi-agent-matrix-and-v10-analysis-preset/summary.md
+        ref: .pipeline/archives/C3-opencode-multi-agent-matrix-and-v10-analysis-preset/summary.md#L25-L26
+        type: legacy_file
+      - locator: .pipeline/archives/C3-opencode-multi-agent-matrix-and-v10-analysis-preset/summary.md
+        ref: .pipeline/archives/C3-opencode-multi-agent-matrix-and-v10-analysis-preset/summary.md#L27-L31
+        type: legacy_file
+      - locator: .pipeline/archives/C15-workflow-interaction-analysis-mode/cycle.yaml
+        ref: 'legacy:C15/cycle#cycle.summary: /hw:analysis recovery'
+        type: legacy_file
+      - locator: .pipeline/archives/C15-workflow-interaction-analysis-mode/summary.md
+        ref: 'legacy:C15/summary#Milestones: C15-M3 Interactive Analysis State And Command Entry'
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-23T16:02:49.267Z
+    dedupe_key: goal.vspi-symbiotic-workflow-goal.plan
+    id: decision-a2d4390ad9175886f5dbce69a7ce14d9
+    kind: decision
+    path: .pipeline/memory/records/goal-67be1746a9d7/decision/decision-a2d4390ad9175886f5dbce69a7ce14d9.md
+    scope:
+      ref: vspi-symbiotic-workflow-goal
+      type: goal
+    semantic_hash: a2d4390ad9175886f5dbce69a7ce14d9619dcfc8aeb2fe803f42836c02cc2433
+    source_refs:
+      - locator: compiled-plan
+        ref: goal:vspi-symbiotic-workflow-goal:revision:0
+        type: delivery_plan
+    supersedes: []
+    updated_at: 2026-07-23T16:02:49.267Z
+  - active: true
+    confidence: high
+    created_at: 2026-07-12T04:32:18+08:00
+    dedupe_key: project:c21:m3-accepted-recovery-baseline
+    id: decision-af3afd6b32d3a919d8f20f803280f856
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-af3afd6b32d3a919d8f20f803280f856.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: af3afd6b32d3a919d8f20f803280f8565f99ec610994bb6fa22a9481e84fb15c
+    source_refs:
+      - locator: .pipeline/reports/02-recovery-journal-capsule-and-pack-engine.report.md
+        ref: >-
+          .pipeline/reports/02-recovery-journal-capsule-and-pack-engine.report.md#Completion Narrative; Delivered
+          Architecture; Architecture Plan Review
+        type: legacy_file
+      - locator: .pipeline/reviews/C21/M3/final-audit.md
+        ref: .pipeline/reviews/C21/M3/final-audit.md#Conclusion; First-Audit Closure Matrix; Residual Risks
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T04:32:18+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-12T15:07:05.549Z
+    dedupe_key: goal.g22-vsp-distribution-contract.plan
+    id: decision-b00efe9e0c4f436329957788887099e8
+    kind: decision
+    path: .pipeline/memory/records/goal-2159a8007a27/decision/decision-b00efe9e0c4f436329957788887099e8.md
+    scope:
+      ref: g22-vsp-distribution-contract
+      type: goal
+    semantic_hash: b00efe9e0c4f436329957788887099e8f311a832d4b1bdf98b5d01556dc78476
+    source_refs:
+      - locator: compiled-plan
+        ref: goal:g22-vsp-distribution-contract:revision:0
+        type: delivery_plan
+    supersedes: []
+    updated_at: 2026-07-12T15:07:05.549Z
+  - active: true
+    confidence: high
+    created_at: 2026-07-12T02:42:16+08:00
+    dedupe_key: project:c21:m2-accepted-authority-baseline
+    id: decision-b909f6e5663b65dc0fb2099067e42d3c
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-b909f6e5663b65dc0fb2099067e42d3c.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: b909f6e5663b65dc0fb2099067e42d3c89cf875234c73c2b5fa94c9ff9436ef6
+    source_refs:
+      - locator: .pipeline/reports/01-runtime-records-receipts-and-snapshots.report.md
+        ref: >-
+          .pipeline/reports/01-runtime-records-receipts-and-snapshots.report.md#Completion Narrative; Delivered
+          Architecture
+        type: legacy_file
+      - locator: .pipeline/reviews/C21/M2/reaudit.md
+        ref: .pipeline/reviews/C21/M2/reaudit.md#Conclusion; Closure Matrix; Residual Risks
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T02:42:16+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-11T20:24:08+08:00
+    dedupe_key: project:commands:c21-nine-command-public-surface
+    id: decision-c14e95505c675841696d374f7dfb12f4
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-c14e95505c675841696d374f7dfb12f4.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: c14e95505c675841696d374f7dfb12f4188827f72b1402e62b942bc4b780bf75
+    source_refs:
+      - locator: .pipeline/architecture.md
+        ref: .pipeline/architecture.md#Command Exposure
+        type: legacy_file
+      - locator: .pipeline/archives/C10-experience-optimizations/cycle.yaml
+        ref: .pipeline/archives/C10-experience-optimizations/cycle.yaml#cycle.lessons[0:2]
+        type: legacy_file
+      - locator: .pipeline/prompts/05-goal-cycle-delivery-core-and-adaptive-plan.md
+        ref: .pipeline/prompts/05-goal-cycle-delivery-core-and-adaptive-plan.md#Requirements; Audit Focus
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-12T00:21:05+08:00
+    dedupe_key: project:c21:m1-accepted-kernel-baseline
+    id: decision-c4b2db75360785e04a5e0ee61100abf6
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-c4b2db75360785e04a5e0ee61100abf6.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: c4b2db75360785e04a5e0ee61100abf6192ca626f12a6de3d887e3df631ee903
+    source_refs:
+      - locator: .pipeline/reports/00-workspace-format-transaction-kernel-and-legacy-write-fence.report.md
+        ref: >-
+          .pipeline/reports/00-workspace-format-transaction-kernel-and-legacy-write-fence.report.md#Completion
+          Narrative; Delivered Architecture; Test Results
+        type: legacy_file
+      - locator: .pipeline/reviews/C21/M1/final-audit.md
+        ref: .pipeline/reviews/C21/M1/final-audit.md#Conclusion; Closure Matrix; Residual risk
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T00:21:05+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-11T20:24:08+08:00
+    dedupe_key: project:delivery:peer-kinds-explicit-start-manual-acceptance
+    id: decision-c4e0960f0e66eb2d26b63e12a1def59f
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-c4e0960f0e66eb2d26b63e12a1def59f.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: c4e0960f0e66eb2d26b63e12a1def59f09dda02d010ae0009980fa89d17a451c
+    source_refs:
+      - locator: .pipeline/archives/C4-knowledge-ledger-global-tui-acceptance-loop-explore-mode/summary.md
+        ref: .pipeline/archives/C4-knowledge-ledger-global-tui-acceptance-loop-explore-mode/summary.md#L25-L27
+        type: legacy_file
+      - locator: .pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/cycle.yaml
+        ref: .pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/cycle.yaml#cycle.lessons
+        type: legacy_file
+      - locator: .pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/cycle.yaml
+        ref: >-
+          .pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/cycle.yaml#cycle.lifecycle_policy.auto_continue
+        type: legacy_file
+      - locator: .pipeline/archives/C7-codex-service-effectiveness-and-workflow-governance/cycle.yaml
+        ref: >-
+          .pipeline/archives/C7-codex-service-effectiveness-and-workflow-governance/cycle.yaml#cycle.lifecycle_policy.auto_continue
+        type: legacy_file
+      - locator: .pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/cycle.yaml
+        ref: .pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/cycle.yaml#cycle.lifecycle_policy.auto_continue
+        type: legacy_file
+      - locator: .pipeline/cycle.yaml
+        ref: .pipeline/cycle.yaml#cycle.acceptance; cycle.lifecycle_policy
+        type: legacy_file
+      - locator: .pipeline/reports/C21-unified-architecture-design.md
+        ref: .pipeline/reports/C21-unified-architecture-design.md#对象模型; Delivery 生命周期; 端到端场景
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-11T20:09:41+08:00
+    dedupe_key: project:stash:implementation-model
+    id: decision-d797ec8b71f786fc4ff80b79bddaf7f1
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-d797ec8b71f786fc4ff80b79bddaf7f1.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: d797ec8b71f786fc4ff80b79bddaf7f18283724a88cf954c348aa9dd263a8df1
+    source_refs:
+      - locator: .pipeline/reports/C21-stash-suspend-reconciliation-design.md
+        ref: .pipeline/reports/C21-stash-suspend-reconciliation-design.md#已确认的产品模型; push 记录什么; pop 语义; 冲突策略
+        type: legacy_file
+    supersedes:
+      - decision-f8e8e63dd30d8a90c572e1a699a19f21
+    updated_at: 2026-07-11T20:09:41+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-23T15:09:27.927Z
+    dedupe_key: project:vspi:uninitialized-plan-requires-explicit-init
+    id: decision-d95fcf9dbd4704b7cf3aba5a0735bfb7
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-d95fcf9dbd4704b7cf3aba5a0735bfb7.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: d95fcf9dbd4704b7cf3aba5a0735bfb77cc1f2f844da877873deb06cb575c78c
+    source_refs:
+      - locator: restored answer for uninitialized Plan behavior
+        ref: conversation/vspi-workflow-symbiosis-2026-07-23
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-07-23T15:09:27.927Z
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-12T11:56:42+08:00
+    dedupe_key: c21:m5:bootstrap-activation-accepted
+    id: decision-db88a448e1deb0918c1e61a1aba1e475
+    kind: decision
+    path: .pipeline/memory/records/milestone-6bfaae2a1d53/decision/decision-db88a448e1deb0918c1e61a1aba1e475.md
+    scope:
+      ref: C21:M5
+      type: milestone
+    semantic_hash: db88a448e1deb0918c1e61a1aba1e4754a0fe78d1ee282ae402da4bc8fb8ea4b
+    source_refs:
+      - locator: .pipeline/reports/04-reference-repository-bootstrap-and-schema-activation.report.md
+        ref: .pipeline/reports/04-reference-repository-bootstrap-and-schema-activation.report.md#m5-completion
+        type: workflow_artifact
+      - locator: .pipeline/reviews/C21/M5/architecture-plan-review.md
+        ref: .pipeline/reviews/C21/M5/architecture-plan-review.md#impact
+        type: workflow_artifact
+      - locator: .pipeline/reviews/C21/M5/post-acceptance-regression-evidence.md
+        ref: .pipeline/reviews/C21/M5/post-acceptance-regression-evidence.md#post-acceptance
+        type: workflow_artifact
+    supersedes: []
+    updated_at: 2026-07-12T11:56:42+08:00
+  - active: true
+    confidence: 0.88
+    created_at: 2026-07-12T07:08:38+08:00
+    dedupe_key: project:hypo-workflow:decision:platform-neutral-readme
+    id: decision-eb18f86042fcffc6b3c94ef1e2684424
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-eb18f86042fcffc6b3c94ef1e2684424.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: eb18f86042fcffc6b3c94ef1e26844241e6a2ccd0d739c6c06a377eef010f42a
+    source_refs:
+      - locator: .pipeline/archives/C20-consultation-first-action-boundary/knowledge-summary.md
+        ref: >-
+          legacy-file:.pipeline/archives/C20-consultation-first-action-boundary/knowledge-summary.md#Decisions: C8-DOC
+          platform installation boundary
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T07:08:38+08:00
+  - active: false
+    confidence: confirmed
+    created_at: 2026-07-16T12:22:18.186Z
+    dedupe_key: cycle.c23-experiment-management.plan
+    id: decision-eb4cf6e1b6a7f306e53be993cd17e90c
+    kind: decision
+    path: .pipeline/memory/records/cycle-ba7549ec1a47/decision/decision-eb4cf6e1b6a7f306e53be993cd17e90c.md
+    scope:
+      ref: c23-experiment-management
+      type: cycle
+    semantic_hash: eb4cf6e1b6a7f306e53be993cd17e90cedac43fecd9263cbb7bb3e8580432130
+    source_refs:
+      - locator: compiled-plan
+        ref: cycle:c23-experiment-management:revision:0
+        type: delivery_plan
+    supersedes: []
+    updated_at: 2026-07-16T12:22:18.186Z
+  - active: false
+    confidence: high
+    created_at: 2026-07-11T20:09:41+08:00
+    dedupe_key: project:stash:implementation-model
+    id: decision-f8e8e63dd30d8a90c572e1a699a19f21
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-f8e8e63dd30d8a90c572e1a699a19f21.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: f8e8e63dd30d8a90c572e1a699a19f217f372c903230c8d133bcddf70a968027
+    source_refs:
+      - locator: .pipeline/reports/C21-stash-suspend-reconciliation-design.md
+        ref: '.pipeline/reports/C21-stash-suspend-reconciliation-design.md#状态: 取代'
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-11T20:09:41+08:00
+  - active: true
+    confidence: 0.99
+    created_at: 2026-07-12T07:08:38+08:00
+    dedupe_key: project:hypo-workflow:decision:audit-quality-optimize-separation
+    id: decision-f94caf102e67e22abc3ed3b57d439e41
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-f94caf102e67e22abc3ed3b57d439e41.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: f94caf102e67e22abc3ed3b57d439e4126c7bdec2aaedb8fbc097d2197c15204
+    source_refs:
+      - locator: .pipeline/archives/C18-instruction-quality-review-and-integration-sync-plan/cycle.yaml
+        ref: >-
+          legacy-file:.pipeline/archives/C18-instruction-quality-review-and-integration-sync-plan/cycle.yaml#cycle.summary
+          and cycle.acceptance
+        type: legacy_file
+      - locator: .pipeline/archives/C18-instruction-quality-review-and-integration-sync-plan/summary.md
+        ref: >-
+          legacy-file:.pipeline/archives/C18-instruction-quality-review-and-integration-sync-plan/summary.md#Milestone
+          摘要 and 关键结果
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T07:08:38+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-05-21T01:30:00+08:00
+    dedupe_key: c16-delivered-but-not-human-accepted
+    id: feedback-00e4158e15cc6c1ee730296a9b776f53
+    kind: feedback
+    path: .pipeline/memory/records/project-d604d20eae74/feedback/feedback-00e4158e15cc6c1ee730296a9b776f53.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 00e4158e15cc6c1ee730296a9b776f53129cf3f822629ab606c6fdb9cd2c00a6
+    source_refs:
+      - locator: .pipeline/archives/C16-root-project-management-mode/cycle.yaml
+        ref: legacy:C16/cycle#cycle.status and cycle.acceptance.state
+        type: legacy_file
+      - locator: .pipeline/archives/C16-root-project-management-mode/summary.md
+        ref: 'legacy:C16/summary#Key results: pending_acceptance despite completed Milestones'
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-05-21T01:30:00+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-23T16:02:48.998Z
+    dedupe_key: delivery:vspi-symbiotic-workflow-core:replace-plan-with-goal
+    id: feedback-2127b84c8d5667c43f93f06baa8c128a
+    kind: feedback
+    path: .pipeline/memory/records/delivery-9ff222eecf7f/feedback/feedback-2127b84c8d5667c43f93f06baa8c128a.md
+    scope:
+      ref: vspi-symbiotic-workflow-core
+      type: delivery
+    semantic_hash: 2127b84c8d5667c43f93f06baa8c128a0ed497fbac9f6516ccd342aed4255209
+    source_refs:
+      - locator: remove intermediate Stone and execute autonomously
+        ref: conversation/vspi-workflow-goal-2026-07-23
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-07-23T16:02:48.998Z
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-18T07:34:45.334Z
+    dedupe_key: cycle.c23-experiment-management.feedback.492b5eb524d3d0ec
+    id: feedback-542a04ff0c7db58769911941cc18aedb
+    kind: feedback
+    path: .pipeline/memory/records/cycle-ba7549ec1a47/feedback/feedback-542a04ff0c7db58769911941cc18aedb.md
+    scope:
+      ref: c23-experiment-management
+      type: cycle
+    semantic_hash: 542a04ff0c7db58769911941cc18aedb161372a6c4cdcd1d83883c23c199c612
+    source_refs:
+      - locator: revision
+        ref: actor:user:operator
+        type: user_feedback
+    supersedes: []
+    updated_at: 2026-07-18T07:34:45.334Z
+  - active: true
+    confidence: 0.99
+    created_at: 2026-07-12T07:07:51+08:00
+    dedupe_key: migration/c12-archive-status-conflict
+    id: feedback-8442e50a859a28f7393182f66666ac79
+    kind: feedback
+    path: .pipeline/memory/records/project-d604d20eae74/feedback/feedback-8442e50a859a28f7393182f66666ac79.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 8442e50a859a28f7393182f66666ac791e59065bbb21d5b4782a5f2f4b061fce
+    source_refs:
+      - locator: .pipeline/archives/C12-workflow-deep-plan-discussion/cycle.yaml
+        ref: >-
+          .pipeline/archives/C12-workflow-deep-plan-discussion/cycle.yaml#cycle.status, cycle.finished absence,
+          cycle.summary, and cycle.lessons
+        type: legacy_file
+      - locator: .pipeline/archives/C12-workflow-deep-plan-discussion/summary.md
+        ref: .pipeline/archives/C12-workflow-deep-plan-discussion/summary.md#基本信息 > 状态/结束时间 and 里程碑
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T07:07:51+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-05-21T01:30:00+08:00
+    dedupe_key: project:validation:external-effects-and-release-evidence
+    id: feedback-91a4f46046c59794010afce14819f010
+    kind: feedback
+    path: .pipeline/memory/records/project-d604d20eae74/feedback/feedback-91a4f46046c59794010afce14819f010.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 91a4f46046c59794010afce14819f0103cda743267367d1b3403fcae4b36e259
+    source_refs:
+      - locator: .pipeline/archives/C10-experience-optimizations/summary.md
+        ref: .pipeline/archives/C10-experience-optimizations/summary.md#Key Data > Warnings
+        type: legacy_file
+      - locator: .pipeline/archives/C19-workflow-core-content-and-plan-mode-optimization/cycle.yaml
+        ref: legacy-file:.pipeline/archives/C19-workflow-core-content-and-plan-mode-optimization/cycle.yaml#cycle.lessons
+        type: legacy_file
+      - locator: .pipeline/archives/C16-root-project-management-mode/summary.md
+        ref: 'legacy:C16/summary#Completion notes: QQ delivery evidence failure and correction'
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: 0.9
+    created_at: 2026-07-12T07:08:38+08:00
+    dedupe_key: project:hypo-workflow:feedback:c17-unresolved-architecture-quality-followups
+    id: feedback-9218e742beeacbd8adb9c2b0dccc645f
+    kind: feedback
+    path: .pipeline/memory/records/project-d604d20eae74/feedback/feedback-9218e742beeacbd8adb9c2b0dccc645f.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 9218e742beeacbd8adb9c2b0dccc645fb396c630c4ebcf09b31bbe163f5fbde0
+    source_refs:
+      - locator: .pipeline/archives/C17-audit-remediation-and-architecture-debt-reduction/summary.md
+        ref: legacy-file:.pipeline/archives/C17-audit-remediation-and-architecture-debt-reduction/summary.md#关键结果 and 风险/后续
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T07:08:38+08:00
+  - active: true
+    confidence: 0.98
+    created_at: 2026-07-12T07:08:38+08:00
+    dedupe_key: project:hypo-workflow:feedback:c20-target-local-continuations
+    id: feedback-c763ea6f517ad7059284d02910992828
+    kind: feedback
+    path: .pipeline/memory/records/project-d604d20eae74/feedback/feedback-c763ea6f517ad7059284d02910992828.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: c763ea6f517ad7059284d029109928281c0d4f179839176d6ca2ae685864014a
+    source_refs:
+      - locator: .pipeline/archives/C20-consultation-first-action-boundary/cycle.yaml
+        ref: legacy-file:.pipeline/archives/C20-consultation-first-action-boundary/cycle.yaml#cycle.continuations
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T07:08:38+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-05-21T01:30:00+08:00
+    dedupe_key: project:maintain:path-helper-workspace-revalidation
+    id: feedback-fc067d08fc454424981f2aa58aa0888d
+    kind: feedback
+    path: .pipeline/memory/records/project-d604d20eae74/feedback/feedback-fc067d08fc454424981f2aa58aa0888d.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: fc067d08fc454424981f2aa58aa0888d3f8b151c01f09d9f4a0e2b518205a86d
+    source_refs:
+      - locator: .pipeline/prompts/06-ambient-maintain-and-codex-hook-adapter.md
+        ref: >-
+          .pipeline/prompts/06-ambient-maintain-and-codex-hook-adapter.md#Objective; Requirements; Boundaries; Technical
+          Solution
+        type: legacy_file
+      - locator: .pipeline/archives/C17-audit-remediation-and-architecture-debt-reduction/summary.md
+        ref: >-
+          legacy-file:.pipeline/archives/C17-audit-remediation-and-architecture-debt-reduction/summary.md#Milestone 摘要,
+          关键结果, and 完成说明
+        type: legacy_file
+      - locator: .pipeline/archives/C16-root-project-management-mode/summary.md
+        ref: 'legacy:C16/summary#Completion notes: risks and follow-up'
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-05-16T12:40:46+08:00
+    dedupe_key: project:ux:completion-report-substance-in-conversation
+    id: preference-567f6bfd3bfee347fa1b0c96b47d8abe
+    kind: preference
+    path: .pipeline/memory/records/project-d604d20eae74/preference/preference-567f6bfd3bfee347fa1b0c96b47d8abe.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 567f6bfd3bfee347fa1b0c96b47d8abe5353cfce1b169a9eb77cac42daf7a9f7
+    source_refs:
+      - locator: .pipeline/archives/C11-workflow-experience-issues/summary.md
+        ref: .pipeline/archives/C11-workflow-experience-issues/summary.md#里程碑 M1
+        type: legacy_file
+      - locator: .pipeline/archives/C15-workflow-interaction-analysis-mode/summary.md
+        ref: 'legacy:C15/summary#Milestones: C15-M2 Detailed Completion Report Contract'
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-11T20:49:59+08:00
+    dedupe_key: project:c21:m7-maintain-codex-hook-route
+    id: requirement-0718546aea18774ae04dbee96cef9c50
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-0718546aea18774ae04dbee96cef9c50.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 0718546aea18774ae04dbee96cef9c5009a8a2a81eeafd5312771b154c9dcc64
+    source_refs:
+      - locator: .pipeline/architecture.md
+        ref: .pipeline/architecture.md#Codex Adapter Boundary
+        type: legacy_file
+      - locator: .pipeline/prompts/06-ambient-maintain-and-codex-hook-adapter.md
+        ref: >-
+          .pipeline/prompts/06-ambient-maintain-and-codex-hook-adapter.md#Objective; Requirements; Boundaries; Technical
+          Solution
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-11T20:49:59+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-11T20:39:36+08:00
+    dedupe_key: project:c21:m5-reference-bootstrap-cutover-contract
+    id: requirement-0b44d0a7bf7713ab3abf4290cb265b6c
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-0b44d0a7bf7713ab3abf4290cb265b6c.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 0b44d0a7bf7713ab3abf4290cb265b6c6f462c5bc72eeab8fcc31d9f1df79772
+    source_refs:
+      - locator: .pipeline/prompts/04-reference-repository-bootstrap-and-schema-activation.md
+        ref: >-
+          .pipeline/prompts/04-reference-repository-bootstrap-and-schema-activation.md#Objective; Requirements;
+          Technical Route; Audit Focus
+        type: legacy_file
+      - locator: .pipeline/reports/C21-core-cutover-bootstrap-scope.md
+        ref: .pipeline/reports/C21-core-cutover-bootstrap-scope.md#兼容策略; Bootstrap 顺序; 本仓库历史提炼; 激活本仓库
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-11T20:39:36+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-23T15:13:36.548Z
+    dedupe_key: project:concurrency:multi-workstream-multi-model
+    id: requirement-1bd6c8a10c8798a85406759fc6cd32e2
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-1bd6c8a10c8798a85406759fc6cd32e2.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 1bd6c8a10c8798a85406759fc6cd32e2fab9bc3da74686dd83ba4aa510cacedc
+    source_refs:
+      - locator: multi-task concurrency and crash-safe lock requirements
+        ref: conversation/vspi-workflow-symbiosis-2026-07-23
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-07-23T15:13:36.548Z
+  - active: true
+    confidence: high
+    created_at: 2026-05-16T12:40:46+08:00
+    dedupe_key: project:c21:m6-goal-cycle-adaptive-plan-route
+    id: requirement-3586d0c048712ec796f9d90fb75be8f0
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-3586d0c048712ec796f9d90fb75be8f0.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 3586d0c048712ec796f9d90fb75be8f0757922316536d5bc1a302f94d0ad32c0
+    source_refs:
+      - locator: .pipeline/architecture.md
+        ref: .pipeline/architecture.md#Delivery Lifecycle; Command Exposure
+        type: legacy_file
+      - locator: .pipeline/archives/C10-experience-optimizations/cycle.yaml
+        ref: .pipeline/archives/C10-experience-optimizations/cycle.yaml#cycle.summary
+        type: legacy_file
+      - locator: .pipeline/archives/C10-experience-optimizations/summary.md
+        ref: .pipeline/archives/C10-experience-optimizations/summary.md#Milestones M0
+        type: legacy_file
+      - locator: .pipeline/archives/C11-workflow-experience-issues/cycle.yaml
+        ref: .pipeline/archives/C11-workflow-experience-issues/cycle.yaml#cycle.lessons[1]
+        type: legacy_file
+      - locator: .pipeline/archives/C11-workflow-experience-issues/summary.md
+        ref: .pipeline/archives/C11-workflow-experience-issues/summary.md#里程碑 M2
+        type: legacy_file
+      - locator: .pipeline/archives/C12-workflow-deep-plan-discussion/summary.md
+        ref: .pipeline/archives/C12-workflow-deep-plan-discussion/summary.md#里程碑 M0-M7 and 关键数据 > 最终决定
+        type: legacy_file
+      - locator: .pipeline/prompts/05-goal-cycle-delivery-core-and-adaptive-plan.md
+        ref: >-
+          .pipeline/prompts/05-goal-cycle-delivery-core-and-adaptive-plan.md#Objective; Requirements; Boundaries;
+          Technical Route
+        type: legacy_file
+      - locator: .pipeline/archives/C19-workflow-core-content-and-plan-mode-optimization/cycle.yaml
+        ref: >-
+          legacy-file:.pipeline/archives/C19-workflow-core-content-and-plan-mode-optimization/cycle.yaml#cycle.summary
+          and cycle.lessons
+        type: legacy_file
+      - locator: .pipeline/archives/C19-workflow-core-content-and-plan-mode-optimization/summary.md
+        ref: >-
+          legacy-file:.pipeline/archives/C19-workflow-core-content-and-plan-mode-optimization/summary.md#改动摘要 and
+          Milestones C19-M1 through C19-M3
+        type: legacy_file
+      - locator: .pipeline/archives/C15-workflow-interaction-analysis-mode/cycle.yaml
+        ref: 'legacy:C15/cycle#cycle.lessons: P2 technical route review'
+        type: legacy_file
+      - locator: .pipeline/archives/C15-workflow-interaction-analysis-mode/summary.md
+        ref: 'legacy:C15/summary#Milestones: C15-M1 P2 Technical Route Gate'
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-11T20:24:08+08:00
+    dedupe_key: project:execution:risk-based-worker-separation
+    id: requirement-4867abfc7866a9f8d11677e284c4375b
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-4867abfc7866a9f8d11677e284c4375b.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 4867abfc7866a9f8d11677e284c4375b18ece72be7a17f19498fbb6904c915af
+    source_refs:
+      - locator: .pipeline/architecture.md
+        ref: .pipeline/architecture.md#Worker Separation; Bootstrap Cutover
+        type: legacy_file
+      - locator: .pipeline/archives/C10-experience-optimizations/cycle.yaml
+        ref: .pipeline/archives/C10-experience-optimizations/cycle.yaml#cycle.summary
+        type: legacy_file
+      - locator: .pipeline/archives/C11-workflow-experience-issues/cycle.yaml
+        ref: .pipeline/archives/C11-workflow-experience-issues/cycle.yaml#cycle.lessons[2]
+        type: legacy_file
+      - locator: .pipeline/archives/C11-workflow-experience-issues/summary.md
+        ref: .pipeline/archives/C11-workflow-experience-issues/summary.md#里程碑 M4
+        type: legacy_file
+      - locator: .pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md
+        ref: >-
+          .pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md#Milestones / M04-M06 and Review
+          Evidence
+        type: legacy_file
+      - locator: .pipeline/prompts/05-goal-cycle-delivery-core-and-adaptive-plan.md
+        ref: .pipeline/prompts/05-goal-cycle-delivery-core-and-adaptive-plan.md#Requirements; Technical Route item 8
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-23T15:13:36.548Z
+    dedupe_key: project:concurrency:crash-safe-nonblocking-coordination
+    id: requirement-50d48cbaf43d48807074994ffa8db7ef
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-50d48cbaf43d48807074994ffa8db7ef.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 50d48cbaf43d48807074994ffa8db7efd0a3529467dff061f561d2aafbc6a1e5
+    source_refs:
+      - locator: multi-task concurrency and crash-safe lock requirements
+        ref: conversation/vspi-workflow-symbiosis-2026-07-23
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-07-23T15:13:36.548Z
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-23T14:58:18.865Z
+    dedupe_key: project:vspi:workflow-symbiosis-scope
+    id: requirement-64814bf483a3132383329915eb163c58
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-64814bf483a3132383329915eb163c58.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 64814bf483a3132383329915eb163c581d991f0a4a10a2dbd8eccba481d4fcc3
+    source_refs:
+      - locator: confirmed scope and model-group decision
+        ref: conversation/vspi-workflow-symbiosis-2026-07-23
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-07-23T14:58:18.865Z
+  - active: true
+    confidence: 0.98
+    created_at: 2026-07-12T07:07:51+08:00
+    dedupe_key: localization/zh-cn-canonical-headings
+    id: requirement-7a04b01fb7d3941f42b7c605b61a6de5
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-7a04b01fb7d3941f42b7c605b61a6de5.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 7a04b01fb7d3941f42b7c605b61a6de58119cb76a3340e8fdc7b95815aa05f43
+    source_refs:
+      - locator: .pipeline/archives/C11-workflow-experience-issues/cycle.yaml
+        ref: .pipeline/archives/C11-workflow-experience-issues/cycle.yaml#cycle.summary and cycle.lessons[0]
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T07:07:51+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-05-15T18:00:00+08:00
+    dedupe_key: project:validation:dynamic-selection-localization-installed-freshness
+    id: requirement-7afeee592a8ed10bda80e7344b981d88
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-7afeee592a8ed10bda80e7344b981d88.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 7afeee592a8ed10bda80e7344b981d8834e7d1994e3f9b6b368446d83b2c7999
+    source_refs:
+      - locator: .pipeline/archives/C14-prompt-compatibility-audit/cycle.yaml
+        ref: legacy:C14/cycle#cycle.status
+        type: legacy_file
+      - locator: .pipeline/archives/C14-prompt-compatibility-audit/summary.md
+        ref: 'legacy:C14/summary#Key data: bilingual i18n regex and dynamic command count tests'
+        type: legacy_file
+      - locator: .pipeline/archives/C15-workflow-interaction-analysis-mode/cycle.yaml
+        ref: 'legacy:C15/cycle#cycle.lessons: focused regression flags'
+        type: legacy_file
+      - locator: .pipeline/archives/C15-workflow-interaction-analysis-mode/cycle.yaml
+        ref: 'legacy:C15/cycle#cycle.lessons: installed Codex skill bundle freshness'
+        type: legacy_file
+      - locator: .pipeline/archives/C15-workflow-interaction-analysis-mode/summary.md
+        ref: 'legacy:C15/summary#Completion notes: regression runner scenario filter defect'
+        type: legacy_file
+      - locator: .pipeline/archives/C15-workflow-interaction-analysis-mode/summary.md
+        ref: 'legacy:C15/summary#Completion notes: shared asset and installed bundle failures'
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-12T02:42:16+08:00
+    dedupe_key: project:safety:high-impact-gates-and-scoped-automation
+    id: requirement-7d0c723bd96e2dc4b5cebd990e72be76
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-7d0c723bd96e2dc4b5cebd990e72be76.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 7d0c723bd96e2dc4b5cebd990e72be76421d7e7ad60bafaa3dd88c5435704493
+    source_refs:
+      - locator: .pipeline/archives/C10-experience-optimizations/summary.md
+        ref: .pipeline/archives/C10-experience-optimizations/summary.md#Milestones M2
+        type: legacy_file
+      - locator: .pipeline/archives/C11-workflow-experience-issues/cycle.yaml
+        ref: .pipeline/archives/C11-workflow-experience-issues/cycle.yaml#cycle.summary
+        type: legacy_file
+      - locator: .pipeline/archives/C11-workflow-experience-issues/summary.md
+        ref: .pipeline/archives/C11-workflow-experience-issues/summary.md#里程碑 M3
+        type: legacy_file
+      - locator: .pipeline/archives/C12-workflow-deep-plan-discussion/summary.md
+        ref: .pipeline/archives/C12-workflow-deep-plan-discussion/summary.md#关键数据 > 已知限制
+        type: legacy_file
+      - locator: .pipeline/archives/C9-configuration-governance-pr-explain-claude-resume/cycle.yaml
+        ref: >-
+          .pipeline/archives/C9-configuration-governance-pr-explain-claude-resume/cycle.yaml#cycle.lifecycle_policy.gates
+          and cycle.lessons[1]
+        type: legacy_file
+      - locator: .pipeline/archives/C9-configuration-governance-pr-explain-claude-resume/cycle.yaml
+        ref: >-
+          .pipeline/archives/C9-configuration-governance-pr-explain-claude-resume/cycle.yaml#cycle.lifecycle_policy.gates
+        type: legacy_file
+      - locator: .pipeline/reports/01-runtime-records-receipts-and-snapshots.report.md
+        ref: >-
+          .pipeline/reports/01-runtime-records-receipts-and-snapshots.report.md#Completion Narrative; Delivered
+          Architecture
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: high
+    created_at: 2026-07-11T20:39:36+08:00
+    dedupe_key: project:c21:m8-cleanup-deletion-gate-route
+    id: requirement-aec5ac2b5d0b0f1cf2bd5a0f66d544ae
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-aec5ac2b5d0b0f1cf2bd5a0f66d544ae.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: aec5ac2b5d0b0f1cf2bd5a0f66d544ae57ffbd1e860e3261e5e0d1578b13d499
+    source_refs:
+      - locator: .pipeline/prompts/07-surface-cleanup-deletion-gate-and-release-ready-regression.md
+        ref: >-
+          .pipeline/prompts/07-surface-cleanup-deletion-gate-and-release-ready-regression.md#Objective; Hard Gate;
+          Requirements; Technical Route
+        type: legacy_file
+      - locator: .pipeline/reports/C21-core-cutover-bootstrap-scope.md
+        ref: .pipeline/reports/C21-core-cutover-bootstrap-scope.md#仓库清理
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-11T20:39:36+08:00
+  - active: true
+    confidence: 1
+    created_at: 2026-07-12T07:08:38+08:00
+    dedupe_key: project:hypo-workflow:requirement:consultation-first-action-boundary
+    id: requirement-c364ecf8e0d7b70a766ea730613f256b
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-c364ecf8e0d7b70a766ea730613f256b.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: c364ecf8e0d7b70a766ea730613f256bad6379dada0a27b197c8db5a395fbce5
+    source_refs:
+      - locator: .pipeline/archives/C20-consultation-first-action-boundary/cycle.yaml
+        ref: >-
+          legacy-file:.pipeline/archives/C20-consultation-first-action-boundary/cycle.yaml#cycle.summary and
+          cycle.acceptance
+        type: legacy_file
+      - locator: .pipeline/archives/C20-consultation-first-action-boundary/summary.md
+        ref: >-
+          legacy-file:.pipeline/archives/C20-consultation-first-action-boundary/summary.md#改动摘要 and Milestones C20-M1
+          through C20-M2
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T07:08:38+08:00
+  - active: true
+    confidence: 0.99
+    created_at: 2026-07-12T07:07:51+08:00
+    dedupe_key: privacy/evidence-redact-before-persist-render
+    id: requirement-f96524166e1a8217674e9480be062afc
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-f96524166e1a8217674e9480be062afc.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: f96524166e1a8217674e9480be062afc7878210ed3d497e8a5250385d9edf971
+    source_refs:
+      - locator: .pipeline/archives/C9-configuration-governance-pr-explain-claude-resume/cycle.yaml
+        ref: .pipeline/archives/C9-configuration-governance-pr-explain-claude-resume/cycle.yaml#cycle.lessons[0]
+        type: legacy_file
+    supersedes: []
+    updated_at: 2026-07-12T07:07:51+08:00
+schema_version: '1'

@@ -1,5 +1,5 @@
 pipeline:
-  name: "C20 协商优先的修改启动风格"
+  name: "C21 Hypo-Workflow Skill-first 核心切换"
   source: local
   output: local
   prompts_dir: .pipeline/prompts
@@ -11,13 +11,12 @@ plan:
   mode: interactive
   interaction_depth: high
   interactive:
-    min_rounds: 5
-    require_explicit_confirm: false
+    require_explicit_confirm: true
 
 execution:
   mode: self
   worker_separation:
-    mode: recommended
+    mode: strict
     authorization:
       status: authorized
       scope:
@@ -28,20 +27,20 @@ execution:
       downgrade_requires_confirmation: true
   bash:
     mode: allow_local
-    confirm_external: false
-    confirm_destructive: false
-    confirm_system_install: false
+    confirm_external: true
+    confirm_destructive: true
+    confirm_system_install: true
   steps:
     preset: tdd
   step_overrides:
     review_tests:
       executor: subagent
       subagent_tool: codex
-      strict: false
+      strict: true
     review_code:
       executor: subagent
       subagent_tool: codex
-      strict: false
+      strict: true
 
 deep_plan:
   research_code:

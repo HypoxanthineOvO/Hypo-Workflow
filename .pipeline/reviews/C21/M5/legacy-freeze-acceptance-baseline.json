@@ -1,0 +1,40 @@
+{
+  "schema_version": "1",
+  "authority_role": "bootstrap_legacy_freeze_binding",
+  "binding_kind": "sealed_checkpoint_compatibility",
+  "bootstrap_job_ref": {
+    "kind": "bootstrap_job",
+    "id": "c21-reference-bootstrap"
+  },
+  "checkpoint_ref": {
+    "path": ".pipeline/runtime/migrations/c21-reference-bootstrap/rollback-checkpoint.yaml",
+    "semantic_hash": "2f2258b97c56914ec8609337fbe96e1b5b1b9b1bcc3e685214104ba1792d6a56"
+  },
+  "legacy_freeze_inventory": [
+    {
+      "path": ".pipeline/cycle.yaml",
+      "sha256": "d5fdedd7e7d54da5c07687b814492a2d50c06df40fa8e4ff9e908bb4dda472cb",
+      "size_bytes": 606,
+      "mtime_ns": "1783815360286160870"
+    },
+    {
+      "path": ".pipeline/log.yaml",
+      "sha256": "14f108a6994130ec59f60e7a94169df80998ee7319dc4b5dd0f6fa2f8a268222",
+      "size_bytes": 690935,
+      "mtime_ns": "1783815360290160654"
+    },
+    {
+      "path": ".pipeline/PROGRESS.md",
+      "sha256": "303e593fae56deb877718a55d7c4acbb080c2506e6da21f9cda2474fb5b7fa4b",
+      "size_bytes": 34562,
+      "mtime_ns": "1783815360300160114"
+    },
+    {
+      "path": ".pipeline/state.yaml",
+      "sha256": "8b97e6df7a2b78469008b776e65bebd6227eb660e6cba2953422aa38f5cf4d17",
+      "size_bytes": 39182,
+      "mtime_ns": "1783815360088171556"
+    }
+  ],
+  "semantic_hash": "802931c8be1e55221235e5f2e821f364e5ddc22449370c189b8a992f05ef8d41"
+}

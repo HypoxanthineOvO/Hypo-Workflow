@@ -1,0 +1,18 @@
+actor:
+  id: workspace-user
+  type: user
+authority_role: receipt
+consumed_at: 2026-07-23T16:02:49.409Z
+expires_at: 2026-07-24T16:02:49.327Z
+intent: delivery.approve_and_start
+issued_at: 2026-07-23T16:02:49.327Z
+object_ref:
+  id: vspi-symbiotic-workflow-goal
+  kind: delivery
+plan_hash: 923764ac3ef31d8d49acce7c8957ac70abe9e31d43d9663007257fe6432b7b1d
+receipt_id: receipt-d07fd7cc2b58f93678c7ff250047b125
+reserved_at: 2026-07-23T16:02:49.346Z
+reserved_by: vspi-goal-approve-and-start
+schema_version: '1'
+scope_hash: 86b1712a3c9c5a5003b131cb6ad8172dfd3db2e8f74b3738589b5d567dd23715
+state: consumed

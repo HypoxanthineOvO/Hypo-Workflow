@@ -1,4 +1,5 @@
-import { appendFile, lstat, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import { appendFile, lstat, mkdir, open, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { canonicalHash } from "../serialization/index.js";
 import { assertBootstrapAcceptanceWriteAllowed } from "../workspace-store/bootstrap-acceptance.js";
@@ -52,6 +53,9 @@ export const RECOVERY_EVENT_TYPES = Object.freeze([
 ]);
 
 const EVENT_TYPES = new Set(RECOVERY_EVENT_TYPES);
+const STREAM_LOCK_POLL_MS = 10;
+const STREAM_LOCK_TIMEOUT_MS = 20_000;
+const STREAM_LOCK_STALE_MS = 120_000;
 const streamLocks = new Map();
 const blobLocks = new Map();
 
@@ -60,7 +64,7 @@ export async function appendRecoveryEventWithPolicy(root, input, policy) {
   const workspaceRoot = resolve(root || ".");
   await assertBootstrapAcceptanceWriteAllowed(workspaceRoot);
   const lockKey = `${workspaceRoot}\0${normalized.object_ref.kind}\0${normalized.object_ref.id}\0${streamKey(normalized.session_id, normalized.writer)}`;
-  return withStreamLock(lockKey, async () => {
+  return withStreamLock(workspaceRoot, lockKey, async () => {
     await readCurrentManifest(workspaceRoot);
     const streamDirectory = journalStreamDirectory(normalized.object_ref, normalized.session_id, normalized.writer);
     const stream = await readJournalStream(workspaceRoot, {
@@ -729,18 +733,172 @@ function compareEvents(left, right) {
     || left.event_id.localeCompare(right.event_id);
 }
 
-async function withStreamLock(key, operation) {
+async function withStreamLock(root, key, operation) {
   const previous = streamLocks.get(key) || Promise.resolve();
   let release;
   const current = new Promise((resolveLock) => { release = resolveLock; });
   streamLocks.set(key, current);
   await previous.catch(() => {});
+  let releaseFileLock;
   try {
+    releaseFileLock = await acquireStreamFileLock(root, key);
     return await operation();
   } finally {
-    release();
-    if (streamLocks.get(key) === current) streamLocks.delete(key);
+    try {
+      if (releaseFileLock) await releaseFileLock();
+    } finally {
+      release();
+      if (streamLocks.get(key) === current) streamLocks.delete(key);
+    }
   }
+}
+
+async function acquireStreamFileLock(root, key) {
+  const digest = hashBytes(Buffer.from(key, "utf8"));
+  const relativePath = `.pipeline/runtime/recovery/locks/${digest}.lock`;
+  const guarded = await assertWorkspacePathAllowed(root, relativePath);
+  await mkdir(dirname(guarded.path), { recursive: true, mode: 0o700 });
+  const owner = {
+    pid: process.pid,
+    token: randomUUID(),
+    acquired_at_ms: Date.now(),
+  };
+  const startedAt = Date.now();
+
+  while (true) {
+    if (await createExclusiveLockFile(guarded.path, owner)) {
+      return () => releaseStreamFileLock(guarded.path, owner.token);
+    }
+    await reapStaleStreamFileLock(guarded.path);
+    if (Date.now() - startedAt >= STREAM_LOCK_TIMEOUT_MS) {
+      throw authorityError(
+        "ERR_RECOVERY_JOURNAL_LOCK_TIMEOUT",
+        "Timed out waiting for another process to release the Recovery Journal stream lock",
+      );
+    }
+    await wait(STREAM_LOCK_POLL_MS);
+  }
+}
+
+async function createExclusiveLockFile(path, owner) {
+  let handle;
+  try {
+    handle = await open(path, "wx", 0o600);
+  } catch (error) {
+    if (error.code === "EEXIST") return false;
+    throw error;
+  }
+  try {
+    await handle.writeFile(`${JSON.stringify(owner)}\n`, "utf8");
+  } catch (error) {
+    await handle.close().catch(() => {});
+    await unlink(path).catch(() => {});
+    throw error;
+  }
+  await handle.close();
+  return true;
+}
+
+async function releaseStreamFileLock(path, token) {
+  const current = await readStreamFileLock(path);
+  if (!current) return;
+  if (current.token !== token) {
+    throw authorityError(
+      "ERR_RECOVERY_JOURNAL_LOCK_OWNERSHIP",
+      "Recovery Journal stream lock ownership changed before release",
+    );
+  }
+  try {
+    await unlink(path);
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+  }
+}
+
+async function reapStaleStreamFileLock(path) {
+  const observed = await readStreamFileLock(path);
+  if (!observed || !streamFileLockIsStale(observed)) return;
+  const reaperPath = `${path}.reaper`;
+  const reaper = {
+    pid: process.pid,
+    token: randomUUID(),
+    acquired_at_ms: Date.now(),
+  };
+  if (!(await createExclusiveLockFile(reaperPath, reaper))) {
+    await removeStaleLockFile(reaperPath);
+    if (!(await createExclusiveLockFile(reaperPath, reaper))) return;
+  }
+  try {
+    const current = await readStreamFileLock(path);
+    if (!current || !streamFileLockIsStale(current)) return;
+    try {
+      await unlink(path);
+    } catch (error) {
+      if (error.code !== "ENOENT") throw error;
+    }
+  } finally {
+    await releaseStreamFileLock(reaperPath, reaper.token);
+  }
+}
+
+async function removeStaleLockFile(path) {
+  const observed = await readStreamFileLock(path);
+  if (!observed || !streamFileLockIsStale(observed)) return;
+  const current = await readStreamFileLock(path);
+  if (!current || current.token !== observed.token || !streamFileLockIsStale(current)) return;
+  try {
+    await unlink(path);
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+  }
+}
+
+async function readStreamFileLock(path) {
+  let stats;
+  let source;
+  try {
+    stats = await lstat(path);
+    if (!stats.isFile() || stats.isSymbolicLink()) {
+      throw authorityError(
+        "ERR_RECOVERY_JOURNAL_LOCK_INVALID",
+        "Recovery Journal stream lock is not a regular file",
+      );
+    }
+    source = await readFile(path, "utf8");
+  } catch (error) {
+    if (error.code === "ENOENT" || error.code === "ENOTDIR") return null;
+    throw error;
+  }
+
+  let parsed = null;
+  try {
+    parsed = JSON.parse(source);
+  } catch {
+    // A newly-created lock can be observed before its owner metadata is flushed.
+  }
+  return {
+    age_ms: Math.max(0, Date.now() - stats.mtimeMs),
+    pid: Number.isSafeInteger(parsed?.pid) && parsed.pid > 0 ? parsed.pid : null,
+    token: typeof parsed?.token === "string" && parsed.token ? parsed.token : null,
+  };
+}
+
+function streamFileLockIsStale(lock) {
+  if (lock.age_ms >= STREAM_LOCK_STALE_MS) return true;
+  return lock.pid !== null && !processIsAlive(lock.pid);
+}
+
+function processIsAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error.code !== "ESRCH";
+  }
+}
+
+function wait(milliseconds) {
+  return new Promise((resolveWait) => setTimeout(resolveWait, milliseconds));
 }
 
 async function withBlobLock(key, operation) {

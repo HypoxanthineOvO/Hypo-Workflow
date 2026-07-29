@@ -17,7 +17,9 @@ const PLANNING_PROBE = await importProbe(PLANNING_API_URL);
 const COMMANDS = await import("../src/commands/index.js");
 const PLANNING_API = [
   "compileGoalDesign",
+  "compilePlan",
   "compileCyclePlan",
+  "selectDeliveryMode",
   "selectAdaptivePlan",
   "assessPlanReadiness",
 ];
@@ -42,34 +44,41 @@ test("M6 publishes one behavior router for command and natural Workflow intents"
   assert.equal(typeof ROOT_API.resolveWorkflowIntent, "function");
 });
 
-planTest("Goal always selects one Design contract without a fake planning phase ladder", () => {
+planTest("Goal follows full Discussion before generating one Design without fake Milestones", () => {
   for (const input of [
     { delivery_kind: "goal", model_capability: "strong", complexity: "bounded", durable_research: false },
     { delivery_kind: "goal", model_capability: "limited", complexity: "material", durable_research: false },
     { delivery_kind: "goal", model_capability: "limited", complexity: "material", durable_research: true },
   ]) {
     const selected = PLANNING_PROBE.api.selectAdaptivePlan(input);
-    assert.equal(selected.mode, "goal_design");
-    assert.deepEqual(selected.internal_phases, ["design"]);
+    assert.equal(selected.mode, "discussion_to_goal");
+    assert.deepEqual(selected.internal_phases.slice(-5), [
+      "discover",
+      "technical_stack",
+      "architecture",
+      "select_delivery",
+      "generate_goal",
+    ]);
     assert.equal("milestones" in selected, false);
     assert.equal("min_rounds" in selected, false);
   }
 });
 
-planTest("Cycle selects standard internal phases or durable Deep Plan from evidence", () => {
+planTest("Plan follows Discussion and adds decomposition only after delivery selection", () => {
   const standard = PLANNING_PROBE.api.selectAdaptivePlan({
     delivery_kind: "cycle",
     model_capability: "limited",
     complexity: "material",
     durable_research: false,
   });
-  assert.equal(standard.mode, "cycle_standard");
+  assert.equal(standard.mode, "discussion_to_plan");
   assert.deepEqual(standard.internal_phases, [
     "discover",
     "technical_stack",
     "architecture",
+    "select_delivery",
     "decompose",
-    "generate",
+    "generate_plan",
   ]);
   assert.equal(standard.discoverable_command, null);
 
@@ -79,10 +88,23 @@ planTest("Cycle selects standard internal phases or durable Deep Plan from evide
     complexity: "material",
     durable_research: true,
   });
-  assert.equal(deep.mode, "cycle_deep");
+  assert.equal(deep.mode, "discussion_to_plan");
   assert.equal(deep.durable, true);
   assert.ok(deep.internal_phases.includes("deep_plan"));
   assert.equal(deep.discoverable_command, null, "Deep Plan stays internal instead of becoming another public command");
+});
+
+planTest("Stone count, not complexity or acceptance count, selects Goal versus Plan", () => {
+  assert.deepEqual(PLANNING_PROBE.api.selectDeliveryMode({ stones: [] }), {
+    delivery_kind: "goal",
+    stone_count: 0,
+    reason: "no_manual_intermediate_check",
+  });
+  assert.deepEqual(PLANNING_PROBE.api.selectDeliveryMode({ stones: [{ id: "S1" }] }), {
+    delivery_kind: "plan",
+    stone_count: 1,
+    reason: "manual_intermediate_check_required",
+  });
 });
 
 planTest("material ambiguity asks immediately and resolved ambiguity stops without round quotas", () => {
@@ -151,6 +173,23 @@ planTest("Goal and Cycle compilers are deterministic peer contracts with differe
   assert.equal(cycle.milestones.some((milestone) => "acceptance" in milestone), false);
   assert.notEqual(cycle.plan_hash, goal.plan_hash);
 
+  assert.throws(
+    () => PLANNING_PROBE.api.compilePlan(cyclePlanInput()),
+    /at least one Stone|manual inspection/i,
+  );
+  const plan = PLANNING_PROBE.api.compilePlan(cyclePlanInput({
+    milestones: cyclePlanInput().milestones.map((milestone, index) => index === 0 ? {
+      ...milestone,
+      stone: {
+        id: "S1",
+        review: "Inspect the storage contract before the API stage begins.",
+        acceptance_criteria: ["The persisted item is visible in the review fixture."],
+      },
+    } : milestone),
+  }));
+  assert.equal(plan.delivery_mode, "plan");
+  assert.equal(plan.milestones.filter((milestone) => milestone.stone).length, 1);
+
   const revised = PLANNING_PROBE.api.compileGoalDesign(goalDesignInput({
     revision: 1,
     outcome: "A FIFO queue API passes its acceptance command after explicit restart-safe execution.",
@@ -181,7 +220,7 @@ routerTest("objective fixtures route natural and slash inputs to the same author
     resolved.push({ fixture, route });
   }
 
-  for (const prefix of ["goal", "cycle", "explicit-start"]) {
+  for (const prefix of ["goal", "plan", "explicit-start"]) {
     const pair = resolved.filter(({ fixture }) => fixture.name.startsWith(prefix));
     assert.equal(pair.length, 2);
     assert.deepEqual(
@@ -192,6 +231,25 @@ routerTest("objective fixtures route natural and slash inputs to the same author
       ],
     );
   }
+});
+
+routerTest("proposal affirmations distinguish start, hold, and continued Discussion", async () => {
+  const context = {
+    workspace: "current",
+    active_delivery: { status: "proposed" },
+    skillRoot: REPOSITORY_ROOT,
+  };
+  for (const reply of ["确认", "合理的", "方案确认了，开始做吧"]) {
+    const start = await COMMANDS.resolveWorkflowIntent(reply, context);
+    assert.equal(start.authority_intent, "delivery.approve_and_start", reply);
+  }
+
+  const hold = await COMMANDS.resolveWorkflowIntent("确认但不开始", context);
+  assert.equal(hold.authority_intent, "delivery.approve");
+
+  const discuss = await COMMANDS.resolveWorkflowIntent("不确认，继续讨论", context);
+  assert.equal(discuss.authority_intent, "workflow.continue_discussion");
+  assert.deepEqual(discuss.writes, []);
 });
 
 routerTest("target workspace repoRoot never substitutes for the trusted Skill backend root", async (t) => {

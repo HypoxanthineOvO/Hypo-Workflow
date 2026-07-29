@@ -1,0 +1,18 @@
+actor:
+  id: workspace-user
+  type: user
+authority_role: receipt
+consumed_at: 2026-07-18T15:10:22.604Z
+expires_at: 2026-07-18T15:20:22.604Z
+intent: delivery.accept
+issued_at: 2026-07-18T15:10:22.604Z
+object_ref:
+  id: c23-experiment-management
+  kind: delivery
+plan_hash: dc63837d450c3006b9ba106027f1fafdf218e9a13e1c185ae03dd1f952821c0e
+receipt_id: receipt-517ff0439a63ad31a63342e5a91ebed4
+reserved_at: 2026-07-18T15:10:22.604Z
+reserved_by: c23-accept-confirmed-20260718151022
+schema_version: '1'
+scope_hash: 6bb90cf613be11441416f56b055e5d262fc8115fcd612127a7f6ee1497a73229
+state: consumed

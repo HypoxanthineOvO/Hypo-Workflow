@@ -9,7 +9,7 @@ const COMMAND_DEFINITIONS = Object.freeze([
   { canonical: "/hw:guide", agent: "hw-plan", route: "plan", skill: "skills/guide/SKILL.md" },
   { canonical: "/hw:init", agent: "hw-plan", route: "lifecycle", skill: "skills/init/SKILL.md" },
   { canonical: "/hw:goal", agent: "hw-plan", route: "delivery", skill: "skills/goal/SKILL.md" },
-  { canonical: "/hw:plan", agent: "hw-plan", route: "plan", skill: "skills/plan/SKILL.md" },
+  { canonical: "/hw:plan", agent: "hw-plan", route: "delivery", skill: "skills/plan/SKILL.md" },
   { canonical: "/hw:cycle", agent: "hw-build", route: "delivery", skill: "skills/cycle/SKILL.md" },
   { canonical: "/hw:maintain", agent: "hw-build", route: "maintenance", skill: "skills/maintain/SKILL.md" },
   { canonical: "/hw:experiment", agent: "hw-build", route: "experiment", skill: "skills/experiment/SKILL.md" },
@@ -124,6 +124,8 @@ export async function discoverableCommandMap(platform = "codex", options = {}) {
 export async function resolveWorkflowIntent(input, context = {}) {
   if (typeof input !== "string" || !input.trim()) return unavailableRoute("unknown", "No Workflow intent was provided.");
   const text = input.trim();
+  const approval = inferApprovalIntent(text, context);
+  if (approval) return approval;
   const slash = parseCommandInput(text);
   let canonical = slash?.command?.canonical ?? inferNaturalIntent(text, context);
   if (!canonical) return unavailableRoute("unknown", "No supported Workflow intent matched this request.");
@@ -171,6 +173,7 @@ export async function resolveWorkflowIntent(input, context = {}) {
     authority_intent: authorityIntentFor(canonical),
     discoverable: ["public", "contextual"].includes(command.exposure),
     ...(canonical === "/hw:goal" ? { delivery_kind: "goal" } : {}),
+    ...(canonical === "/hw:plan" ? { delivery_kind: "plan" } : {}),
     ...(canonical === "/hw:cycle" ? { delivery_kind: "cycle" } : {}),
     writes: [],
   };
@@ -194,9 +197,45 @@ function inferNaturalIntent(input, context) {
   if (/日常修改|维护记录|记录到项目|maintain/.test(normalized)) return "/hw:maintain";
   if (/接手.*项目|识别.*架构|初始化|initialize|init/.test(normalized)) return "/hw:init";
   if (/不知道.*(?:工作流|开始)|怎么开始|guide|引导/.test(normalized)) return "/hw:guide";
-  if (/不拆里程碑|单一验收目标|\bgoal\b/.test(normalized)) return "/hw:goal";
-  if (/有顺序的阶段|分成.*阶段|整体验收|\bcycle\b/.test(normalized)) return "/hw:cycle";
-  if (/制定方案|规划|\bplan\b/.test(normalized)) return "/hw:plan";
+  if (/中途.*(?:检查|验收|确认)|人工.*(?:检查|验收)|\bstone\b|制定方案|规划|\bplan\b/.test(normalized)) return "/hw:plan";
+  if (/不需要.*中途|一口气.*(?:做完|完成)|自主.*(?:做完|完成)|不拆里程碑|单一验收目标|\bgoal\b/.test(normalized)) return "/hw:goal";
+  if (/\bcycle\b/.test(normalized)) return "/hw:cycle";
+  return null;
+}
+
+function inferApprovalIntent(input, context) {
+  if (!new Set(["proposed", "needs_revision"]).has(context.active_delivery?.status)) return null;
+  const normalized = input.trim().toLowerCase();
+  if (/不确认|继续讨论|先别确认|not approved|do not approve/.test(normalized)) {
+    return {
+      status: "available",
+      canonical: null,
+      authority_intent: "workflow.continue_discussion",
+      discoverable: false,
+      writes: [],
+    };
+  }
+  if (/确认但不开始|确认.*(?:暂不|先不|别).*开始|approve only|do not start/.test(normalized)) {
+    return {
+      status: "available",
+      canonical: null,
+      authority_intent: "delivery.approve",
+      discoverable: false,
+      writes: [],
+    };
+  }
+  if (
+    /^(?:可以|确认|合理的?|没问题|就这样|ok|okay|go ahead|apply it|按这个做|开始吧|开干)[。.!！\s]*$/i.test(input.trim())
+    || /(?:确认|方案).*(?:开始|开干)|(?:开始|开干).*(?:做|执行)/i.test(normalized)
+  ) {
+    return {
+      status: "available",
+      canonical: null,
+      authority_intent: "delivery.approve_and_start",
+      discoverable: false,
+      writes: [],
+    };
+  }
   return null;
 }
 
@@ -205,7 +244,7 @@ function authorityIntentFor(canonical) {
     "/hw:guide": "workflow.guide",
     "/hw:init": "workspace.initialize",
     "/hw:goal": "delivery.propose_goal",
-    "/hw:plan": "delivery.plan",
+    "/hw:plan": "delivery.propose_plan",
     "/hw:cycle": "delivery.propose_cycle",
     "/hw:maintain": "maintain.record",
     "/hw:experiment": "experiment.manage",

@@ -1,0 +1,341 @@
+{
+  "bootstrap_job_ref": {
+    "kind": "bootstrap_job",
+    "id": "c21-reference-bootstrap"
+  },
+  "worker": {
+    "role": "extractor",
+    "id": "m5-extract-c05-c08"
+  },
+  "source_group": "C5-C8",
+  "sources_reviewed": [
+    ".pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/cycle.yaml",
+    ".pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/summary.md",
+    ".pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/knowledge-summary.md",
+    ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/cycle.yaml",
+    ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/summary.md",
+    ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/knowledge-summary.md",
+    ".pipeline/archives/C7-codex-service-effectiveness-and-workflow-governance/cycle.yaml",
+    ".pipeline/archives/C7-codex-service-effectiveness-and-workflow-governance/summary.md",
+    ".pipeline/archives/C7-codex-service-effectiveness-and-workflow-governance/knowledge-summary.md",
+    ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/cycle.yaml",
+    ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md",
+    ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/knowledge-summary.md"
+  ],
+  "candidates": [
+    {
+      "key": "c05-lifecycle-transaction-recovery-contract",
+      "source_class": "architecture_decision",
+      "future_decision_risk": "material",
+      "current": true,
+      "reviewed": true,
+      "support": "observed",
+      "sources": [
+        {
+          "type": "legacy_file",
+          "ref": ".pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/summary.md#Milestone 摘要 / M03, M07, M08",
+          "locator": ".pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/summary.md",
+          "digest": "sha256:4ac1e165daea0e092035278b90fb258b450cb37c85df23e5bc2be05d536ef888"
+        }
+      ],
+      "supersedes": [],
+      "record_patch": {
+        "scope": {
+          "type": "project",
+          "ref": "project:hypo-workflow"
+        },
+        "kind": "decision",
+        "source_refs": [
+          {
+            "type": "legacy_file",
+            "ref": ".pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/summary.md#Milestone 摘要 / M03, M07, M08",
+            "locator": ".pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/summary.md"
+          }
+        ],
+        "confidence": "high",
+        "dedupe_key": "hypo-workflow:lifecycle-transaction-recovery-derived-refresh",
+        "created_at": "2026-07-12T07:00:47+08:00",
+        "updated_at": "2026-07-12T07:09:58+08:00",
+        "supersedes": [],
+        "body": "生命周期变更采用一致提交与 invariant 合同，并同步刷新派生产物；执行恢复保留 lease、stale takeover、watchdog 与 platform handoff 语义。"
+      }
+    },
+    {
+      "key": "c05-authorized-execution-auto-continuation",
+      "source_class": "important_feedback_failure",
+      "future_decision_risk": "material",
+      "current": true,
+      "reviewed": true,
+      "support": "observed",
+      "sources": [
+        {
+          "type": "legacy_file",
+          "ref": ".pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/cycle.yaml#cycle.lessons",
+          "locator": ".pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/cycle.yaml",
+          "digest": "sha256:0da30ed106fa2dfb24097574a8df84a7a67c15d1e050edb4dc7e83b11394dd28"
+        },
+        {
+          "type": "legacy_file",
+          "ref": ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/cycle.yaml#cycle.lifecycle_policy.auto_continue",
+          "locator": ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/cycle.yaml",
+          "digest": "sha256:4e7844028a5bd3ffda2caf6e040bd4c6628291ec2a6409b48621e24af9101c1c"
+        },
+        {
+          "type": "legacy_file",
+          "ref": ".pipeline/archives/C7-codex-service-effectiveness-and-workflow-governance/cycle.yaml#cycle.lifecycle_policy.auto_continue",
+          "locator": ".pipeline/archives/C7-codex-service-effectiveness-and-workflow-governance/cycle.yaml",
+          "digest": "sha256:e872336a96ce3e1ca008b1b85db5a8cba79f6296ef4d81ffe42c64ec1e26fe57"
+        },
+        {
+          "type": "legacy_file",
+          "ref": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/cycle.yaml#cycle.lifecycle_policy.auto_continue",
+          "locator": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/cycle.yaml",
+          "digest": "sha256:2372649ee4d4ce2bd2a992111befbbb741d67874e8dca78cfdf08f02dd4caff7"
+        }
+      ],
+      "supersedes": [],
+      "record_patch": {
+        "scope": {
+          "type": "project",
+          "ref": "project:hypo-workflow"
+        },
+        "kind": "preference",
+        "source_refs": [
+          {
+            "type": "legacy_file",
+            "ref": ".pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/cycle.yaml#cycle.lessons",
+            "locator": ".pipeline/archives/C5-hypo-workflow-c5-follow-up-ai-coding-workflow-redesign/cycle.yaml"
+          },
+          {
+            "type": "legacy_file",
+            "ref": ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/cycle.yaml#cycle.lifecycle_policy.auto_continue",
+            "locator": ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/cycle.yaml"
+          },
+          {
+            "type": "legacy_file",
+            "ref": ".pipeline/archives/C7-codex-service-effectiveness-and-workflow-governance/cycle.yaml#cycle.lifecycle_policy.auto_continue",
+            "locator": ".pipeline/archives/C7-codex-service-effectiveness-and-workflow-governance/cycle.yaml"
+          },
+          {
+            "type": "legacy_file",
+            "ref": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/cycle.yaml#cycle.lifecycle_policy.auto_continue",
+            "locator": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/cycle.yaml"
+          }
+        ],
+        "confidence": "high",
+        "dedupe_key": "hypo-workflow:authorized-execution-auto-continuation",
+        "created_at": "2026-07-12T07:00:47+08:00",
+        "updated_at": "2026-07-12T07:09:58+08:00",
+        "supersedes": [],
+        "body": "已获授权的常规执行应自动跨 milestone 继续，不因 milestone 边界重复打断；这一用户偏好从 C5 反馈延续到 C6-C8 的 auto_continue 配置。"
+      }
+    },
+    {
+      "key": "c06-claude-adapter-namespace-settings-hook-safety",
+      "source_class": "architecture_decision",
+      "future_decision_risk": "material",
+      "current": true,
+      "reviewed": true,
+      "support": "observed",
+      "sources": [
+        {
+          "type": "legacy_file",
+          "ref": ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/summary.md#Cycle summary and Milestone 摘要 / M02-M04",
+          "locator": ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/summary.md",
+          "digest": "sha256:33084ae677b3150a4ff87e4df5245fa4919e5159da485a53eee4a1e07423fe06"
+        },
+        {
+          "type": "legacy_file",
+          "ref": ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/knowledge-summary.md#Pitfalls / C6-SYNC-claude-opencode-codex-interface-map-20260505",
+          "locator": ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/knowledge-summary.md",
+          "digest": "sha256:f130563b3e11707b085ac6b13ca6c671423a9478062b9e7a13e4fb762df3e662"
+        }
+      ],
+      "supersedes": [],
+      "record_patch": {
+        "scope": {
+          "type": "project",
+          "ref": "project:hypo-workflow"
+        },
+        "kind": "decision",
+        "source_refs": [
+          {
+            "type": "legacy_file",
+            "ref": ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/summary.md#Cycle summary and Milestone 摘要 / M02-M04",
+            "locator": ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/summary.md"
+          },
+          {
+            "type": "legacy_file",
+            "ref": ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/knowledge-summary.md#Pitfalls / C6-SYNC-claude-opencode-codex-interface-map-20260505",
+            "locator": ".pipeline/archives/C6-claude-code-adapter-plugin-and-full-workflow-takeover/knowledge-summary.md"
+          }
+        ],
+        "confidence": "high",
+        "dedupe_key": "hypo-workflow:claude-hw-namespace-settings-hook-safety",
+        "created_at": "2026-07-12T07:00:47+08:00",
+        "updated_at": "2026-07-12T07:09:58+08:00",
+        "supersedes": [],
+        "body": "Claude Code 适配器通过 /hw:* plugin namespace 暴露 Workflow；settings 合入需保留备份与冲突报告，hook 输出必须按事件和退出码语义处理。"
+      }
+    },
+    {
+      "key": "c08-structured-rules-habits-authority",
+      "source_class": "architecture_decision",
+      "future_decision_risk": "material",
+      "current": true,
+      "reviewed": true,
+      "support": "observed",
+      "sources": [
+        {
+          "type": "legacy_file",
+          "ref": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md#Summary and Milestones / M01-M03",
+          "locator": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md",
+          "digest": "sha256:d56b1755c6f898a0c4c88edf1be241d72296d36f9f49debf55f47e3340eb7f9a"
+        },
+        {
+          "type": "legacy_file",
+          "ref": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/knowledge-summary.md#Decisions / C8-PLAN-domain-pack-boundary-and-review-rules-20260506",
+          "locator": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/knowledge-summary.md",
+          "digest": "sha256:e6572a26d26b1f057541b54d3fbe100999ab8326b5871c82d82e09aea0959177"
+        }
+      ],
+      "supersedes": [],
+      "record_patch": {
+        "scope": {
+          "type": "project",
+          "ref": "project:hypo-workflow"
+        },
+        "kind": "decision",
+        "source_refs": [
+          {
+            "type": "legacy_file",
+            "ref": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md#Summary and Milestones / M01-M03",
+            "locator": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md"
+          },
+          {
+            "type": "legacy_file",
+            "ref": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/knowledge-summary.md#Decisions / C8-PLAN-domain-pack-boundary-and-review-rules-20260506",
+            "locator": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/knowledge-summary.md"
+          }
+        ],
+        "confidence": "high",
+        "dedupe_key": "hypo-workflow:structured-rules-habits-authority",
+        "created_at": "2026-07-12T07:00:47+08:00",
+        "updated_at": "2026-07-12T07:09:58+08:00",
+        "supersedes": [],
+        "body": "Structured Rules/Habits 是行为约束的权威来源；habits 文档和跨平台注入产物是派生视图，应从结构化源生成。"
+      }
+    },
+    {
+      "key": "c08-default-agent-review-evidence-contract",
+      "source_class": "accepted_outcome",
+      "future_decision_risk": "material",
+      "current": true,
+      "reviewed": true,
+      "support": "observed",
+      "sources": [
+        {
+          "type": "legacy_file",
+          "ref": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md#Milestones / M04-M06 and Review Evidence",
+          "locator": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md",
+          "digest": "sha256:d56b1755c6f898a0c4c88edf1be241d72296d36f9f49debf55f47e3340eb7f9a"
+        }
+      ],
+      "supersedes": [],
+      "record_patch": {
+        "scope": {
+          "type": "project",
+          "ref": "project:hypo-workflow"
+        },
+        "kind": "decision",
+        "source_refs": [
+          {
+            "type": "legacy_file",
+            "ref": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md#Milestones / M04-M06 and Review Evidence",
+            "locator": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md"
+          }
+        ],
+        "confidence": "high",
+        "dedupe_key": "hypo-workflow:default-agent-review-evidence-contract",
+        "created_at": "2026-07-12T07:00:47+08:00",
+        "updated_at": "2026-07-12T07:09:58+08:00",
+        "supersedes": [],
+        "body": "默认 Agent Review 覆盖 plan、test、code 以及 skill/platform artifacts；结论与重试迭代应形成可审计 review artifacts，并以稳定通过证据收敛。"
+      }
+    },
+    {
+      "key": "c08-externalizable-domain-pack-boundary",
+      "source_class": "architecture_decision",
+      "future_decision_risk": "material",
+      "current": true,
+      "reviewed": true,
+      "support": "observed",
+      "sources": [
+        {
+          "type": "legacy_file",
+          "ref": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md#Summary and Milestones / M07-M09",
+          "locator": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md",
+          "digest": "sha256:d56b1755c6f898a0c4c88edf1be241d72296d36f9f49debf55f47e3340eb7f9a"
+        },
+        {
+          "type": "legacy_file",
+          "ref": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/knowledge-summary.md#Decisions / C8-PLAN-domain-pack-boundary-and-review-rules-20260506",
+          "locator": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/knowledge-summary.md",
+          "digest": "sha256:e6572a26d26b1f057541b54d3fbe100999ab8326b5871c82d82e09aea0959177"
+        }
+      ],
+      "supersedes": [],
+      "record_patch": {
+        "scope": {
+          "type": "project",
+          "ref": "project:hypo-workflow"
+        },
+        "kind": "decision",
+        "source_refs": [
+          {
+            "type": "legacy_file",
+            "ref": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md#Summary and Milestones / M07-M09",
+            "locator": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/summary.md"
+          },
+          {
+            "type": "legacy_file",
+            "ref": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/knowledge-summary.md#Decisions / C8-PLAN-domain-pack-boundary-and-review-rules-20260506",
+            "locator": ".pipeline/archives/C8-experience-rules-review-rtl-codex-plugin/knowledge-summary.md"
+          }
+        ],
+        "confidence": "high",
+        "dedupe_key": "hypo-workflow:externalizable-domain-pack-boundary",
+        "created_at": "2026-07-12T07:00:47+08:00",
+        "updated_at": "2026-07-12T07:09:58+08:00",
+        "supersedes": [],
+        "body": "领域能力通过可外置 Domain Pack boundary protocol 接入，RTL 是参考实现；规划、Review 与测试可以消费 pack，核心工作流不内嵌具体领域规则。"
+      }
+    }
+  ],
+  "excluded": [
+    {
+      "locator": "C5-C7 knowledge-summary.md / C4-derived Knowledge entries",
+      "reason": "这些条目源自 C4 并在后续快照重复出现，不是 C5-C8 新增或更强的当前证据。"
+    },
+    {
+      "locator": "C6-C8 cycle.yaml / lifecycle_policy.gates and acceptance.mode",
+      "reason": "这些值是单个 Cycle 的局部执行配置，且各 Cycle 间不同，不能提升为持久项目规则。"
+    },
+    {
+      "locator": "C7 summary.md / Milestones M01-M07",
+      "reason": "条目仅列完成项，缺少足以约束未来选择的稳定决策内容；宽泛 outcome inventory 不进入 Record Patch。"
+    },
+    {
+      "locator": "C8 summary.md / Milestones M10-M12",
+      "reason": "Codex plugin capability、delegation 与 worker 安装路径属于平台适配细节，后续易演化，未提升为跨 Cycle 候选。"
+    },
+    {
+      "locator": "C5-C8 summary.md / validation counts, release readiness, and transient warnings",
+      "reason": "历史测试计数、待发布状态、telemetry 与 LICENSE 警告是时点证据，不是当前决策约束。"
+    },
+    {
+      "locator": "C5-C8 architecture-snapshot.md",
+      "reason": "未读取；cycle.yaml、summary.md 与 knowledge-summary.md 已足以判断候选，按最小读取边界停止。"
+    }
+  ]
+}

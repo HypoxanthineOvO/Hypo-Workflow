@@ -1,0 +1,18 @@
+actor:
+  id: heyx
+  type: user
+authority_role: receipt
+consumed_at: 2026-07-12T18:09:47.012Z
+expires_at: 2026-07-12T19:09:46.876Z
+intent: deletion.execute
+issued_at: 2026-07-12T18:09:45.875Z
+object_ref:
+  id: deletion-c3ee2d03748e3d358063004a
+  kind: activity
+plan_hash: c3ee2d03748e3d358063004a792f750c1397f348ecd92a5d427bf66e1f601ad9
+receipt_id: receipt-52d21fbc1c7afdf6b84f013c50066243
+reserved_at: 2026-07-12T18:09:46.924Z
+reserved_by: g22-delete-hypo
+schema_version: '1'
+scope_hash: be0d8f84986bfd99f1ca018ebd03612cc1d84f00b1a51770e7d5e0a3c8b0da2e
+state: consumed

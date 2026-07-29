@@ -1,7 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
+import { fork } from "node:child_process";
+import { createHash } from "node:crypto";
+import { mkdir, readFile, utimes, writeFile } from "node:fs/promises";
+import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   OBJECT_REF,
   OTHER_OBJECT_REF,
@@ -45,6 +48,9 @@ const REQUIRED_EVENT_TYPES = Object.freeze([
   "restore.started",
   "restore.completed",
 ]);
+const MULTIPROCESS_APPEND_FIXTURE = fileURLToPath(
+  new URL("./fixtures/c21-m3/recovery-journal-append-child.mjs", import.meta.url),
+);
 
 const RECOVERY_PROBE = await import("../src/recovery/index.js")
   .then((api) => ({ api, error: null }))
@@ -260,6 +266,68 @@ journalTest("same-writer concurrent appends serialize while subagents retain sep
   assert.match(auditWorker.path, /\/subagent\/audit-worker\/00000001\.jsonl$/);
 });
 
+journalTest("same-writer appends serialize across independent Hook processes", async (t) => {
+  const api = await loadRecoveryApi();
+  const { store } = createRecoveryTestStore(api);
+  const root = await temporaryCurrentWorkspace(t, "hw-m3-journal-multiprocess-");
+  const count = 12;
+  const workers = Array.from({ length: count }, (_, index) => (
+    startJournalAppendProcess(root, index)
+  ));
+  t.after(() => {
+    for (const worker of workers) {
+      if (!worker.child.killed) worker.child.kill();
+    }
+  });
+
+  await Promise.all(workers.map((worker) => worker.ready));
+  for (const worker of workers) worker.child.send({ type: "start" });
+  const writes = await Promise.all(workers.map((worker) => worker.result));
+
+  assert.deepEqual(
+    writes.map((write) => write.sequence).sort((left, right) => left - right),
+    Array.from({ length: count }, (_, index) => index + 1),
+  );
+  const replay = await store.replayRecoveryJournal(root, { object_ref: OBJECT_REF });
+  const events = replay.events.filter((event) => (
+    event.session_id === "session-multiprocess" && event.writer.kind === "main"
+  ));
+  assert.equal(events.length, count);
+  assert.deepEqual(
+    events.map((event) => event.sequence),
+    Array.from({ length: count }, (_, index) => index + 1),
+  );
+});
+
+journalTest("an abandoned stale reaper cannot permanently block the stream", async (t) => {
+  const api = await loadRecoveryApi();
+  const { store } = createRecoveryTestStore(api);
+  const root = await temporaryCurrentWorkspace(t, "hw-m3-journal-stale-reaper-");
+  const sessionId = "session-stale-reaper";
+  const writer = { kind: "main", id: "main" };
+  const lockKey = `${resolve(root)}\0${OBJECT_REF.kind}\0${OBJECT_REF.id}\0${sessionId}\0${writer.kind}\0${writer.id}`;
+  const digest = createHash("sha256").update(Buffer.from(lockKey, "utf8")).digest("hex");
+  const lockDirectory = join(root, ".pipeline", "runtime", "recovery", "locks");
+  const lockPath = join(lockDirectory, `${digest}.lock`);
+  const reaperPath = `${lockPath}.reaper`;
+  const staleOwner = `${JSON.stringify({ pid: null, token: "abandoned", acquired_at_ms: 0 })}\n`;
+  const staleTime = new Date(Date.now() - 180_000);
+  await mkdir(lockDirectory, { recursive: true });
+  await writeFile(lockPath, staleOwner, "utf8");
+  await writeFile(reaperPath, staleOwner, "utf8");
+  await utimes(lockPath, staleTime, staleTime);
+  await utimes(reaperPath, staleTime, staleTime);
+
+  const result = await store.appendRecoveryEvent(root, journalEvent({
+    session_id: sessionId,
+    writer,
+    summary: "append after stale reaper recovery",
+  }));
+  assert.equal(result.event.sequence, 1);
+  await assert.rejects(readFile(lockPath, "utf8"), { code: "ENOENT" });
+  await assert.rejects(readFile(reaperPath, "utf8"), { code: "ENOENT" });
+});
+
 journalTest("at least sixteen writer streams concurrently converge on one redacted content-addressed blob", async (t) => {
   const api = await loadRecoveryApi();
   const { store } = createRecoveryTestStore(api, {
@@ -460,6 +528,60 @@ async function loadRecoveryApi() {
     assert.fail(`recovery module is unavailable: ${RECOVERY_PROBE.error.code || "load failure"}`);
   }
   return RECOVERY_PROBE.api;
+}
+
+function startJournalAppendProcess(root, index) {
+  const child = fork(MULTIPROCESS_APPEND_FIXTURE, [root, String(index)], {
+    stdio: ["ignore", "ignore", "pipe", "ipc"],
+  });
+  let stderr = "";
+  let ready = false;
+  let complete = false;
+  let resolveReady;
+  let rejectReady;
+  let resolveResult;
+  let rejectResult;
+  const readyPromise = new Promise((resolve, reject) => {
+    resolveReady = resolve;
+    rejectReady = reject;
+  });
+  const resultPromise = new Promise((resolve, reject) => {
+    resolveResult = resolve;
+    rejectResult = reject;
+  });
+
+  child.stderr.setEncoding("utf8");
+  child.stderr.on("data", (chunk) => { stderr += chunk; });
+  child.on("message", (message) => {
+    if (message?.type === "ready") {
+      ready = true;
+      resolveReady();
+      return;
+    }
+    if (message?.type === "result") {
+      complete = true;
+      resolveResult(message.result);
+      return;
+    }
+    if (message?.type === "error") {
+      complete = true;
+      rejectResult(new Error(`${message.error?.code || "child error"}: ${message.error?.message || "unknown"}`));
+    }
+  });
+  child.on("error", (error) => {
+    if (!ready) rejectReady(error);
+    if (!complete) rejectResult(error);
+  });
+  child.on("exit", (code, signal) => {
+    if (complete) return;
+    const error = new Error(
+      `Recovery Journal append child exited before completion (code=${code}, signal=${signal}): ${stderr.trim()}`,
+    );
+    if (!ready) rejectReady(error);
+    rejectResult(error);
+  });
+
+  return { child, ready: readyPromise, result: resultPromise };
 }
 
 function escapeRegExp(value) {

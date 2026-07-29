@@ -1,0 +1,84 @@
+acceptance_kind: bootstrap_activation
+acceptance_state: accepted
+accepted_at: 2026-07-12T03:35:51.607Z
+authority_role: bootstrap_acceptance
+bootstrap_job_ref:
+  id: c21-reference-bootstrap
+  kind: bootstrap_job
+checkpoint_ref:
+  path: .pipeline/runtime/migrations/c21-reference-bootstrap/rollback-checkpoint.yaml
+  semantic_hash: 2f2258b97c56914ec8609337fbe96e1b5b1b9b1bcc3e685214104ba1792d6a56
+evidence_refs:
+  - path: .pipeline/reviews/C21/M5/audit.md
+    sha256: 1a4734c1025d4cd3325c51c5da1a1d7c86e744a7adf8ece99d63bf1cf6f1ca4e
+    type: file
+  - path: .pipeline/snapshots/cycles/c21/checkpoint-0c3866ced3fa71b190b26cd3.yaml
+    semantic_hash: 0c3866ced3fa71b190b26cd32f14c024a1a1474af0b4462cb8924c65ecfdda03
+    type: snapshot
+manifest:
+  path: .pipeline/manifest.yaml
+  sha256: 6e367f6b2fc288c3197aaa6ec10d66893897dbd502d6a936c0211fef09a01e1e
+mode: reconciliation
+schema_version: '1'
+semantic_hash: 41e80088212960404fecebb2ec9bcd3235856063dbfe3e4f5466b4d71b7c25e8
+stage_hash: 170be60dd7633f5f6e19313705ef5e29d11ea4cb6f729bcd466a3a0c5632335f
+validation_head:
+  capsule_semantic_hash: cb6c9dc2f9b0c16dc79e50b67a56b901def87f262ded48ebcf94771e64f9924d
+  continuation_hash: ee3b48b1d047e5b480e2bcf85b082660a823156c583062d0bd4454f2e4baa58b
+  current_cursor:
+    object_ref:
+      id: c21
+      kind: delivery
+    schema_version: '1'
+    streams:
+      - event_id: b8577a5f33be42016426502f7ddde4c04e3816a90de7537de4b9e61d37076eca
+        segment_id: '00000001'
+        sequence: 18
+        session_id: c21-m5-cutover
+        writer:
+          id: root
+          kind: main
+  head_pack_ref:
+    id: c772da37d5ab512e4886adc7f536aab27280e80960c7cb1d89ac5cda1c41f069
+    object_ref:
+      id: c21
+      kind: delivery
+  initial_pack_ref:
+    id: b3fe311f4be23e2c3f54bded9cb08bb32867ee6d6bbf70ea71cefdafaf66b3f3
+    object_ref:
+      id: c21
+      kind: delivery
+  journal_event_count: 18
+  journal_warning_count: 0
+  legacy_freeze_inventory_hash: 8126ed7ec6176bd77f1460abfb1e07b1a0a1139352302f73885bc8a21cf9c008
+  legacy_freeze_source:
+    kind: compatibility_binding
+    path: .pipeline/reviews/C21/M5/legacy-freeze-acceptance-baseline.json
+    semantic_hash: 802931c8be1e55221235e5f2e821f364e5ddc22449370c189b8a992f05ef8d41
+    sha256: a81c9dc1780f1426e530c03ca02e3a705c9bcbe07af1f0251efc41a3f98c6866
+  object_ref:
+    id: c21
+    kind: delivery
+  pack_chain:
+    - id: b3fe311f4be23e2c3f54bded9cb08bb32867ee6d6bbf70ea71cefdafaf66b3f3
+      object_ref:
+        id: c21
+        kind: delivery
+    - id: 5a84f34fe97e47143daf77a71ec88ec7d72c0a0d4f29deaf976b550f25a8fa04
+      object_ref:
+        id: c21
+        kind: delivery
+    - id: fb22c3510eaee7b467dbf3e3e6060de7f0dbaef4bc274f0ace7fb4644d54a986
+      object_ref:
+        id: c21
+        kind: delivery
+    - id: c772da37d5ab512e4886adc7f536aab27280e80960c7cb1d89ac5cda1c41f069
+      object_ref:
+        id: c21
+        kind: delivery
+  receipt_inventory_hash: 9231272fdbf2a6e99b038d03cec1f6cd3197afb4edb320706103002888d74d6a
+  record_inventory_hash: 757a913fc788e96c939a133ba902c108d00a51b312c40ec88c68f189abbfaa26
+  restore_delta_count: 0
+  runtime_hash: 8f810dc45c8a4d335087128ac1eabd974d3645b72c82e49c516e62dd5ea4eed7
+  snapshot_inventory_hash: d0e20f38fc1784fe4fa65a94a715981782dd887bf7b6c40a384e48eb5063e359
+  verified_evidence_hash: e838743654001a57efaf4c32873f478db6c2f60980f69dcd86f1db0417f27c5e

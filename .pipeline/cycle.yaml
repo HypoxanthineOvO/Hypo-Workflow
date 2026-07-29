@@ -1,30 +1,15 @@
 cycle:
   acceptance:
-    accepted_at: 2026-06-30T21:43:36+08:00
     mode: manual
-    requested_at: 2026-06-30T21:07:50+08:00
-    state: accepted
-  context_sources: []
-  continuations:
-    - id: C20-target-codex-vsp
-      kind: target_local_cycle
-      status: planned_after_source_closure
-      summary: >-
-        Use the C20 source contract to decide and validate Codex-VSP managed AGENTS/direct-sync updates and target-owned
-        per-model prompt work.
-      target: Codex-VSP
-    - id: C20-target-vsp-open-code
-      kind: target_local_cycle
-      status: planned_after_source_closure
-      summary: >-
-        Use the C20 source contract to decide and validate VSP-Open-Code managed AGENTS/direct-sync updates and
-        target-owned reminder/runtime prompt work.
-      target: VSP-Open-Code
-  finished: 2026-06-30T21:43:36+08:00
+    state: null
+  context_sources:
+    - audit
+  continuations: []
+  finished: null
   lessons: null
   lifecycle_policy:
     accept:
-      next: follow_up_plan
+      next: complete
     auto_continue: true
     gates:
       acceptance: confirm
@@ -32,15 +17,12 @@ cycle:
       default_action: needs_revision
     resume:
       default_action: continue_current
-  name: 协商优先的修改启动风格
-  number: 20
+  name: Hypo-Workflow vNext：全局架构、平台能力与效果治理
+  number: 21
   preset: tdd
-  previous_cycle: 19
-  started: 2026-06-30T18:02:35+08:00
-  status: completed
-  summary: >-
-    C20 delivered the consultation-first action boundary in source-owned contracts, shared OpenCode/Claude guidance,
-    refreshed managed artifacts, full source regression, and a target-local Cycle handoff package; target repositories
-    were not written.
+  previous_cycle: 20
+  started: 2026-07-06T21:52:30+08:00
+  status: active
   type: feature
+  updated_at: 2026-07-12T08:15:40+08:00
   workflow_kind: build

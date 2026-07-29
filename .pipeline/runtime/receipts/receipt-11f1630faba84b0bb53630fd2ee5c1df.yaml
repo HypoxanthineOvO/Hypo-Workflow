@@ -1,0 +1,18 @@
+actor:
+  id: operator
+  type: user
+authority_role: receipt
+consumed_at: 2026-07-12T09:40:30.935Z
+expires_at: 2026-07-12T10:10:30.665Z
+intent: deletion.execute
+issued_at: 2026-07-12T09:40:29.665Z
+object_ref:
+  id: deletion-2bbfa6ff4d1354bcdef2543c
+  kind: activity
+plan_hash: 2bbfa6ff4d1354bcdef2543c4d44bb8b844e7dd266fbc5f95cb5f6d1372176ac
+receipt_id: receipt-11f1630faba84b0bb53630fd2ee5c1df
+reserved_at: 2026-07-12T09:40:30.778Z
+reserved_by: c21-m8-phase-a-deletion
+schema_version: '1'
+scope_hash: 77f98ba2ed55f2dfe1faa2f6a577c65fb616b4b020ce878477ebac1501ebdd79
+state: consumed
