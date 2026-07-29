@@ -111,6 +111,7 @@ for (const target of targets) {
   const output = join(DIST_ROOT, target.file);
   await rm(output, { force: true });
   const files = (await inventory(stage)).map((entry) => entry.path).sort();
+  if (target.key === "portable_bundle") files.push(BUNDLE_MANIFEST_PATH);
   if (!files.length) throw new Error(`No files staged for ${target.key}`);
   run("zip", ["-X", "-q", output, ...files], stage, { TZ: "UTC", LC_ALL: "C" });
   const bytes = await readFile(output);
