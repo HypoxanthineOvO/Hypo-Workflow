@@ -13,12 +13,22 @@ const STAGING_ROOT = join(DIST_ROOT, ".host-artifacts-staging");
 const INSTALLED_DESCRIPTOR_PATH = "contracts/host/v1/installed-release.json";
 const BUNDLE_MANIFEST_PATH = "bundle-manifest.json";
 const PUBLIC_SKILLS = ["guide", "init", "goal", "plan", "cycle", "maintain", "experiment", "resume", "accept", "reject"];
+const RUNTIME_DEPENDENCIES = ["argparse", "js-yaml"];
 
 const plugin = JSON.parse(await readFile(join(ROOT, ".codex-plugin", "plugin.json"), "utf8"));
 const version = plugin.version;
 const sourceCommit = git(["rev-parse", "HEAD"]).trim();
 if (!/^[a-f0-9]{40}$/.test(sourceCommit)) throw new Error("Unable to resolve the source commit");
 const sourceDate = new Date(Number(git(["show", "-s", "--format=%ct", sourceCommit]).trim()) * 1000);
+const packageLock = JSON.parse(await readFile(join(ROOT, "package-lock.json"), "utf8"));
+
+for (const dependency of RUNTIME_DEPENDENCIES) {
+  const expected = packageLock.packages?.[`node_modules/${dependency}`]?.version;
+  const installed = JSON.parse(await readFile(join(ROOT, "node_modules", dependency, "package.json"), "utf8"));
+  if (!expected || installed.version !== expected) {
+    throw new Error(`Runtime dependency ${dependency} does not match package-lock.json`);
+  }
+}
 
 await rm(STAGING_ROOT, { recursive: true, force: true });
 await mkdir(STAGING_ROOT, { recursive: true });
@@ -26,6 +36,7 @@ await mkdir(STAGING_ROOT, { recursive: true });
 const common = [
   "SKILL.md",
   "package.json",
+  "package-lock.json",
   "core/package.json",
   "core/src",
   "hooks/hooks.json",
@@ -77,6 +88,12 @@ for (const target of targets) {
   for (const source of target.sources) {
     const from = join(ROOT, source);
     const to = join(stage, source);
+    await mkdir(dirname(to), { recursive: true });
+    await cp(from, to, { recursive: true, dereference: false, preserveTimestamps: false });
+  }
+  for (const dependency of RUNTIME_DEPENDENCIES) {
+    const from = join(ROOT, "node_modules", dependency);
+    const to = join(stage, "node_modules", dependency);
     await mkdir(dirname(to), { recursive: true });
     await cp(from, to, { recursive: true, dereference: false, preserveTimestamps: false });
   }

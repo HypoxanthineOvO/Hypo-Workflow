@@ -389,9 +389,10 @@ async function evaluatePreCompact(root, input, operation, recovery) {
   const objectRef = await readActiveObjectRef(root, input, operation.clock);
   if (!objectRef) return { continue: true };
   if (objectRef.kind === "experiment") return { continue: true };
-  const [capsule, runtime, worktreeSummary] = await Promise.all([
+  const runtime = await readRuntimeObject(root, objectRef);
+  if (["accepted", "rejected"].includes(runtime.runtime.status)) return { continue: true };
+  const [capsule, worktreeSummary] = await Promise.all([
     recovery.readContextCapsule(root, objectRef),
-    readRuntimeObject(root, objectRef),
     collectGitWorktreeSummary(root),
   ]);
   const sealed = await recovery.sealRecoveryPack(root, {
@@ -421,6 +422,8 @@ async function evaluatePostCompact(root, input, operation, recovery) {
   const objectRef = await readActiveObjectRef(root, input, operation.clock);
   if (!objectRef) return { continue: true };
   if (objectRef.kind === "experiment") return { continue: true };
+  const runtime = await readRuntimeObject(root, objectRef);
+  if (["accepted", "rejected"].includes(runtime.runtime.status)) return { continue: true };
   const selected = await recovery.selectLatestValidRecoveryPack(root, { object_ref: objectRef });
   await recovery.appendRecoveryEvent(root, {
     object_ref: objectRef,

@@ -86,6 +86,8 @@ test("release artifacts are materialized, checksummed, and portable content matc
   assert.ok(has("bundle-manifest.json"));
   assert.ok(has("contracts/host/v1/installed-release.json"));
   assert.ok(has("hooks/hooks.json"));
+  assert.ok(has("node_modules/js-yaml/index.js"), "portable bundle must include the js-yaml runtime dependency");
+  assert.ok(has("node_modules/argparse/argparse.js"), "portable bundle must include the argparse runtime dependency");
   for (const command of EXPECTED_COMMANDS) {
     assert.ok(has(`skills/${command.slice(3)}/SKILL.md`), `portable bundle missing ${command}`);
   }
@@ -109,6 +111,19 @@ test("release artifacts are materialized, checksummed, and portable content matc
     "SubagentStop",
     "UserPromptSubmit",
   ]);
+
+  const installed = await mkdtemp(join(tmpdir(), "hypo-host-runtime-"));
+  try {
+    const extracted = spawnSync("unzip", ["-q", join(ROOT, bundle.path), "-d", installed], { encoding: "utf8" });
+    assert.equal(extracted.status, 0, extracted.stderr || "portable bundle must extract cleanly");
+    const runtime = spawnSync(process.execPath, ["-e", "import('./core/src/serialization/index.js')"], {
+      cwd: installed,
+      encoding: "utf8",
+    });
+    assert.equal(runtime.status, 0, runtime.stderr || "portable bundle must load runtime dependencies without npm install");
+  } finally {
+    await rm(installed, { recursive: true, force: true });
+  }
 
   const bundleManifestEntry = entries.find((entry) => entry === "bundle-manifest.json" || entry.endsWith("/bundle-manifest.json"));
   const bundleManifestPayload = spawnSync("unzip", ["-p", join(ROOT, bundle.path), bundleManifestEntry], { encoding: "utf8" });

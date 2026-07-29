@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile, readdir } from "node:fs/promises";
+import { readFile, readdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 import * as api from "../src/index.js";
 import {
@@ -130,6 +130,31 @@ test("compact hooks seal a valid Pack, record the outcome, and restore bounded c
   assert.match(context, /seal_recovery_pack_from_verified_capsule/);
   assert.ok(Buffer.byteLength(context) < 16_384, "restored context must stay bounded");
   assert.doesNotMatch(context, /full transcript|raw_journal|transcript_path/i);
+});
+
+test("compact hooks ignore terminal Delivery objects without a Context Capsule", async (t) => {
+  const root = await temporaryGitWorkspace(t, "hw-m7-hooks-terminal-compact-");
+  const authorities = await seedActiveRecovery(root, "m7-terminal-compact");
+  await api.writeRuntimeObject(root, {
+    object_ref: OBJECT_REF,
+    runtime: {
+      ...authorities.authorities.runtimeInput.runtime,
+      status: "accepted",
+      phase: "accepted",
+    },
+    continuation: authorities.authorities.runtimeInput.continuation,
+  }, { id: "m7-terminal-compact-runtime" });
+
+  const capsulePath = join(root, ".pipeline/memory/capsules/delivery/goal-alpha.yaml");
+  await rm(capsulePath);
+
+  for (const event of ["PreCompact", "PostCompact"]) {
+    const output = await api.evaluateCodexHookEvent(root, await officialHookCase(root, event), {
+      id: `m7-terminal-${event.toLowerCase()}`,
+      clock: () => FIXED_NOW,
+    });
+    assert.deepEqual(output, { continue: true });
+  }
 });
 
 test("repeated SessionStart projection refresh is a byte-stable no-op", async (t) => {
