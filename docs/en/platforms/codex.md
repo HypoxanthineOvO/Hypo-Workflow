@@ -15,6 +15,8 @@ codex plugin marketplace list
 
 Install or enable `hypo-workflow` from Codex `/plugins`, then start a new session. Use `/hooks` to inspect sources and trust the current definitions. Codex binds trust to Hook hashes, so changed definitions are skipped until trusted again.
 
+When upgrading a local marketplace, `codex plugin add` prunes older caches for the same plugin ID while started or resumed Sessions may still hold an absolute path to their previous `PLUGIN_ROOT`. Before the upgrade command returns, snapshot the active old cache, install the new version, and restore the old cache at its exact path. Remove that rollback copy only after every old Session has ended. Exiting the UI or resuming the same Session does not change its pinned Hook path.
+
 A Skill-only symlink is available for degraded testing without Hooks:
 
 ```bash

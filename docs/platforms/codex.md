@@ -13,6 +13,8 @@ codex plugin marketplace list
 
 在 Codex `/plugins` 中安装或启用 `hypo-workflow`，然后开始一个新会话。用 `/hooks` 查看来源、审查并信任当前 Hook 定义。Codex 按 Hook hash 保存信任；文件改变后会跳过未重新信任的 Hook。
 
+升级本地 marketplace 时，`codex plugin add` 会清理同一 plugin ID 的旧 cache，而已经启动或恢复的 Session 仍可能持有旧 `PLUGIN_ROOT` 绝对路径。升级命令返回前必须先快照活动旧 cache、安装新版本，再把旧 cache 恢复到原路径；确认所有旧 Session 结束后才能删除该回滚副本。只退出界面或 resume 同一 Session 不会改变已固定的 Hook 路径。
+
 Skill-only symlink 可用于无 Hooks 的降级测试：
 
 ```bash
