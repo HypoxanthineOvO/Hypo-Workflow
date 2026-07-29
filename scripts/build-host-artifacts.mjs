@@ -110,11 +110,7 @@ for (const target of targets) {
   await normalizeTimes(stage, sourceDate);
   const output = join(DIST_ROOT, target.file);
   await rm(output, { force: true });
-  const files = git(["ls-files", "--cached", "--others", "--exclude-standard"], stage)
-    .split("\n")
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-    .sort();
+  const files = (await inventory(stage)).map((entry) => entry.path).sort();
   if (!files.length) throw new Error(`No files staged for ${target.key}`);
   run("zip", ["-X", "-q", output, ...files], stage, { TZ: "UTC", LC_ALL: "C" });
   const bytes = await readFile(output);
