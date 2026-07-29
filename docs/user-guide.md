@@ -32,6 +32,14 @@ v14.0.0-alpha.3 的 Official Codex 发布包公开十个聚焦入口，每次只
 
 当用户询问“现在实验怎么样”时，Agent 首先读取项目的 bounded materialized status projection，直接概括默认与 contextual baseline、硬件与环境、数据集含义、扫描目的、outcome、可疑结果、资源边界和下一步；只有需要 drill-down 时才跟随 detail references。普通状态查询不会重新扫描仓库、结果目录或全部 immutable events。
 
+## 多 Work Item 与并发 Placement
+
+同一个 Project 可以同时存在多个 Goal、Plan、兼容 Cycle 和 Experiment。`active.delivery` 仅供尚未采用 Placement 的旧 workspace 使用，不是全项目互斥锁。当前 Session 必须显式选择一个 Work Item；有多个候选而尚未绑定时，SessionStart 返回候选列表，不会把两个任务混在一个上下文中。
+
+一个 Project authority root 可以登记多个独立 Git Repository Target，例如 `Cryo-Computing` 下相互独立的 `Accel-Sim` 与 `llm-trace`。每个 target 保存稳定仓库身份、当前 locator、Git base，以及一个 primary integration target；后续可以增加 alternate integration target，不要求把嵌套仓库改成 submodule。
+
+启动前，Host 声明代码和资源占用，Core 原子返回 `shared`、`isolated_worktree`、`isolated_resources` 或 `blocked`。固定同一 commit 的 `read`/`execute` 可以共享；不同 snapshot 或 `build`/`write`/`checkout` 使用 worktree；可重定位 mutable cache 使用资源隔离；独占 GPU、端口或固定输出重叠会阻断。Core 只持久化 lease/fencing 与 bounded Host action，不直接执行 Git 或启动进程。源码变更必须合并进登记的 integration target，并提供与 claim、target、commit 和 `git merge-base --is-ancestor` 结果一致的摘要校验文件，Delivery 才能请求最终验收。
+
 ## Experiment 工作模型
 
 ### 项目知识与复现上下文

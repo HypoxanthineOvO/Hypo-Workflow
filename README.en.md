@@ -34,6 +34,7 @@ Manifest
 
 - **Runtime** owns Goal/Plan lifecycle and remains compatible with existing Cycles; **Continuation** owns only the next action.
 - **Delivery / Workstream** allow multiple tasks and Sessions to run in one project; `active.delivery` remains only as a legacy foreground pointer.
+- **Work Placement / Repository Target** bind each Session to one Delivery or Experiment and atomically choose a shared checkout, isolated worktree, resource isolation, or blocked placement; source changes must return to a registered integration target.
 - **Records** store requirements, preferences, decisions, and feedback. They replace the generic Rules system.
 - **Experiment events / status projection** store Git-mergeable experiment facts and provide instant status without rescanning result trees.
 - **Worker Routing** shows a task assessment before Worker start and emits a semantic capability class without choosing a model or provider.

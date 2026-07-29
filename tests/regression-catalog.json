@@ -103,6 +103,22 @@
           ]
         },
         {
+          "path": "core/test/concurrent-work-host-integration.test.js",
+          "classification": "maintained",
+          "reason": "Session selection, legacy foreground isolation, and Host status projection contract for concurrent Work Items.",
+          "covers": [
+            "concurrent-work-placement-integration"
+          ]
+        },
+        {
+          "path": "core/test/concurrent-work-placement-contract.test.js",
+          "classification": "maintained",
+          "reason": "Repository Target, atomic Placement lease, Cryo-Computing concurrency, and integration gate contract.",
+          "covers": [
+            "concurrent-work-placement-integration"
+          ]
+        },
+        {
           "path": "core/test/command-skill-root-routing.test.js",
           "classification": "maintained",
           "reason": "Executable current C21 behavior or protection contract used by the maintained release gate.",

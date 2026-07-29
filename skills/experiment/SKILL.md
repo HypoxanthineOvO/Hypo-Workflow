@@ -17,14 +17,16 @@ Experiment is a durable project lane alongside Goal, Plan, and Maintain. It is n
 2. If the projection is missing after a clone or Git merge, rebuild it from `.pipeline/memory/experiment-events/<project_id>/` once, then use the projection for ordinary status questions.
 3. Load only the referenced project knowledge needed for the task: purpose, metric meanings, dataset units, module roles, concept-to-code mappings, paper expectations, and stale source/version warnings.
 4. State the intended experiment, baseline context, dataset or scene, changed and fixed parameters, success evidence, resource boundary, and next action before launching work.
+5. Resolve the current Session to exactly one Work Item. Multiple Experiments and Deliveries may coexist, but one Session must not silently mix their authority or inherit a legacy foreground pointer.
 
 ## Prepare And Run
 
 1. Capture a code snapshot, `uv` environment and lock digest, machine/GPU/driver/CUDA facts, external dataset location, command, resource limits, readable output directory, and parameters through the Experiment Core APIs. Do not introduce Conda by default.
-2. Treat the same code, parameters, dataset, scene, and explicit user-directed rerun as one logical run identity with a new Attempt. A different dataset or scene is a different experiment identity.
-3. Expand explicit one-axis or cross-axis scans before execution. Record fixed parameters, axes, selected cases, feasibility limits, and why a screening scan expands to all data.
-4. Run through the host in foreground or an isolated, uniquely named tmux session. Poll when the user asks the Agent to watch. Record interruption evidence; resume from a real checkpoint when available, otherwise record restart-from-scratch.
-5. Preserve logs, config, metrics, output references, failure evidence, and scientific review. Operational completion alone is not scientific success.
+2. Before launching, register every independent Git checkout as a Repository Target and atomically assess Repository and resource claims through Work Placement. Compatible pinned read/execute experiments may share; different snapshots or source-changing access use isolated worktrees; relocatable caches use resource isolation; fixed GPU/port/output conflicts block launch.
+3. Treat the same code, parameters, dataset, scene, and explicit user-directed rerun as one logical run identity with a new Attempt. A different dataset or scene is a different experiment identity.
+4. Expand explicit one-axis or cross-axis scans before execution. Record fixed parameters, axes, selected cases, feasibility limits, and why a screening scan expands to all data.
+5. Run through the host in foreground or an isolated, uniquely named tmux session. Renew the fenced Placement lease during long runs; an expired lease leaves active Session/Host projection and cannot be reclaimed after a conflicting owner acquires the resource. Poll when the user asks the Agent to watch. Record interruption evidence; resume from a real checkpoint when available, otherwise record restart-from-scratch.
+6. Preserve logs, config, metrics, output references, failure evidence, and scientific review. Operational completion alone is not scientific success.
 
 ## Review And Change History
 

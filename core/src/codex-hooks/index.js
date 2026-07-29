@@ -7,6 +7,7 @@ import { createRecoveryStore } from "../recovery/index.js";
 import { readActivePointer, readRuntimeObject } from "../runtime/index.js";
 import { canonicalHash } from "../serialization/index.js";
 import { refreshHostStatusProjection } from "../host-contract/index.js";
+import { resolveWorkItemSession } from "../work-placement/index.js";
 import { validateWorkerRoutingDecision } from "../worker-routing/index.js";
 import { assertWorkspacePathAllowed } from "../workspace-store/index.js";
 import {
@@ -177,10 +178,10 @@ export async function evaluateCodexHookEvent(root, rawInput, options = {}) {
       output = await evaluateUserPrompt(workspaceRoot, input, operation);
       break;
     case "PreToolUse":
-      output = evaluatePreToolUse(input);
+      output = await evaluatePreToolUse(workspaceRoot, input, operation);
       break;
     case "PermissionRequest":
-      output = evaluatePermissionRequest(input);
+      output = await evaluatePermissionRequest(workspaceRoot, input, operation);
       break;
     case "PostToolUse":
       output = await evaluatePostToolUse(workspaceRoot, input, operation);
@@ -222,9 +223,18 @@ function bindOptionalHookIdentifiers(input, operation) {
 }
 
 async function evaluateSessionStart(root, input, operation, recovery) {
-  await refreshProjectionIfCurrent(root, operation, "session-start");
+  await refreshProjectionIfCurrent(root, operation, "session-start", input);
+  const selection = await resolveSessionRouting(root, input, operation.clock);
+  if (selection.status === "selection_required") {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "SessionStart",
+        additionalContext: renderSelectionContext(selection.candidates),
+      },
+    };
+  }
   if (input.source !== "compact") return {};
-  const objectRef = await readActiveObjectRef(root);
+  const objectRef = selection.object_ref;
   if (!objectRef) return {};
   try {
     const plan = await recovery.planRecoveryRestore(root, {
@@ -245,6 +255,10 @@ async function evaluateSessionStart(root, input, operation, recovery) {
 }
 
 async function evaluateUserPrompt(root, input, operation) {
+  const selection = await resolveSessionRouting(root, input, operation.clock);
+  if (selection.status === "selection_required") {
+    return { decision: "block", reason: selectionRequiredReason(selection.candidates) };
+  }
   const semanticDelta = inferSemanticDelta(root, input);
   const promptIsSecretSafe = isSecretSafeText(input.prompt);
   const maintain = createAmbientMaintainStore({ clock: operation.clock ?? (() => new Date().toISOString()) });
@@ -262,7 +276,17 @@ async function evaluateUserPrompt(root, input, operation) {
   return {};
 }
 
-function evaluatePreToolUse(input) {
+async function evaluatePreToolUse(root, input, operation) {
+  const selection = await resolveSessionRouting(root, input, operation.clock);
+  if (selection.status === "selection_required") {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "PreToolUse",
+        permissionDecision: "deny",
+        permissionDecisionReason: selectionRequiredReason(selection.candidates),
+      },
+    };
+  }
   if (!isObviousDirectDeletion(input.tool_name, input.tool_input)) return {};
   return {
     hookSpecificOutput: {
@@ -273,7 +297,16 @@ function evaluatePreToolUse(input) {
   };
 }
 
-function evaluatePermissionRequest(input) {
+async function evaluatePermissionRequest(root, input, operation) {
+  const selection = await resolveSessionRouting(root, input, operation.clock);
+  if (selection.status === "selection_required") {
+    return {
+      hookSpecificOutput: {
+        hookEventName: "PermissionRequest",
+        decision: { behavior: "deny", message: selectionRequiredReason(selection.candidates) },
+      },
+    };
+  }
   if (!isObviousDirectDeletion(input.tool_name, input.tool_input)) return {};
   return {
     hookSpecificOutput: {
@@ -284,12 +317,12 @@ function evaluatePermissionRequest(input) {
 }
 
 async function evaluatePostToolUse(root, input, operation) {
-  const objectRef = await readActiveObjectRef(root);
+  const objectRef = await readActiveObjectRef(root, input, operation.clock);
   if (!objectRef) return {};
   const changedPaths = extractChangedPaths(root, input);
   const worktreeEffect = collectReminderWorktreeEffect(root, changedPaths);
   const reminderKey = reminderDigest(input.tool_name, changedPaths, input.tool_input, worktreeEffect.digest);
-  await refreshProjectionIfCurrent(root, operation, "post-tool");
+  await refreshProjectionIfCurrent(root, operation, "post-tool", input);
   if (!shouldRemind(input.tool_name, changedPaths)) return {};
   const target = changedPaths.length ? changedPaths.join(", ") : input.tool_name;
   const systemMessage = `Review documentation affected by ${target}; stage a Record only for durable requirements or decisions.`;
@@ -334,11 +367,12 @@ async function claimReminderMarker(root, objectRef, reminderKey, systemMessage) 
   }
 }
 
-async function refreshProjectionIfCurrent(root, operation, suffix) {
+async function refreshProjectionIfCurrent(root, operation, suffix, input = null) {
   try {
     await refreshHostStatusProjection(root, {
       clock: operation.clock ?? (() => new Date().toISOString()),
       id: `${operation.id}-${suffix}-host-status`,
+      ...(input ? { host: "codex", session_id: input.session_id } : {}),
     });
   } catch (error) {
     if (new Set([
@@ -352,8 +386,9 @@ async function refreshProjectionIfCurrent(root, operation, suffix) {
 }
 
 async function evaluatePreCompact(root, input, operation, recovery) {
-  const objectRef = await readActiveObjectRef(root);
+  const objectRef = await readActiveObjectRef(root, input, operation.clock);
   if (!objectRef) return { continue: true };
+  if (objectRef.kind === "experiment") return { continue: true };
   const [capsule, runtime, worktreeSummary] = await Promise.all([
     recovery.readContextCapsule(root, objectRef),
     readRuntimeObject(root, objectRef),
@@ -383,8 +418,9 @@ async function evaluatePreCompact(root, input, operation, recovery) {
 }
 
 async function evaluatePostCompact(root, input, operation, recovery) {
-  const objectRef = await readActiveObjectRef(root);
+  const objectRef = await readActiveObjectRef(root, input, operation.clock);
   if (!objectRef) return { continue: true };
+  if (objectRef.kind === "experiment") return { continue: true };
   const selected = await recovery.selectLatestValidRecoveryPack(root, { object_ref: objectRef });
   await recovery.appendRecoveryEvent(root, {
     object_ref: objectRef,
@@ -404,7 +440,7 @@ async function evaluatePostCompact(root, input, operation, recovery) {
 }
 
 async function evaluateSubagent(root, input, operation, recovery, starting) {
-  const objectRef = await readActiveObjectRef(root);
+  const objectRef = await readActiveObjectRef(root, input, operation.clock);
   const evidenceRefs = starting ? [] : extractEvidenceLocators(input.last_assistant_message);
   const workerRouting = objectRef
     ? await readWorkerRoutingForEvent(root, objectRef, input, recovery, starting)
@@ -494,7 +530,7 @@ function renderWorkerRoutingContext(routing) {
 }
 
 async function evaluateStop(root, input, operation, recovery) {
-  const objectRef = await readActiveObjectRef(root);
+  const objectRef = await readActiveObjectRef(root, input, operation.clock);
   if (objectRef) {
     await recovery.appendRecoveryEvent(root, {
       object_ref: objectRef,
@@ -532,14 +568,38 @@ function normalizeEvaluationOptions(event, options) {
   return { id: normalizeSafeIdentifier(options.id, "Codex Hook operation id"), ...(clock === undefined ? {} : { clock }) };
 }
 
-async function readActiveObjectRef(root) {
+async function readActiveObjectRef(root, input, clock) {
+  const selection = await resolveSessionRouting(root, input, clock);
+  return selection.status === "selected" ? selection.object_ref : null;
+}
+
+async function resolveSessionRouting(root, input, clock) {
+  const selection = await resolveWorkItemSession(root, {
+    host: "codex",
+    session_id: input.session_id,
+  }, { ...(clock ? { clock } : {}) });
+  if (selection.status === "selected") {
+    return { status: "selected", object_ref: selection.work_item_ref };
+  }
+  if (selection.placement_registry_present) return selection;
   try {
     const pointer = await readActivePointer(root);
-    return pointer.active.delivery ?? pointer.active.activity ?? pointer.active.bootstrap_job ?? null;
+    const objectRef = pointer.active.delivery ?? pointer.active.activity ?? pointer.active.bootstrap_job ?? null;
+    return objectRef ? { status: "selected", object_ref: objectRef, legacy: true } : { status: "none" };
   } catch (error) {
-    if (error?.code === "ERR_AUTHORITY_OBJECT_NOT_FOUND") return null;
+    if (error?.code === "ERR_AUTHORITY_OBJECT_NOT_FOUND") return { status: "none" };
     throw error;
   }
+}
+
+function renderSelectionContext(candidates) {
+  const choices = candidates.map(({ work_item_ref }) => `${work_item_ref.kind}:${work_item_ref.id}`).join(", ");
+  return `This Session is not bound to a Work Item. Select exactly one before continuing; do not inherit active.delivery. Available Work Items: ${choices}.`;
+}
+
+function selectionRequiredReason(candidates) {
+  const choices = candidates.map(({ work_item_ref }) => `${work_item_ref.kind}:${work_item_ref.id}`).join(", ");
+  return `Select exactly one Work Item for this Session before prompts or tools can continue${choices ? `: ${choices}` : "."}`;
 }
 
 function inferSemanticDelta(root, input) {

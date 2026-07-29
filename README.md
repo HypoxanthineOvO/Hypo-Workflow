@@ -34,6 +34,7 @@ Manifest
 
 - **Runtime** 保存 Goal/Plan 生命周期，并兼容读取既有 Cycle；**Continuation** 只保存下一步。
 - **Delivery / Workstream** 支持同一项目中的多个任务与 Session 并行；`active.delivery` 只保留为旧宿主 foreground pointer。
+- **Work Placement / Repository Target** 让每个 Session 显式选择一个 Delivery 或 Experiment，并在启动前原子判定共享 checkout、独立 worktree、资源隔离或阻断；源码改动完成后必须回到登记的 integration target。
 - **Records** 保存 requirement、preference、decision 和 feedback；它们替代通用 Rules 系统。
 - **Experiment events / status projection** 保存可 Git 合并的实验事实，并提供无需扫描结果树的即时状态。
 - **Worker Routing** 在 Worker 启动前显示任务评估并输出语义能力档，不选择具体模型或 Provider。
@@ -81,6 +82,8 @@ codex plugin marketplace add /absolute/path/to/Hypo-Workflow
 ```
 
 提案门提供三种明确语义：`确认并开始`、`确认但不开始`、`不确认/继续讨论`。普通的“可以”“确认”“OK”“go ahead”默认签发 `delivery.approve_and_start` 并立即执行；只有“确认但不开始”进入 `waiting_to_start`。删除、远程写入、发布、服务重启等高影响操作仍保留局部门禁。中断后使用 `/hw:resume`。
+
+并发工作不再由单一 `active.delivery` 限制。一个 Project authority root 可以登记多个独立 Git Repository Target，并同时存在多个 Goal、Plan、Cycle 与 Experiment；一个 Session 仍只绑定一个 Work Item。固定快照的只读/执行实验可以共享环境，源码写入使用独立 worktree，GPU、端口、cache 和输出目录在启动前通过原子 lease 与 fencing 检查冲突。永久主 checkout 作为 primary integration target 保留，源码改动在最终完成前必须提供带摘要校验的 Git ancestry 证据。
 
 ### Experiment 能力
 

@@ -10,6 +10,7 @@ import {
   readCurrentManifest,
 } from "../runtime/internal.js";
 import { commitWorkspaceTransaction } from "../workspace-store/index.js";
+import { createWorkPlacementStore, resolveWorkItemSession } from "../work-placement/index.js";
 
 export {
   compileVspiIntegrationContract,
@@ -29,12 +30,16 @@ const STATUS_KEYS = new Set([
   "workspace",
   "delivery",
   "continuation",
+  "work_items",
+  "session",
   "invalidation",
 ]);
 const WORKSPACE_KEYS = new Set(["format_version", "status"]);
 const DELIVERY_KEYS = new Set(["kind", "id", "status", "revision"]);
 const CONTINUATION_KEYS = new Set(["available", "safe_resume_command"]);
 const INVALIDATION_KEYS = new Set(["invalidated_at", "reason"]);
+const WORK_ITEM_KEYS = new Set(["kind", "id", "status", "placement_ids"]);
+const SESSION_KEYS = new Set(["host", "session_id", "status", "work_item_ref"]);
 const SECRET_KEY = /(?:api[_-]?key|authorization|credential|password|passwd|private[_-]?key|secret|session[_-]?token|token)/i;
 const SHA256 = /^[a-f0-9]{64}$/;
 
@@ -52,18 +57,22 @@ export function parseHostStatusProjection(input) {
     const workspace = parseWorkspace(input.workspace);
     const delivery = input.delivery === null ? null : parseDelivery(input.delivery);
     const continuation = input.continuation === null ? null : parseContinuation(input.continuation);
+    const workItems = input.work_items === undefined ? [] : parseWorkItems(input.work_items);
+    const session = input.session === undefined || input.session === null ? null : parseSession(input.session);
     if (input.invalidation !== null) {
       throw contractError("ERR_HOST_STATUS_INVALID", "Current Host status cannot contain invalidation data");
     }
-    return clone({ ...input, workspace, delivery, continuation, invalidation: null });
+    return clone({ ...input, workspace, delivery, continuation, work_items: workItems, session, invalidation: null });
   }
 
   if (input.projection_status === "invalidated") {
-    if (input.workspace !== null || input.delivery !== null || input.continuation !== null) {
+    if (input.workspace !== null || input.delivery !== null || input.continuation !== null
+      || (input.work_items !== undefined && input.work_items !== null)
+      || (input.session !== undefined && input.session !== null)) {
       throw contractError("ERR_HOST_STATUS_INVALID", "Invalidated Host status must clear host-visible state");
     }
     const invalidation = parseInvalidation(input.invalidation);
-    return clone({ ...input, workspace: null, delivery: null, continuation: null, invalidation });
+    return clone({ ...input, workspace: null, delivery: null, continuation: null, work_items: null, session: null, invalidation });
   }
   throw contractError("ERR_HOST_STATUS_INVALID", "Host status projection_status is unsupported");
 }
@@ -82,13 +91,15 @@ export function invalidateHostStatusProjection(currentInput, input) {
     workspace: null,
     delivery: null,
     continuation: null,
+    work_items: null,
+    session: null,
     invalidation,
   });
 }
 
 export function compileHostStatusProjection(input) {
   assertObject(input, "Host status source");
-  rejectUnknownKeys(input, new Set(["generated_at", "generation", "manifest", "delivery", "continuation"]), "Host status source");
+  rejectUnknownKeys(input, new Set(["generated_at", "generation", "manifest", "delivery", "continuation", "work_items", "session"]), "Host status source");
   assertObject(input.manifest, "Host status manifest");
   const runtime = input.delivery ?? null;
   const continuation = input.continuation ?? null;
@@ -112,6 +123,8 @@ export function compileHostStatusProjection(input) {
       available: true,
       safe_resume_command: "/hw:resume",
     },
+    work_items: input.work_items ?? [],
+    session: input.session ?? null,
     invalidation: null,
   });
 }
@@ -135,7 +148,7 @@ export async function readHostStatusProjection(root) {
 
 export async function refreshHostStatusProjection(root, options = {}) {
   assertPlainObject(options, "Host status refresh options");
-  assertExactKeys(options, ["clock", "id"], "Host status refresh options");
+  assertExactKeys(options, ["clock", "id", "host", "session_id"], "Host status refresh options");
   if (typeof options.clock !== "function") throw contractError("ERR_HOST_CONTRACT_INVALID", "Host status refresh requires a zero-argument clock");
   const id = normalizeSafeIdentifier(options.id, "Host status refresh options.id");
   const generatedAt = normalizeTimestamp(options.clock(), "Host status refresh clock value");
@@ -144,10 +157,33 @@ export async function refreshHostStatusProjection(root, options = {}) {
   const generation = existing.projection?.generation === undefined ? 0 : existing.projection.generation + 1;
   let delivery = null;
   let continuation = null;
+  const placements = await createWorkPlacementStore({ clock: options.clock, lease_ttl_ms: 1 }).list(root);
+  const workItems = compileWorkItems(placements);
+  let session = null;
+  let selectedRef = null;
+  let placementRegistryPresent = false;
+  if (options.host !== undefined || options.session_id !== undefined) {
+    if (options.host === undefined || options.session_id === undefined) {
+      throw contractError("ERR_HOST_CONTRACT_INVALID", "Host status Session requires host and session_id together");
+    }
+    const selection = await resolveWorkItemSession(root, { host: options.host, session_id: options.session_id }, { clock: options.clock });
+    placementRegistryPresent = selection.placement_registry_present;
+    selectedRef = selection.status === "selected" ? selection.work_item_ref : null;
+    session = {
+      host: options.host,
+      session_id: options.session_id,
+      status: selection.status,
+      work_item_ref: selectedRef,
+    };
+  }
   try {
-    const pointer = await readActivePointer(root);
-    if (pointer.active.delivery) {
-      const authority = await readRuntimeObject(root, pointer.active.delivery);
+    let deliveryRef = selectedRef?.kind === "delivery" ? selectedRef : null;
+    if (!selectedRef && !placementRegistryPresent && workItems.length === 0) {
+      const pointer = await readActivePointer(root);
+      deliveryRef = pointer.active.delivery ?? null;
+    }
+    if (deliveryRef) {
+      const authority = await readRuntimeObject(root, deliveryRef);
       delivery = authority.runtime;
       continuation = authority.continuation;
     }
@@ -171,6 +207,8 @@ export async function refreshHostStatusProjection(root, options = {}) {
     manifest,
     delivery,
     continuation,
+    work_items: workItems,
+    session,
   });
   await commitWorkspaceTransaction(root, {
     id,
@@ -252,6 +290,57 @@ function parseContinuation(value) {
   if (typeof value.available !== "boolean") throw contractError("ERR_HOST_STATUS_INVALID", "Host status continuation.available must be boolean");
   if (value.safe_resume_command !== "/hw:resume") throw contractError("ERR_HOST_STATUS_INVALID", "Host status safe resume command is invalid");
   return clone(value);
+}
+
+function parseWorkItems(value) {
+  if (!Array.isArray(value)) throw contractError("ERR_HOST_STATUS_INVALID", "Host status work_items must be an array");
+  return value.map((item) => {
+    assertObject(item, "Host status Work Item");
+    rejectUnknownKeys(item, WORK_ITEM_KEYS, "Host status Work Item");
+    if (!new Set(["delivery", "experiment"]).has(item.kind)) throw contractError("ERR_HOST_STATUS_INVALID", "Host status Work Item kind is invalid");
+    requireText(item.id, "work_items.id");
+    if (!new Set(["active", "expired", "released"]).has(item.status)) throw contractError("ERR_HOST_STATUS_INVALID", "Host status Work Item status is invalid");
+    if (!Array.isArray(item.placement_ids) || item.placement_ids.some((id) => typeof id !== "string" || !id.trim())) {
+      throw contractError("ERR_HOST_STATUS_INVALID", "Host status Work Item placement_ids is invalid");
+    }
+    return clone(item);
+  });
+}
+
+function parseSession(value) {
+  assertObject(value, "Host status Session");
+  rejectUnknownKeys(value, SESSION_KEYS, "Host status Session");
+  requireText(value.host, "session.host");
+  requireText(value.session_id, "session.session_id");
+  if (!new Set(["selected", "selection_required", "none"]).has(value.status)) throw contractError("ERR_HOST_STATUS_INVALID", "Host status Session status is invalid");
+  if (value.work_item_ref !== null) {
+    assertObject(value.work_item_ref, "Host status Session Work Item ref");
+    rejectUnknownKeys(value.work_item_ref, new Set(["kind", "id"]), "Host status Session Work Item ref");
+    if (!new Set(["delivery", "experiment"]).has(value.work_item_ref.kind)) throw contractError("ERR_HOST_STATUS_INVALID", "Host status Session Work Item kind is invalid");
+    requireText(value.work_item_ref.id, "session.work_item_ref.id");
+  }
+  if (value.status === "selected" && value.work_item_ref === null) throw contractError("ERR_HOST_STATUS_INVALID", "Selected Host status Session requires a Work Item ref");
+  return clone(value);
+}
+
+function compileWorkItems(placements) {
+  const items = new Map();
+  for (const placement of placements) {
+    const key = `${placement.work_item_ref.kind}:${placement.work_item_ref.id}`;
+    const current = items.get(key) ?? {
+      kind: placement.work_item_ref.kind,
+      id: placement.work_item_ref.id,
+      status: "released",
+      placement_ids: [],
+    };
+    current.placement_ids.push(placement.id);
+    if (placement.status === "active") current.status = "active";
+    else if (placement.status === "expired" && current.status !== "active") current.status = "expired";
+    items.set(key, current);
+  }
+  return [...items.values()]
+    .map((item) => ({ ...item, placement_ids: item.placement_ids.sort() }))
+    .sort((left, right) => `${left.kind}:${left.id}`.localeCompare(`${right.kind}:${right.id}`));
 }
 
 function parseInvalidation(value) {

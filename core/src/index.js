@@ -114,6 +114,16 @@ export {
   createWorkstreamStore,
 } from "./workstreams/index.js";
 export {
+  createRepositoryTargetStore,
+  normalizeRepositoryTarget,
+} from "./repository-targets/index.js";
+export {
+  createWorkPlacementStore,
+  inspectWorkItemCompletion,
+  normalizeWorkItemRef,
+  resolveWorkItemSession,
+} from "./work-placement/index.js";
+export {
   createExperimentStore,
   buildExperimentReceiptContext,
 } from "./experiment/index.js";

@@ -7,12 +7,15 @@ VSPi 与 Hypo-Workflow 的关系是宿主与项目事实内核，不是进程管
 - Hypo-Workflow 是项目 Plan 的唯一 authority。VSPi 的 `/plan` 只投影和编辑 Workflow Plan，不保留长期 Local Plan fallback，也不双写第二份 Plan。
 - 未初始化项目必须显式运行 `/hw:init`。VSPi 不静默创建本地 Plan。
 - `active.delivery` 只是旧宿主可见的 foreground pointer。它不表示整个项目只能存在一个非终态 Delivery。
-- 每个并行任务使用独立 Workstream，并绑定 `{ workspace_id, delivery_ref, plan_hash, revision }` 与 VSPi Session。状态、证据、Continuation 和恢复均按 object ref 隔离。
+- 每个 Session 通过 Work Placement 显式选择一个 Work Item（Delivery 或 Experiment）；Delivery 内的并行 Worker 仍使用 Workstream。存在多个候选时不得静默继承 `active.delivery`。
+- 一个 Project authority root 可以登记多个 Repository Target。stable repository identity 与可变 locator 分离，每个 Repository 可以有一个 primary 和后续兼容的 alternate integration target。
 - Hypo-Workflow 不启动、停止或监督项目进程，也不持有覆盖整个 Agent turn 的全局锁。
 
 ## 并发与恢复
 
 一个工作区可以同时存在多个 Delivery；同一 Delivery 中 dependency-ready 的 Milestone 可以由不同 Workstream claim。Workstream 使用 generation CAS、Session 唯一绑定、Git base 和 path scope 约束来拒绝 stale update 与冲突写入。
+
+Delivery 和 Experiment 的 Repository/resource claims 在一次短 transaction 内完成评估与 lease 获取。判定只有 `shared`、`isolated_worktree`、`isolated_resources` 和 `blocked` 四种。Core 只返回 bounded `argv[]` Host action descriptor，不运行 Git、创建 worktree、分配 GPU 或执行 merge。源码变更必须提供与 claim 和 integration target 一致、带 digest 的 Git ancestry proof，才能通过 Delivery 最终完成门禁。
 
 工作区 mutation 仅在一次短 transaction commit 内获取 writer lease。lease 使用 owner token 与 fencing；后继 writer 会在 lease 失效后自动恢复 pending transaction。普通读取不需要获取 writer lease，终端或 writer 被 `SIGTERM`、`SIGKILL` 或意外关闭后也不要求用户手工删除 lock。
 
@@ -39,6 +42,9 @@ VSPi adapter 从版本匹配的 Hypo-Workflow Core bundle 调用 root exports：
 
 - `createDeliveryStore({ clock })`
 - `createWorkstreamStore({ clock })`
+- `createRepositoryTargetStore({ clock })`
+- `createWorkPlacementStore({ clock, lease_ttl_ms })`
+- `resolveWorkItemSession(root, { host, session_id })`
 - `compileVspiIntegrationContract({ generated_at })`
 - `parseVspiIntegrationContract(value)`
 

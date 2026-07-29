@@ -34,6 +34,14 @@ Ordinary conversation does not require a route choice. Status, reports, explanat
 
 When the user asks for experiment status, the Agent reads the project's bounded materialized status projection first. It summarizes default and contextual baselines, hardware and environment context, dataset meaning, scan purpose, outcomes, suspicious results, resource boundaries, and next actions. It follows detail references only for drill-down; an ordinary status answer does not rescan the repository, result directories, or every immutable event.
 
+## Multiple Work Items And Concurrent Placement
+
+One Project may contain multiple Goals, Plans, compatible Cycles, and Experiments. `active.delivery` is a legacy fallback, not a project-wide mutex. Each Session explicitly selects one Work Item; when several candidates exist, SessionStart reports `selection_required` instead of mixing their authority.
+
+One Project authority root may register several independent Git Repository Targets, such as `Accel-Sim` and `llm-trace` under `Cryo-Computing`. Stable repository identity is separate from its current locator. Each target has one primary integration target and may later add alternate targets without converting nested repositories into submodules.
+
+Before launch, the Host declares repository and resource claims. Core atomically returns `shared`, `isolated_worktree`, `isolated_resources`, or `blocked`. Compatible pinned `read`/`execute` claims may share; different snapshots or source-changing access use worktrees; relocatable mutable caches use resource isolation; fixed GPU, port, or output conflicts block. Core records lease/fencing and bounded Host actions but does not execute Git or start processes. Source changes must be integrated into the registered target with a digest-verified ancestry proof before a Delivery requests final acceptance.
+
 ## Experiment Working Model
 
 ### Project Knowledge And Reproducible Context
