@@ -15,20 +15,20 @@ Deep Plan, Discover, Technical Stack, Architecture, Decompose, Generate, Extend,
 
 ## Discussion First
 
-Do not choose Goal or Plan before Discussion has resolved the relevant product and technical questions. Discussion proceeds in this order:
+Do not choose Goal or Plan merely because repository exploration produced a plausible implementation. Exploration supplies evidence; it does not prove shared understanding. Before proposing work, challenge which statements came from the user, which are repository facts, which are Agent inferences, and which decisions belong to the user.
 
-1. **Discover** discusses requirements only: desired effect, users, behaviors, scope, non-goals, acceptance criteria, and unresolved product decisions.
-2. **Technical Stack** discusses the existing stack, dependencies, compatibility, validation tools, and material implementation choices. Skip with explicit evidence when no stack decision exists.
-3. **Architecture** discusses ownership, components, data/control flow, integration points, failure boundaries, migration, and downstream effects. State explicitly when the change is local and architecture-neutral.
+Discussion must visibly produce these artifacts:
+
+1. **Discover**: a complete requirement synthesis showing what the user asked for, how related statements were combined, desired effect, users, behaviors, scope, non-goals, acceptance criteria, assumptions, and unresolved product decisions. Separate user statements, repository facts, and Agent inference.
+2. **Technical**: the existing and proposed stack, dependencies, compatibility, validation tools, and material implementation choices with reasons. Always show it for a new project or new stage. When nothing changes, say so explicitly instead of silently skipping it.
+3. **Architecture**: a Mermaid, ASCII, table, or TUI-equivalent diagram. For an existing project, show the overall architecture and mark changed components plus downstream effects. For a new project, show the target components, ownership, boundaries, data/control flow, integration points, and failure boundaries.
 4. **Delivery Selection** lists proposed Stones. Call `selectDeliveryMode`: zero Stones routes to Goal; one or more Stones routes to Plan.
 
-Readiness is evidence-based, never round-count based. Continue Discussion while a material ambiguity could change scope, architecture, a Stone, or acceptance. The user may explicitly end Discussion and request generation once those decisions are sufficiently bounded.
-
-`assessPlanReadiness` rejects `min_rounds`. Continue asking only while a material ambiguity remains.
+These artifacts do not each require confirmation. When the user requests uninterrupted planning, show them together and proceed to one complete Proposal. Ask only questions whose answers could materially change requirements, technology, architecture, acceptance, or a Stone. Never invent questions or repeat recommended answers to satisfy a round quota. If no material question remains, explain why the evidence is sufficient and still show all three artifacts.
 
 ## Internal Phase Contract
 
-1. **Deep Plan**: preserve question, evidence, alternatives, decisions, risks, and unresolved items as durable planning Records. It never implements work and never bypasses later readiness checks.
+1. **Deep Plan**: preserve question, evidence, alternatives, decisions, risks, and unresolved items as durable planning Records. It never implements work and never replaces the later visible artifacts or final Proposal review.
 2. **Discover**: establish desired effect, non-goals, constraints, acceptance boundary, exact validation path, and material ambiguities. Separate confirmed repository facts from inference.
 3. **Technical Stack**: run only when language, framework, dependency, platform, compatibility, or validation tooling choices are material. Resolve unknown external capabilities from primary evidence or keep them blocking.
 4. **Architecture**: show components, ownership, data/control flow, integration points, failure boundaries, and downstream impact. Include a compact diagram when relationships would otherwise be ambiguous.
@@ -37,17 +37,17 @@ Readiness is evidence-based, never round-count based. Continue Discussion while 
 7. **Extend**: append dependent Milestones through a superseding Plan. Never renumber or rewrite completed history.
 8. **Review**: after execution changes reality, compare actual architecture with the approved Plan and propose downstream revisions before changing them.
 
-Show the relevant phase artifact in chat before every material decision gate: facts and ambiguities, choice table, architecture map, Milestone table, or generated Design/Plan summary. The Ask card is only the gate after this explanation.
+Show the relevant artifact in chat before relying on it. A visible artifact is not itself a request for confirmation. Use an Ask gate only for a real unresolved user decision or the final Proposal choice.
 
 ## Proposal And Start
 
-After showing the complete Plan, offer exactly these meanings:
+After showing the complete Plan, offer exactly one Proposal choice with these meanings:
 
-- **确认并开始**: issue one scoped `delivery.approve_and_start` Receipt and call `approveAndStart`; this is the default meaning of 可以、确认、OK、go ahead、apply it、按这个做.
+- **确认并开始**: issue one scoped `delivery.approve_and_start` Receipt and call `approveAndStart`.
 - **确认但不开始**: issue `delivery.approve`, persist `waiting_to_start`, and wait for Resume or explicit start.
 - **不确认 / 继续讨论**: make no authority write and return to Discussion.
 
-Do not add a second start turn after ordinary confirmation. Destructive actions, remote writes, releases, service restarts, protected-file writes, or scope growth may still require their own local gate.
+Plain agreement answers the question that was actually asked; it is not universal execution authority. Explicit phrases such as 确认并开始、按这个方案实施、按你的方案来、go ahead, or apply it authorize start when the complete Proposal is visible. Do not add a second ordinary start confirmation after that. Destructive actions, remote writes, releases, service restarts, protected-file writes, or scope growth may still require their own local gate.
 
 After each ordinary Milestone verifies, continue automatically. When a Stone Milestone verifies, persist `pending_stone`, set Delivery to `waiting_for_stone`, and show the real artifact and criteria. Acceptance issues scoped `stone.accept` and continues; rejection issues scoped `stone.reject`, records structured feedback, and returns to `needs_revision`. A rejected Stone never silently continues.
 

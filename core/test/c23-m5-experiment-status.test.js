@@ -626,9 +626,16 @@ statusTest("C23 M5 Git-like clones merge immutable events and fail closed on a l
 
 test("C23 M5 source and released Host Contract v1 expose /hw:experiment", async () => {
   const skill = await readFile(join(REPOSITORY_ROOT, "skills", "experiment", "SKILL.md"), "utf8");
+  const protocol = await readFile(join(REPOSITORY_ROOT, "docs", "reference", "experiment-records.md"), "utf8");
   assert.match(skill, /^---[\s\S]*name:\s*experiment[\s\S]*---/);
   assert.match(skill, /not a runner|不是.*runner|host.*run|Agent.*run/i);
   assert.match(skill, /materialized|物化|status projection|状态投影/i);
+  assert.match(skill, /ordinary[- ]file|普通.*文件|normal file/i);
+  assert.match(skill, /optional helper|可选.*(?:工具|辅助)|must not block/i);
+  assert.match(skill, /docs\/reference\/experiment-records\.md/);
+  assert.match(protocol, /\.pipeline\/memory\/experiment-records/);
+  assert.match(protocol, /BatchReport/);
+  assert.match(protocol, /不是前置条件|不得.*阻断|继续运行/);
   assert.match(skill, /NeRF|AceSim/);
   assert.match(skill, /not.*validated|未.*验证|尚未.*验证/i);
   const pilotBoundary = skill.split("\n").find((line) => /not.*validated|未.*验证|尚未.*验证/i.test(line)) || "";

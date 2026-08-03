@@ -48,9 +48,7 @@ Resolve every configurable value in this order:
 | P0 Configure trigger | `cycle.configure.trigger` | `cycle.configure.trigger` | `cycle_new_before_discover` |
 | P0 Configure reuse | `cycle.configure.allow_reuse` | `cycle.configure.allow_reuse` | `true` |
 | plan mode | `plan.mode` | `plan.default_mode` | `interactive` |
-| plan interaction depth | `plan.interaction_depth` | `plan.interaction_depth` | `medium` |
-| plan interactive min rounds | `plan.interactive.min_rounds` | `plan.interactive.min_rounds` | `3` |
-| plan explicit confirm | `plan.interactive.require_explicit_confirm` | `plan.interactive.require_explicit_confirm` | `true` |
+| plan proposal choice | `plan.interactive.require_explicit_confirm` | `plan.interactive.require_explicit_confirm` | `true`; applies once to the complete Proposal, not once per planning artifact |
 | dashboard enabled | `dashboard.enabled` | `dashboard.enabled` | `false` |
 | dashboard port | `dashboard.port` | `dashboard.port` | `7700` |
 | output language | `output.language` | `output.language` | `zh-CN` |
@@ -416,9 +414,7 @@ dashboard:
   port: 7700
 plan:
   default_mode: interactive
-  interaction_depth: medium
   interactive:
-    min_rounds: 3
     require_explicit_confirm: true
 output:
   language: zh-CN

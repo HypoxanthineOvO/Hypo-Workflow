@@ -2,7 +2,7 @@
 
 [中文](../../reference/commands.md) | English
 
-The v14.0.0-alpha.5 Official Codex surface and Host Contract v1 expose exactly ten public routes. The Root Router normalizes namespaces and checks backend availability; each route loads one ordinary, non-symlink Child Skill. The Codex plugin ZIP and portable ZIP contain the same route set.
+The v14.0.0-alpha.6 Official Codex surface and Host Contract v1 expose exactly ten public routes. The Root Router normalizes namespaces and checks backend availability; each route loads one ordinary, non-symlink Child Skill. The Codex plugin ZIP and portable ZIP contain the same route set.
 
 | Command | Child Skill | Use when |
 | --- | --- | --- |
@@ -19,7 +19,7 @@ The v14.0.0-alpha.5 Official Codex surface and Host Contract v1 expose exactly t
 
 ## Internal Natural Behavior
 
-Chat, Explain, Status, Report, Log, Check, Compact, Knowledge, Sync, and Debug are selected naturally by the Agent. Discussion runs Discover, Technical Stack, and Architecture before Stone count selects Goal or Plan. Plain confirmation uses `delivery.approve_and_start`; only confirm-without-start enters `waiting_to_start`. These behaviors create no additional Codex commands or Skills.
+Chat, Explain, Status, Report, Log, Check, Compact, Knowledge, Sync, and Debug are selected naturally by the Agent. Discussion must show the user Discover, Technical, and Architecture before Stone count selects Goal or Plan; the three artifacts may be presented together and are not separate gates. A short confirmation uses `delivery.approve_and_start` only while the Agent is asking whether to start the visible final Proposal; confirm-without-start enters `waiting_to_start`. These behaviors create no additional Codex commands or Skills.
 
 ## Deferred And Removed
 

@@ -1,5 +1,23 @@
 # Changelog
 
+## v14.0.0-alpha.6 - 2026-08-03
+
+### Behavior Changes
+
+- Experiment 默认改用可直接读写的普通 YAML protocol；命名报告工具、content-addressed events 和物化 projection 降为可选辅助能力，缺失时不再阻断执行、监督或记录。
+- 未绑定 Work Item 的 Session 只接收上下文提醒，普通 prompt 和工具继续运行；只有 Workflow authority 写入和资源 claim 需要完成 Work Placement。
+- Hooks 不再用关键词推断并自动持久化用户语义；主 Agent 负责识别明确的长期 requirement、preference、decision 和 feedback，并通过 Maintain 写入权威记录。
+
+### Fixes
+
+- 辅助 Hook 处理失败时返回可见提醒并允许宿主工作继续；显式删除和受控破坏性操作的 `PreToolUse` / `PermissionRequest` guardrail 保持 fail-closed。
+- 补回 CLI 依赖的 sync、TUI、maintenance、project-event 和 notification Root Core exports，修复 `buildGlobalTuiModel` 缺失导致 `hypo-workflow sync --check-only` 无法启动的问题。
+- Planning Discussion 改为一次展示 Discover、Technical 与 Architecture artifact，只在真实决策和最终 Proposal 处询问，不再使用固定轮数或仪式化确认门。
+
+### Validation
+
+- Maintained Core suite、Codex Hook smoke、插件结构校验和 release artifact 完整性检查均作为发布门执行。
+
 ## v14.0.0-alpha.5 - 2026-07-29
 
 ### Fixes
@@ -25,21 +43,12 @@
 - 合入 v14.0.0-alpha.3 的 Codex Hook reminder 并发修复，并让 Host projection 的并发收尾兼容新增 Work Item/Session 字段。
 - 过期 Placement 不再让 Session 管理操作死锁；Experiment compact 在没有 Delivery Recovery Capsule 时安全降级。
 
-### Tests
-
-- Placement/Host/Hook/transaction 交叉回归 `59/59 PASS`；发布前 maintained suite `710/710 PASS`。
-
 ## v14.0.0-alpha.3 - 2026-07-19
 
 ### Fixes
 
 - Codex `PostToolUse` 不再追加 `tool.completed` Recovery Journal 事件，也不再 replay Journal 做 reminder 去重。
-- 相同 reminder 现在通过 workspace runtime 中按 active object、worktree effect 和提示内容生成的 digest marker 去重；最终 marker directory 使用原子 `mkdir` claim。只有 `EEXIST` 后重新校验为 workspace 内普通 marker directory 才表示 dedupe loser；普通文件、symlink 或其他非法节点按 Hook error 失败。
-- `Stop`、`PreCompact`、`PostCompact` 保持 `main/main` Recovery writer 语义；Subagent、Ambient Maintain 和 Recovery Journal Core 不变。
-
-### Tests
-
-- 新增真实 multi-process wrapper 回归，并发执行相同 `PostToolUse` 和单个 `Stop`，验证单次 reminder、唯一 `turn.agent` 事件以及 12288-byte Recovery restore。
+- 相同 reminder 改由 workspace runtime 中的 digest marker 原子去重，`Stop`、compact 和 Subagent writer 语义保持不变。
 
 ## v14.0.0-alpha.2 - 2026-07-18
 

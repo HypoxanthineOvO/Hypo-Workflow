@@ -6,7 +6,7 @@
 
 规划 -> 执行 -> 独立验证 -> 人工验收 -> 可恢复继续
 
-[![Version](https://img.shields.io/badge/version-14.0.0--alpha.4-blue)](.codex-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-14.0.0--alpha.6-blue)](.codex-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Official%20Codex-black)](docs/reference/platforms.md)
 
@@ -16,7 +16,7 @@
 
 Hypo-Workflow 是 Skill 协议，不是 runner 或后台服务。宿主 Agent 负责实现、测试和审查；`.pipeline/` 负责保存可验证、可恢复的项目事实。
 
-[v14.0.0-alpha.5 发布说明](docs/release/v14.0.0-alpha.5.md)
+[v14.0.0-alpha.6 发布说明](docs/release/v14.0.0-alpha.6.md)
 
 当前版本以 **Official Codex** 为唯一当前适配平台。OpenCode、Claude Code、Cursor、GitHub Copilot、Trae 和自定义 Codex fork 的适配器均延后，仓库中残留的旧平台产物不代表当前支持。
 
@@ -34,9 +34,9 @@ Manifest
 
 - **Runtime** 保存 Goal/Plan 生命周期，并兼容读取既有 Cycle；**Continuation** 只保存下一步。
 - **Delivery / Workstream** 支持同一项目中的多个任务与 Session 并行；`active.delivery` 只保留为旧宿主 foreground pointer。
-- **Work Placement / Repository Target** 让每个 Session 显式选择一个 Delivery 或 Experiment，并在启动前原子判定共享 checkout、独立 worktree、资源隔离或阻断；源码改动完成后必须回到登记的 integration target。
+- **Work Placement / Repository Target** 为需要权威路由或资源 claim 的 Session 选择一个 Delivery 或 Experiment，并在启动前原子判定共享 checkout、独立 worktree、资源隔离或阻断；未绑定状态不会封锁普通工具，源码改动完成后必须回到登记的 integration target。
 - **Records** 保存 requirement、preference、decision 和 feedback；它们替代通用 Rules 系统。
-- **Experiment events / status projection** 保存可 Git 合并的实验事实，并提供无需扫描结果树的即时状态。
+- **Experiment records** 使用普通 YAML 保存实验计划和 Attempt；旧 events / status projection 保留为可选兼容视图。
 - **Worker Routing** 在 Worker 启动前显示任务评估并输出语义能力档，不选择具体模型或 Provider。
 - **Receipts** 保存一次性、带作用域的用户授权。
 - **Recovery Journal / Capsule / Pack** 保存有界恢复证据，不回放完整会话，也不覆盖较新的 Runtime。
@@ -74,23 +74,23 @@ codex plugin marketplace add /absolute/path/to/Hypo-Workflow
          -> Stone 人工验收 -> 继续执行 -> 最终验收
 ```
 
-没有线性终点、需要持续重跑、参数扫描和结果判断时使用 Experiment：
+没有线性终点、需要持续重跑、参数扫描和结果判断时使用 Experiment。默认记录是普通 YAML，不依赖任何命名报告工具：
 
 ```text
 /hw:init -> /hw:experiment -> 记录环境/知识/基线 -> 执行与监督
-         -> 追加 immutable events -> 读取物化状态 -> 持续迭代
+         -> 普通 YAML 记录 Attempt -> 读取引用记录 -> 持续迭代
 ```
 
-提案门提供三种明确语义：`确认并开始`、`确认但不开始`、`不确认/继续讨论`。普通的“可以”“确认”“OK”“go ahead”默认签发 `delivery.approve_and_start` 并立即执行；只有“确认但不开始”进入 `waiting_to_start`。删除、远程写入、发布、服务重启等高影响操作仍保留局部门禁。中断后使用 `/hw:resume`。
+最终 Proposal 提供三种明确语义：`确认并开始`、`确认但不开始`、`不确认/继续讨论`。只有在完整 Proposal 已展示且 Agent 正在询问是否开始时，简短肯定回复才继承 `delivery.approve_and_start` 语义；其他“可以”“确认”“OK”只回答当下问题。只有“确认但不开始”进入 `waiting_to_start`。删除、远程写入、发布、服务重启等高影响操作仍保留局部门禁。中断后使用 `/hw:resume`。
 
-并发工作不再由单一 `active.delivery` 限制。一个 Project authority root 可以登记多个独立 Git Repository Target，并同时存在多个 Goal、Plan、Cycle 与 Experiment；一个 Session 仍只绑定一个 Work Item。固定快照的只读/执行实验可以共享环境，源码写入使用独立 worktree，GPU、端口、cache 和输出目录在启动前通过原子 lease 与 fencing 检查冲突。永久主 checkout 作为 primary integration target 保留，源码改动在最终完成前必须提供带摘要校验的 Git ancestry 证据。
+并发工作不再由单一 `active.delivery` 限制。一个 Project authority root 可以登记多个独立 Git Repository Target，并同时存在多个 Goal、Plan、Cycle 与 Experiment；需要权威写入或资源 claim 时，一个 Session 只选择一个 Work Item。普通提示、工具和 Experiment 文件记录不依赖 Session 绑定。固定快照的只读/执行实验可以共享环境，源码写入使用独立 worktree，GPU、端口、cache 和输出目录在启动前通过原子 lease 与 fencing 检查冲突。永久主 checkout 作为 primary integration target 保留，源码改动在最终完成前必须提供带摘要校验的 Git ancestry 证据。
 
 ### Experiment 能力
 
 - 保存项目目的、论文/文档引用、指标和数据集含义、模块职责、优化位置与 concept-to-code 映射，并在代码变化后检查知识是否过期。
 - 每个运行绑定 Git 快照、`uv` 环境、机器/GPU/驱动/CUDA、数据位置、参数、命令、资源限制和可读输出目录。
 - 区分逻辑 Experiment 与多次 Attempt，支持单轴/交叉扫描、screening 扩展、contextual baseline、tmux 监督、中断恢复、trash/restore 和科学合理性确认。
-- “现在实验怎么样”直接读取 bounded materialized status，先回答 baseline、环境、数据集、扫描目的、结果、异常和下一步，不重新扫描全部目录。
+- “现在实验怎么样”直接读取 `experiment.yaml` 和它引用的 Attempt，先回答 baseline、环境、数据集、扫描目的、结果、异常和下一步，不重新扫描全部目录。
 
 真实 NeRF、AceSim、GitLab、SSH/SCP、大 trace 和多周运行仍需真实项目 Pilot。当前记录的是实验使用的机器环境，不是整台电脑的代理、端口、服务、工具和 SSH 全局资产管理。
 

@@ -1,12 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { mkdir, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import * as CORE from "../src/index.js";
 import { temporaryCurrentWorkspace } from "./fixtures/c21-m2/helpers.js";
 import { goalDesignInput, soloTopologyInput } from "./fixtures/c21-m6/helpers.js";
 
 const NOW = "2026-07-29T06:00:00+08:00";
 
-test("SessionStart requires explicit Work Item selection and Host status projects the selected Experiment", async (t) => {
+test("SessionStart recommends Work Item selection without blocking ordinary work and Host status projects the selected Experiment", async (t) => {
   const root = await temporaryCurrentWorkspace(t, "hw-concurrent-host-");
   const deliveryStore = CORE.createDeliveryStore({ clock: () => NOW });
   const legacy = await deliveryStore.proposeGoal(root, {
@@ -41,31 +43,32 @@ test("SessionStart requires explicit Work Item selection and Host status project
   assert.match(unbound.hookSpecificOutput.additionalContext, /select exactly one/i);
   assert.match(unbound.hookSpecificOutput.additionalContext, /experiment:experiment-a/);
   assert.doesNotMatch(unbound.hookSpecificOutput.additionalContext, /legacy-foreground/);
-  const deniedTool = await CORE.evaluateCodexHookEvent(root, {
+  const ordinaryTool = await CORE.evaluateCodexHookEvent(root, {
     ...hookBase(root, "new-session", "PreToolUse"),
     permission_mode: "default",
     turn_id: "turn-unbound-tool",
     tool_name: "Bash",
     tool_use_id: "tool-unbound",
-    tool_input: { command: "echo must-not-run" },
+    tool_input: { command: "echo ordinary-work" },
   }, { id: "host-unbound-pre-tool", clock: () => NOW });
-  assert.equal(deniedTool.hookSpecificOutput.permissionDecision, "deny");
-  assert.match(deniedTool.hookSpecificOutput.permissionDecisionReason, /select exactly one/i);
-  const deniedPermission = await CORE.evaluateCodexHookEvent(root, {
+  assert.deepEqual(ordinaryTool, {});
+  const ordinaryPermission = await CORE.evaluateCodexHookEvent(root, {
     ...hookBase(root, "new-session", "PermissionRequest"),
     permission_mode: "default",
     turn_id: "turn-unbound-permission",
     tool_name: "Bash",
-    tool_input: { command: "echo must-not-run" },
+    tool_input: { command: "echo ordinary-work" },
   }, { id: "host-unbound-permission", clock: () => NOW });
-  assert.equal(deniedPermission.hookSpecificOutput.decision.behavior, "deny");
-  const deniedPrompt = await CORE.evaluateCodexHookEvent(root, {
+  assert.deepEqual(ordinaryPermission, {});
+  const ordinaryPrompt = await CORE.evaluateCodexHookEvent(root, {
     ...hookBase(root, "new-session", "UserPromptSubmit"),
     permission_mode: "default",
     turn_id: "turn-unbound-prompt",
     prompt: "continue the foreground work",
   }, { id: "host-unbound-prompt", clock: () => NOW });
-  assert.equal(deniedPrompt.decision, "block");
+  assert.equal(ordinaryPrompt.decision, undefined);
+  assert.match(ordinaryPrompt.hookSpecificOutput.additionalContext, /ordinary prompts and tools may continue/i);
+  assert.match(ordinaryPrompt.hookSpecificOutput.additionalContext, /experiment:experiment-a/);
 
   await placements.bindSession(root, {
     host: "codex",
@@ -76,7 +79,18 @@ test("SessionStart requires explicit Work Item selection and Host status project
     id: "host-selected-session-start",
     clock: () => NOW,
   });
-  assert.deepEqual(selected, {});
+  assert.match(selected.hookSpecificOutput.additionalContext, /experiment:experiment-b/);
+  assert.match(selected.hookSpecificOutput.additionalContext, /Runtime and Continuation/i);
+  assert.doesNotMatch(selected.hookSpecificOutput.additionalContext, /legacy-foreground/);
+  assert.ok(Buffer.byteLength(selected.hookSpecificOutput.additionalContext) < 16_384);
+  const selectedPrompt = await CORE.evaluateCodexHookEvent(root, {
+    ...hookBase(root, "new-session", "UserPromptSubmit"),
+    permission_mode: "default",
+    turn_id: "turn-selected-prompt",
+    prompt: "continue the experiment",
+  }, { id: "host-selected-prompt", clock: () => NOW });
+  assert.match(selectedPrompt.hookSpecificOutput.additionalContext, /ordinary-file protocol/i);
+  assert.match(selectedPrompt.hookSpecificOutput.additionalContext, /must not block/i);
   const preCompact = await CORE.evaluateCodexHookEvent(root, {
     ...hookBase(root, "new-session", "PreCompact"),
     turn_id: "turn-experiment-pre-compact",
@@ -126,6 +140,31 @@ test("an expired-only Placement registry allows Session management tools instead
     tool_use_id: "tool-expired-management",
     tool_input: { command: "echo placement-management" },
   }, { id: "expired-management-tool", clock: () => currentTime });
+  assert.deepEqual(tool, {});
+});
+
+test("auxiliary Hook state failures warn without blocking prompts or ordinary tools", async (t) => {
+  const root = await temporaryCurrentWorkspace(t, "hw-hook-fail-open-");
+  await mkdir(join(root, ".pipeline", "runtime"), { recursive: true });
+  await writeFile(join(root, ".pipeline", "runtime", "work-placements.yaml"), "not: [valid\n", "utf8");
+
+  const prompt = await CORE.evaluateCodexHookEvent(root, {
+    ...hookBase(root, "fail-open-session", "UserPromptSubmit"),
+    permission_mode: "default",
+    turn_id: "turn-fail-open-prompt",
+    prompt: "continue ordinary work",
+  }, { id: "host-fail-open-prompt", clock: () => NOW });
+  assert.match(prompt.systemMessage, /auxiliary processing was unavailable/i);
+  assert.match(prompt.systemMessage, /continue the host work/i);
+
+  const tool = await CORE.evaluateCodexHookEvent(root, {
+    ...hookBase(root, "fail-open-session", "PreToolUse"),
+    permission_mode: "default",
+    turn_id: "turn-fail-open-tool",
+    tool_name: "Bash",
+    tool_use_id: "tool-fail-open",
+    tool_input: { command: "echo still-runs" },
+  }, { id: "host-fail-open-tool", clock: () => NOW });
   assert.deepEqual(tool, {});
 });
 

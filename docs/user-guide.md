@@ -4,7 +4,7 @@ Hypo-Workflow 是当前 Codex 宿主中的项目工作协议。`.pipeline/manife
 
 ## 当前入口
 
-v14.0.0-alpha.5 的 Official Codex 发布包公开十个聚焦入口，每次只路由到一个 Child Skill：
+v14.0.0-alpha.6 的 Official Codex 发布包公开十个聚焦入口，每次只路由到一个 Child Skill：
 
 | 入口 | 用途 |
 | --- | --- |
@@ -30,7 +30,15 @@ v14.0.0-alpha.5 的 Official Codex 发布包公开十个聚焦入口，每次只
 - Maintain 保存日常项目事实，不开启 Delivery。
 - Experiment 是长期、非线性的实验记录面。它把项目知识、环境、代码快照、机器、数据集、baseline、scan、Attempt、指标、异常、trash/restore 与 next action 组织成可索引事实。
 
-当用户询问“现在实验怎么样”时，Agent 首先读取项目的 bounded materialized status projection，直接概括默认与 contextual baseline、硬件与环境、数据集含义、扫描目的、outcome、可疑结果、资源边界和下一步；只有需要 drill-down 时才跟随 detail references。普通状态查询不会重新扫描仓库、结果目录或全部 immutable events。
+当用户询问“现在实验怎么样”时，Agent 首先读取 [Experiment Record Protocol](reference/experiment-records.md) 中的 `experiment.yaml` 和它明确引用的 Attempt，直接概括默认与 contextual baseline、硬件与环境、数据集含义、扫描目的、outcome、可疑结果、资源边界和下一步；只有需要 drill-down 时才跟随引用。旧的 bounded materialized status projection 是可选兼容来源，不是回答状态或继续实验的前置条件。
+
+## 多 Work Item 与并发 Placement
+
+同一个 Project 可以同时存在多个 Goal、Plan、兼容 Cycle 和 Experiment。`active.delivery` 仅供尚未采用 Placement 的旧 workspace 使用，不是全项目互斥锁。Session 可以显式选择一个 Work Item 来路由上下文；有多个候选而尚未绑定时，SessionStart 返回候选列表，但不阻断普通提示、工具、诊断或 Experiment 文件记录。跨 Work Item 权威写入和资源 claim 仍要求明确选择，避免把两个任务混在一起。
+
+一个 Project authority root 可以登记多个独立 Git Repository Target，例如 `Cryo-Computing` 下相互独立的 `Accel-Sim` 与 `llm-trace`。每个 target 保存稳定仓库身份、当前 locator、Git base，以及一个 primary integration target；后续可以增加 alternate integration target，不要求把嵌套仓库改成 submodule。
+
+启动前，Host 声明代码和资源占用，Core 原子返回 `shared`、`isolated_worktree`、`isolated_resources` 或 `blocked`。固定同一 commit 的 `read`/`execute` 可以共享；不同 snapshot 或 `build`/`write`/`checkout` 使用 worktree；可重定位 mutable cache 使用资源隔离；独占 GPU、端口或固定输出重叠会阻断。Core 只持久化 lease/fencing 与 bounded Host action，不直接执行 Git 或启动进程。源码变更必须合并进登记的 integration target，并提供与 claim、target、commit 和 `git merge-base --is-ancestor` 结果一致的摘要校验文件，Delivery 才能请求最终验收。
 
 ## 多 Work Item 与并发 Placement
 
@@ -53,7 +61,7 @@ Experiment knowledge 保存实验目的、论文和文档的安全引用、指�
 - 机器、GPU、驱动、CUDA、资源限制和外部大文件位置。不同服务器可以保存不同数据路径与运行细节。
 - 数据集、scene、参数、随机种子、完整命令、日志/config/metric 引用和可读输出目录。
 
-凭据、原始 Key、隐藏推理、完整对话和论文 PDF 不写入 Experiment event；只保存经授权位置的安全引用。
+凭据、原始 Key、隐藏推理、完整对话和论文 PDF 不写入 Experiment record；只保存经授权位置的安全引用。
 
 ### Experiment、Attempt、扫描与 baseline
 
@@ -76,11 +84,11 @@ Attempt 的 operational completion 只表示程序走完，不表示科学结果
 
 错误或过期 Attempt 进入 trash，不直接删除；用户改变判断时可以 restore。只有新的明确删除授权才能永久清理。若同一 Attempt 重跑会覆盖已有输出，Agent 必须先说明保留风险。
 
-### 事件、Git 同步与即时状态
+### 普通记录、兼容同步与即时状态
 
-Baseline、dataset、scan、Attempt、exception、lifecycle 和 next action 都追加为 content-addressed immutable event。不同 clone 的事件可以做 Git union；同一 `event_key` 出现无法解释的冲突时，Workflow 整理差异并停止自动选择，除非用户明确委托。
+默认记录位于 `.pipeline/memory/experiment-records/<project_id>/<experiment_id>/`：一个可读的 `experiment.yaml` 保存当前计划和 Attempt 引用，每个 Attempt 使用独立 YAML 文件。Agent 通过普通文件工具直接维护，不要求 `BatchReport`、专用写入 API、内容哈希或 projection。不同 clone 使用普通 Git 合并；相同语义事实冲突时，Workflow 整理差异并停止自动选择，除非用户明确委托。
 
-Materialized status 是有界、可校验的项目视图。默认回答顺序是 baseline、硬件/环境、数据集语义、扫描及目的、outcome counts、可疑或资源受限结果、trash/保留状态和具体下一步。详细 JSON 和原始事件只在 drill-down 时读取。
+默认回答顺序是 baseline、硬件/环境、数据集语义、扫描及目的、outcome counts、可疑或资源受限结果、trash/保留状态和具体下一步。旧 content-addressed events 和 materialized status 可以继续读取或由可选工具同步，但辅助能力失败只能告警，不能阻断实验运行、分析或普通记录更新。
 
 ### Experiment 边界
 
@@ -123,7 +131,7 @@ Workflow 不输出 Luna/Sol、Provider、凭据、reasoning effort、token 或�
 
 ## 执行与验收
 
-复杂交付由可验证效果驱动。提案门提供“确认并开始 / 确认但不开始 / 不确认”三种语义，普通肯定回复默认原子执行 `delivery.approve_and_start`；只有“确认但不开始”进入 `waiting_to_start`。高影响副作用仍保留局部门禁。
+复杂交付由可验证效果驱动。最终 Proposal 提供“确认并开始 / 确认但不开始 / 继续讨论”三种语义。只有完整 Proposal 已展示且 Agent 正在询问是否开始时，简短肯定回复才继承 `delivery.approve_and_start`；其他肯定只回答当下问题。只有“确认但不开始”进入 `waiting_to_start`。高影响副作用仍保留局部门禁。
 
 Runtime 是生命周期权威，Continuation 保存下一步，Recovery Pack 只提供有界恢复上下文。Pack 缺失时仍可从 Runtime 与 Continuation degraded resume；旧 `.pipeline` lifecycle 文件不作为回退权威。
 
@@ -131,4 +139,4 @@ Runtime 是生命周期权威，Continuation 保存下一步，Recovery Pack 只
 
 ## 发布边界
 
-v14.0.0-alpha.5 的 Host Contract v1、Codex plugin ZIP 和 portable ZIP 均发布十个入口并包含 `/hw:experiment`。Official Codex 是当前唯一支持面；其他平台和 VSP-Codex 具体模型映射仍由各目标仓独立适配与验证。
+v14.0.0-alpha.6 的 Host Contract v1、Codex plugin ZIP 和 portable ZIP 均发布十个入口并包含 `/hw:experiment`。Official Codex 是当前唯一支持面；其他平台和 VSP-Codex 具体模型映射仍由各目标仓独立适配与验证。

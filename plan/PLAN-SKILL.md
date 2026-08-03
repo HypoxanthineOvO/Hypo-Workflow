@@ -51,19 +51,14 @@ All user-facing planning prompts, status summaries, and generated PROGRESS/repor
 Read `plan.mode` from `.pipeline/config.yaml` when present. If it is missing, fall back to `~/.hypo-workflow/config.yaml` `plan.default_mode`, then `interactive`.
 
 - `interactive` is the default:
-  - Discover asks targeted questions in rounds
-  - the user participates at checkpoints
-  - every major phase must show its artifact before moving forward
-  - confirmation is captured through in-phase Question Tool / Ask gates
-  - read `plan.interaction_depth`:
-    - `low` -> at least 2 question rounds
-    - `medium` -> at least 3 question rounds
-    - `high` -> at least 5 question rounds
-  - `plan.interactive.min_rounds` can raise the floor
-  - Discover may enter Decompose only after the user explicitly says「够了」「开始吧」「可以了」or an equivalent end signal
+  - Discover asks only targeted questions that could materially change the result
+  - Discover, Technical, and Architecture must each show their artifact, but they are not separate confirmation gates
+  - the three artifacts may be shown together when the user requests uninterrupted planning
+  - after the complete Proposal, offer one choice: confirm and start, confirm without starting, or continue Discussion
 - `auto` is unattended:
-  - Claude completes named Plan phases without pausing unless blocked by missing critical information
-  - confirmation gates become summary checkpoints only when configuration explicitly allows unattended planning
+  - use it only when the user explicitly delegates uninterrupted planning
+  - still show Discover, Technical, and Architecture artifacts before the Proposal
+  - pause only for missing critical information or a separately gated high-impact side effect
 
 ## Batch Plan Mode
 
@@ -131,7 +126,7 @@ Interactive questioning rules:
 - before leaving Discover on OpenCode, use configured native agents/subagents; no separate subworker authorization gate is required
 - Generate must pre-assign subworker tasks in each prompt instead of leaving role boundaries for `/hw:start` to invent later. Use a `Subworker Assignment Plan` with exactly three worker roles: `test`, `implement`, and `audit`, concrete scope, non-overlap rules, evidence outputs, and artifact paths. `review_tests` is a TDD step name owned by the `test` role, not a worker role; `review_code` is an audit/review step or artifact stage, not a worker role.
 - Each generated subworker assignment must declare write scope: spawned workers can edit only `.pipeline/` files and explicitly scoped root-level non-project documentation such as `README.md`, `CHANGELOG.md`, and `PROJECT-SUMMARY.md`; `audit` is read-only and must not edit files. Out-of-scope needs must stop and report the path instead of editing, and no worker may revert or overwrite another worker's changes without explicit prompt-scope authorization.
-- do not leave Discover until the configured minimum question rounds are complete and the user signals that the requirement interview is sufficient
+- do not leave Discover until the requirement synthesis is complete enough to show what came from the user, the repository, and Agent inference; never use a question-round quota
 - never treat "确认一下" or a plain answer as permission to enter Decompose
 
 Context injection:

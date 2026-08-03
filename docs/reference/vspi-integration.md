@@ -7,7 +7,7 @@ VSPi 与 Hypo-Workflow 的关系是宿主与项目事实内核，不是进程管
 - Hypo-Workflow 是项目 Plan 的唯一 authority。VSPi 的 `/plan` 只投影和编辑 Workflow Plan，不保留长期 Local Plan fallback，也不双写第二份 Plan。
 - 未初始化项目必须显式运行 `/hw:init`。VSPi 不静默创建本地 Plan。
 - `active.delivery` 只是旧宿主可见的 foreground pointer。它不表示整个项目只能存在一个非终态 Delivery。
-- 每个 Session 通过 Work Placement 显式选择一个 Work Item（Delivery 或 Experiment）；Delivery 内的并行 Worker 仍使用 Workstream。存在多个候选时不得静默继承 `active.delivery`。
+- Session 在需要权威路由或资源 claim 时通过 Work Placement 显式选择一个 Work Item（Delivery 或 Experiment）；Delivery 内的并行 Worker 仍使用 Workstream。存在多个候选时不得静默继承 `active.delivery`，但未绑定状态不阻断普通提示、工具、诊断或 Experiment 文件记录。
 - 一个 Project authority root 可以登记多个 Repository Target。stable repository identity 与可变 locator 分离，每个 Repository 可以有一个 primary 和后续兼容的 alternate integration target。
 - Hypo-Workflow 不启动、停止或监督项目进程，也不持有覆盖整个 Agent turn 的全局锁。
 

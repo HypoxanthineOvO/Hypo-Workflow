@@ -1,13 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readdir, rmdir, symlink } from "node:fs/promises";
 import { join } from "node:path";
 import * as api from "../src/index.js";
 import {
   ACTOR,
-  AMBIENT_REF,
   listFiles,
-  readText,
   seedActiveRecovery,
   temporaryCurrentWorkspace,
   temporaryGitWorkspace,
@@ -62,7 +59,7 @@ test("deletion Receipt context independently rejects crafted Recovery-store bind
   }
 });
 
-test("UserPromptSubmit stages only a bounded semantic sentence in both Inbox and Journal", async (t) => {
+test("UserPromptSubmit leaves semantic persistence to the main Agent", async (t) => {
   const root = await temporaryCurrentWorkspace(t, "hw-m7-r2-semantic-");
   const durable = "Durable requirement: Public API changes must update project documentation.";
   const transientMarkers = Array.from(
@@ -70,48 +67,15 @@ test("UserPromptSubmit stages only a bounded semantic sentence in both Inbox and
     (_, index) => `TRACE_${String(index).padStart(2, "0")}: console.log transient diagnostic line ${index}`,
   );
   const prompt = [durable, ...transientMarkers].join("\n");
-
-  await api.evaluateCodexHookEvent(root, userPromptPayload(root, prompt), {
-    id: "m7-r2-semantic-extraction",
-    clock: () => FIXED_NOW,
-  });
-
-  const inboxPaths = (await listFiles(root)).filter((path) => path.startsWith(".pipeline/memory/inbox/"));
-  assert.equal(inboxPaths.length, 1, "one clear durable statement should stage exactly one Inbox item");
-  const inbox = api.parseYaml(await readText(join(root, inboxPaths[0])));
-  const recovery = api.createRecoveryStore({ clock: () => FIXED_NOW });
-  const replay = await recovery.replayRecoveryJournal(root, { object_ref: AMBIENT_REF });
-  const journalEvent = replay.events.find((event) => event.payload?.kind === "ambient_maintain_delta");
-  assert.ok(journalEvent, "the staged semantic delta must be recoverable from the Journal");
-
-  const persistedBodies = [
-    ["Inbox", inbox.record_patch.body],
-    ["Journal", journalEvent.payload.record_patch.body],
-  ];
-  for (const [surface, body] of persistedBodies) {
-    await t.test(surface, () => {
-      assert.match(body, /Public API changes must update project documentation/);
-      assert.notEqual(body, prompt, `${surface} must not persist the complete raw prompt`);
-      assert.ok(Buffer.byteLength(body, "utf8") <= 512, `${surface} semantic body must be bounded`);
-      for (const marker of transientMarkers) {
-        assert.doesNotMatch(body, new RegExp(marker.split(":")[0]), `${surface} must exclude ${marker}`);
-      }
-    });
-  }
-});
-
-test("a prompt with no durable statement remains zero-Inbox noise", async (t) => {
-  const root = await temporaryCurrentWorkspace(t, "hw-m7-r2-semantic-noise-");
   const before = await listFiles(root);
-  const prompt = Array.from({ length: 40 }, (_, index) => `TRACE_${index}: console output only`).join("\n");
 
-  await api.evaluateCodexHookEvent(root, userPromptPayload(root, prompt), {
-    id: "m7-r2-semantic-noise",
+  const output = await api.evaluateCodexHookEvent(root, userPromptPayload(root, prompt), {
     clock: () => FIXED_NOW,
   });
 
-  const added = (await listFiles(root)).filter((path) => !before.includes(path));
-  assert.equal(added.some((path) => path.startsWith(".pipeline/memory/inbox/")), false);
+  assert.match(output.hookSpecificOutput.additionalContext, /semantic judgment/i);
+  assert.match(output.hookSpecificOutput.additionalContext, /Hooks do not decide or persist/i);
+  assert.deepEqual(await listFiles(root), before, "the Hook must not infer or persist meaning from prompt text");
 });
 
 test("output validator accepts the exact current documented release shapes", async (t) => {
@@ -240,62 +204,6 @@ test("PostToolUse suppresses no-new-effect repeats but reminds after the same pa
     clock: () => FIXED_NOW,
   });
   assert.match(changedAgain.systemMessage, /src\/live\.js/, "a materially changed effect may remind again");
-});
-
-test("PostToolUse fails through the Hook error contract when reminder markers cannot be created", async (t) => {
-  const root = await temporaryGitWorkspace(t, "hw-m7-r2-reminder-io-");
-  await seedActiveRecovery(root, "m7-r2-reminder-io");
-  await writeText(join(root, ".pipeline/runtime/codex-hooks"), "blocks the marker directory\n");
-
-  await assert.rejects(
-    () => api.evaluateCodexHookEvent(root, postToolPayload(root, "io-1"), {
-      id: "m7-r2-reminder-io-1",
-      clock: () => FIXED_NOW,
-    }),
-    (error) => error?.code === "ERR_CODEX_HOOK_REMINDER_MARKER_FAILED",
-  );
-});
-
-test("PostToolUse rejects a reminder marker parent symlink that escapes the workspace", async (t) => {
-  const root = await temporaryGitWorkspace(t, "hw-m7-r2-reminder-symlink-");
-  const outside = await temporaryCurrentWorkspace(t, "hw-m7-r2-reminder-outside-");
-  await seedActiveRecovery(root, "m7-r2-reminder-symlink");
-  await symlink(outside, join(root, ".pipeline/runtime/codex-hooks"), process.platform === "win32" ? "junction" : "dir");
-
-  await assert.rejects(
-    () => api.evaluateCodexHookEvent(root, postToolPayload(root, "symlink-1"), {
-      id: "m7-r2-reminder-symlink-1",
-      clock: () => FIXED_NOW,
-    }),
-    (error) => error?.code === "ERR_CODEX_HOOK_REMINDER_MARKER_FAILED",
-  );
-});
-
-test("PostToolUse rejects an ordinary file that replaces the final reminder marker", async (t) => {
-  const root = await temporaryGitWorkspace(t, "hw-m7-r2-reminder-file-");
-  await seedActiveRecovery(root, "m7-r2-reminder-file");
-  const payload = postToolPayload(root, "file-1");
-  const first = await api.evaluateCodexHookEvent(root, payload, {
-    id: "m7-r2-reminder-file-1",
-    clock: () => FIXED_NOW,
-  });
-  assert.equal(typeof first.systemMessage, "string");
-
-  const markerRoot = join(root, ".pipeline/runtime/codex-hooks/reminders");
-  const entries = await readdir(markerRoot, { withFileTypes: true });
-  assert.equal(entries.length, 1);
-  assert.equal(entries[0].isDirectory(), true);
-  const markerPath = join(markerRoot, entries[0].name);
-  await rmdir(markerPath);
-  await writeText(markerPath, "not a marker directory\n");
-
-  await assert.rejects(
-    () => api.evaluateCodexHookEvent(root, postToolPayload(root, "file-2"), {
-      id: "m7-r2-reminder-file-2",
-      clock: () => FIXED_NOW,
-    }),
-    (error) => error?.code === "ERR_CODEX_HOOK_REMINDER_MARKER_FAILED",
-  );
 });
 
 function userPromptPayload(root, prompt) {

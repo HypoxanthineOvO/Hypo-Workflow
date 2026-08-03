@@ -6,7 +6,7 @@ Hypo-Workflow is a project-work protocol for the current Codex host. `.pipeline/
 
 ## Current Routes
 
-The v14.0.0-alpha.5 Official Codex release exposes ten focused routes. Each route loads exactly one Child Skill:
+The v14.0.0-alpha.6 Official Codex release exposes ten focused routes. Each route loads exactly one Child Skill:
 
 | Route | Purpose |
 | --- | --- |
@@ -32,7 +32,15 @@ Ordinary conversation does not require a route choice. Status, reports, explanat
 - Maintain records day-to-day project facts without opening a Delivery.
 - Experiment is a durable nonlinear lane for project knowledge, environments, code snapshots, machines, datasets, baselines, scans, Attempts, metrics, exceptions, trash/restore history, and next actions.
 
-When the user asks for experiment status, the Agent reads the project's bounded materialized status projection first. It summarizes default and contextual baselines, hardware and environment context, dataset meaning, scan purpose, outcomes, suspicious results, resource boundaries, and next actions. It follows detail references only for drill-down; an ordinary status answer does not rescan the repository, result directories, or every immutable event.
+When the user asks for experiment status, the Agent first reads `experiment.yaml` and the Attempts explicitly referenced by the [Experiment Record Protocol](reference/experiment-records.md). It summarizes default and contextual baselines, hardware and environment context, dataset meaning, scan purpose, outcomes, suspicious results, resource boundaries, and next actions. A legacy bounded materialized status projection is an optional compatibility source, not a prerequisite for status or continued execution.
+
+## Multiple Work Items And Concurrent Placement
+
+One Project may contain multiple Goals, Plans, compatible Cycles, and Experiments. `active.delivery` is a legacy fallback, not a project-wide mutex. A Session may select one Work Item for context routing. When several candidates exist, SessionStart reports them without blocking ordinary prompts, tools, diagnostics, or Experiment file records. Cross-Work-Item authority writes and resource claims still require an explicit selection.
+
+One Project authority root may register several independent Git Repository Targets, such as `Accel-Sim` and `llm-trace` under `Cryo-Computing`. Stable repository identity is separate from its current locator. Each target has one primary integration target and may later add alternate targets without converting nested repositories into submodules.
+
+Before launch, the Host declares repository and resource claims. Core atomically returns `shared`, `isolated_worktree`, `isolated_resources`, or `blocked`. Compatible pinned `read`/`execute` claims may share; different snapshots or source-changing access use worktrees; relocatable mutable caches use resource isolation; fixed GPU, port, or output conflicts block. Core records lease/fencing and bounded Host actions but does not execute Git or start processes. Source changes must be integrated into the registered target with a digest-verified ancestry proof before a Delivery requests final acceptance.
 
 ## Multiple Work Items And Concurrent Placement
 
@@ -55,7 +63,7 @@ Before a run, record:
 - machine, GPU, driver, CUDA, resource limits, and server-specific external data locations;
 - dataset, scene, parameters, random seeds, the complete command, log/config/metric references, and a readable output directory.
 
-Experiment events never store raw credentials, Keys, hidden reasoning, full transcripts, or paper PDFs. They store only safe references to authorized locations.
+Experiment records never store raw credentials, Keys, hidden reasoning, full transcripts, or paper PDFs. They store only safe references to authorized locations.
 
 ### Experiments, Attempts, Scans, And Baselines
 
@@ -78,11 +86,11 @@ Operational completion means only that the program ended. Scientific review also
 
 Incorrect or obsolete Attempts go to trash instead of being deleted and remain restorable. Permanent cleanup requires fresh explicit authorization. Before a rerun can overwrite an existing output reference, the Agent must surface the retention risk.
 
-### Events, Git Synchronization, And Instant Status
+### Ordinary Records, Compatibility Synchronization, And Instant Status
 
-Baseline, dataset, scan, Attempt, exception, lifecycle, and next-action facts are appended as content-addressed immutable events. Events from multiple clones can be unioned through Git. If the same `event_key` has incompatible meanings, Workflow summarizes the conflict and stops before choosing unless the user delegates that decision.
+The default record lives under `.pipeline/memory/experiment-records/<project_id>/<experiment_id>/`: one readable `experiment.yaml` holds the current plan and Attempt references, and each Attempt has a separate YAML file. The Agent maintains these records with ordinary file tools and does not require `BatchReport`, a dedicated write API, content hashes, or a projection. Clones use ordinary Git merging; incompatible changes to the same semantic fact stop for an explicit choice unless the user delegates it.
 
-Materialized status is a bounded, validated project view. It leads with baselines, hardware and environment, dataset semantics, scans and their purpose, outcome counts, suspicious or resource-limited results, trash/retention state, and concrete next actions. Raw JSON and immutable events are read only for drill-down.
+Status leads with baselines, hardware and environment, dataset semantics, scans and their purpose, outcome counts, suspicious or resource-limited results, trash/retention state, and concrete next actions. Legacy content-addressed events and materialized status remain readable or synchronizable by optional tooling, but an auxiliary failure may only warn; it cannot block execution, analysis, or an ordinary record update.
 
 ### Experiment Boundaries
 
@@ -125,7 +133,7 @@ Workflow does not emit Luna/Sol, providers, credentials, reasoning effort, token
 
 ## Execution And Acceptance
 
-Material delivery is driven by verifiable effects. The proposal gate offers confirm and start, confirm without starting, or do not confirm. Plain affirmative replies atomically use `delivery.approve_and_start`; only confirm-without-start enters `waiting_to_start`. High-impact side effects retain local gates.
+Material delivery is driven by verifiable effects. The final Proposal offers confirm and start, confirm without starting, or continue Discussion. A short affirmative reply inherits `delivery.approve_and_start` only when the complete Proposal is visible and the Agent is asking whether to start; otherwise it answers only the current question. Only confirm-without-start enters `waiting_to_start`. High-impact side effects retain local gates.
 
 Runtime owns lifecycle authority, Continuation owns the next action, and a Recovery Pack only supplies bounded recovery context. If no Pack exists, Runtime and Continuation still permit a degraded resume. Legacy `.pipeline` lifecycle files are never fallback authority.
 
@@ -133,4 +141,4 @@ Final delivery explains the conclusion, technical approach, modified modules, te
 
 ## Release Boundary
 
-The v14.0.0-alpha.5 Host Contract v1, Codex plugin ZIP, and portable ZIP all publish ten routes and include `/hw:experiment`. Official Codex is the only current support surface; other platforms and concrete VSP-Codex model mapping require separate target-repository adaptation and validation.
+The v14.0.0-alpha.6 Host Contract v1, Codex plugin ZIP, and portable ZIP all publish ten routes and include `/hw:experiment`. Official Codex is the only current support surface; other platforms and concrete VSP-Codex model mapping require separate target-repository adaptation and validation.

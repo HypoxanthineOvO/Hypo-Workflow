@@ -6,7 +6,7 @@
 
 Plan -> Execute -> Independently verify -> Human acceptance -> Resume safely
 
-[![Version](https://img.shields.io/badge/version-14.0.0--alpha.4-blue)](.codex-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-14.0.0--alpha.6-blue)](.codex-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Official%20Codex-black)](docs/en/reference/platforms.md)
 
@@ -16,7 +16,7 @@ Plan -> Execute -> Independently verify -> Human acceptance -> Resume safely
 
 Hypo-Workflow is a Skill protocol, not a runner or background service. The host Agent implements, tests, and reviews project work; `.pipeline/` preserves verifiable, recoverable project facts.
 
-[v14.0.0-alpha.5 Release Notes](docs/en/release/v14.0.0-alpha.5.md)
+[v14.0.0-alpha.6 Release Notes](docs/en/release/v14.0.0-alpha.6.md)
 
 This release supports **Official Codex** as its only current adapter. OpenCode, Claude Code, Cursor, GitHub Copilot, Trae, and custom Codex-fork adapters are deferred. Old platform artifacts that remain in the repository are not current support claims.
 
@@ -34,9 +34,9 @@ Manifest
 
 - **Runtime** owns Goal/Plan lifecycle and remains compatible with existing Cycles; **Continuation** owns only the next action.
 - **Delivery / Workstream** allow multiple tasks and Sessions to run in one project; `active.delivery` remains only as a legacy foreground pointer.
-- **Work Placement / Repository Target** bind each Session to one Delivery or Experiment and atomically choose a shared checkout, isolated worktree, resource isolation, or blocked placement; source changes must return to a registered integration target.
+- **Work Placement / Repository Target** selects one Delivery or Experiment when a Session needs authority routing or resource claims, then atomically chooses a shared checkout, isolated worktree, resource isolation, or blocked placement; an unbound Session does not disable ordinary tools.
 - **Records** store requirements, preferences, decisions, and feedback. They replace the generic Rules system.
-- **Experiment events / status projection** store Git-mergeable experiment facts and provide instant status without rescanning result trees.
+- **Experiment records** use ordinary YAML for plans and Attempts; legacy events and status projections remain optional compatibility views.
 - **Worker Routing** shows a task assessment before Worker start and emits a semantic capability class without choosing a model or provider.
 - **Receipts** store one-time, scoped user authorization.
 - **Recovery Journal / Capsule / Pack** preserve bounded recovery evidence without replaying full conversations or overriding newer Runtime.
@@ -74,21 +74,21 @@ Use Plan when at least one intermediate artifact needs user inspection or a deci
          -> accept Stone -> continue -> final acceptance
 ```
 
-Use Experiment when work has no linear finish and requires repeated runs, parameter scans, and result judgment:
+Use Experiment when work has no linear finish and requires repeated runs, parameter scans, and result judgment. Its default record is ordinary YAML and does not depend on a named reporting tool:
 
 ```text
 /hw:init -> /hw:experiment -> record environment/knowledge/baselines -> run and supervise
-         -> append immutable events -> read materialized status -> continue iterating
+         -> write ordinary Attempt YAML -> read referenced records -> continue iterating
 ```
 
-The proposal gate exposes three meanings: confirm and start, confirm without starting, or do not confirm and continue Discussion. Plain affirmative replies issue `delivery.approve_and_start`; only confirm-without-start enters `waiting_to_start`. Deletion, remote writes, releases, service restarts, and other high-impact actions retain local gates. Use `/hw:resume` after interruption.
+The final Proposal exposes three meanings: confirm and start, confirm without starting, or continue Discussion. A short affirmative reply inherits `delivery.approve_and_start` only when the complete Proposal is visible and the Agent is asking whether to start; otherwise it answers only the current question. Only confirm-without-start enters `waiting_to_start`. Deletion, remote writes, releases, service restarts, and other high-impact actions retain local gates. Use `/hw:resume` after interruption.
 
 ### Experiment Capabilities
 
 - Preserve project purpose, paper/document references, metric and dataset meanings, module roles, optimization locations, and concept-to-code mappings, with stale-knowledge checks after code changes.
 - Bind every run to a Git snapshot, `uv` environment, machine/GPU/driver/CUDA facts, data locations, parameters, command, resource limits, and a readable output directory.
 - Separate logical Experiments from Attempts and support one-axis/cross scans, screening expansion, contextual baselines, tmux supervision, interruption recovery, trash/restore history, and confirmation-gated scientific review.
-- Answer “how are the experiments going?” from a bounded materialized status that leads with baselines, environment, datasets, scan purpose, outcomes, exceptions, and next actions instead of rescanning every result directory.
+- Answer “how are the experiments going?” from `experiment.yaml` and its referenced Attempts, leading with baselines, environment, datasets, scan purpose, outcomes, exceptions, and next actions instead of rescanning every result directory.
 
 Real NeRF, AceSim, GitLab, SSH/SCP, large-trace, and multi-week behavior still need a real-project Pilot. The current release records the environment used by an experiment; it is not a whole-computer inventory for proxies, ports, services, tools, or SSH configuration.
 

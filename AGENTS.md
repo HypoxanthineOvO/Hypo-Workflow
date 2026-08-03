@@ -9,7 +9,13 @@ For discussion/background/idea/complaint/question/solution-discussion inputs, tr
 
 Clear imperative requests with a concrete target may use direct execution: when the user names the action and target file, command, report, or bounded scope, execute directly unless the request is framed as discussion, background, idea, complaint, question, or solution-discussion.
 
-Post-plan affirmative replies authorize execution. After a displayed plan, Mini-contract, or recommendation, replies such as 可以, 确认, OK, go ahead, and apply it are execution authorization within the shown scope; ask again if scope grows, becomes destructive, or touches target repositories.
+Affirmative replies answer the question actually asked. Agreement after a Mini-contract confirms understanding, not execution. Only after a complete Proposal is visible and the Agent explicitly asks whether to start do 确认并开始、按这个方案实施、按你的方案来、go ahead, or apply it authorize execution. 确认但不开始 approves without starting.
+
+Before choosing Goal or Plan, visibly show Discover, Technical, and Architecture artifacts. Discover synthesizes the user's requirements and distinguishes user statements, repository facts, and Agent inference. Technical explains current/proposed technology and reasons. Architecture uses a Mermaid, ASCII, table, or TUI-equivalent diagram; existing projects mark changed components and downstream effects, while new projects show the target components, boundaries, ownership, and data/control flow. These artifacts may be shown together and do not create separate confirmation gates.
+
+After rejection, explain what is wrong, the current state, why the prior reasoning failed, which assumptions change, the proposed correction, and affected Discover/Technical/Architecture deltas before generating a revised Proposal. Never replace this discussion with a Receipt or confirmation card.
+
+An explicit `/hw:accept`, `/hw:reject`, or unmistakable natural-language acceptance/rejection statement authorizes that corresponding action. Validate the Receipt binding internally and report it, but do not ask for a duplicate ordinary confirmation. Ask only when the target, scope, result, or feedback meaning is ambiguous.
 
 On first-use of a new concept in a Cycle, explain it with one-sentence explanation before relying on it.
 
@@ -25,17 +31,17 @@ Project the optional @karpathy/guidelines behavior pack as concise execution dis
 
 Use Ask Questions proactively when a decision materially changes scope, safety, architecture, release behavior, remote side effects, protected files, or acceptance criteria. Use the `question` tool when it is available; otherwise stop and ask the user in the normal response channel. Do not bury required user decisions in unrelated prose or proceed on a guess when the answer changes what should be edited, tested, pushed, released, installed, or delegated.
 
-Before calling Question Tool / Ask for a Plan gate, explain in the conversation why the decision is needed, what will change for each answer, and what evidence or artifact the user is confirming. Never open a bare question card before that explanation is visible.
+Before calling Question Tool / Ask, explain in the conversation why the decision is needed and what will change for each answer. Never open a bare question card before that explanation is visible.
 
-For major Plan gates, show the actual phase artifacts before Question Tool / Ask confirmation. This includes Discover, Technical Stack, Architecture, Decompose, and Generate outputs such as the stage summary, decision table, open questions, diagrams, milestone table, decision matrix, and dependency map. The Question Tool / Ask card must be the gate after the visible explanation and artifacts, not a replacement for them.
+Discover, Technical, and Architecture artifacts must be visible, but visibility does not create a confirmation gate. Show them together when uninterrupted planning is requested. Ask only for a real unresolved decision or the final Proposal choice.
 
-Prefer one concise question with the smallest actionable decision. Continue without asking only when the repo evidence and active configuration make the decision unambiguous.
+Prefer one concise question with the smallest actionable decision. Do not invent questions, repeat recommended answers, or use a round quota.
 
 ## Runtime contract
 
 - Hypo-Workflow is not a runner.
 - The OpenCode Agent performs the actual work.
-- `.pipeline/` remains the source of truth for state, Cycle, Patch, rules, PROGRESS, logs, prompts, and reports.
+- `.pipeline/manifest.yaml`, the selected Work Item Runtime/Continuation, and structured Records are the current authority. Legacy Cycle/Patch files remain migration inputs, not default session context.
 - Use `question` for required user decisions.
 - Use `todowrite` for visible plan discipline, especially in `/hw-plan*` commands.
 
@@ -45,20 +51,17 @@ When a Workflow writes a report, debug artifact, audit artifact, Patch record, C
 
 The final response must also explain the substance of the report in the conversation before or alongside artifact paths. Do not only list `.pipeline/...` files, worker closures, YAML validity, and test counts. For every important report or review artifact, summarize what it contains, the main conclusion, the user-facing interpretation, and what the user should understand or do next. For learning gates, quizzes, research reports, requirement briefs, or design reports, teach the key concepts and intended checkpoint outcome directly in chat; paths are supporting references, not the explanation.
 
-## Workflow state persistence
+## Hook-optional context and persistence
 
-When executing inside a Hypo-Workflow Cycle, maintain pipeline state throughout the session:
+Hooks are optimizations, not the source of correctness. At session start, after compaction, or when Workflow context is uncertain:
 
-- At session start or after compaction, read `.pipeline/state.yaml` to restore the current milestone/step context.
-- After every meaningful code or config change that advances a step, update:
-  - `.pipeline/state.yaml` — current step, heartbeat timestamp
-  - `.pipeline/log.yaml` — step_complete or milestone_complete event
-  - `.pipeline/PROGRESS.md` — timeline entry
-- When receiving revision feedback mid-step, update step status to `in_progress` before reworking.
-- If blocked, write `.pipeline/continuation.yaml` with `status: active` and `safe_resume_command: /hw:resume`.
-- Never silently drop out of Workflow mode — always record state before responding to non-Workflow requests.
+- Read `.pipeline/manifest.yaml` first.
+- Resolve the Session's Work Item through Work Placement when authority routing or resource claims require it. Use `.pipeline/runtime/active.yaml` only as a legacy fallback when no Placement registry exists.
+- An unbound Session may receive candidate reminders, but it must not block ordinary prompts, tools, diagnostics, or ordinary-file Experiment records.
+- When a Work Item is selected, read only its Runtime and Continuation, plus the latest valid Recovery Pack when resuming.
+- Do not scan all Records or use legacy `state.yaml`, `cycle.yaml`, `log.yaml`, or `PROGRESS.md` as authority.
 
-If you are unsure whether you are in a Workflow Cycle, run `/hw:status` first.
+The main Agent must notice explicit durable requirements, preferences, decisions, and feedback even without `UserPromptSubmit`. After explaining the fact in chat, persist it through Maintain without an extra execution gate. Do not record brainstorming, full transcripts, hidden reasoning, secrets, or transient diagnostics. Review staged Ambient Maintain Inbox items before treating them as authority.
 
 ## Protected files
 

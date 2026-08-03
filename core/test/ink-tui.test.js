@@ -142,13 +142,13 @@ test("config TUI model separates global and project targets", async () => {
 
   await writeConfig(globalFile, {
     agent: { platform: "codex", model: "default" },
-    plan: { default_mode: "interactive", interaction_depth: "medium" },
+    plan: { default_mode: "interactive" },
     output: { language: "zh-CN", timezone: "Asia/Shanghai" },
   });
   await writeConfig(projectFile, {
     pipeline: { name: "Target Project", source: "local", output: "local" },
     platform: "auto",
-    plan: { mode: "interactive", interaction_depth: "high" },
+    plan: { mode: "interactive" },
     execution: { mode: "self", steps: { preset: "tdd" } },
     evaluation: { auto_continue: true, max_diff_score: 3 },
   });

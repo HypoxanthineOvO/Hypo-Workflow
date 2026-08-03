@@ -125,5 +125,5 @@ When enabled, these rules act as always-on planning and implementation guidance 
 ## Runtime Notes
 
 - keep natural-language user input as the source; structured fields are extracted after the conversation
-- preserve existing `interaction_depth`, `min_rounds`, and explicit Discover completion semantics
+- preserve semantic reflection and visible planning artifacts without fixed question counts or per-artifact confirmation gates
 - do not replace normal `/hw:plan`; make it more disciplined

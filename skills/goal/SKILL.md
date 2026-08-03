@@ -13,15 +13,16 @@ A Goal is selected after Discussion when execution needs no manual intermediate 
 
 Use the Root Core Call Contract: import from the installed bundle, pass the target workspace as `root`, create the store with an explicit zero-argument Clock, and give every mutation a unique safe `{ id }`. Issue transition Receipts only after the host has shown the full binding and received explicit user confirmation.
 
-1. Run Discussion in order: Discover requirements, resolve material Technical Stack choices, then resolve Architecture changes. Show each real artifact before moving on; skip a phase only with evidence that no decision exists.
-2. Gather the complete outcome, scope, non-goals, acceptance criteria, constraints, repository evidence, risks, and Agent decision boundaries. Use `assessPlanReadiness`; ask only unresolved material questions.
-3. Confirm that the proposed Stone list is empty, then compile with `compileGoalDesign`. Do not add `milestones` merely to represent internal implementation steps.
-4. Select execution topology from coupling, parallel value, oracle strength, and risk. Default to the main Agent when delegation does not create clear value.
-5. For each selected Worker, have the host Agent generate and show a bounded Task Assessment, validate it with `validateTaskAssessment`, and call `selectWorkerRouting`. Persist only the semantic decision and assessment, never the generating prompt.
-6. Apply `execution.worker_routing.mode`: `off` omits the hint, `advisory` records an explicit unsupported-host fallback, and `required` blocks that Worker start when the semantic handoff is unavailable. Routing does not change topology or acceptance.
-7. Persist the proposal with `createDeliveryStore(...).proposeGoal`; report the full requirement Design in chat.
-8. Offer 确认并开始 / 确认但不开始 / 不确认. Plain affirmative replies mean 确认并开始: issue `delivery.approve_and_start` and call `approveAndStart` in the same authorized transition. 确认但不开始 uses `delivery.approve` and `waiting_to_start`.
-9. After start, execute the full Goal continuously through the host's built-in Goal mechanism (`/Goal` where available), stopping only for a newly discovered material decision or a separately gated high-impact side effect.
-10. Verify real file-bound evidence, request final acceptance, then use `/hw:accept` or `/hw:reject`.
+1. Run Discussion before selecting Goal. Repository exploration is evidence, not user alignment. Challenge user statements, repository facts, Agent inference, and decisions that belong to the user.
+2. Show one complete planning surface containing: a Discover requirement synthesis; a Technical summary of current/proposed stack, dependencies, compatibility, validation tools, and reasons; and an Architecture diagram. Existing projects mark changed components and downstream effects; new projects show the target components, boundaries, ownership, and data/control flow. These are required displays, not separate confirmation gates.
+3. Gather the complete outcome, scope, non-goals, acceptance criteria, constraints, repository evidence, risks, and Agent decision boundaries. Ask only questions that could materially change them. Never ask filler questions or use a round quota; when no material question remains, explain why and still show the artifacts.
+4. Confirm that the proposed Stone list is empty, then compile with `compileGoalDesign`. Do not add `milestones` merely to represent internal implementation steps.
+5. Select execution topology from coupling, parallel value, oracle strength, and risk. Default to the main Agent when delegation does not create clear value.
+6. For each selected Worker, have the host Agent generate and show a bounded Task Assessment, validate it with `validateTaskAssessment`, and call `selectWorkerRouting`. Persist only the semantic decision and assessment, never the generating prompt.
+7. Apply `execution.worker_routing.mode`: `off` omits the hint, `advisory` records an explicit unsupported-host fallback, and `required` blocks that Worker start when the semantic handoff is unavailable. Routing does not change topology or acceptance.
+8. Persist the proposal with `createDeliveryStore(...).proposeGoal`; report the full requirement Design in chat.
+9. Offer one final choice: 确认并开始 / 确认但不开始 / 不确认. Plain agreement answers the explicit question in context; only an explicit start choice or equivalent wording authorizes `delivery.approve_and_start`.
+10. After start, execute the full Goal continuously through the host's built-in Goal mechanism (`/Goal` where available), stopping only for a newly discovered material decision or a separately gated high-impact side effect.
+11. Verify real file-bound evidence, request final acceptance, then use `/hw:accept` or `/hw:reject`.
 
-Revision feedback writes Feedback plus a revised Design Record and returns to `needs_revision`; it never authorizes product edits or auto-starts.
+Revision feedback returns to Discussion. First explain what was wrong, the current state, why the prior reasoning failed, which assumptions change, the proposed correction, and any Discover/Technical/Architecture delta. Only after that discussion is clear may the Agent present a revised Design. Feedback never authorizes product edits or auto-starts by itself.

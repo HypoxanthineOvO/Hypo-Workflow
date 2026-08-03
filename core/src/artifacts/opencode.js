@@ -9,10 +9,11 @@ import {
   ASK_QUESTIONS_GUIDANCE,
   CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE,
   FOUR_RULE_DISCIPLINE_GUIDANCE,
+  HOOKLESS_WORKFLOW_GUIDANCE,
   renderDeepSeekToolCallingRules,
 } from "./agent-guidance.js";
 
-const HW_VERSION = "14.0.0-alpha.5";
+const HW_VERSION = "14.0.0-alpha.6";
 const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(MODULE_DIR, "..", "..", "..");
 const DEPRECATED_TUI_PLUGIN_REF = ".opencode/tui/hypo-workflow-tui.tsx";
@@ -113,13 +114,13 @@ export async function writeOpenCodeArtifacts(outDir, options = {}) {
 
 export function renderCommand(command) {
   const planGuidance = command.route === "plan"
-    ? "\nPlan discipline: use `question` / Ask for every hard interactive gate unless automation is explicitly configured, and keep `todowrite` synchronized for Discover / Technical Stack / Architecture / Decompose / Generate checkpoint state. Progressive Discover starts with task category, desired effect, and verification method, then moves through assumptions, ambiguities, tradeoffs, and validation criteria as needed without discussing implementation stack or architecture prematurely. Technical Stack owns implementation substrate and existing stack choices. Architecture owns current architecture reading, diagrams, and integration points. Decompose owns milestone splitting after those phase artifacts exist. Confirmation is an in-phase Ask gate, not a standalone user command. For `/hw:guide`, use the intent router contract and recommend one next path before confirmation. For `/hw:plan --deep`, treat it as an alias and route to `/hw:plan:deep` before ordinary planning; ordinary `/hw:plan` keeps the named phase gates and must not skip them after Deep Plan conversion. For `/hw:plan --batch`, collect multiple Features in one Discover pass, then generate Feature Queue tables and Mermaid diagrams according to `batch.decompose_mode`. For `/hw:plan --insert`, convert the natural-language request into a structured queue operation, summarize the queue diff, and wait for explicit confirmation before writing `.pipeline/feature-queue.yaml`.\n"
+    ? "\nPlan discipline: keep `todowrite` synchronized with meaningful work, not confirmation choreography. Always show Discover requirement synthesis, Technical choices, and an Architecture diagram; these may be presented together and do not create separate gates. Ask only material questions, then offer one final Proposal choice. For `/hw:guide`, use the intent router contract and recommend one next path. For `/hw:plan --deep`, treat it as an alias and route to `/hw:plan:deep` before ordinary planning; converted research remains evidence and never replaces the three visible planning artifacts. For `/hw:plan --batch`, collect multiple Features in one discussion, then generate Feature Queue tables and Mermaid diagrams according to `batch.decompose_mode`. For `/hw:plan --insert`, summarize the queue diff and wait for the one write authorization before changing `.pipeline/feature-queue.yaml`.\n"
     : "";
   const routeGuidance = commandSpecificGuidance(command);
   const knowledgeContext = command.canonical === "/hw:knowledge"
     ? "- `.pipeline/knowledge/knowledge.compact.md`\n- `.pipeline/knowledge/index/*.yaml`\n"
     : "";
-  return `---\nagent: ${command.agent}\ndescription: Hypo-Workflow mapping for ${command.canonical}\n---\n\n# ${command.opencode}\n\nCanonical command: \`${command.canonical}\`\nRoute: \`${command.route}\`\nSkill: \`${command.skill}\`\n\nLoad the corresponding Hypo-Workflow skill instructions from \`${command.skill}\`, then execute the canonical command semantics with any user-provided arguments.\n\n${CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE}\n${planGuidance}${routeGuidance}\n${FOUR_RULE_DISCIPLINE_GUIDANCE}\n\n${ASK_QUESTIONS_GUIDANCE}\n\nBefore acting, inspect the relevant context when present:\n\n- \`.pipeline/config.yaml\`\n- \`.pipeline/cycle.yaml\`\n- \`.pipeline/state.yaml\`\n- \`.pipeline/rules.yaml\`\n${knowledgeContext}- current prompt/report files for pipeline commands\n- open patches for Patch commands\n\nKeep this command as an OpenCode-native slash mapping, not a separate runner. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.\n`;
+  return `---\nagent: ${command.agent}\ndescription: Hypo-Workflow mapping for ${command.canonical}\n---\n\n# ${command.opencode}\n\nCanonical command: \`${command.canonical}\`\nRoute: \`${command.route}\`\nSkill: \`${command.skill}\`\n\nLoad the corresponding Hypo-Workflow skill instructions from \`${command.skill}\`, then execute the canonical command semantics with any user-provided arguments.\n\n${CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE}\n${planGuidance}${routeGuidance}\n${FOUR_RULE_DISCIPLINE_GUIDANCE}\n\n${ASK_QUESTIONS_GUIDANCE}\n\n${HOOKLESS_WORKFLOW_GUIDANCE}\n\nKeep this command as an OpenCode-native slash mapping, not a separate runner. The OpenCode Agent performs the work and Hypo-Workflow files remain the source of truth.\n`;
 }
 
 function commandSpecificGuidance(command) {
@@ -153,7 +154,7 @@ function commandSpecificGuidance(command) {
 export function renderAgent(agent, profile = {}) {
   const model = agent.model ? `model: ${renderOpenCodeModelId(agent.model, profile)}\n` : "";
   const deepSeekRules = renderDeepSeekToolCallingRules(agent.model, "OpenCode");
-  return `---\ndescription: ${agent.description}\nmode: ${agent.mode}\n${model}permission:\n${renderAgentPermissions(agent.tools, profile)}---\n\n# ${agent.name}\n\n${agent.description}\n\n${CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE}\n\nAnalysis boundary: read \`.opencode/hypo-workflow.json.analysis\` before executing an \`analysis\` preset. Manual mode denies code changes, hybrid mode confirms before code changes, and auto mode may change code within the configured boundaries. Always honor restart, system dependency, network, destructive, and external side-effect boundaries.\n\n${FOUR_RULE_DISCIPLINE_GUIDANCE}\n\n${ASK_QUESTIONS_GUIDANCE}\n\nUse \`question\` / Ask for required user interaction and \`todowrite\` for visible plan discipline when those tools are available. For Plan work, every Discover / Technical Stack / Architecture / Decompose / Generate checkpoint must be represented in the todo state before continuing.\n${deepSeekRules ? `\n${deepSeekRules}\n` : ""}`;
+  return `---\ndescription: ${agent.description}\nmode: ${agent.mode}\n${model}permission:\n${renderAgentPermissions(agent.tools, profile)}---\n\n# ${agent.name}\n\n${agent.description}\n\n${CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE}\n\nAnalysis boundary: read \`.opencode/hypo-workflow.json.analysis\` before executing an \`analysis\` preset. Manual mode denies code changes, hybrid mode confirms before code changes, and auto mode may change code within the configured boundaries. Always honor restart, system dependency, network, destructive, and external side-effect boundaries.\n\n${FOUR_RULE_DISCIPLINE_GUIDANCE}\n\n${ASK_QUESTIONS_GUIDANCE}\n\n${HOOKLESS_WORKFLOW_GUIDANCE}\n\nUse \`question\` / Ask only for required user decisions and \`todowrite\` for visible work discipline when those tools are available. Required planning artifacts are displays, not one gate per todo item.\n${deepSeekRules ? `\n${deepSeekRules}\n` : ""}`;
 }
 
 export function renderOpenCodeModelId(model, profile = {}) {

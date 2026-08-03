@@ -92,8 +92,6 @@ export {
   compilePlan,
   compileCyclePlan,
   selectDeliveryMode,
-  selectAdaptivePlan,
-  assessPlanReadiness,
 } from "./planning/index.js";
 export {
   selectExecutionTopology,
@@ -319,13 +317,9 @@ export {
 export {
   buildProgressiveDiscoverPlan,
   buildPlanAuditQuestions,
-  assessDiscoverCompletionGate,
-  validateVisiblePhaseGate,
   extractExampleAbstraction,
   normalizeDiscoverFeature,
   PLAN_PHASE_MODEL,
-  DISCOVER_COMPLETION_SIGNALS,
-  VISIBLE_PHASE_OUTPUTS,
   DISCOVER_BIG_QUESTIONS,
   P0_CONFIGURE_STAGE,
   PLAN_AUDIT_FIELDS,
@@ -509,11 +503,34 @@ export {
   renderExplainAnswerFromSubagentEvidence,
 } from "./explain/index.js";
 export {
+  runProjectSync,
   mergeClaudeCodeSettings,
   buildDerivedArtifactMap,
   checkDerivedArtifacts,
   runSessionStartLightSyncCheck,
 } from "./sync/index.js";
+export {
+  buildGlobalTuiModel,
+  renderGlobalTuiSnapshot,
+  buildConfigTuiModel,
+  stageConfigTuiEdit,
+  applyConfigTuiEdit,
+  buildReadOnlyProgressDashboardModel,
+  renderReadOnlyProgressDashboardSnapshot,
+} from "./tui/index.js";
+export {
+  runMaintenanceScheduler,
+  runDailyProjectSummaryScheduler,
+} from "./maintenance/index.js";
+export {
+  emitProjectEvent,
+  routeProjectEvent,
+} from "./project-events/index.js";
+export {
+  dispatchProjectStopNotifications,
+  enqueueProjectStopNotification,
+  loadPendingNotifications,
+} from "./project-notifications/index.js";
 export {
   isPlainObject,
   cloneJson,

@@ -25,9 +25,11 @@ If the request has a bounded deliverable and final acceptance, route to Goal. If
 
 ## Ambient Maintain
 
-The Official Codex `UserPromptSubmit` Hook may extract a clean durable semantic delta. `createAmbientMaintainStore` first appends a Recovery Journal event and stages a proposal under `.pipeline/memory/inbox/`. A staged Inbox item is not Record authority.
+Hooks are optional optimizations. The main Agent remains responsible for noticing explicit durable requirements, preferences, decisions, and feedback even when `UserPromptSubmit` is unavailable. After explaining the fact in chat, it may persist that exact fact without an extra execution gate. Do not capture brainstorming, transient diagnostics, or an inference that the user did not state.
 
-Only the main Agent may validate and promote the exact staged `RecordPatch`. A recorder Subagent may propose a patch, but cannot commit authority. Promotion verifies the proposal binding, writes the Markdown Record, and refreshes derived indexes. Duplicate semantic facts are deduplicated; changed facts require explicit `supersedes`.
+When a host supplies a clean semantic delta, `createAmbientMaintainStore` first appends a Recovery Journal event and stages a proposal under `.pipeline/memory/inbox/`. A staged Inbox item is not Record authority and must not be treated as remembered merely because the file exists.
+
+Only the main Agent may validate and promote the exact staged `RecordPatch`. It should review staged items during bounded session bootstrap or Maintain work, promote only facts whose meaning and scope are clear, and leave ambiguous proposals unpromoted for discussion. A recorder Subagent may propose a patch, but cannot commit authority. Promotion verifies the proposal binding, writes the Markdown Record, and refreshes derived indexes. Duplicate semantic facts are deduplicated; changed facts require explicit `supersedes`.
 
 `PostToolUse` records bounded evidence and emits only relevant, deduplicated documentation or Record reminders. It does not force a write after every tool call.
 

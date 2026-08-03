@@ -187,7 +187,8 @@ test("maintained sync and legacy generator entry points cannot revive retired su
 });
 
 test("read-only sync checks do not mutate a temporary workspace", async (t) => {
-  if (typeof api.runProjectSync !== "function") return;
+  assert.equal(typeof api.runProjectSync, "function");
+  assert.equal(typeof api.buildGlobalTuiModel, "function");
   const root = await temporaryLegacyWorkspace(t, "hw-c21-m8-sync-check-");
   const before = await treeHash(root);
   const result = await api.runProjectSync(root, {

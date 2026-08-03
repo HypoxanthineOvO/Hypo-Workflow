@@ -1,6 +1,6 @@
 # 命令参考
 
-v14.0.0-alpha.5 的 Official Codex 公共发现面与 Host Contract v1 严格包含十个入口。Root Router 负责 namespace normalization 与 backend availability；每个入口只加载一个普通、非 symlink 的 Child Skill。Codex plugin ZIP 和 portable ZIP 均包含同一组入口。
+v14.0.0-alpha.6 的 Official Codex 公共发现面与 Host Contract v1 严格包含十个入口。Root Router 负责 namespace normalization 与 backend availability；每个入口只加载一个普通、非 symlink 的 Child Skill。Codex plugin ZIP 和 portable ZIP 均包含同一组入口。
 
 | 命令 | Child Skill | 何时使用 |
 | --- | --- | --- |
@@ -17,7 +17,7 @@ v14.0.0-alpha.5 的 Official Codex 公共发现面与 Host Contract v1 严格包
 
 ## 内部自然行为
 
-Chat、Explain、Status、Report、Log、Check、Compact、Knowledge、Sync 和 Debug 由 Agent 根据语义自然执行。Discussion 依次完成 Discover、Technical Stack 和 Architecture，再按 Stone 数量选择 Goal 或 Plan。普通确认签发 `delivery.approve_and_start`；“确认但不开始”才进入 `waiting_to_start`。这些行为不创建额外 Codex Skill 或命令。
+Chat、Explain、Status、Report、Log、Check、Compact、Knowledge、Sync 和 Debug 由 Agent 根据语义自然执行。Discussion 必须向用户展示 Discover、Technical 和 Architecture，再按 Stone 数量选择 Goal 或 Plan；三项可一次展示，不各自设门。只有完整 Proposal 已展示且正在询问是否开始时，简短确认才签发 `delivery.approve_and_start`；“确认但不开始”进入 `waiting_to_start`。这些行为不创建额外 Codex Skill 或命令。
 
 ## 延后与移除
 

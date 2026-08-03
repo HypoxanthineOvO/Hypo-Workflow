@@ -23,14 +23,11 @@ const protectedFiles = [
 ];
 
 const compactContextFiles = [
-  ".pipeline/state.compact.yaml",
-  ".pipeline/state.yaml",
-  ".pipeline/PROGRESS.compact.md",
-  ".pipeline/PROGRESS.md",
-  ".pipeline/cycle.yaml",
+  ".pipeline/manifest.yaml",
+  ".pipeline/runtime/active.yaml",
+  ".pipeline/runtime/placements.yaml",
   ".pipeline/rules.yaml",
-  ".pipeline/patches.compact.md",
-  ".pipeline/patches",
+  ".pipeline/memory/index.yaml",
 ];
 
 const autoContinue = {

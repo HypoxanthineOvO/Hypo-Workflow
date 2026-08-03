@@ -7,7 +7,7 @@ VSPi hosts Hypo-Workflow project facts; it is not a process manager. VSPi and Pi
 - Hypo-Workflow is the sole project Plan authority. VSPi `/plan` projects and edits that Plan; it does not keep a long-lived Local Plan fallback or dual-write another Plan.
 - An uninitialized project requires explicit `/hw:init`.
 - `active.delivery` is a legacy foreground pointer, not a workspace-wide exclusivity lock.
-- Each Session explicitly selects one Delivery or Experiment through Work Placement. Delivery-internal workers still use Workstreams, and multiple candidates never silently inherit `active.delivery`.
+- A Session explicitly selects one Delivery or Experiment through Work Placement when authority routing or resource claims require it. Delivery-internal workers still use Workstreams, and multiple candidates never silently inherit `active.delivery`; an unbound Session does not block ordinary prompts, tools, diagnostics, or Experiment file records.
 - One Project authority root may register multiple Repository Targets with stable identities, mutable locators, one primary integration target, and forward-compatible alternate targets.
 - Hypo-Workflow never starts, stops, or supervises project processes and never holds a writer lock for an entire Agent turn.
 

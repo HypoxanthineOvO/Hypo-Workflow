@@ -1,15 +1,15 @@
 ---
-description: Hypo-Workflow mapping for /hw:reject
+description: Hypo-Workflow mapping for /hw:goal
 hypo_workflow_managed: true
 ---
 
-# /hw:reject
+# /hw:goal
 
-Canonical command: `/hw:reject`
+Canonical command: `/hw:goal`
 Route: `delivery`
-Skill: `skills/reject/SKILL.md`
+Skill: `skills/goal/SKILL.md`
 
-Load the corresponding Hypo-Workflow skill instructions from `skills/reject/SKILL.md`, then execute `/hw:reject` semantics with any user-provided arguments.
+Load the corresponding Hypo-Workflow skill instructions from `skills/goal/SKILL.md`, then execute `/hw:goal` semantics with any user-provided arguments.
 
 ## Consultation-First Action Boundary / 协商优先
 

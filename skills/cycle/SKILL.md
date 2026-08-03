@@ -9,7 +9,7 @@ description: Compatibility route for legacy Cycle requests. New work should use 
 
 用户可见内容遵循项目输出语言；缺失时跟随当前对话语言。内部 schema key 保持英文。
 
-`/hw:cycle` remains readable and executable for existing v14 Runtime objects and explicit compatibility requests. Do not recommend it for new work. Run Discussion, then route new work by Stone count: zero Stones to `/hw:goal`, one or more Stones to `/hw:plan`.
+`/hw:cycle` remains readable and executable for existing v14 Runtime objects and explicit compatibility requests. Do not recommend it for new work. Run Discussion, visibly show the Discover synthesis, Technical choices, and Architecture diagram, then route new work by Stone count: zero Stones to `/hw:goal`, one or more Stones to `/hw:plan`. These displays may be delivered together and do not create three confirmation gates.
 
 Use the Root Core Call Contract: import from the installed bundle, pass the target workspace as `root`, create the store with an explicit zero-argument Clock, and give every mutation a unique safe `{ id }`. Issue transition Receipts only after the host has shown the full binding and received explicit user confirmation.
 
@@ -21,6 +21,6 @@ Use the Root Core Call Contract: import from the installed bundle, pass the targ
 6. Verify each Milestone in order with the selected worker topology. Only after all Milestones verify may aggregate Cycle verification run.
 7. Move only the aggregate Cycle to `pending_acceptance`, then route one Cycle-level manual gate to `/hw:accept` or `/hw:reject`.
 
-Revision creates Feedback plus a superseding Plan Record, resets revised Milestones to pending, and requires renewed approval and explicit start.
+Revision starts with discussion of what was wrong, the current state, why the prior approach failed, the intended correction, and affected Discover/Technical/Architecture deltas. Only then create Feedback plus a superseding Plan Record and reset revised Milestones to pending. Offer one renewed Proposal choice; 确认并开始 must not be followed by a duplicate ordinary start gate.
 
 Completion chat includes the change summary, technical approach, modified modules, test design, validation result, expected behavior, encountered problems, and remaining risks. New-format Records replace legacy Knowledge Ledger archival; never write or delete legacy `.pipeline/knowledge/` from this Skill.

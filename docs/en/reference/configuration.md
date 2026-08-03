@@ -28,8 +28,8 @@ Configuration resolution is project config > global config > built-in default. P
 
 | Field | Purpose | Typical policy |
 |---|---|---|
-| `plan.mode` | `interactive` runs Discover / Technical Stack / Architecture / Decompose / Generate gates; `auto` summarizes only when config allows | Use `interactive` when the user participates in planning |
-| `plan.interaction_depth` | Controls minimum Discover question rounds | Use `high` for complex Cycles |
+| `plan.mode` | `interactive` displays Discover / Technical / Architecture artifacts and asks only for material decisions; `auto` continues only when explicitly delegated | Use `interactive` when the user participates in planning |
+| `plan.interactive.require_explicit_confirm` | Offers one confirm-and-start / confirm-without-starting / continue-discussion choice after the complete Proposal | Keep `true` for team or high-risk work |
 | `execution.mode` | `self`, `subagent`, or host-specific execution mode | Codex defaults to main Agent orchestration with optional Subagents |
 | `execution.worker_separation.mode` | `off` / `recommended` / `strict` | `recommended` separates implement/test/audit when practical; `strict` does not fully accept degraded execution |
 | `execution.worker_routing.mode` | `off` / `advisory` / `required` | Passes a semantic capability class after topology is fixed; default is `advisory` |

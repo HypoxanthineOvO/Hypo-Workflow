@@ -8,10 +8,11 @@ import {
   ASK_QUESTIONS_GUIDANCE,
   CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE,
   FOUR_RULE_DISCIPLINE_GUIDANCE,
+  HOOKLESS_WORKFLOW_GUIDANCE,
   renderDeepSeekToolCallingRules,
 } from "./agent-guidance.js";
 
-const HW_VERSION = "14.0.0-alpha.5";
+const HW_VERSION = "14.0.0-alpha.6";
 
 export async function writeClaudeCodePluginArtifacts(outDir = ".", options = {}) {
   void outDir;
@@ -60,6 +61,7 @@ export function renderClaudeCodeSlashCommand(command = {}, options = {}) {
     `Load the corresponding Hypo-Workflow skill instructions from \`${command.skill}\`, then execute \`${command.canonical}\` semantics with any user-provided arguments.`,
     "",
     CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE,
+    HOOKLESS_WORKFLOW_GUIDANCE,
     "",
     routeGuidance.trimEnd(),
     "",
@@ -71,12 +73,12 @@ export function renderClaudeCodeSlashCommand(command = {}, options = {}) {
     "",
     "Before acting, inspect the relevant context when present:",
     "",
+    "- `.pipeline/manifest.yaml`",
     "- `.pipeline/config.yaml`",
-    "- `.pipeline/cycle.yaml`",
-    "- `.pipeline/state.yaml`",
+    "- the Session-selected Work Item Runtime and Continuation",
+    "- the latest valid Recovery Pack when resuming",
     "- `.pipeline/rules.yaml`",
-    "- current prompt/report files for pipeline commands",
-    "- open patches for Patch commands",
+    "- only the structured Records relevant to the current task",
     "",
     "Keep this command as a Claude Code plugin slash-command mapping, not a separate runner. Claude Code performs the work; Hypo-Workflow files remain the source of truth.",
     "",
@@ -85,16 +87,16 @@ export function renderClaudeCodeSlashCommand(command = {}, options = {}) {
 
 function claudeCommandSpecificGuidance(command) {
   if (command.canonical === "/hw:plan") {
-    return "If the user provides `--deep`, route to `/hw:plan:deep` as an alias before ordinary planning. Ordinary `/hw:plan` keeps the Discover, Technical Stack, Architecture, Decompose, and Generate gates; Deep Plan context or conversion output must not skip them. Confirmation is handled by in-phase Question Tool / Ask gates.";
+    return "If the user provides `--deep`, route to `/hw:plan:deep` as an alias before ordinary planning. Ordinary `/hw:plan` visibly presents Discover, Technical Stack, and Architecture before Decompose and Generate. Deep Plan context or conversion output may supply evidence but must not hide those artifacts. Ask only for material unresolved decisions and one final Proposal choice.";
   }
   if (command.canonical === "/hw:plan:deep") {
-    return "This is also the target for the `/hw:plan --deep` alias. It creates or updates a durable discussion package before ordinary `/hw:plan`. It must not skip ordinary named Plan phase gates after `convert`.";
+    return "This is also the target for the `/hw:plan --deep` alias. It creates or updates a durable discussion package before ordinary `/hw:plan`. Converted research may supply evidence, but ordinary planning must still show Discover, Technical, and Architecture artifacts without creating one gate per artifact.";
   }
   if (command.canonical === "/hw:plan:technical-stack") {
-    return "Run the Technical Stack phase after Discover has produced visible requirements. Discuss implementation substrate, existing stack, integration mechanisms, constraints, and validation tooling; then show the phase artifact and use a Question Tool / Ask gate before Architecture.";
+    return "Run the Technical Stack phase after Discover has produced visible requirements. Discuss implementation substrate, existing stack, integration mechanisms, constraints, and validation tooling, then show the phase artifact. Ask only when a material technical decision remains unresolved.";
   }
   if (command.canonical === "/hw:plan:architecture") {
-    return "Run the Architecture phase after Technical Stack is confirmed. Read the current architecture baseline, produce architecture diagrams and integration points, show the phase artifact, and use a Question Tool / Ask gate before Decompose.";
+    return "Run the Architecture phase after the Technical Stack artifact is visible. Read the current architecture baseline, produce architecture diagrams and integration points, and show the phase artifact. Ask only when a material architecture decision remains unresolved.";
   }
   if (command.canonical === "/hw:patch fix") {
     return "Patch Fix lane: read the Patch first, preserve distinct `test`, `implement`, and `audit` worker identities for code/test changes, and do not close the Patch until worker lifecycle evidence is recorded.";
@@ -216,7 +218,7 @@ export function renderClaudeCodeAgent(role, agent = {}) {
   const name = `hw-${role}`;
   const model = agent.model || "default";
   const deepSeekRules = renderDeepSeekToolCallingRules(model, "Claude Code");
-  return `---\nname: ${name}\ndescription: Hypo-Workflow Claude Code ${role} subagent.\nmodel: ${model}\nhypo_workflow_managed: true\n---\n\n# ${name}\n\nRole: \`${role}\`\nModel: \`${model}\`\n\nUse this Claude Code subagent for Hypo-Workflow ${role} work. The model is generated from the shared \`model_pool.roles\` contract, refined by \`claude_code.agents.${role}.model\` when explicitly configured.\n\n${CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE}\n\n${FOUR_RULE_DISCIPLINE_GUIDANCE}\n\n${ASK_QUESTIONS_GUIDANCE}\n\n${deepSeekRules ? `${deepSeekRules}\n\n` : ""}Do not call models directly from Hypo-Workflow core. Claude Code remains responsible for actual model invocation; this file only declares routing intent.\n`;
+  return `---\nname: ${name}\ndescription: Hypo-Workflow Claude Code ${role} subagent.\nmodel: ${model}\nhypo_workflow_managed: true\n---\n\n# ${name}\n\nRole: \`${role}\`\nModel: \`${model}\`\n\nUse this Claude Code subagent for Hypo-Workflow ${role} work. The model is generated from the shared \`model_pool.roles\` contract, refined by \`claude_code.agents.${role}.model\` when explicitly configured.\n\n${CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE}\n\n${HOOKLESS_WORKFLOW_GUIDANCE}\n\n${FOUR_RULE_DISCIPLINE_GUIDANCE}\n\n${ASK_QUESTIONS_GUIDANCE}\n\n${deepSeekRules ? `${deepSeekRules}\n\n` : ""}Do not call models directly from Hypo-Workflow core. Claude Code remains responsible for actual model invocation; this file only declares routing intent.\n`;
 }
 
 export function selectClaudeAgentRole(context = {}) {

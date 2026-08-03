@@ -550,7 +550,7 @@ Behavior:
 - honor `--template <name>` as an initial template hint when present
 - honor `--context` as comma-separated Discover context sources, including `explore:E001` refs created by `/hw:explore upgrade plan E001`
 - single-feature `/hw:plan` runs Discover, Technical Stack, Architecture, Decompose, and Generate when `--batch` is absent
-- ordinary `/hw:plan` keeps named phase gates; Deep Plan context, `--deep`, or converted discussion output must not skip Discover, Technical Stack, Architecture, Decompose, or Generate
+- ordinary `/hw:plan` keeps Discover, Technical, and Architecture visible; Deep Plan context, `--deep`, or converted discussion output may supply evidence but must not hide those artifacts
 - ordinary single-feature planning must remain simple. Feature DAG fields and queue dependency semantics are only for `--batch`; do not add DAG requirements to a normal Decompose checkpoint.
 - with `--batch`, Discover covers multiple Features in one interview and generates a Feature Queue after confirmation
 - Progressive Discover starts by asking task category, desired effect, and verification method before deeper implementation detail; Technical Stack and Architecture discussion must wait for their named phases unless the user explicitly changes scope
@@ -589,7 +589,7 @@ Behavior:
 - honor analysis boundaries and protected file boundaries when reading, researching, or updating package artifacts
 - must not directly execute implementation milestones
 - require `readiness` and explicit `convert` before using the package as ordinary Plan context
-- after conversion, ordinary `/hw:plan` still runs named Plan phases and must not skip their gates
+- after conversion, ordinary `/hw:plan` still shows Discover, Technical, and Architecture artifacts without adding one gate per artifact
 - for external code research, remote clone/download requires a concrete action authorization: either per-run `confirmed_remote_actions` from the user or trusted local config `local_config_trusted_remote_actions`; portable project defaults must continue to ask the user
 - even when locally trusted, remote code research still requires bounded `.pipeline/deep-plans/.../research-cache/...` storage and implementation-code `evidence_refs`; README-only evidence remains insufficient
 
@@ -608,10 +608,9 @@ Behavior:
 - if the category is `research`, ask baseline, expected direction, and validation script before leaving Discover
 - write or update `.pipeline/design-spec.md`
 - persist intermediate planning state in `.plan-state/` when available
-- in interactive mode, ask targeted follow-up questions in rounds
+- in interactive mode, ask only targeted follow-up questions whose answers could materially change the Proposal
 - use assumption statement, ambiguity resolution, tradeoff review, and validation criteria as the default Progressive Discover structure
-- in interactive mode, enforce minimum rounds from `plan.interaction_depth`: low=2, medium=3, high=5
-- in interactive mode, do not enter Technical Stack until the user explicitly says「够了」「开始吧」「可以了」or equivalent
+- do not enforce a question count or require an explicit transition phrase between planning artifacts
 - if context is injected, present it before the first question round but do not skip Discover
 - in auto mode, continue without pausing unless blocked by missing critical information
 
@@ -624,7 +623,7 @@ Supported flags:
 Behavior:
 
 - load `skills/plan-technical-stack/SKILL.md`
-- run after Discover has shown visible requirement outputs and passed an Ask / Question Tool gate
+- run after Discover has shown the visible requirement synthesis; no separate Ask gate is required
 - inspect repository stack, package/tooling files, adapter generation surfaces, test tooling, platform capabilities, and relevant `.pipeline/architecture.md` facts
 - identify implementation substrate, existing stack fit, integration mechanisms, compatibility constraints, non-goals, and validation tooling
 - record hard `research_required` items for unknown third-party libraries, platform capabilities, external services, private schemas, or unverified CLIs/APIs
@@ -641,7 +640,7 @@ Supported flags:
 Behavior:
 
 - load `skills/plan-architecture/SKILL.md`
-- run after Technical Stack has shown visible outputs and passed an Ask / Question Tool gate
+- run after Technical has shown its visible choices and reasons; no separate Ask gate is required
 - read `.pipeline/architecture.md` and relevant source/adapter/reference files before making architecture claims
 - produce current architecture observations, target integration points, affected modules, risks, non-goals, and at least one Mermaid diagram or phase-flow artifact plus a Markdown decision/impact table
 - if `.pipeline/architecture.md` needs changes, show the proposed content and ask before writing
@@ -686,7 +685,7 @@ Behavior:
 - stop and return to Decompose revision instead of generating prompts if any implementation milestone lacks those fields, has unresolved hard `research_required` items, or still has active blocking research questions
 - on prompt-number conflicts, preserve executed prompts and append new prompt numbers after the highest existing number unless explicit resequencing is approved
 
-Confirmation is no longer a standalone user-facing `/hw:plan:*` command. Existing generated artifacts that mention a confirm step should migrate it to an in-phase Question Tool / Ask gate that summarizes generated artifacts, including project name, stack, preset, milestone count, test point count, and generated files, before `/hw:start`.
+Confirmation is no longer a standalone user-facing `/hw:plan:*` command. Discover, Technical, and Architecture are visible artifacts rather than per-phase gates. After the complete Proposal, offer one contextual choice: confirm and start, confirm without starting, or continue Discussion.
 
 ### `/hw:plan:extend`
 

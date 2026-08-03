@@ -1,6 +1,6 @@
 # Hypo-Workflow Hooks
 
-Hooks provide bounded recovery, ambient Maintain, relevant reminders, worker evidence, and an additional safety guardrail. They call deterministic Core APIs, but do not own Delivery lifecycle, human acceptance, or permission authority.
+Hooks provide bounded recovery, relevant reminders, worker evidence, and an additional safety guardrail. They do not own Delivery lifecycle, Experiment records, human acceptance, or permission authority. Non-safety Hook processing is best-effort and must not block host work.
 
 ## Official Codex Adapter
 
@@ -17,22 +17,23 @@ Enabled plugins discover `hooks/hooks.json` by default. Hypo-Workflow uses one p
 - `SubagentStop`
 - `Stop`
 
-Commands use `PLUGIN_ROOT` to locate the installed bundle. Timeout values are seconds. `hooks/codex-hook.mjs` writes exactly one valid JSON line to stdout and sends diagnostics to stderr.
+Commands use `PLUGIN_ROOT` to locate the installed bundle. Timeout values are seconds. `hooks/codex-hook.mjs` writes exactly one valid JSON line to stdout and sends diagnostics to stderr. Wrapper, import, or host-payload compatibility failures emit `{}` with exit status 0 so a reminder cannot disable the host.
 
 Main behavior:
 
-- `UserPromptSubmit` may stage a clean requirement, preference, decision, or feedback delta in the Recovery Journal and `.pipeline/memory/inbox/`.
+- `UserPromptSubmit` reminds the main Agent to use semantic judgment. For a selected Experiment it also reminds the Agent to maintain the ordinary-file Experiment record.
 - `PostToolUse` records bounded tool evidence and emits effect-aware, deduplicated docs/Record reminders.
 - `PreCompact` seals a Recovery Pack from a validated Capsule; `PostCompact` records the outcome.
 - `SessionStart(source=compact)` injects bounded restore context, never a raw transcript or full Journal.
 - `SubagentStart` and `SubagentStop` use per-writer Journal streams for role and evidence references.
-- `PreToolUse` and `PermissionRequest` reject or explain obvious direct deletion paths.
+- An unbound Session is reported as context; it does not block prompts, tools, diagnostics, or ordinary Experiment record writes.
+- `PreToolUse` and `PermissionRequest` reject or explain obvious direct deletion paths. They do not enforce Session selection.
 
 ## Trust And Limits
 
 Non-managed plugin Hooks do not run merely because the plugin is installed. Review and trust them through Codex `/hooks`. Trust is hash-bound, so changed definitions require review again. Project-local discovery also depends on project trust.
 
-Multiple matching command Hooks launch concurrently. `PreToolUse` interception is incomplete and does not cover every equivalent execution path. Hooks are therefore guardrails and evidence producers, not a complete enforcement boundary.
+Multiple matching command Hooks launch concurrently. `PreToolUse` interception is incomplete and does not cover every equivalent execution path. Hooks are therefore reminders, guardrails, and optional evidence producers, not a complete enforcement boundary or a source of workflow correctness. Auxiliary Hook errors degrade to a bounded warning; only explicit safety guards return a denial.
 
 Real deletion requires all of:
 

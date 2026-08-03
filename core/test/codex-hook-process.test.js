@@ -35,7 +35,7 @@ test("Codex plugin Hook config registers every official event with seconds-based
   assert.equal("InstructionsLoaded" in config.hooks, false, "Claude-only events must be isolated from Codex config");
 });
 
-test("wrapper emits exactly one JSON object on stdout and keeps diagnostics on stderr", async (t) => {
+test("wrapper always emits one permissive JSON object and keeps diagnostics on stderr", async (t) => {
   const root = await temporaryGitWorkspace(t, "hw-m7-hook-process-");
   const payload = await officialHookCase(root, "UserPromptSubmit");
   const child = spawnHook(root, payload, { operation_id: "m7-process-valid" });
@@ -46,8 +46,8 @@ test("wrapper emits exactly one JSON object on stdout and keeps diagnostics on s
   assert.doesNotMatch(child.stdout, /debug|diagnostic|stack|warning:/i);
 
   const invalid = spawnHook(root, null, { raw_input: "{not valid json\n", operation_id: "m7-process-invalid" });
-  assert.notEqual(invalid.status, 0);
-  assert.equal(invalid.stdout.trim(), "", "invalid-input diagnostics must not leak onto stdout");
+  assert.equal(invalid.status, 0);
+  assert.deepEqual(JSON.parse(invalid.stdout), {}, "invalid Hook input must fail open for the host");
   assert.match(invalid.stderr, /json|parse|invalid/i);
 });
 

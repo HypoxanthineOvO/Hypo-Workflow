@@ -1,8 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { lstat, mkdir } from "node:fs/promises";
-import { basename, join, resolve } from "node:path";
-import { createAmbientMaintainStore } from "../maintain/index.js";
+import { resolve } from "node:path";
 import { createRecoveryStore } from "../recovery/index.js";
 import { readActivePointer, readRuntimeObject } from "../runtime/index.js";
 import { canonicalHash } from "../serialization/index.js";
@@ -36,6 +35,7 @@ const EVENT_SET = new Set(CODEX_HOOK_EVENTS);
 const PERMISSION_MODES = new Set(["default", "acceptEdits", "plan", "dontAsk", "bypassPermissions"]);
 const WRITE_EVENTS = new Set(CODEX_HOOK_EVENTS.filter((event) => ![
   "SessionStart",
+  "UserPromptSubmit",
   "PreToolUse",
   "PermissionRequest",
 ].includes(event)));
@@ -170,37 +170,42 @@ export async function evaluateCodexHookEvent(root, rawInput, options = {}) {
   const recovery = createRecoveryStore({ ...(operation.clock ? { clock: operation.clock } : {}) });
 
   let output;
-  switch (input.hook_event_name) {
-    case "SessionStart":
-      output = await evaluateSessionStart(workspaceRoot, input, operation, recovery);
-      break;
-    case "UserPromptSubmit":
-      output = await evaluateUserPrompt(workspaceRoot, input, operation);
-      break;
-    case "PreToolUse":
-      output = await evaluatePreToolUse(workspaceRoot, input, operation);
-      break;
-    case "PermissionRequest":
-      output = await evaluatePermissionRequest(workspaceRoot, input, operation);
-      break;
-    case "PostToolUse":
-      output = await evaluatePostToolUse(workspaceRoot, input, operation);
-      break;
-    case "PreCompact":
-      output = await evaluatePreCompact(workspaceRoot, input, operation, recovery);
-      break;
-    case "PostCompact":
-      output = await evaluatePostCompact(workspaceRoot, input, operation, recovery);
-      break;
-    case "SubagentStart":
-      output = await evaluateSubagent(workspaceRoot, input, operation, recovery, true);
-      break;
-    case "SubagentStop":
-      output = await evaluateSubagent(workspaceRoot, input, operation, recovery, false);
-      break;
-    case "Stop":
-      output = await evaluateStop(workspaceRoot, input, operation, recovery);
-      break;
+  try {
+    switch (input.hook_event_name) {
+      case "SessionStart":
+        output = await evaluateSessionStart(workspaceRoot, input, operation, recovery);
+        break;
+      case "UserPromptSubmit":
+        output = await evaluateUserPrompt(workspaceRoot, input, operation);
+        break;
+      case "PreToolUse":
+        output = await evaluatePreToolUse(input);
+        break;
+      case "PermissionRequest":
+        output = await evaluatePermissionRequest(input);
+        break;
+      case "PostToolUse":
+        output = await evaluatePostToolUse(workspaceRoot, input, operation);
+        break;
+      case "PreCompact":
+        output = await evaluatePreCompact(workspaceRoot, input, operation, recovery);
+        break;
+      case "PostCompact":
+        output = await evaluatePostCompact(workspaceRoot, input, operation, recovery);
+        break;
+      case "SubagentStart":
+        output = await evaluateSubagent(workspaceRoot, input, operation, recovery, true);
+        break;
+      case "SubagentStop":
+        output = await evaluateSubagent(workspaceRoot, input, operation, recovery, false);
+        break;
+      case "Stop":
+        output = await evaluateStop(workspaceRoot, input, operation, recovery);
+        break;
+    }
+  } catch (error) {
+    if (["PreToolUse", "PermissionRequest"].includes(input.hook_event_name)) throw error;
+    output = failOpenHookOutput(input.hook_event_name, error);
   }
   return validateCodexHookOutput(input.hook_event_name, output, input);
 }
@@ -233,60 +238,51 @@ async function evaluateSessionStart(root, input, operation, recovery) {
       },
     };
   }
-  if (input.source !== "compact") return {};
   const objectRef = selection.object_ref;
   if (!objectRef) return {};
+  if (input.source === "compact") {
+    try {
+      const plan = await recovery.planRecoveryRestore(root, {
+        object_ref: objectRef,
+        budget_bytes: 12 * 1024,
+      });
+      return sessionStartContext(boundUtf8(renderRestoreContext(plan), 16_000));
+    } catch (error) {
+      if (error?.code !== "ERR_RECOVERY_PACK_NOT_FOUND") throw error;
+    }
+  }
   try {
-    const plan = await recovery.planRecoveryRestore(root, {
-      object_ref: objectRef,
-      budget_bytes: 12 * 1024,
-    });
-    const additionalContext = boundUtf8(renderRestoreContext(plan), 16_000);
-    return {
-      hookSpecificOutput: {
-        hookEventName: "SessionStart",
-        additionalContext,
-      },
-    };
+    const authority = await readRuntimeObject(root, objectRef);
+    return sessionStartContext(boundUtf8(renderRuntimeContext(authority), 16_000));
   } catch (error) {
-    if (error?.code === "ERR_RECOVERY_PACK_NOT_FOUND") return {};
+    if (error?.code === "ERR_AUTHORITY_OBJECT_NOT_FOUND") return {};
     throw error;
   }
 }
 
 async function evaluateUserPrompt(root, input, operation) {
   const selection = await resolveSessionRouting(root, input, operation.clock);
-  if (selection.status === "selection_required") {
-    return { decision: "block", reason: selectionRequiredReason(selection.candidates) };
+  const context = [];
+  if (selection.status === "selection_required") context.push(renderSelectionContext(selection.candidates));
+  if (selection.status === "selected" && selection.object_ref.kind === "experiment") {
+    context.push(
+      "Experiment record reminder: use the documented ordinary-file protocol to keep the plan, run evidence, result, and next action current. Named reporting tools, hashed events, and projections are optional helpers and must not block the work.",
+    );
   }
-  const semanticDelta = inferSemanticDelta(root, input);
-  const promptIsSecretSafe = isSecretSafeText(input.prompt);
-  const maintain = createAmbientMaintainStore({ clock: operation.clock ?? (() => new Date().toISOString()) });
-  await maintain.captureSemanticDelta(root, {
-    object_ref: { kind: "activity", id: "ambient-maintain" },
-    session_id: input.session_id,
-    turn_id: input.turn_id,
-    writer: { kind: "main", id: "main" },
-    source: "user_prompt",
-    summary: semanticDelta?.body ?? (promptIsSecretSafe
-      ? "User prompt contained no clean durable statement."
-      : "User prompt omitted because it contains secret-like material."),
-    semantic_delta: semanticDelta,
-  }, { id: operation.id });
-  return {};
+  context.push(
+    "Hypo-Workflow memory reminder: Hooks do not decide or persist project meaning.",
+    "The main Agent must use semantic judgment to identify explicit durable requirements, preferences, decisions, and feedback, then maintain the authoritative project record when appropriate.",
+    "Do not turn brainstorming, transient logs, or keyword matches into durable facts. A staged inbox entry is not authority.",
+  );
+  return {
+    hookSpecificOutput: {
+      hookEventName: "UserPromptSubmit",
+      additionalContext: context.join("\n"),
+    },
+  };
 }
 
-async function evaluatePreToolUse(root, input, operation) {
-  const selection = await resolveSessionRouting(root, input, operation.clock);
-  if (selection.status === "selection_required") {
-    return {
-      hookSpecificOutput: {
-        hookEventName: "PreToolUse",
-        permissionDecision: "deny",
-        permissionDecisionReason: selectionRequiredReason(selection.candidates),
-      },
-    };
-  }
+function evaluatePreToolUse(input) {
   if (!isObviousDirectDeletion(input.tool_name, input.tool_input)) return {};
   return {
     hookSpecificOutput: {
@@ -297,16 +293,7 @@ async function evaluatePreToolUse(root, input, operation) {
   };
 }
 
-async function evaluatePermissionRequest(root, input, operation) {
-  const selection = await resolveSessionRouting(root, input, operation.clock);
-  if (selection.status === "selection_required") {
-    return {
-      hookSpecificOutput: {
-        hookEventName: "PermissionRequest",
-        decision: { behavior: "deny", message: selectionRequiredReason(selection.candidates) },
-      },
-    };
-  }
+function evaluatePermissionRequest(input) {
   if (!isObviousDirectDeletion(input.tool_name, input.tool_input)) return {};
   return {
     hookSpecificOutput: {
@@ -597,79 +584,20 @@ async function resolveSessionRouting(root, input, clock) {
 
 function renderSelectionContext(candidates) {
   const choices = candidates.map(({ work_item_ref }) => `${work_item_ref.kind}:${work_item_ref.id}`).join(", ");
-  return `This Session is not bound to a Work Item. Select exactly one before continuing; do not inherit active.delivery. Available Work Items: ${choices}.`;
+  return `This Session is not bound to a Work Item. Select exactly one before writing Workflow authority or claiming resources; ordinary prompts and tools may continue. Do not inherit active.delivery. Available Work Items: ${choices}.`;
 }
 
-function selectionRequiredReason(candidates) {
-  const choices = candidates.map(({ work_item_ref }) => `${work_item_ref.kind}:${work_item_ref.id}`).join(", ");
-  return `Select exactly one Work Item for this Session before prompts or tools can continue${choices ? `: ${choices}` : "."}`;
-}
-
-function inferSemanticDelta(root, input) {
-  if (!isSecretSafeText(input.prompt)) return null;
-  const body = extractDurableStatement(input.prompt);
-  if (!body) return null;
+function failOpenHookOutput(event, error) {
+  const code = typeof error?.code === "string" ? error.code : "ERR_CODEX_HOOK_AUXILIARY_FAILED";
   return {
-    scope: { type: "project", ref: `project:${safeRef(basename(root))}` },
-    kind: /\b(decide|decision|choose|selected)\b/i.test(body) ? "decision" : "requirement",
-    confidence: "confirmed",
-    dedupe_key: `codex-prompt:${canonicalHash({ body })}`,
-    body,
-    source_refs: [{ type: "session", ref: input.session_id, locator: input.turn_id }],
-    supersedes: [],
+    systemMessage: `Hypo-Workflow ${event} auxiliary processing was unavailable (${code}). Continue the host work and maintain required records through ordinary file operations.`,
+    ...(["PreCompact", "PostCompact"].includes(event) ? { continue: true } : {}),
   };
-}
-
-function isDurablePrompt(value) {
-  return /(?:\bremember\b|\bmust\b|\brequire(?:d|ment)?\b|\balways\b|\bnever\b|\bdecision\b|\bdecided\b|\bconstraint\b|记住|必须|要求|约束|决定)/i.test(value);
-}
-
-function extractDurableStatement(prompt) {
-  const statements = [];
-  for (const line of prompt.split("\n")) {
-    for (const sentence of splitSemanticSentences(line)) {
-      const candidate = sentence.replace(/\s+/g, " ").trim();
-      if (!candidate || isTransientDiagnostic(candidate) || !isDurablePrompt(candidate)) continue;
-      statements.push(candidate);
-    }
-  }
-  if (!statements.length) return null;
-  return boundSemanticText(statements.join(" "), 512);
-}
-
-function splitSemanticSentences(line) {
-  const trimmed = line.trim();
-  if (!trimmed) return [];
-  return trimmed.match(/[^.!?。！？]+[.!?。！？]?/gu) ?? [trimmed];
-}
-
-function isTransientDiagnostic(value) {
-  return /^(?:TRACE(?:_[A-Z0-9_-]+)?|DEBUG|INFO|WARN(?:ING)?|ERROR|LOG|STDOUT|STDERR|CONSOLE|STACK(?:\s+TRACE)?)(?:\s*[:=[\]-]|\s)/i.test(value)
-    || /^console\.(?:log|debug|info|warn|error)\b/i.test(value)
-    || /^at\s+(?:async\s+)?(?:\S+\s+)?\(?[^\s()]+:\d+:\d+\)?$/i.test(value);
-}
-
-function boundSemanticText(value, maximumBytes) {
-  const bytes = Buffer.from(value, "utf8");
-  if (bytes.length <= maximumBytes) return value;
-  return `${bytes.subarray(0, maximumBytes - 3).toString("utf8").replace(/\uFFFD+$/u, "")}...`;
-}
-
-function isSecretSafeText(value) {
-  try {
-    assertNoRawSecrets(value, "Codex Hook prompt");
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 function isObviousDirectDeletion(toolName, toolInput) {
   const command = typeof toolInput?.command === "string" ? toolInput.command : "";
-  if (toolName === "apply_patch") {
-    const deletionHeader = ["***", "Delete", "File:"].join(" ");
-    return command.split("\n").some((line) => line.startsWith(deletionHeader));
-  }
+  if (toolName === "apply_patch" && /^\*\*\* Delete File:/m.test(command)) return true;
   if (/(?:^|[;&|()\n]\s*|\bsudo\s+)(?:rm|unlink|rmdir)\b|\bgit\s+clean\b|\bfind\b[^\n]*\s-delete\b|\bRemove-Item\b|\bdel(?:ete)?\s+\//i.test(command)) {
     return true;
   }
@@ -888,6 +816,25 @@ function renderRestoreContext(plan) {
   ].join("\n");
 }
 
+function renderRuntimeContext(authority) {
+  return [
+    "Hypo-Workflow active context (selected Work Item Runtime and Continuation):",
+    `object_ref: ${authority.object_ref.kind}:${authority.object_ref.id}`,
+    `runtime: ${JSON.stringify(authority.runtime)}`,
+    `continuation: ${JSON.stringify(authority.continuation)}`,
+    "Treat these records as current workflow context. Reconcile them with the user's latest message before acting.",
+  ].join("\n");
+}
+
+function sessionStartContext(additionalContext) {
+  return {
+    hookSpecificOutput: {
+      hookEventName: "SessionStart",
+      additionalContext,
+    },
+  };
+}
+
 function boundUtf8(value, maximumBytes) {
   const bytes = Buffer.from(value, "utf8");
   if (bytes.length < maximumBytes) return value;
@@ -1033,10 +980,6 @@ function requireBoolean(value, field) {
 
 function requireOneOf(value, allowed, field) {
   if (!allowed.includes(value)) throw hookError("ERR_CODEX_HOOK_INPUT_INVALID", `Codex Hook ${field} is unsupported`);
-}
-
-function safeRef(value) {
-  return value.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "") || "workspace";
 }
 
 function hookError(code, message) {

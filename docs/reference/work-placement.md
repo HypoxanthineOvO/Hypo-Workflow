@@ -19,7 +19,7 @@ lease 带 fencing token。并发进程基于 registry hash 做 CAS；失败者�
 
 ## Session 与 Host 边界
 
-一个 Session 只绑定一个 Work Item，同一 Work Item 可以显式绑定多个协作 Session。存在多个候选而 Session 未绑定时，SessionStart 返回 `selection_required`，不会退回 legacy `active.delivery`。只有 workspace 尚未建立 Work Placement 时才保留旧 pointer fallback。
+需要权威路由或资源 claim 时，一个 Session 只绑定一个 Work Item；同一 Work Item 可以显式绑定多个协作 Session。存在多个候选而 Session 未绑定时，SessionStart 返回 `selection_required` 作为上下文提醒，不会退回 legacy `active.delivery`，但普通提示、工具、诊断和 Experiment 普通文件记录继续可用。只有 workspace 尚未建立 Work Placement 时才保留旧 pointer fallback。
 
 Core 不执行系统副作用。`isolated_worktree` 只产生无 shell 字符串的 bounded `argv[]` descriptor，`isolated_resources` 产生唯一 locator 分配；实际 `git worktree add`、进程启动、GPU/端口分配和 merge 由 Host 完成。对源码有改动的 Delivery 只有在 digest-verified proof 证明 integration target 包含 source commit 后，才能进入最终人工验收。
 
