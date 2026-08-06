@@ -1,16 +1,30 @@
 ---
 name: reject
-description: Reject the active Goal, Plan, or legacy Cycle at final manual acceptance with structured feedback. Use for /hw:reject or an explicit rejection of pending results.
+description: 拒绝当前 waiting-review Stone 或最终结果，保存具体反馈并返回修订。
 ---
 
-# Reject Delivery
+# Reject
 
 ## 输出语言规则
 
-用户可见内容遵循项目输出语言；缺失时跟随当前对话语言。内部 schema key 保持英文。
+用户可见内容跟随当前对话或项目语言；YAML key、命令、路径和必要专名保留英文。
 
-Require `pending_acceptance` and collect `problem`, `reproduce_steps`, `expected`, `actual`, and `context`. Issue a scoped `delivery.reject` Receipt, write one Feedback Record, and move the Delivery to `needs_revision`.
+明确的 `/hw:reject` 或无歧义的自然语言拒绝已经构成该动作的授权，不要重复确认。只有目标、范围或反馈含义不清时才提问。
 
-Import Core from the installed bundle, pass the target workspace as `root`, and create Delivery/Receipt stores with the same explicit zero-argument Clock. Show the complete Receipt binding first; only after explicit user confirmation issue it, then call `reject` with a unique safe mutation `{ id }`.
+拒绝后先在聊天中说明：
 
-Rejection never edits product files, generates a replacement proposal by itself, or starts execution. Present a revised Goal Design or Plan. At the renewed gate, ordinary confirmation means `delivery.approve_and_start`; “确认但不开始” alone moves to `waiting_to_start`.
+1. 用户指出的问题；
+2. 当前已经完成和尚未开始的状态；
+3. 之前推理或实现为什么失败；
+4. 哪些假设发生变化；
+5. 推荐修正方案；
+6. 受影响的需求、技术或架构变化。
+
+然后更新记录：
+
+- Discussion Ledger 保留用户与助手可见原文，Discussion Summary 保存拒绝范围和核心反馈；
+- Progress 将相关 Milestone 恢复为 `in_progress`，Stone 改为 `pending`，其他未受影响计划项保持原状态；
+- Execution 追加拒绝 checkpoint，引用从 Stone 返回的 Milestone ID；
+- Plan 只有在目的、边界、顺序或验证发生变化时才修改，不能删除旧拒绝证据。
+
+反馈已经足够明确时直接修订；反馈不授权额外 scope、远端副作用或受保护文件写入。修订完成后重新展示真实产物并进入同一 Stone 审阅。

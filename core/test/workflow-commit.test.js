@@ -303,14 +303,12 @@ test("legacy commit helper remains documented while current Delivery mutations u
   assert.equal(resumed.recovery.pack_status, "missing");
   assert.deepEqual(await snapshotTree(root), beforeResume, "Resume is a read-only authority reconstruction");
 
-  assert.match(goalSkill, /unique safe `\{ id \}`/i);
-  assert.match(goalSkill, /createDeliveryStore\(\.\.\.\)\.proposeGoal/i);
-  assert.match(cycleSkill, /unique safe `\{ id \}`/i);
-  assert.match(cycleSkill, /Persist with `proposeCycle`/i);
-  assert.match(acceptSkill, /call `accept` with a unique safe mutation `\{ id \}`/i);
-  assert.match(rejectSkill, /call `reject` with a unique safe mutation `\{ id \}`/i);
-  assert.match(resumeSkill, /createDeliveryStore\(\{ clock \}\)\.resume\(root, \{\}\)/i);
-  assert.match(resumeSkill, /Resume itself is read-only and takes no transaction `\{ id \}`/i);
+  assert.match(goalSkill, /PLAN\.md/);
+  assert.match(goalSkill, /Proposal/);
+  assert.match(cycleSkill, /旧格式 Cycle 只读保留/);
+  assert.match(acceptSkill, /接受/);
+  assert.match(rejectSkill, /拒绝/);
+  assert.match(resumeSkill, /不得写回旧/);
 });
 
 async function fixtureRoot(prefix) {

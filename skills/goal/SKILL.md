@@ -1,27 +1,25 @@
 ---
 name: goal
-description: Discuss and deliver one bounded outcome autonomously with no manual intermediate Stone. Use for /hw:goal when a capable model can execute the full requirement contract after confirmation.
+description: 在一个 Cycle 内连续交付没有中间人工审阅点的明确结果。
 ---
 
-# Goal Delivery
+# Goal
 
 ## 输出语言规则
 
-用户可见内容遵循项目输出语言；缺失时跟随当前对话语言。内部 schema key 保持英文。
+用户可见内容跟随当前对话或项目语言；YAML key、命令、路径和必要专名保留英文。
 
-A Goal is selected after Discussion when execution needs no manual intermediate Stone. It may still be complex, span many modules, and contain many acceptance criteria. Complexity and acceptance count never force Plan.
+Goal 是 Cycle 内的一种交付方式，不与 Cycle 竞争。它适合执行过程中不需要中间人工审阅点、但最终结果仍需验证和接受的工作。
 
-Use the Root Core Call Contract: import from the installed bundle, pass the target workspace as `root`, create the store with an explicit zero-argument Clock, and give every mutation a unique safe `{ id }`. Issue transition Receipts only after the host has shown the full binding and received explicit user confirmation.
+1. 先通过 Discussion 弄清目的、边界、验证目标、风险和真正未决的问题。软件项目展示需求综合、技术选择和架构影响。
+2. 创建或聚焦一个 Cycle。不要把另一个 active Cycle 的任务带进来。
+3. 在 `PLAN.md` 中写 `mode: goal`，用稳定 ID 列出完整工作阶段；不添加 `S` 类型中间审阅点。
+4. 创建对应 `PROGRESS.md`、`EXECUTION.md` 和 `DISCUSSION-SUMMARY.md`。
+5. 展示完整 Proposal，并询问确认并开始、确认但不开始或继续讨论。未经开始授权不实现。
+6. 开始后连续执行；每个 checkpoint 更新完整 Progress 表并追加 Execution。
+7. 只有新发现的重大用户决定或另行受限的高影响副作用才中断执行。
+8. 完成真实验证后展示结果，等待最终接受或拒绝。
 
-1. Run Discussion in order: Discover requirements, resolve material Technical Stack choices, then resolve Architecture changes. Show each real artifact before moving on; skip a phase only with evidence that no decision exists.
-2. Gather the complete outcome, scope, non-goals, acceptance criteria, constraints, repository evidence, risks, and Agent decision boundaries. Use `assessPlanReadiness`; ask only unresolved material questions.
-3. Confirm that the proposed Stone list is empty, then compile with `compileGoalDesign`. Do not add `milestones` merely to represent internal implementation steps.
-4. Select execution topology from coupling, parallel value, oracle strength, and risk. Default to the main Agent when delegation does not create clear value.
-5. For each selected Worker, have the host Agent generate and show a bounded Task Assessment, validate it with `validateTaskAssessment`, and call `selectWorkerRouting`. Persist only the semantic decision and assessment, never the generating prompt.
-6. Apply `execution.worker_routing.mode`: `off` omits the hint, `advisory` records an explicit unsupported-host fallback, and `required` blocks that Worker start when the semantic handoff is unavailable. Routing does not change topology or acceptance.
-7. Persist the proposal with `createDeliveryStore(...).proposeGoal`; report the full requirement Design in chat.
-8. Offer 确认并开始 / 确认但不开始 / 不确认. Plain affirmative replies mean 确认并开始: issue `delivery.approve_and_start` and call `approveAndStart` in the same authorized transition. 确认但不开始 uses `delivery.approve` and `waiting_to_start`.
-9. After start, execute the full Goal continuously through the host's built-in Goal mechanism (`/Goal` where available), stopping only for a newly discovered material decision or a separately gated high-impact side effect.
-10. Verify real file-bound evidence, request final acceptance, then use `/hw:accept` or `/hw:reject`.
+默认由主模型执行。只有独立审计、清晰并行价值或专门能力能明显改善结果时才委派，并为 Worker 生成任务专用 Handoff。
 
-Revision feedback writes Feedback plus a revised Design Record and returns to `needs_revision`; it never authorizes product edits or auto-starts.
+拒绝反馈返回 Discussion：先说明错误、当前状态、失败原因、假设变化、修正方案和受影响架构，再修改 Plan。拒绝本身不授权产品修改之外的新 scope。

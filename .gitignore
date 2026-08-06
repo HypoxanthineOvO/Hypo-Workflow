@@ -7,12 +7,14 @@
 .pipeline/inbox/
 .pipeline/derived-health.yaml
 .pipeline/log.md
+.pipeline/local/
 *.compact.*
 .plan-state/
 
 # 本地临时材料
 tmp/
 tmp.md
+.worktrees/
 
 # 测试产物
 tests/scenarios/**/results/

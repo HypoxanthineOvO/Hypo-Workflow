@@ -1,38 +1,25 @@
 ---
 name: maintain
-description: Persist focused day-to-day project facts without opening a Goal or Plan. Use for /hw:maintain and for ambient capture of requirements, preferences, decisions, or feedback in a current workspace.
+description: 保存一条已确认的长期 requirement、preference、decision 或 feedback，不创建新的工作容器。
 ---
 
 # Maintain
 
-Maintain records project facts; it does not create an ordered Delivery.
-
 ## 输出语言规则
 
-用户可见内容遵循项目 `output.language`；缺失时跟随当前对话语言。Schema key、配置 key、命令和路径保持英文。
+用户可见内容跟随当前对话或项目语言；YAML key、命令、路径和必要专名保留英文。
 
-## Explicit Maintain
+Maintain 是记忆动作，不是独立工作轨道。
 
-For `/hw:maintain`:
+1. 确认事实内容、来源、适用范围，以及它是否替代已有事实。
+2. 将它归类为 `requirement`、`preference`、`decision` 或 `feedback`。
+3. 直接按 Memory 模板写入语义化 Markdown，使用可读名称，并更新对应 `INDEX.md`。
+4. 如果事实只适用于一个 Cycle 或 Experiment，将 scope 写清；不要错误提升到整个项目。
+5. 如果新事实改变旧事实，通过 `supersedes` 保留关系，不覆盖历史。
+6. 在聊天中说明保存了什么、适用范围、来源和替代关系。
 
-1. Confirm the concrete fact, source, scope, and whether it supersedes an active fact.
-2. Classify it as `requirement`, `preference`, `decision`, or `feedback`.
-3. Create a secret-safe `RecordPatch` with a stable dedupe key and explicit source references.
-4. Persist through `commitRecordPatch` and refresh `.pipeline/memory/index.yaml` plus `INDEX.md`.
-5. Explain the saved fact, scope, confidence, superseded fact if any, and Record reference in chat.
+主模型即使没有 Hook，也要识别用户明确说出的长期事实。解释后可以直接保存，不需要额外执行 gate。不要把 brainstorming、临时诊断、模型推断或模糊话语写成权威事实。
 
-If the request has a bounded deliverable and final acceptance, route to Goal. If it has ordered dependent stages, route to Cycle.
+Discussion Ledger 负责保存可见原文；Memory 只保存提炼后的长期事实。不要保存原始密码、token、凭据、隐藏推理或 system/developer prompt。
 
-## Ambient Maintain
-
-The Official Codex `UserPromptSubmit` Hook may extract a clean durable semantic delta. `createAmbientMaintainStore` first appends a Recovery Journal event and stages a proposal under `.pipeline/memory/inbox/`. A staged Inbox item is not Record authority.
-
-Only the main Agent may validate and promote the exact staged `RecordPatch`. A recorder Subagent may propose a patch, but cannot commit authority. Promotion verifies the proposal binding, writes the Markdown Record, and refreshes derived indexes. Duplicate semantic facts are deduplicated; changed facts require explicit `supersedes`.
-
-`PostToolUse` records bounded evidence and emits only relevant, deduplicated documentation or Record reminders. It does not force a write after every tool call.
-
-## Safety
-
-Never persist raw passwords, tokens, credentials, hidden reasoning, or full transcripts. `secret_refs` may point to separately authorized secret locations, but secret values are not Workflow authority.
-
-Write only through the current manifest-selected memory and recovery APIs. Never update legacy `state.yaml`, `cycle.yaml`, `log.yaml`, `PROGRESS.md`, `rules.yaml`, or `knowledge/`.
+如果请求包含实际交付，应在当前 Cycle 使用 Goal 或 Plan，而不是用 Maintain 代替执行。

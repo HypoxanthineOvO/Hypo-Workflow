@@ -1,69 +1,40 @@
 # Hypo-Workflow Hooks
 
-Hooks provide bounded recovery, ambient Maintain, relevant reminders, worker evidence, and an additional safety guardrail. They call deterministic Core APIs, but do not own Delivery lifecycle, human acceptance, or permission authority.
+Hooks 是语义文件工作方式的轻量辅助，不是 Workflow 正确性来源。主模型即使没有 Hooks，也必须维护 Progress、Execution、Discussion 和恢复所需记录。
 
 ## Official Codex Adapter
 
-Enabled plugins discover `hooks/hooks.json` by default. Hypo-Workflow uses one process wrapper for ten current events:
+`hooks/hooks.json` 只注册六类事件：
 
-- `SessionStart`
-- `UserPromptSubmit`
-- `PreToolUse`
-- `PermissionRequest`
-- `PostToolUse`
-- `PreCompact`
-- `PostCompact`
-- `SubagentStart`
-- `SubagentStop`
-- `Stop`
+| 事件 | 职责 |
+| --- | --- |
+| `SessionStart` | 指向当前 Cycle 的语义索引、Progress 和下一步 |
+| `UserPromptSubmit` | 捕获用户可见原文，并提醒主模型识别长期事实 |
+| `PreCompact` | 检查 Progress、Execution 和 Discussion Summary 是否足以恢复 |
+| `Stop` | 捕获助手可见回复，并提醒同步有意义的进度变化 |
+| `PreToolUse` | 对明显的受保护或破坏性操作提供额外安全保护 |
+| `PermissionRequest` | 对需要用户权限的高影响操作说明原因 |
 
-Commands use `PLUGIN_ROOT` to locate the installed bundle. Timeout values are seconds. `hooks/codex-hook.mjs` writes exactly one valid JSON line to stdout and sends diagnostics to stderr.
+不再注册逐工具证据、压缩后记账或 Worker 生命周期 Hook。普通工具调用、文件读取和上下文压缩不是项目历史；Worker 的任务、结果和证据由 Handoff、Progress 与 Execution 记录。
 
-Main behavior:
+## Discussion Ledger
 
-- `UserPromptSubmit` may stage a clean requirement, preference, decision, or feedback delta in the Recovery Journal and `.pipeline/memory/inbox/`.
-- `PostToolUse` records bounded tool evidence and emits effect-aware, deduplicated docs/Record reminders.
-- `PreCompact` seals a Recovery Pack from a validated Capsule; `PostCompact` records the outcome.
-- `SessionStart(source=compact)` injects bounded restore context, never a raw transcript or full Journal.
-- `SubagentStart` and `SubagentStop` use per-writer Journal streams for role and evidence references.
-- `PreToolUse` and `PermissionRequest` reject or explain obvious direct deletion paths.
+用户和助手原文按 Cycle/Session 追加到 `.pipeline/local/discussions/<cycle>/<session>.md`，默认 Git ignore。
 
-## Trust And Limits
+- 只保存用户和助手实际可见文本。
+- 不保存 system/developer prompt、隐藏推理或原始工具输出。
+- 明显 token、password 或 credential 替换为 `[REDACTED]`。
+- 已有条目不得修改；纠正作为新条目追加。
+- Git 中的 `DISCUSSION-SUMMARY.md` 保存需求、决定、接受、拒绝、纠正、未决问题和本地引用。
 
-Non-managed plugin Hooks do not run merely because the plugin is installed. Review and trust them through Codex `/hooks`. Trust is hash-bound, so changed definitions require review again. Project-local discovery also depends on project trust.
+## Progress And Recovery
 
-Multiple matching command Hooks launch concurrently. `PreToolUse` interception is incomplete and does not cover every equivalent execution path. Hooks are therefore guardrails and evidence producers, not a complete enforcement boundary.
+`PreCompact` 只检查能否通过 `PLAN.md`、完整 `PROGRESS.md`、最近 `EXECUTION.md` 和 `DISCUSSION-SUMMARY.md` 恢复，不生成另一套恢复协议。
 
-Real deletion requires all of:
+`SessionStart` 提示当前 Cycle、当前位置和下一步。存在多个 active Cycle 且 Session 未聚焦时，只展示候选并请求选择；不能阻止普通问题和诊断。
 
-1. an exact hashed Deletion Manifest with Git binding shown in chat
-2. fresh explicit user approval for that Manifest
-3. a scoped `deletion.execute` Receipt
-4. Core controlled executor revalidation immediately before execution
+## Safety And Failure
 
-Hash, tree, or Git drift invalidates the authorization and returns to the user gate.
+非安全 Hook 失败时应 fail open，并给出简短警告。只有明确的受保护文件、破坏性命令或其他安全边界可以拒绝动作。Hook 不替代用户授权，也不能自行改变 Plan 或长期事实。
 
-## Ambient Maintain Authority
-
-Ambient capture first produces a Journal event and staged Inbox proposal. A proposal is not a durable Record. Only the main Agent may promote an exact bound `RecordPatch`, after which Core writes the Markdown Record and refreshes derived indexes. Recorder Subagents may propose but cannot commit authority.
-
-Raw credentials, full transcripts, and hidden reasoning are excluded. Metadata-only `secret_refs` may point to separately authorized secret locations.
-
-## Deferred Platforms
-
-Claude Code Hook files remain isolated under `hooks/claude/` as deferred source material. OpenCode and other platform adapters are also deferred. These assets do not constitute current adapter support and must not be parsed as Official Codex Hook configuration.
-
-## Validation
-
-```bash
-node scripts/codex-hook-smoke.mjs
-python3 /home/heyx/.vsp-codex/skills/.system/plugin-creator/scripts/validate_plugin.py .
-```
-
-Real-host probing is conditional:
-
-```bash
-CODEX_HOOK_SMOKE=1 node scripts/codex-real-hook-smoke.mjs
-```
-
-If the compatible current Official Codex host, plugin enablement, or Hook trust path is unavailable, report `SKIP` / `UNAVAILABLE`. Never count an old binary or VSP fork as a current-host PASS.
+Codex wrapper 必须只向 stdout 输出一行有效 JSON，诊断写入 stderr。项目本地 Hook 仍需通过宿主信任机制启用。

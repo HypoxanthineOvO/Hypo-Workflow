@@ -197,7 +197,7 @@ test("deriveDeepPlanModuleTracks creates module tracks from requirement and them
           id: "architecture-renderer",
           title: "Architecture Renderer",
           source_track_ids: ["REQ-package", "THEME-human-readable"],
-          evidence_refs: ["core/test/deep-plan-contract.test.js:1"],
+          evidence_refs: ["core/test/deep-plan-architecture.test.js:1"],
         },
       ],
     },
@@ -211,7 +211,7 @@ test("deriveDeepPlanModuleTracks creates module tracks from requirement and them
   assert.deepEqual(renderer.evidence_refs, [
     "core/test/deep-plan-package.test.js:1",
     "references/commands-spec.md:deep-plan",
-    "core/test/deep-plan-contract.test.js:1",
+    "core/test/deep-plan-architecture.test.js:1",
   ]);
   assert.deepEqual(renderer.relationships.depends_on, ["REQ-package", "THEME-human-readable"]);
 });

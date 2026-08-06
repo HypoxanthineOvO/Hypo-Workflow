@@ -1,26 +1,23 @@
 ---
 name: cycle
-description: Compatibility route for legacy Cycle requests. New work should use Goal for zero Stones or Plan for one or more manual Stones.
+description: 创建、列出、聚焦或关闭一轮有明确边界的项目迭代，并支持多个并行 active Cycle。
 ---
 
-# Legacy Cycle Compatibility
+# Cycle
 
 ## 输出语言规则
 
-用户可见内容遵循项目输出语言；缺失时跟随当前对话语言。内部 schema key 保持英文。
+用户可见内容跟随当前对话或项目语言；YAML key、命令、路径和必要专名保留英文。
 
-`/hw:cycle` remains readable and executable for existing v14 Runtime objects and explicit compatibility requests. Do not recommend it for new work. Run Discussion, then route new work by Stone count: zero Stones to `/hw:goal`, one or more Stones to `/hw:plan`.
+Cycle 是项目迭代和归档边界，不是 Goal 或 Plan 的竞争选项。Goal 与 Plan 都在 Cycle 内交付。
 
-Use the Root Core Call Contract: import from the installed bundle, pass the target workspace as `root`, create the store with an explicit zero-argument Clock, and give every mutation a unique safe `{ id }`. Issue transition Receipts only after the host has shown the full binding and received explicit user confirmation.
+- **创建：** 使用新的语义名称和目录，写清本轮目的、边界和验证目标。新 Cycle 拥有全新任务列表。
+- **继承：** 通过 `builds_on` 显式引用历史 Cycle，只选择性继承决定、产物、风险、经验或后续候选。绝不自动继承旧任务。
+- **列出：** 从项目索引展示 active/closed Cycle 的名称、目的、状态、当前位置和下一步。
+- **聚焦：** 一个 Session 只聚焦一个 Cycle。将 `cycle` 和 `updated` 写入本地 `.pipeline/local/sessions/<host>/<session>.yaml`。切换前确认当前 Cycle 的 Progress、Execution 和 Discussion Summary 已更新。
+- **并行：** 多个 active Cycle 可以同时存在。源码修改需要隔离 worktree 和明确集成目标；资源冲突需要隔离或暂停。
+- **关闭：** 验证完成后写 `SUMMARY.md`，保存目的、边界、结果、证据、重要决定、经验和后续候选。将状态改为 `closed`，但不移动目录或破坏引用。
 
-1. Preserve existing Cycle plans with `compileCyclePlan` and their aggregate final acceptance behavior. Persist with `proposeCycle`; this compatibility path does not create Plan Stones.
-2. Do not silently reinterpret an existing Cycle Milestone as a Stone.
-3. For a newly requested manual checkpoint, generate a Plan with `compilePlan` instead of extending the legacy Cycle contract.
-4. After topology is fixed and before each Worker starts, have the host Agent generate and show a bounded Task Assessment, validate it, and select a deterministic semantic Worker Routing class. Persist the decision in Runtime/Continuation and Worker Journal evidence; never persist the generating prompt.
-5. Apply `execution.worker_routing.mode` without changing role separation: `off` omits hints, `advisory` records fallback, and `required` blocks an unsupported semantic handoff.
-6. Verify each Milestone in order with the selected worker topology. Only after all Milestones verify may aggregate Cycle verification run.
-7. Move only the aggregate Cycle to `pending_acceptance`, then route one Cycle-level manual gate to `/hw:accept` or `/hw:reject`.
+如果用户要求关闭但结果未验证，清楚说明缺口；不要把“停止继续做”伪装成成功。放弃的 Cycle 也应保留可读原因和已有证据。
 
-Revision creates Feedback plus a superseding Plan Record, resets revised Milestones to pending, and requires renewed approval and explicit start.
-
-Completion chat includes the change summary, technical approach, modified modules, test design, validation result, expected behavior, encountered problems, and remaining risks. New-format Records replace legacy Knowledge Ledger archival; never write or delete legacy `.pipeline/knowledge/` from this Skill.
+旧格式 Cycle 只读保留。未经审阅的 History Refresh 不得修改或删除旧历史。

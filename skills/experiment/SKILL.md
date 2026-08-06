@@ -1,46 +1,35 @@
 ---
 name: experiment
-description: Maintain a non-linear, reproducible experiment lane with project knowledge, run identity, parameter scans, long-run supervision, scientific review, immutable Git records, and instant materialized status. Use for /hw:experiment, experiment setup or reruns, NeRF/AceSim-style comparisons, baseline changes, parameter sweeps, result triage, and questions such as "现在实验怎么样".
+description: 用普通 Markdown/YAML 创建、运行、监督、比较和审阅可跨 Cycle 延续的实验。
 ---
 
 # Experiment
 
-Experiment is a durable project lane alongside Goal, Plan, and Maintain. It is not a runner: the host Agent executes commands and monitors processes; Workflow validates and records the evidence.
-
 ## 输出语言规则
 
-用户可见内容遵循项目输出语言；缺失时跟随当前对话语言。Schema key、命令、路径、指标名和专有英文术语保持英文。
+用户可见内容跟随当前对话或项目语言；YAML key、命令、路径、指标名和必要专名保留英文。
 
-## Start Or Resume
+Experiment 是人类可读文件，不是 runner，也不是另一种 Cycle。主模型负责实际命令、进程监督、结果解释和记录更新。
 
-1. Read the current manifest and project Experiment status projection first. Do not answer status by scanning the repository, result tree, or every immutable event.
-2. If the projection is missing after a clone or Git merge, rebuild it from `.pipeline/memory/experiment-events/<project_id>/` once, then use the projection for ordinary status questions.
-3. Load only the referenced project knowledge needed for the task: purpose, metric meanings, dataset units, module roles, concept-to-code mappings, paper expectations, and stale source/version warnings.
-4. State the intended experiment, baseline context, dataset or scene, changed and fixed parameters, success evidence, resource boundary, and next action before launching work.
+## 创建或恢复
 
-## Prepare And Run
+1. 从 Experiment 索引读取选中的实验文件和必要 Attempts，不扫描整个结果树回答普通状态问题。
+2. 写清目的与假设、baseline、数据或 scene、变化与固定参数、环境、指标、成功解释、资源边界和下一步。
+3. 同一代码、参数、数据、scene 和用户明确 rerun 属于同一实验的新 Attempt；数据或 scene 不同通常是不同实验。
+4. Experiment 可以在 `cycles` 中引用多个 Cycle。Cycle 关闭不会删除或重置 Attempts。
 
-1. Capture a code snapshot, `uv` environment and lock digest, machine/GPU/driver/CUDA facts, external dataset location, command, resource limits, readable output directory, and parameters through the Experiment Core APIs. Do not introduce Conda by default.
-2. Treat the same code, parameters, dataset, scene, and explicit user-directed rerun as one logical run identity with a new Attempt. A different dataset or scene is a different experiment identity.
-3. Expand explicit one-axis or cross-axis scans before execution. Record fixed parameters, axes, selected cases, feasibility limits, and why a screening scan expands to all data.
-4. Run through the host in foreground or an isolated, uniquely named tmux session. Poll when the user asks the Agent to watch. Record interruption evidence; resume from a real checkpoint when available, otherwise record restart-from-scratch.
-5. Preserve logs, config, metrics, output references, failure evidence, and scientific review. Operational completion alone is not scientific success.
+## 执行与监督
 
-## Review And Change History
+- 使用普通文件工具更新 Experiment 与 Attempt。记录代码 snapshot、环境、GPU/driver/CUDA、外部数据位置、命令、参数、输出目录、日志、指标和失败证据。
+- 扫描实验先明确 axes、固定参数、case 展开和资源上限。
+- 长任务使用前台或唯一命名的隔离会话；用户要求持续监督时才轮询。
+- 可恢复时使用真实 checkpoint；否则明确记录从头重启。
+- 运行结束不等于科学成功，必须比较 baseline、指标语义、资源限制和异常结果。
 
-1. Compare results with baselines, paper expectations, neighboring runs, resource limits, and metric semantics. If a result is suspicious, create a pending confirmation; do not silently accept or reject it.
-2. When local results differ from a paper, list plausible causes such as environment, dataset preprocessing, configuration, randomness, metric definition, resource limits, and implementation. Do not jump directly to "implementation is wrong."
-3. Record baseline changes with their scope. Multiple default and contextual baselines may coexist.
-4. Trash incorrect or obsolete Attempts instead of deleting them. Restore retained history when the user reverses the judgment. Delete only with fresh explicit authorization.
-5. Before rerunning a same-identity Attempt, preserve or trash old bytes when output references overlap. Surface this retention risk in status.
-6. When code changes, check whether metric, module, optimization-location, and concept-to-code knowledge became stale; update the knowledge record or flag the unresolved difference.
+## 并行与保留
 
-## Record And Synchronize
+只读且代码 snapshot 兼容的实验可以共享 checkout。不同 snapshot、源码修改、GPU、端口、mutable cache 或输出目录冲突需要隔离或暂停。需要原子资源声明时再使用项目已有的 placement 机制，不让它阻塞普通记录与分析。
 
-Append one content-addressed immutable event for each baseline, dataset, scan, Attempt, exception, lifecycle change, and next action. Rebuild the materialized projection after local writes and after Git event unions. If two branches change the same `event_key` without explicit supersession, stop, summarize the difference, and ask the user unless they explicitly delegated the choice.
+错误或过时 Attempt 标为 `trashed`，不要直接删除。相同输出目录 rerun 前先处理旧产物保留风险。两个分支对同一实验事实产生不兼容修改时，停止并让用户决定。
 
-For status, lead with the default and contextual baselines, hardware/configuration context, dataset meaning, scans and their purpose, outcome counts, suspicious or resource-limited results, retention state, and concrete next actions. Render a compact Markdown table from `table_model`; follow its detail references only when the user asks for drill-down.
-
-NeRF-like screening and full-scene expansion and AceSim-like frequency/cache/trace scans are reference fixtures. Real NeRF, AceSim, GPU, paper-project, GitLab remote, SSH/SCP, large-trace, and long-run behavior is not validated yet; state this pilot boundary until a later real-project Pilot Goal validates it.
-
-Never store raw credentials, hidden reasoning, full transcripts, or paper PDFs inside Experiment events. Store safe references to authorized locations instead.
+状态报告先展示 baseline、配置和硬件上下文、数据含义、Attempts、指标、异常、保留状态和下一步。不要用内部事件代替可读解释。

@@ -107,49 +107,6 @@ export function selectDeliveryMode(input) {
   };
 }
 
-export function selectAdaptivePlan(input) {
-  assertPlainObject(input, "adaptive plan input");
-  assertExactKeys(input, ["delivery_kind", "model_capability", "complexity", "durable_research"], "adaptive plan input");
-  const deliveryKind = input.delivery_kind === "cycle" ? "plan" : input.delivery_kind;
-  if (!["goal", "plan"].includes(deliveryKind)) throw deliverySchemaError("adaptive plan delivery_kind must be goal or plan");
-  const discussion = ["discover", "technical_stack", "architecture"];
-  const generation = deliveryKind === "goal" ? ["generate_goal"] : ["decompose", "generate_plan"];
-  return {
-    mode: deliveryKind === "goal" ? "discussion_to_goal" : "discussion_to_plan",
-    durable: input.durable_research === true,
-    internal_phases: [...(input.durable_research === true ? ["deep_plan"] : []), ...discussion, "select_delivery", ...generation],
-    discoverable_command: null,
-  };
-}
-
-export function assessPlanReadiness(input) {
-  assertPlainObject(input, "plan readiness input");
-  if (Object.hasOwn(input, "min_rounds")) {
-    throw deliverySchemaError("min_rounds is unsupported; readiness is evidence-based rather than round-based");
-  }
-  assertExactKeys(input, ["delivery_kind", "evidence", "ambiguities"], "plan readiness input");
-  if (!["goal", "plan", "cycle"].includes(input.delivery_kind)) throw deliverySchemaError("plan readiness delivery_kind must be goal or plan");
-  if (!Array.isArray(input.evidence)) throw deliverySchemaError("plan readiness evidence must be an array");
-  if (!Array.isArray(input.ambiguities)) throw deliverySchemaError("plan readiness ambiguities must be an array");
-  const unresolved = input.ambiguities.map((value, index) => {
-    assertPlainObject(value, `ambiguities[${index}]`);
-    assertExactKeys(value, ["id", "prompt", "material", "resolved", "challenge"], `ambiguities[${index}]`);
-    return {
-      id: normalizeSafeIdentifier(value.id, `ambiguities[${index}].id`),
-      prompt: text(value.prompt, `ambiguities[${index}].prompt`),
-      material: value.material === true,
-      resolved: value.resolved === true,
-      challenge: text(value.challenge, `ambiguities[${index}].challenge`),
-    };
-  }).filter((item) => item.material && !item.resolved);
-  return {
-    status: unresolved.length ? "ask" : "ready",
-    unresolved_material: unresolved.map((item) => item.id),
-    questions: unresolved.map((item) => item.prompt),
-    challenge_questions: unresolved.map((item) => item.challenge),
-  };
-}
-
 function normalizeStone(value, field) {
   assertPlainObject(value, field);
   assertExactKeys(value, ["id", "review", "acceptance_criteria"], field);

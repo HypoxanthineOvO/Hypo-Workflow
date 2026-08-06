@@ -28,6 +28,7 @@ import {
 import { canonicalHash, stringifyYaml } from "../serialization/index.js";
 import { assertWorkspacePathAllowed, commitWorkspaceTransaction } from "../workspace-store/index.js";
 import { inspectBootstrapAcceptanceGate } from "../workspace-store/bootstrap-acceptance.js";
+import { inspectWorkItemCompletion } from "../work-placement/index.js";
 import { validateWorkerRoutingDecision } from "../worker-routing/index.js";
 
 const TRANSITIONS = Object.freeze({
@@ -444,6 +445,13 @@ async function requestAcceptance(root, request, options, clock) {
   assertExactKeys(request, ["object_ref"], "acceptance request");
   const current = await read(root, request.object_ref);
   if (current.status !== "verified") throw deliveryError("ERR_DELIVERY_STATE_INVALID", "Only a verified Delivery can request acceptance");
+  const integration = await inspectWorkItemCompletion(root, current.object_ref);
+  if (!integration.allowed) {
+    throw deliveryError(
+      "ERR_DELIVERY_INTEGRATION_REQUIRED",
+      "Source-changing Work Placement requires integration evidence before Delivery acceptance",
+    );
+  }
   const next = { ...current, status: "pending_acceptance", updated_at: now(clock) };
   await persistRuntime(root, next, options);
   return clone(next);

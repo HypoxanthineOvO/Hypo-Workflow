@@ -297,7 +297,7 @@ initBehavior("no-input Init returns one explicit outcome Ask contract and perfor
   assert.equal(result.ask.id, "init_outcome");
   assert.equal(result.ask.required, true);
   assert.match(result.ask.prompt, /outcome|intent|目标|想做|结果/i);
-  assert.doesNotMatch(JSON.stringify(result), /min_rounds|initialized successfully|初始化完成/i);
+  assert.doesNotMatch(JSON.stringify(result), /initialized successfully|初始化完成/i);
   assert.deepEqual(await snapshotTree(root), before);
 });
 

@@ -20,6 +20,29 @@ const OPTIONAL_TURN_EVENTS = Object.freeze([
   "Stop",
 ]);
 
+const SUBAGENT_CONTEXT_EVENTS = Object.freeze([
+  "UserPromptSubmit",
+  "PreToolUse",
+  "PermissionRequest",
+  "PostToolUse",
+  "PreCompact",
+  "PostCompact",
+]);
+
+test("VSP command hooks accept paired subagent context and reject partial context", async () => {
+  for (const event of SUBAGENT_CONTEXT_EVENTS) {
+    const payload = await officialHookCase(REPOSITORY_ROOT, event);
+    const subagentPayload = { ...payload, agent_id: "vsp-worker-1", agent_type: "test" };
+    assert.deepEqual(api.validateCodexHookInput(subagentPayload), subagentPayload);
+  }
+
+  const payload = await officialHookCase(REPOSITORY_ROOT, "PostToolUse");
+  assert.throws(
+    () => api.validateCodexHookInput({ ...payload, agent_id: "vsp-worker-1" }),
+    /agent_id|agent_type|provided together/i,
+  );
+});
+
 test("C23 M6 accepts host-compatible payloads that omit optional turn identifiers", async (t) => {
   for (const event of OPTIONAL_TURN_EVENTS) {
     await t.test(event, async () => {

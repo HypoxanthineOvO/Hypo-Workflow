@@ -4,9 +4,7 @@ import { join } from "node:path";
 import * as api from "../src/index.js";
 import {
   ACTOR,
-  AMBIENT_REF,
   listFiles,
-  readText,
   seedActiveRecovery,
   temporaryCurrentWorkspace,
   temporaryGitWorkspace,
@@ -61,7 +59,7 @@ test("deletion Receipt context independently rejects crafted Recovery-store bind
   }
 });
 
-test("UserPromptSubmit stages only a bounded semantic sentence in both Inbox and Journal", async (t) => {
+test("UserPromptSubmit leaves semantic persistence to the main Agent", async (t) => {
   const root = await temporaryCurrentWorkspace(t, "hw-m7-r2-semantic-");
   const durable = "Durable requirement: Public API changes must update project documentation.";
   const transientMarkers = Array.from(
@@ -69,48 +67,15 @@ test("UserPromptSubmit stages only a bounded semantic sentence in both Inbox and
     (_, index) => `TRACE_${String(index).padStart(2, "0")}: console.log transient diagnostic line ${index}`,
   );
   const prompt = [durable, ...transientMarkers].join("\n");
-
-  await api.evaluateCodexHookEvent(root, userPromptPayload(root, prompt), {
-    id: "m7-r2-semantic-extraction",
-    clock: () => FIXED_NOW,
-  });
-
-  const inboxPaths = (await listFiles(root)).filter((path) => path.startsWith(".pipeline/memory/inbox/"));
-  assert.equal(inboxPaths.length, 1, "one clear durable statement should stage exactly one Inbox item");
-  const inbox = api.parseYaml(await readText(join(root, inboxPaths[0])));
-  const recovery = api.createRecoveryStore({ clock: () => FIXED_NOW });
-  const replay = await recovery.replayRecoveryJournal(root, { object_ref: AMBIENT_REF });
-  const journalEvent = replay.events.find((event) => event.payload?.kind === "ambient_maintain_delta");
-  assert.ok(journalEvent, "the staged semantic delta must be recoverable from the Journal");
-
-  const persistedBodies = [
-    ["Inbox", inbox.record_patch.body],
-    ["Journal", journalEvent.payload.record_patch.body],
-  ];
-  for (const [surface, body] of persistedBodies) {
-    await t.test(surface, () => {
-      assert.match(body, /Public API changes must update project documentation/);
-      assert.notEqual(body, prompt, `${surface} must not persist the complete raw prompt`);
-      assert.ok(Buffer.byteLength(body, "utf8") <= 512, `${surface} semantic body must be bounded`);
-      for (const marker of transientMarkers) {
-        assert.doesNotMatch(body, new RegExp(marker.split(":")[0]), `${surface} must exclude ${marker}`);
-      }
-    });
-  }
-});
-
-test("a prompt with no durable statement remains zero-Inbox noise", async (t) => {
-  const root = await temporaryCurrentWorkspace(t, "hw-m7-r2-semantic-noise-");
   const before = await listFiles(root);
-  const prompt = Array.from({ length: 40 }, (_, index) => `TRACE_${index}: console output only`).join("\n");
 
-  await api.evaluateCodexHookEvent(root, userPromptPayload(root, prompt), {
-    id: "m7-r2-semantic-noise",
+  const output = await api.evaluateCodexHookEvent(root, userPromptPayload(root, prompt), {
     clock: () => FIXED_NOW,
   });
 
-  const added = (await listFiles(root)).filter((path) => !before.includes(path));
-  assert.equal(added.some((path) => path.startsWith(".pipeline/memory/inbox/")), false);
+  assert.match(output.hookSpecificOutput.additionalContext, /主模型自行判断/);
+  assert.match(output.hookSpecificOutput.additionalContext, /不要把.*模型推断写成长期事实/);
+  assert.deepEqual(await listFiles(root), before, "the Hook must not infer or persist meaning from prompt text");
 });
 
 test("output validator accepts the exact current documented release shapes", async (t) => {

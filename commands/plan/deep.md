@@ -25,7 +25,7 @@ Direct sync scope covers source-owned managed surfaces such as shared guidance, 
 
 Target-owned scope stays separate: Codex-VSP per-model prompts, model selection prompts, and runtime prompt tuning, plus VSP-Open-Code local reminders, runtime prompt details, provider/model behavior, and reminder wording are target-owned scope. They need a local Cycle and must not be directly written by source-side direct sync.
 
-This is also the target for the `/hw:plan --deep` alias. It creates or updates a durable discussion package before ordinary `/hw:plan`. It must not skip ordinary named Plan phase gates after `convert`.
+This is also the target for the `/hw:plan --deep` alias. It creates or updates a durable discussion package before ordinary `/hw:plan`. Converted research may supply evidence, but ordinary planning must still show Discover, Technical, and Architecture artifacts without creating one gate per artifact.
 
 ## Four-Rule Discipline
 

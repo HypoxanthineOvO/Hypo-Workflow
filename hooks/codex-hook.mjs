@@ -25,7 +25,7 @@ try {
   process.stdout.write(`${JSON.stringify(output)}\n`);
 } catch (error) {
   process.stderr.write(`Codex Hook failed: ${error?.message || String(error)}\n`);
-  process.exitCode = 1;
+  process.stdout.write("{}\n");
 }
 
 async function readStdin() {

@@ -187,7 +187,8 @@ test("maintained sync and legacy generator entry points cannot revive retired su
 });
 
 test("read-only sync checks do not mutate a temporary workspace", async (t) => {
-  if (typeof api.runProjectSync !== "function") return;
+  assert.equal(typeof api.runProjectSync, "function");
+  assert.equal(typeof api.buildGlobalTuiModel, "function");
   const root = await temporaryLegacyWorkspace(t, "hw-c21-m8-sync-check-");
   const before = await treeHash(root);
   const result = await api.runProjectSync(root, {
@@ -315,12 +316,12 @@ test("Root Skill, Plugin metadata, and current Codex docs describe the replaceme
   }
 
   for (const path of ["README.md", "README.en.md"]) {
-    await t.test(`${path} presents Codex as current and explains C21 authority`, () => {
+    await t.test(`${path} presents Codex as current and explains semantic authority`, () => {
       assertCurrentPlatformRows(path, docs.get(path));
-      assert.match(docs.get(path), /manifest\.yaml/i, `${path} must introduce the manifest authority`);
-      assert.match(docs.get(path), /Record/i, `${path} must explain Records as the Rules/Patch replacement`);
-      assert.match(docs.get(path), /Receipt/i, `${path} must explain scoped authorization`);
-      assert.match(docs.get(path), /Recovery/i, `${path} must explain restart/compact recovery`);
+      assert.match(docs.get(path), /\.pipeline\/INDEX\.md/i, `${path} must introduce the semantic index`);
+      assert.match(docs.get(path), /Plan \/ Progress \/ Execution/i, `${path} must explain the readable Cycle records`);
+      assert.match(docs.get(path), /Memory/i, `${path} must separate durable facts from discussion`);
+      assert.match(docs.get(path), /Legacy compatibility/i, `${path} must retain the old Delivery compatibility boundary`);
     });
   }
 

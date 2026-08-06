@@ -224,10 +224,11 @@ function inferApprovalIntent(input, context) {
       writes: [],
     };
   }
-  if (
-    /^(?:可以|确认|合理的?|没问题|就这样|ok|okay|go ahead|apply it|按这个做|开始吧|开干)[。.!！\s]*$/i.test(input.trim())
-    || /(?:确认|方案).*(?:开始|开干)|(?:开始|开干).*(?:做|执行)/i.test(normalized)
-  ) {
+  const explicitStart = /^(?:确认并开始|按(?:这个|你的?)方案(?:来|做|实施|执行|开始)|go ahead|apply it|开始吧|开干)[。.!！\s]*$/i.test(input.trim())
+    || /(?:确认|方案).*(?:开始|实施|执行|开干)|(?:开始|开干).*(?:做|执行|实施)/i.test(normalized);
+  const contextualAgreement = context.awaiting_authority_intent === "delivery.approve_and_start"
+    && /^(?:可以|确认|合理的?|没问题|就这样|ok|okay)[。.!！\s]*$/i.test(input.trim());
+  if (explicitStart || contextualAgreement) {
     return {
       status: "available",
       canonical: null,

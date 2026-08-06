@@ -1399,26 +1399,14 @@ $defs:
               - interactive
               - auto
             default: interactive
-          interaction_depth:
-            type: string
-            enum:
-              - low
-              - medium
-              - high
-            default: medium
           interactive:
             type: object
             additionalProperties: false
             properties:
-              min_rounds:
-                type: integer
-                minimum: 1
-                default: 3
               require_explicit_confirm:
                 type: boolean
                 default: true
             default:
-              min_rounds: 3
               require_explicit_confirm: true
           discover:
             type: object
@@ -1558,26 +1546,14 @@ properties:
           - auto
           - interactive
         default: interactive
-      interaction_depth:
-        type: string
-        enum:
-          - low
-          - medium
-          - high
-        default: medium
       interactive:
         type: object
         additionalProperties: false
         properties:
-          min_rounds:
-            type: integer
-            minimum: 1
-            default: 3
           require_explicit_confirm:
             type: boolean
             default: true
         default:
-          min_rounds: 3
           require_explicit_confirm: true
       discover:
         type: object
@@ -1601,9 +1577,7 @@ properties:
           plan_extend_mode: lightweight
     default:
       mode: interactive
-      interaction_depth: medium
       interactive:
-        min_rounds: 3
         require_explicit_confirm: true
       discover:
         progressive: true

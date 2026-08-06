@@ -1,12 +1,19 @@
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { basename, resolve } from "node:path";
-import { createAmbientMaintainStore } from "../maintain/index.js";
+import { lstat, mkdir } from "node:fs/promises";
+import { resolve } from "node:path";
 import { createRecoveryStore } from "../recovery/index.js";
 import { readActivePointer, readRuntimeObject } from "../runtime/index.js";
 import { canonicalHash } from "../serialization/index.js";
 import { refreshHostStatusProjection } from "../host-contract/index.js";
+import { resolveWorkItemSession } from "../work-placement/index.js";
 import { validateWorkerRoutingDecision } from "../worker-routing/index.js";
+import { assertWorkspacePathAllowed } from "../workspace-store/index.js";
+import {
+  appendDiscussionMessage,
+  inspectSemanticWorkflow,
+  renderSemanticResumeContext,
+} from "../semantic-workflow/index.js";
 import {
   assertExactKeys,
   assertNoRawSecrets,
@@ -33,6 +40,7 @@ const EVENT_SET = new Set(CODEX_HOOK_EVENTS);
 const PERMISSION_MODES = new Set(["default", "acceptEdits", "plan", "dontAsk", "bypassPermissions"]);
 const WRITE_EVENTS = new Set(CODEX_HOOK_EVENTS.filter((event) => ![
   "SessionStart",
+  "UserPromptSubmit",
   "PreToolUse",
   "PermissionRequest",
 ].includes(event)));
@@ -45,6 +53,14 @@ const PERMISSION_MODE_EVENTS = new Set([
   "SubagentStart",
   "SubagentStop",
   "Stop",
+]);
+const SUBAGENT_CONTEXT_EVENTS = new Set([
+  "UserPromptSubmit",
+  "PreToolUse",
+  "PermissionRequest",
+  "PostToolUse",
+  "PreCompact",
+  "PostCompact",
 ]);
 const COMMON_KEYS = ["session_id", "transcript_path", "cwd", "hook_event_name", "model"];
 const EVENT_KEYS = Object.freeze({
@@ -74,7 +90,8 @@ export function validateCodexHookInput(input) {
   if (!EVENT_SET.has(event)) {
     throw hookError("ERR_CODEX_HOOK_EVENT_UNSUPPORTED", "Codex Hook event is unsupported");
   }
-  assertExactKeys(input, [...COMMON_KEYS, ...EVENT_KEYS[event]], "Codex Hook input");
+  const subagentContextKeys = SUBAGENT_CONTEXT_EVENTS.has(event) ? ["agent_id", "agent_type"] : [];
+  assertExactKeys(input, [...COMMON_KEYS, ...EVENT_KEYS[event], ...subagentContextKeys], "Codex Hook input");
   requireText(input.session_id, "session_id");
   requireNullableText(input.transcript_path, "transcript_path");
   requireText(input.cwd, "cwd");
@@ -85,6 +102,7 @@ export function validateCodexHookInput(input) {
     }
   }
   if (event !== "SessionStart") validateOptionalHookIdentifier(input, "turn_id");
+  if (SUBAGENT_CONTEXT_EVENTS.has(event)) validateOptionalAgentContext(input);
 
   switch (event) {
     case "SessionStart":
@@ -157,37 +175,42 @@ export async function evaluateCodexHookEvent(root, rawInput, options = {}) {
   const recovery = createRecoveryStore({ ...(operation.clock ? { clock: operation.clock } : {}) });
 
   let output;
-  switch (input.hook_event_name) {
-    case "SessionStart":
-      output = await evaluateSessionStart(workspaceRoot, input, operation, recovery);
-      break;
-    case "UserPromptSubmit":
-      output = await evaluateUserPrompt(workspaceRoot, input, operation);
-      break;
-    case "PreToolUse":
-      output = evaluatePreToolUse(input);
-      break;
-    case "PermissionRequest":
-      output = evaluatePermissionRequest(input);
-      break;
-    case "PostToolUse":
-      output = await evaluatePostToolUse(workspaceRoot, input, operation, recovery);
-      break;
-    case "PreCompact":
-      output = await evaluatePreCompact(workspaceRoot, input, operation, recovery);
-      break;
-    case "PostCompact":
-      output = await evaluatePostCompact(workspaceRoot, input, operation, recovery);
-      break;
-    case "SubagentStart":
-      output = await evaluateSubagent(workspaceRoot, input, operation, recovery, true);
-      break;
-    case "SubagentStop":
-      output = await evaluateSubagent(workspaceRoot, input, operation, recovery, false);
-      break;
-    case "Stop":
-      output = await evaluateStop(workspaceRoot, input, operation, recovery);
-      break;
+  try {
+    switch (input.hook_event_name) {
+      case "SessionStart":
+        output = await evaluateSessionStart(workspaceRoot, input, operation, recovery);
+        break;
+      case "UserPromptSubmit":
+        output = await evaluateUserPrompt(workspaceRoot, input, operation);
+        break;
+      case "PreToolUse":
+        output = await evaluatePreToolUse(input);
+        break;
+      case "PermissionRequest":
+        output = await evaluatePermissionRequest(input);
+        break;
+      case "PostToolUse":
+        output = await evaluatePostToolUse(workspaceRoot, input, operation);
+        break;
+      case "PreCompact":
+        output = await evaluatePreCompact(workspaceRoot, input, operation, recovery);
+        break;
+      case "PostCompact":
+        output = await evaluatePostCompact(workspaceRoot, input, operation, recovery);
+        break;
+      case "SubagentStart":
+        output = await evaluateSubagent(workspaceRoot, input, operation, recovery, true);
+        break;
+      case "SubagentStop":
+        output = await evaluateSubagent(workspaceRoot, input, operation, recovery, false);
+        break;
+      case "Stop":
+        output = await evaluateStop(workspaceRoot, input, operation, recovery);
+        break;
+    }
+  } catch (error) {
+    if (["PreToolUse", "PermissionRequest"].includes(input.hook_event_name)) throw error;
+    output = failOpenHookOutput(input.hook_event_name, error);
   }
   return validateCodexHookOutput(input.hook_event_name, output, input);
 }
@@ -210,44 +233,77 @@ function bindOptionalHookIdentifiers(input, operation) {
 }
 
 async function evaluateSessionStart(root, input, operation, recovery) {
-  await refreshProjectionIfCurrent(root, operation, "session-start");
-  if (input.source !== "compact") return {};
-  const objectRef = await readActiveObjectRef(root);
-  if (!objectRef) return {};
-  try {
-    const plan = await recovery.planRecoveryRestore(root, {
-      object_ref: objectRef,
-      budget_bytes: 12 * 1024,
-    });
-    const additionalContext = boundUtf8(renderRestoreContext(plan), 16_000);
+  const semantic = await renderSemanticResumeContext(root, {
+    host: "codex",
+    sessionId: input.session_id,
+  });
+  if (["selected", "selection_required"].includes(semantic.status)) {
+    return sessionStartContext(semantic.context);
+  }
+
+  await refreshProjectionIfCurrent(root, operation, "session-start", input);
+  const selection = await resolveSessionRouting(root, input, operation.clock);
+  if (selection.status === "selection_required") {
     return {
       hookSpecificOutput: {
         hookEventName: "SessionStart",
-        additionalContext,
+        additionalContext: renderSelectionContext(selection.candidates),
       },
     };
+  }
+  const objectRef = selection.object_ref;
+  if (!objectRef) return {};
+  if (input.source === "compact") {
+    try {
+      const plan = await recovery.planRecoveryRestore(root, {
+        object_ref: objectRef,
+        budget_bytes: 12 * 1024,
+      });
+      return sessionStartContext(boundUtf8(renderRestoreContext(plan), 16_000));
+    } catch (error) {
+      if (error?.code !== "ERR_RECOVERY_PACK_NOT_FOUND") throw error;
+    }
+  }
+  try {
+    const authority = await readRuntimeObject(root, objectRef);
+    return sessionStartContext(boundUtf8(renderRuntimeContext(authority), 16_000));
   } catch (error) {
-    if (error?.code === "ERR_RECOVERY_PACK_NOT_FOUND") return {};
+    if (error?.code === "ERR_AUTHORITY_OBJECT_NOT_FOUND") return {};
     throw error;
   }
 }
 
 async function evaluateUserPrompt(root, input, operation) {
-  const semanticDelta = inferSemanticDelta(root, input);
-  const promptIsSecretSafe = isSecretSafeText(input.prompt);
-  const maintain = createAmbientMaintainStore({ clock: operation.clock ?? (() => new Date().toISOString()) });
-  await maintain.captureSemanticDelta(root, {
-    object_ref: { kind: "activity", id: "ambient-maintain" },
-    session_id: input.session_id,
-    turn_id: input.turn_id,
-    writer: { kind: "main", id: "main" },
-    source: "user_prompt",
-    summary: semanticDelta?.body ?? (promptIsSecretSafe
-      ? "User prompt contained no clean durable statement."
-      : "User prompt omitted because it contains secret-like material."),
-    semantic_delta: semanticDelta,
-  }, { id: operation.id });
-  return {};
+  const discussion = await appendDiscussionMessage(root, {
+    speaker: "user",
+    text: input.prompt,
+    host: "codex",
+    sessionId: input.session_id,
+    turnId: input.turn_id,
+  }, { clock: operation.clock });
+  const context = [];
+  if (discussion.status === "appended") context.push(`用户原文已追加到 ${discussion.path}。`);
+  if (discussion.status === "selection_required") context.push("存在多个 active Cycle；聚焦一个 Cycle 后再写入 Discussion Ledger。普通对话可以继续。");
+  const selection = ["appended", "deduplicated", "selection_required"].includes(discussion.status)
+    ? { status: discussion.status }
+    : await resolveSessionRouting(root, input, operation.clock);
+  if (selection.status === "selection_required") context.push(renderSelectionContext(selection.candidates));
+  if (selection.status === "selected" && selection.object_ref.kind === "experiment") {
+    context.push(
+      "Experiment 提醒：用普通 Markdown/YAML 保持实验目的、Attempts、证据、结果和下一步最新。可选辅助工具失败不能阻止清楚的普通文件记录。",
+    );
+  }
+  context.push(
+    "Hypo-Workflow 提醒：将本轮用户可见原文追加到当前 Cycle 的本地 Discussion Ledger；明显凭据使用 [REDACTED]。",
+    "主模型自行判断明确的长期 requirement、preference、decision 和 feedback，并在适用时更新 Memory。",
+    "不要把 brainstorming、临时日志、关键词命中或模型推断写成长期事实。",
+  );
+  return {
+    hookSpecificOutput: {
+      hookEventName: "UserPromptSubmit",
+      additionalContext: context.join("\n"),
+    },
+  };
 }
 
 function evaluatePreToolUse(input) {
@@ -271,44 +327,63 @@ function evaluatePermissionRequest(input) {
   };
 }
 
-async function evaluatePostToolUse(root, input, operation, recovery) {
-  const objectRef = await readActiveObjectRef(root);
+async function evaluatePostToolUse(root, input, operation) {
+  const objectRef = await readActiveObjectRef(root, input, operation.clock);
   if (!objectRef) return {};
   const changedPaths = extractChangedPaths(root, input);
   const worktreeEffect = collectReminderWorktreeEffect(root, changedPaths);
   const reminderKey = reminderDigest(input.tool_name, changedPaths, input.tool_input, worktreeEffect.digest);
-  const replay = await recovery.replayRecoveryJournal(root, { object_ref: objectRef });
-  const alreadyReminded = replay.events.some((event) => event.payload?.reminder_key === reminderKey);
-  await recovery.appendRecoveryEvent(root, {
-    object_ref: objectRef,
-    session_id: input.session_id,
-    writer: { kind: "main", id: "main" },
-    turn_id: input.turn_id,
-    type: "tool.completed",
-    summary: `Codex completed ${input.tool_name}.`,
-    payload: {
-      operation_id: operation.id,
-      tool_name: input.tool_name,
-      tool_use_id: input.tool_use_id,
-      changed_paths: changedPaths,
-      worktree_effect_digest: worktreeEffect.digest,
-      reminder_key: reminderKey,
-      evidence_refs: [],
-    },
-  });
-  await refreshProjectionIfCurrent(root, operation, "post-tool");
-  if (alreadyReminded || !shouldRemind(input.tool_name, changedPaths)) return {};
+  await refreshProjectionIfCurrent(root, operation, "post-tool", input);
+  if (!shouldRemind(input.tool_name, changedPaths)) return {};
   const target = changedPaths.length ? changedPaths.join(", ") : input.tool_name;
+  const systemMessage = `检查 ${target} 是否改变了文档、Progress 或长期项目事实；只有真实变化才需要更新。`;
+  const claimed = await claimReminderMarker(root, objectRef, reminderKey, systemMessage);
+  if (!claimed) return {};
   return {
-    systemMessage: `Review documentation affected by ${target}; stage a Record only for durable requirements or decisions.`,
+    systemMessage,
   };
 }
 
-async function refreshProjectionIfCurrent(root, operation, suffix) {
+async function claimReminderMarker(root, objectRef, reminderKey, systemMessage) {
+  const markerRootRelative = ".pipeline/runtime/codex-hooks/reminders";
+  const digest = canonicalHash({ object_ref: objectRef, reminder_key: reminderKey, system_message: systemMessage });
+  let markerRoot;
+  try {
+    markerRoot = await assertWorkspacePathAllowed(root, markerRootRelative, { allowRoot: true });
+    await mkdir(markerRoot.path, { recursive: true });
+    markerRoot = await assertWorkspacePathAllowed(root, markerRootRelative, { allowRoot: true });
+  } catch {
+    throw hookError("ERR_CODEX_HOOK_REMINDER_MARKER_FAILED", "Codex Hook reminder marker parent creation failed");
+  }
+  let marker;
+  try {
+    marker = await assertWorkspacePathAllowed(root, `${markerRoot.relativePath}/${digest}`);
+  } catch {
+    throw hookError("ERR_CODEX_HOOK_REMINDER_MARKER_FAILED", "Codex Hook reminder marker path is forbidden");
+  }
+  try {
+    await mkdir(marker.path);
+    return true;
+  } catch (error) {
+    if (error?.code === "EEXIST") {
+      try {
+        const existing = await assertWorkspacePathAllowed(root, marker.relativePath);
+        const stats = await lstat(existing.path);
+        if (stats.isDirectory() && !stats.isSymbolicLink()) return false;
+      } catch {
+        // Fall through to the stable Hook error below.
+      }
+    }
+    throw hookError("ERR_CODEX_HOOK_REMINDER_MARKER_FAILED", "Codex Hook reminder marker claim failed");
+  }
+}
+
+async function refreshProjectionIfCurrent(root, operation, suffix, input = null) {
   try {
     await refreshHostStatusProjection(root, {
       clock: operation.clock ?? (() => new Date().toISOString()),
       id: `${operation.id}-${suffix}-host-status`,
+      ...(input ? { host: "codex", session_id: input.session_id } : {}),
     });
   } catch (error) {
     if (new Set([
@@ -322,11 +397,30 @@ async function refreshProjectionIfCurrent(root, operation, suffix) {
 }
 
 async function evaluatePreCompact(root, input, operation, recovery) {
-  const objectRef = await readActiveObjectRef(root);
+  const semantic = await inspectSemanticWorkflow(root, {
+    host: "codex",
+    sessionId: input.session_id,
+  });
+  if (semantic.present) {
+    const resume = await renderSemanticResumeContext(root, {
+      host: "codex",
+      sessionId: input.session_id,
+    });
+    return {
+      continue: true,
+      systemMessage: resume.status === "selected"
+        ? `压缩前语义恢复检查完成：${resume.cycle} 的 Plan、Progress、Execution 和 Discussion Summary 可读取。`
+        : "压缩前发现多个 active Cycle；恢复后需要先选择一个 Cycle。",
+    };
+  }
+
+  const objectRef = await readActiveObjectRef(root, input, operation.clock);
   if (!objectRef) return { continue: true };
-  const [capsule, runtime, worktreeSummary] = await Promise.all([
+  if (objectRef.kind === "experiment") return { continue: true };
+  const runtime = await readRuntimeObject(root, objectRef);
+  if (["accepted", "rejected"].includes(runtime.runtime.status)) return { continue: true };
+  const [capsule, worktreeSummary] = await Promise.all([
     recovery.readContextCapsule(root, objectRef),
-    readRuntimeObject(root, objectRef),
     collectGitWorktreeSummary(root),
   ]);
   const sealed = await recovery.sealRecoveryPack(root, {
@@ -353,8 +447,11 @@ async function evaluatePreCompact(root, input, operation, recovery) {
 }
 
 async function evaluatePostCompact(root, input, operation, recovery) {
-  const objectRef = await readActiveObjectRef(root);
+  const objectRef = await readActiveObjectRef(root, input, operation.clock);
   if (!objectRef) return { continue: true };
+  if (objectRef.kind === "experiment") return { continue: true };
+  const runtime = await readRuntimeObject(root, objectRef);
+  if (["accepted", "rejected"].includes(runtime.runtime.status)) return { continue: true };
   const selected = await recovery.selectLatestValidRecoveryPack(root, { object_ref: objectRef });
   await recovery.appendRecoveryEvent(root, {
     object_ref: objectRef,
@@ -374,7 +471,7 @@ async function evaluatePostCompact(root, input, operation, recovery) {
 }
 
 async function evaluateSubagent(root, input, operation, recovery, starting) {
-  const objectRef = await readActiveObjectRef(root);
+  const objectRef = await readActiveObjectRef(root, input, operation.clock);
   const evidenceRefs = starting ? [] : extractEvidenceLocators(input.last_assistant_message);
   const workerRouting = objectRef
     ? await readWorkerRoutingForEvent(root, objectRef, input, recovery, starting)
@@ -452,19 +549,30 @@ async function readActiveWorkerRouting(root, objectRef) {
 }
 
 function renderWorkerRoutingContext(routing) {
-  const assessment = routing.assessment;
-  const details = assessment
-    ? ` complexity=${assessment.complexity}, uncertainty=${assessment.uncertainty}, oracle_strength=${assessment.oracle_strength}, blast_radius=${assessment.blast_radius}, reversibility=${assessment.reversibility}.`
-    : " unavailable; use the validated semantic decision.";
-  return [
-    `Task Assessment:${details}`,
-    `Semantic Worker Routing: class=${routing.routing_class}, policy=${routing.policy_version}, reasons=${routing.reason_codes.join(",")}.`,
-    "Keep role-specific evidence_refs explicit; routing does not change role separation or acceptance.",
-  ].join("\n");
+  void routing;
+  return "Worker 提醒：只执行当前 Handoff 的目的、边界和验证；结果与证据返回主模型，由主模型更新 Progress 与 Execution。";
 }
 
 async function evaluateStop(root, input, operation, recovery) {
-  const objectRef = await readActiveObjectRef(root);
+  const discussion = await appendDiscussionMessage(root, {
+    speaker: "assistant",
+    text: input.last_assistant_message || "",
+    host: "codex",
+    sessionId: input.session_id,
+    turnId: input.turn_id,
+  }, { clock: operation.clock });
+  if (["appended", "deduplicated"].includes(discussion.status)) {
+    return {
+      continue: true,
+      ...(discussion.status === "appended" ? {
+        systemMessage: `助手回复已追加到 ${discussion.path}。如本轮改变了计划状态，请同步更新 Progress 与 Execution。`,
+      } : {}),
+    };
+  }
+  if (discussion.status === "selection_required") {
+    return { continue: true, systemMessage: "存在多个 active Cycle；聚焦一个 Cycle 后再保存助手回复。" };
+  }
+  const objectRef = await readActiveObjectRef(root, input, operation.clock);
   if (objectRef) {
     await recovery.appendRecoveryEvent(root, {
       object_ref: objectRef,
@@ -480,7 +588,12 @@ async function evaluateStop(root, input, operation, recovery) {
       },
     });
   }
-  return { continue: true };
+  return {
+    continue: true,
+    ...(discussion.status === "appended" ? {
+      systemMessage: `助手回复已追加到 ${discussion.path}。如本轮改变了计划状态，请同步更新 Progress 与 Execution。`,
+    } : {}),
+  };
 }
 
 function normalizeEvaluationOptions(event, options) {
@@ -502,73 +615,41 @@ function normalizeEvaluationOptions(event, options) {
   return { id: normalizeSafeIdentifier(options.id, "Codex Hook operation id"), ...(clock === undefined ? {} : { clock }) };
 }
 
-async function readActiveObjectRef(root) {
+async function readActiveObjectRef(root, input, clock) {
+  const selection = await resolveSessionRouting(root, input, clock);
+  return selection.status === "selected" ? selection.object_ref : null;
+}
+
+async function resolveSessionRouting(root, input, clock) {
+  const selection = await resolveWorkItemSession(root, {
+    host: "codex",
+    session_id: input.session_id,
+  }, { ...(clock ? { clock } : {}) });
+  if (selection.status === "selected") {
+    return { status: "selected", object_ref: selection.work_item_ref };
+  }
+  if (selection.placement_registry_present) return selection;
   try {
     const pointer = await readActivePointer(root);
-    return pointer.active.delivery ?? pointer.active.activity ?? pointer.active.bootstrap_job ?? null;
+    const objectRef = pointer.active.delivery ?? pointer.active.activity ?? pointer.active.bootstrap_job ?? null;
+    return objectRef ? { status: "selected", object_ref: objectRef, legacy: true } : { status: "none" };
   } catch (error) {
-    if (error?.code === "ERR_AUTHORITY_OBJECT_NOT_FOUND") return null;
+    if (error?.code === "ERR_AUTHORITY_OBJECT_NOT_FOUND") return { status: "none" };
     throw error;
   }
 }
 
-function inferSemanticDelta(root, input) {
-  if (!isSecretSafeText(input.prompt)) return null;
-  const body = extractDurableStatement(input.prompt);
-  if (!body) return null;
+function renderSelectionContext(candidates) {
+  const choices = candidates.map(({ work_item_ref }) => `${work_item_ref.kind}:${work_item_ref.id}`).join(", ");
+  return `当前 Session 尚未聚焦一个工作项。候选项：${choices}。在修改 Workflow 记录或占用独占资源前选择一个；普通提问和诊断可以继续。`;
+}
+
+function failOpenHookOutput(event, error) {
+  const code = typeof error?.code === "string" ? error.code : "ERR_CODEX_HOOK_AUXILIARY_FAILED";
   return {
-    scope: { type: "project", ref: `project:${safeRef(basename(root))}` },
-    kind: /\b(decide|decision|choose|selected)\b/i.test(body) ? "decision" : "requirement",
-    confidence: "confirmed",
-    dedupe_key: `codex-prompt:${canonicalHash({ body })}`,
-    body,
-    source_refs: [{ type: "session", ref: input.session_id, locator: input.turn_id }],
-    supersedes: [],
+    systemMessage: `Hypo-Workflow ${event} 辅助处理暂不可用（${code}）。继续当前工作，并用普通文件维护所需记录。`,
+    ...(["PreCompact", "PostCompact"].includes(event) ? { continue: true } : {}),
   };
-}
-
-function isDurablePrompt(value) {
-  return /(?:\bremember\b|\bmust\b|\brequire(?:d|ment)?\b|\balways\b|\bnever\b|\bdecision\b|\bdecided\b|\bconstraint\b|记住|必须|要求|约束|决定)/i.test(value);
-}
-
-function extractDurableStatement(prompt) {
-  const statements = [];
-  for (const line of prompt.split("\n")) {
-    for (const sentence of splitSemanticSentences(line)) {
-      const candidate = sentence.replace(/\s+/g, " ").trim();
-      if (!candidate || isTransientDiagnostic(candidate) || !isDurablePrompt(candidate)) continue;
-      statements.push(candidate);
-    }
-  }
-  if (!statements.length) return null;
-  return boundSemanticText(statements.join(" "), 512);
-}
-
-function splitSemanticSentences(line) {
-  const trimmed = line.trim();
-  if (!trimmed) return [];
-  return trimmed.match(/[^.!?。！？]+[.!?。！？]?/gu) ?? [trimmed];
-}
-
-function isTransientDiagnostic(value) {
-  return /^(?:TRACE(?:_[A-Z0-9_-]+)?|DEBUG|INFO|WARN(?:ING)?|ERROR|LOG|STDOUT|STDERR|CONSOLE|STACK(?:\s+TRACE)?)(?:\s*[:=[\]-]|\s)/i.test(value)
-    || /^console\.(?:log|debug|info|warn|error)\b/i.test(value)
-    || /^at\s+(?:async\s+)?(?:\S+\s+)?\(?[^\s()]+:\d+:\d+\)?$/i.test(value);
-}
-
-function boundSemanticText(value, maximumBytes) {
-  const bytes = Buffer.from(value, "utf8");
-  if (bytes.length <= maximumBytes) return value;
-  return `${bytes.subarray(0, maximumBytes - 3).toString("utf8").replace(/\uFFFD+$/u, "")}...`;
-}
-
-function isSecretSafeText(value) {
-  try {
-    assertNoRawSecrets(value, "Codex Hook prompt");
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 function isObviousDirectDeletion(toolName, toolInput) {
@@ -581,7 +662,7 @@ function isObviousDirectDeletion(toolName, toolInput) {
 }
 
 function deletionGuardReason() {
-  return "Direct destructive deletion is blocked: report an exact deletion manifest, obtain an explicit Receipt, and use the controlled deletion executor. This Hook is only an additional guardrail.";
+  return "已阻止直接破坏性删除：先展示准确的删除清单和影响，获得用户明确授权，再使用受控删除方式。此 Hook 只是额外安全保护。";
 }
 
 function extractChangedPaths(root, input) {
@@ -781,15 +862,35 @@ function parseStatusPaths(status) {
 
 function renderRestoreContext(plan) {
   return [
-    "Hypo-Workflow compact recovery context (derived from a sealed Recovery Pack):",
-    `next_action: ${plan.next_action}`,
-    `current_goal: ${plan.context.current_goal ?? "none"}`,
-    `scope: ${JSON.stringify(plan.context.scope ?? [])}`,
-    `non_goals: ${JSON.stringify(plan.context.non_goals ?? [])}`,
-    `recent_verification: ${JSON.stringify(plan.context.recent_verification ?? null)}`,
-    `workers: ${JSON.stringify(plan.context.workers ?? [])}`,
-    `journal_delta: ${JSON.stringify(plan.journal_delta ?? [])}`,
+    "Hypo-Workflow 恢复提示：",
+    `下一步：${plan.next_action}`,
+    `当前目的：${plan.context.current_goal ?? "未记录"}`,
+    `执行范围：${JSON.stringify(plan.context.scope ?? [])}`,
+    `非目标：${JSON.stringify(plan.context.non_goals ?? [])}`,
+    `最近验证：${JSON.stringify(plan.context.recent_verification ?? null)}`,
+    "继续前优先核对当前 Cycle 的 PLAN.md、PROGRESS.md、最近 EXECUTION.md 和 DISCUSSION-SUMMARY.md；不要重放已完成动作。",
   ].join("\n");
+}
+
+function renderRuntimeContext(authority) {
+  const status = authority.runtime?.status ?? "unknown";
+  const nextAction = authority.continuation?.next_action ?? authority.continuation?.action ?? "读取当前 Progress";
+  return [
+    "Hypo-Workflow 当前工作提示：",
+    `工作项：${authority.object_ref.kind}:${authority.object_ref.id}`,
+    `状态：${status}`,
+    `下一步：${nextAction}`,
+    "优先读取语义索引和当前 Cycle 的 PLAN.md、PROGRESS.md、最近 EXECUTION.md 与 DISCUSSION-SUMMARY.md，并以用户最新消息为准。",
+  ].join("\n");
+}
+
+function sessionStartContext(additionalContext) {
+  return {
+    hookSpecificOutput: {
+      hookEventName: "SessionStart",
+      additionalContext,
+    },
+  };
 }
 
 function boundUtf8(value, maximumBytes) {
@@ -889,6 +990,15 @@ function requireAgentFields(input) {
   requireText(input.agent_type, "agent_type");
 }
 
+function validateOptionalAgentContext(input) {
+  const hasAgentId = Object.hasOwn(input, "agent_id");
+  const hasAgentType = Object.hasOwn(input, "agent_type");
+  if (hasAgentId !== hasAgentType) {
+    throw hookError("ERR_CODEX_HOOK_INPUT_INVALID", "Codex Hook agent_id and agent_type must be provided together");
+  }
+  if (hasAgentId) requireAgentFields(input);
+}
+
 function normalizeJsonValue(value, field) {
   normalizeCanonicalValue(value, field);
 }
@@ -928,10 +1038,6 @@ function requireBoolean(value, field) {
 
 function requireOneOf(value, allowed, field) {
   if (!allowed.includes(value)) throw hookError("ERR_CODEX_HOOK_INPUT_INVALID", `Codex Hook ${field} is unsupported`);
-}
-
-function safeRef(value) {
-  return value.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "") || "workspace";
 }
 
 function hookError(code, message) {

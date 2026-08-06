@@ -1,73 +1,35 @@
 ---
 name: plan
-description: Discuss requirements, technical stack, and architecture, then deliver a Milestone Plan containing at least one user-reviewed Stone. Use for /hw:plan when execution needs an intermediate manual checkpoint.
+description: 在一个 Cycle 内讨论并执行包含至少一个人工审阅点的完整计划。
 ---
 
-# Discussion And Plan Delivery
+# Plan
 
 ## 输出语言规则
 
-用户可见内容遵循项目 `output.language`；缺失时跟随当前对话语言。Schema key、配置 key、命令和路径保持英文。
+用户可见内容跟随当前对话或项目语言；YAML key、命令、路径和必要专名保留英文。
 
-`/hw:plan` is the Plan Delivery route. A Plan is selected only when execution contains at least one **Stone**: a Milestone checkpoint where the user must inspect a concrete artifact or make a decision. Complexity, file count, acceptance-criteria count, and internal implementation phases do not by themselves justify Plan.
+Plan 是 Cycle 内包含一个或多个 **Stone** 的交付方式。Stone 是用户需要检查真实产物或作出决定的计划项；复杂度、文件数量和内部阶段数量本身不构成 Stone。
 
-Deep Plan, Discover, Technical Stack, Architecture, Decompose, Generate, Extend, and Review remain internal phases, not separate public commands or Child Skills.
+## Discussion
 
-## Discussion First
+根据任务自适应提问。必须弄清执行目的、执行边界、验证目标、进度位置和会实质改变方案的未决问题。软件项目展示：
 
-Do not choose Goal or Plan before Discussion has resolved the relevant product and technical questions. Discussion proceeds in this order:
+- Discover：用户需求、仓库事实、模型推断和未决用户决定；
+- Technical：现有与拟议技术、兼容性、依赖和验证工具；
+- Architecture：组件、边界、数据或控制流、改动点和下游影响。
 
-1. **Discover** discusses requirements only: desired effect, users, behaviors, scope, non-goals, acceptance criteria, and unresolved product decisions.
-2. **Technical Stack** discusses the existing stack, dependencies, compatibility, validation tools, and material implementation choices. Skip with explicit evidence when no stack decision exists.
-3. **Architecture** discusses ownership, components, data/control flow, integration points, failure boundaries, migration, and downstream effects. State explicitly when the change is local and architecture-neutral.
-4. **Delivery Selection** lists proposed Stones. Call `selectDeliveryMode`: zero Stones routes to Goal; one or more Stones routes to Plan.
+这些内容可以一起展示，不各自制造确认 gate。信息已经充分时直接说明，不为了轮数继续提问。
 
-Readiness is evidence-based, never round-count based. Continue Discussion while a material ambiguity could change scope, architecture, a Stone, or acceptance. The user may explicitly end Discussion and request generation once those decisions are sufficiently bounded.
+## 完整计划
 
-`assessPlanReadiness` rejects `min_rounds`. Continue asking only while a material ambiguity remains.
+1. 创建或聚焦一个 Cycle，并在 `PLAN.md` 写 `mode: plan`。
+2. 使用稳定的人类可读 ID 编码全部 Milestone 与 Stone，例如 `M1 → S1 → M2`。开始后不重排或复用 ID。
+3. 每行写清阶段、期望结果和验证方式。Stone 还要写清用户将看到的真实产物和接受标准。
+4. `PROGRESS.md` 通过 `plan: PLAN.md` 指回计划，按相同顺序完整镜像全部 ID、状态、结果或证据和下一步。
+5. `EXECUTION.md` 的每个 checkpoint 引用对应计划 ID。
+6. 展示完整 Proposal，只询问一次是否确认并开始、确认但不开始或继续讨论。
 
-## Internal Phase Contract
+普通 Milestone 验证后自动继续。Stone 完成时将该项标为 `waiting-review`，展示真实产物和核心报告内容，然后等待接受或拒绝。拒绝后解释失败原因和修正方案，将相关 Milestone 恢复为 `in_progress`，保留拒绝记录，不删除历史。
 
-1. **Deep Plan**: preserve question, evidence, alternatives, decisions, risks, and unresolved items as durable planning Records. It never implements work and never bypasses later readiness checks.
-2. **Discover**: establish desired effect, non-goals, constraints, acceptance boundary, exact validation path, and material ambiguities. Separate confirmed repository facts from inference.
-3. **Technical Stack**: run only when language, framework, dependency, platform, compatibility, or validation tooling choices are material. Resolve unknown external capabilities from primary evidence or keep them blocking.
-4. **Architecture**: show components, ownership, data/control flow, integration points, failure boundaries, and downstream impact. Include a compact diagram when relationships would otherwise be ambiguous.
-5. **Decompose**: Plan work becomes ordered Milestones. Each Milestone has one outcome, earlier-only dependencies, verification criteria, technical route, risks, and audit focus. Mark at least one Milestone with a Stone containing its review artifact and acceptance criteria.
-6. **Generate**: compile with `compilePlan`. The compiler rejects zero-Stone Plans. The content-derived `plan_hash` binds approval, Stone acceptance, final acceptance, and revision Receipts.
-7. **Extend**: append dependent Milestones through a superseding Plan. Never renumber or rewrite completed history.
-8. **Review**: after execution changes reality, compare actual architecture with the approved Plan and propose downstream revisions before changing them.
-
-Show the relevant phase artifact in chat before every material decision gate: facts and ambiguities, choice table, architecture map, Milestone table, or generated Design/Plan summary. The Ask card is only the gate after this explanation.
-
-## Proposal And Start
-
-After showing the complete Plan, offer exactly these meanings:
-
-- **确认并开始**: issue one scoped `delivery.approve_and_start` Receipt and call `approveAndStart`; this is the default meaning of 可以、确认、OK、go ahead、apply it、按这个做.
-- **确认但不开始**: issue `delivery.approve`, persist `waiting_to_start`, and wait for Resume or explicit start.
-- **不确认 / 继续讨论**: make no authority write and return to Discussion.
-
-Do not add a second start turn after ordinary confirmation. Destructive actions, remote writes, releases, service restarts, protected-file writes, or scope growth may still require their own local gate.
-
-After each ordinary Milestone verifies, continue automatically. When a Stone Milestone verifies, persist `pending_stone`, set Delivery to `waiting_for_stone`, and show the real artifact and criteria. Acceptance issues scoped `stone.accept` and continues; rejection issues scoped `stone.reject`, records structured feedback, and returns to `needs_revision`. A rejected Stone never silently continues.
-
-## Worker Topology And Routing
-
-Use `selectExecutionTopology` from coordination value, coupling, and oracle strength:
-
-- `solo-verified` whenever the main Agent can maintain coherence and verify objectively, including material but tightly coupled work.
-- `independent-audit` when a genuinely independent oracle adds value.
-- `strict` or custom separated roles only when subproblems are bounded, parallelizable, and cheaper to coordinate than to keep together.
-- Add bounded research, challenge, curation, design, or visual-audit roles when the domain requires them.
-
-Do not derive Worker count from Plan, Milestone, Stone, file count, or acceptance-criteria count. When separation is selected, show why its independence or parallel value exceeds coordination cost.
-
-Topology chooses identities; Worker Routing chooses only a semantic capability class after identities are fixed. The host Agent generates a visible Task Assessment from repository evidence, including complexity, uncertainty, oracle strength, blast radius, reversibility, risk flags, and a bounded summary. Validate it with `validateTaskAssessment`, then call `selectWorkerRouting`; do not invoke another classifier or persist its prompt.
-
-Routing precedence is `escalation > critical > explore > standard > mechanical`. Security, migration, irreversible work, or two distinct failed execution routes escalate; architecture, weak oracle, independent audit, and recovery conflict are critical; unknown root causes and candidate comparisons explore. Same-route retries, cancellation, startup failures, and network failures do not increase the distinct-route count. Display the assessment, class, reasons, and any fallback before Worker start. Routing metadata never relaxes topology or acceptance.
-
-## Persistence And Reporting
-
-Persist current facts only through Manifest-selected Runtime, Continuation, Records, Receipts, Journal, Capsule, Pack, and Snapshot APIs. Never recreate legacy Plan phase files or legacy state writers.
-
-At each gate and completion, explain the actual artifact content in the conversation. Do not answer only with a `.pipeline/` path.
+能力较强的主模型只读取薄 Plan。只有委派 Worker 时才生成详细 Handoff；不要把 Worker 操作手册塞进所有 Plan。

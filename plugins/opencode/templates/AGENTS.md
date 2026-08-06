@@ -2,11 +2,21 @@
 
 This file is Hypo-Workflow managed. Edit the source Hypo-Workflow rules/config when possible, then regenerate adapters with `hypo-workflow sync --platform opencode`.
 
+## Planning conversation
+
+Repository exploration is evidence, not proof that the Agent understands the user. Before proposing Goal or Plan work, visibly present: Discover, with the complete requirement synthesis and the source of each conclusion; Technical, with current/proposed technology and reasons; and Architecture, with a Mermaid, ASCII, table, or TUI-equivalent diagram showing changed components and downstream effects for an existing project or target components and flows for a new project. These artifacts may be shown together and are not separate confirmation gates.
+
+Ask only about material unresolved decisions; never enforce a question or round quota. After the complete Proposal, offer one contextual choice: confirm and start, confirm without starting, or continue Discussion. A plain affirmative outside that final question is not execution authority.
+
+After rejection, discuss what is wrong, the current state, why the prior reasoning failed, changed assumptions, the correction, and affected Discover/Technical/Architecture deltas before presenting a revised Proposal.
+
+An explicit `/hw:accept`, `/hw:reject`, or unmistakable natural-language acceptance/rejection statement authorizes that action. Validate and report its Receipt binding without asking for a duplicate ordinary confirmation.
+
 ## Runtime contract
 
 - Hypo-Workflow is not a runner.
 - The OpenCode Agent performs the actual work.
-- `.pipeline/` remains the source of truth for state, Cycle, Patch, rules, PROGRESS, logs, prompts, and reports.
+- `.pipeline/manifest.yaml`, the selected Work Item Runtime/Continuation, and structured Records are the current authority. Legacy Cycle/Patch files remain migration inputs, not default session context.
 - Use `question` for required user decisions.
 - Use `todowrite` for visible plan discipline, especially in `/hw-plan*` commands.
 
@@ -16,20 +26,17 @@ When a Workflow writes a report, debug artifact, audit artifact, Patch record, C
 
 The final response must also explain the substance of the report in the conversation before or alongside artifact paths. Do not only list `.pipeline/...` files, worker closures, YAML validity, and test counts. For every important report or review artifact, summarize what it contains, the main conclusion, the user-facing interpretation, and what the user should understand or do next. For learning gates, quizzes, research reports, requirement briefs, or design reports, teach the key concepts and intended checkpoint outcome directly in chat; paths are supporting references, not the explanation.
 
-## Workflow state persistence
+## Hook-optional context and persistence
 
-When executing inside a Hypo-Workflow Cycle, maintain pipeline state throughout the session:
+Hooks are optimizations, not the source of correctness. At session start, after compaction, or when Workflow context is uncertain:
 
-- At session start or after compaction, read `.pipeline/state.yaml` to restore the current milestone/step context.
-- After every meaningful code or config change that advances a step, update:
-  - `.pipeline/state.yaml` — current step, heartbeat timestamp
-  - `.pipeline/log.yaml` — step_complete or milestone_complete event
-  - `.pipeline/PROGRESS.md` — timeline entry
-- When receiving revision feedback mid-step, update step status to `in_progress` before reworking.
-- If blocked, write `.pipeline/continuation.yaml` with `status: active` and `safe_resume_command: /hw:resume`.
-- Never silently drop out of Workflow mode — always record state before responding to non-Workflow requests.
+- Read `.pipeline/manifest.yaml` first.
+- Resolve the Session's Work Item through Work Placement when authority routing or resource claims require it. Use `.pipeline/runtime/active.yaml` only as a legacy fallback when no Placement registry exists.
+- An unbound Session may receive candidate reminders, but it must not block ordinary prompts, tools, diagnostics, or ordinary-file Experiment records.
+- When a Work Item is selected, read only its Runtime and Continuation, plus the latest valid Recovery Pack when resuming.
+- Do not scan all Records or use legacy `state.yaml`, `cycle.yaml`, `log.yaml`, or `PROGRESS.md` as authority.
 
-If you are unsure whether you are in a Workflow Cycle, run `/hw:status` first.
+The main Agent must notice explicit durable requirements, preferences, decisions, and feedback even without `UserPromptSubmit`. After explaining the fact in chat, persist it through Maintain without an extra execution gate. Do not record brainstorming, full transcripts, hidden reasoning, secrets, or transient diagnostics. Review staged Ambient Maintain Inbox items before treating them as authority.
 
 ## Protected files
 

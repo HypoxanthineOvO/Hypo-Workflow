@@ -1,58 +1,24 @@
 ---
 name: init
-description: Initialize or inspect a Hypo-Workflow workspace using the manifest-based format. Use for /hw:init when starting a repository, adopting an existing codebase, or checking whether legacy state can be adopted safely.
+description: 理解新项目或现有代码库，并初始化语义化 Hypo-Workflow 工作区。
 ---
 
-# Init Workspace Adoption
+# Init
 
 ## 输出语言规则
 
-用户可见内容遵循项目 `output.language`；缺失时跟随当前对话语言。Schema key、配置 key、命令和路径保持英文。
+用户可见内容跟随当前对话或项目语言；YAML key、命令、路径和必要专名保留英文。
 
-Init creates a recoverable bootstrap context, not a Goal or Plan. Init has no user-global configuration or setup prerequisite.
+Init 的目的不是创建 Goal 或 Plan，而是理解项目并建立可恢复的记录入口。
 
-Import `initializeWorkspace` from this installed bundle's `core/src/index.js` and pass the target project separately as `root`. Every mutation uses a unique safe final `{ id }` transaction option.
+1. 确认项目想实现什么；如果用户已经说清，不重复提问。
+2. 有边界地读取 README、入口文件、主要目录、构建与测试配置，区分用户陈述、仓库事实和模型推断。
+3. 判断项目是空目录、未管理的现有项目、当前格式、仅有旧格式，还是损坏的当前格式。
+4. 对空目录或未管理项目，使用语义模板创建项目索引、Cycle 索引、Memory 索引、Experiment 索引和默认忽略的本地 Discussion 目录。
+5. 对当前格式只报告状态，不重复初始化。
+6. 对旧格式只生成只读 Adoption Brief；未经 History Refresh 审阅，不迁移、不删除、不覆盖。
+7. 对损坏格式停止写入，说明具体缺失或冲突。
 
-## Input
+初始化结果应包含项目目的、已确认技术事实、重要边界、现有验证入口和仍不确定的内容。推断必须明确标记，不能伪装成确认事实。
 
-Use:
-
-```text
-initializeWorkspace(root, { intent?, project_id?, workspace_id? }, { id?, faultInjector? })
-```
-
-The ordinary form is `/hw:init <intended outcome>`. Treat trailing text as the intended project outcome.
-
-When no non-empty outcome is supplied, return the single `init_outcome` question and ask what the project should achieve. This branch is read-only. After the answer, summarize the understood outcome; that answer authorizes Init only, not a Goal, Plan, or implementation.
-
-## Workspace Classes
-
-| Classification | Behavior |
-| --- | --- |
-| `empty` | Initialize the manifest format transactionally from the supplied outcome. |
-| `unmanaged_brownfield` | Read bounded safe repository evidence, create an Adoption Brief, then initialize transactionally. |
-| `current` | Report `already_initialized` and make no write. |
-| `mixed_current_with_legacy_residue` | Report residue without rewriting either model. |
-| `legacy` | Run `inspectLegacyWorkspace` read-only; migration is a separate future action. |
-| `damaged_current` | Fail closed with concrete repair evidence. Never call a legacy writer. |
-
-## Successful Initialization
-
-A manifest-last transaction creates:
-
-- `.pipeline/manifest.yaml` with runtime, memory, and snapshot zones
-- a reference-only `runtime/active.yaml` pointer to a `bootstrap_job`
-- bootstrap Runtime and Continuation objects
-- `project_intent` and `adoption_brief` Markdown Records
-- derived machine and human Record indexes
-- a derived Context Capsule
-
-`initial_snapshot` is `null`. Init does not fabricate a Goal, Plan, legacy Cycle, Receipt, Journal event, Recovery Pack, accepted Snapshot, platform adapter, generic Rules store, or global configuration.
-
-For brownfield adoption, every fact records basis, confidence, and an existing repository-relative locator. Inference is never labeled confirmed. Preserve source bytes and mtimes.
-
-## Safety And Report
-
-Reject traversal, symlink evidence, secret-like values, raw credentials, and hidden reasoning before persistence. Errors must not echo rejected secrets. Preserve all repository files outside the staged `.pipeline` write set.
-
-Explain the workspace classification, project/workspace identity, bootstrap reference, and Adoption Brief facts and confidence in chat. Continue naturally into Discussion for the supplied outcome; do not insert Guide as a mandatory or default next step. Recommend `/hw:guide` only when the user is genuinely unsure what kind of work they want to do. For legacy or damaged workspaces, explain why no write occurred and what evidence or repair is needed.
+拒绝路径穿越、symlink 写入、原始凭据和隐藏推理。完成后自然进入当前目标的 Discussion；只有用户确实不知道下一步时才推荐 `/hw:guide`。

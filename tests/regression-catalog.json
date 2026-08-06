@@ -17,7 +17,7 @@
         {
           "path": "core/test/adaptive-plan.test.js",
           "classification": "maintained",
-          "reason": "Executable current C21 behavior or protection contract used by the maintained release gate.",
+          "reason": "Stable Delivery compiler schemas and context-scoped final Proposal authority; excludes prompt wording, question counts, and phase choreography.",
           "covers": [
             "C21-M6"
           ]
@@ -100,6 +100,22 @@
           "reason": "Executable current C21 behavior or protection contract used by the maintained release gate.",
           "covers": [
             "C21-M7"
+          ]
+        },
+        {
+          "path": "core/test/concurrent-work-host-integration.test.js",
+          "classification": "maintained",
+          "reason": "Session selection, legacy foreground isolation, and Host status projection contract for concurrent Work Items.",
+          "covers": [
+            "concurrent-work-placement-integration"
+          ]
+        },
+        {
+          "path": "core/test/concurrent-work-placement-contract.test.js",
+          "classification": "maintained",
+          "reason": "Repository Target, atomic Placement lease, Cryo-Computing concurrency, and integration gate contract.",
+          "covers": [
+            "concurrent-work-placement-integration"
           ]
         },
         {
@@ -321,6 +337,15 @@
           ]
         },
         {
+          "path": "core/test/history-refresh-preview.test.js",
+          "classification": "maintained",
+          "reason": "C22 History Refresh preview, explicit activation, conflict rollback, legacy preservation, and idempotence contract.",
+          "covers": [
+            "C22-M4",
+            "C22-M5"
+          ]
+        },
+        {
           "path": "core/test/init-bootstrap.test.js",
           "classification": "maintained",
           "reason": "Executable current C21 behavior or protection contract used by the maintained release gate.",
@@ -446,6 +471,30 @@
           "reason": "Executable current C21 behavior or protection contract used by the maintained release gate.",
           "covers": [
             "C21-M5"
+          ]
+        },
+        {
+          "path": "core/test/semantic-workflow-prompts.test.js",
+          "classification": "maintained",
+          "reason": "C22 Chinese-first Router, thin command adapters, and semantic Hook exposure contract.",
+          "covers": [
+            "C22-M2"
+          ]
+        },
+        {
+          "path": "core/test/semantic-workflow-runtime.test.js",
+          "classification": "maintained",
+          "reason": "C22 semantic Plan validation, Resume, Session focus, Discussion Ledger, and PreCompact contract.",
+          "covers": [
+            "C22-M3"
+          ]
+        },
+        {
+          "path": "core/test/semantic-workflow-templates.test.js",
+          "classification": "maintained",
+          "reason": "C22 semantic template and complete Plan/Progress projection contract.",
+          "covers": [
+            "C22-M1"
           ]
         },
         {
@@ -615,32 +664,6 @@
           ]
         },
         {
-          "path": "core/test/batch-plan.test.js",
-          "classification": "quarantined",
-          "reason": "Asserts a superseded standalone Plan phase or legacy planning artifact contract.",
-          "replacement": [
-            "core/test/adaptive-plan.test.js",
-            "core/test/deep-plan-architecture.test.js"
-          ]
-        },
-        {
-          "path": "core/test/c18-instruction-quality-contract.test.js",
-          "classification": "quarantined",
-          "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
-          "replacement": [
-            "core/test/adaptive-plan.test.js",
-            "core/test/c21-m8-surface-cleanup.test.js"
-          ]
-        },
-        {
-          "path": "core/test/c20-consultation-boundary.test.js",
-          "classification": "quarantined",
-          "reason": "Historical pre-C21 contract outside the maintained manifest-based Skill release boundary.",
-          "replacement": [
-            "core/test/c21-m8-surface-cleanup.test.js"
-          ]
-        },
-        {
           "path": "core/test/chat-hooks.test.js",
           "classification": "quarantined",
           "reason": "Exercises the legacy Chat state/log writer; C21 keeps Chat as internal Agent behavior without legacy authority writes.",
@@ -775,15 +798,6 @@
           ]
         },
         {
-          "path": "core/test/commands-rules-artifacts.test.js",
-          "classification": "quarantined",
-          "reason": "Exercises a removed Rules, Patch, Showcase, lease, or Watchdog product surface.",
-          "replacement": [
-            "core/test/record-store.test.js",
-            "core/test/c21-m8-surface-cleanup.test.js"
-          ]
-        },
-        {
           "path": "core/test/compact-end-of-run.test.js",
           "classification": "quarantined",
           "reason": "Exercises legacy compact, log, or progress authority files superseded by Journal, Capsule, Pack, Runtime, and Continuation.",
@@ -826,15 +840,6 @@
           "replacement": [
             "core/test/root-skill-router.test.js",
             "core/test/init-bootstrap.test.js"
-          ]
-        },
-        {
-          "path": "core/test/deep-plan-contract.test.js",
-          "classification": "quarantined",
-          "reason": "Mixes current Deep Plan intent with retired Child-Skill or platform integration assertions.",
-          "replacement": [
-            "core/test/adaptive-plan.test.js",
-            "core/test/deep-plan-package.test.js"
           ]
         },
         {
@@ -1293,15 +1298,6 @@
           "replacement": [
             "core/test/recovery-pack.test.js",
             "core/test/context-capsule.test.js"
-          ]
-        },
-        {
-          "path": "core/test/progressive-discover.test.js",
-          "classification": "quarantined",
-          "reason": "Asserts a superseded standalone Plan phase or legacy planning artifact contract.",
-          "replacement": [
-            "core/test/adaptive-plan.test.js",
-            "core/test/deep-plan-architecture.test.js"
           ]
         },
         {

@@ -671,10 +671,9 @@ test("Codex SubagentStart records and displays semantic routing without resolvin
     agent_type: "audit",
   }, { id: "m7-codex-routing-start", clock: () => FIXED_NOW });
   const context = output.hookSpecificOutput.additionalContext;
-  assert.match(context, /Task Assessment/i);
-  assert.match(context, /critical/);
-  assert.match(context, /worker-routing-v1/);
-  assert.match(context, /uncertainty[^\n]*high/i);
+  assert.match(context, /Worker 提醒/);
+  assert.match(context, /Handoff/);
+  assert.doesNotMatch(context, /Task Assessment|critical|worker-routing-v1|uncertainty/i);
 
   const replay = await CORE.createRecoveryStore({ clock: () => FIXED_NOW })
     .replayRecoveryJournal(root, { object_ref: OBJECT_REF });

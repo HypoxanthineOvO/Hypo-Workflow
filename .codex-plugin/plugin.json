@@ -1,7 +1,7 @@
 {
   "name": "hypo-workflow",
-  "version": "14.0.0-alpha.2+codex.20260723142011",
-  "description": "Discussion-first Goal, Plan, and Experiment workflows with manual Stones, adaptive Worker use, restart-safe recovery, and Receipt-controlled actions for Codex.",
+  "version": "15.0.0-alpha.1",
+  "description": "Semantic Cycle, Goal, Plan, Experiment, and Memory workflows with readable local records and restart-safe recovery for Codex.",
   "author": {
     "name": "Hypoxanthine",
     "url": "https://github.com/HypoxanthineOvO"
@@ -21,15 +21,16 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Hypo-Workflow",
-    "shortDescription": "Discussion-first Goal, Plan, and Experiment workflows for Codex.",
-    "longDescription": "Hypo-Workflow gives Codex a manifest-based project workspace with deep Discussion before delivery selection, autonomous zero-Stone Goals, Plans with explicit manual Stones, nonlinear Experiment management, adaptive Worker use, restart-safe recovery, and Receipt-backed control for high-impact operations.",
+    "shortDescription": "Readable semantic project workflows for Codex.",
+    "longDescription": "Hypo-Workflow gives Codex a semantic project workspace built from readable Cycle, Plan, Progress, Execution, Discussion, Experiment, and Memory files, with Goal and Plan delivery modes, bounded recovery, concurrent work placement, and narrow safety guardrails.",
     "developerName": "Hypoxanthine",
     "category": "Productivity",
     "capabilities": [
       "Ten focused workflow Skills",
-      "Official Codex lifecycle Hooks",
-      "Discussion-first Goal and Stone-based Plan delivery",
+      "Six semantic and safety lifecycle Hooks",
+      "Cycle-scoped Goal and Stone-based Plan delivery",
       "Reproducible Experiment management and instant status",
+      "Concurrent Work Placement and Repository Targets",
       "Semantic Worker Routing",
       "Project memory and recovery",
       "Controlled destructive operations"
@@ -37,8 +38,7 @@
     "defaultPrompt": [
       "Initialize this repository with Hypo-Workflow.",
       "Discuss this delivery thoroughly, then choose Goal or Plan by Stone count.",
-      "Set up and manage a reproducible experiment lane.",
-      "Resume the active Hypo-Workflow delivery."
+      "Set up and manage a reproducible experiment lane."
     ],
     "websiteURL": "https://github.com/HypoxanthineOvO/Hypo-Workflow"
   }

@@ -1,5 +1,62 @@
 # Changelog
 
+## v15.0.0-alpha.1 - 2026-08-06
+
+### Breaking Changes
+
+- `.pipeline/INDEX.md` 与普通语义文件成为新 workspace 的默认入口；manifest Runtime/Receipt/Recovery 只为尚未结束的旧 Delivery 保留兼容读取。
+- Codex plugin 从十事件 Hook 集合收敛为 SessionStart、UserPromptSubmit、PreToolUse、PermissionRequest、PreCompact、Stop 六类语义与安全 Hook。
+
+### Features
+
+- 新增可直接审阅的 Cycle、Plan、Progress、Execution、Discussion、Experiment、Memory 与 Handoff 模板及运行时辅助。
+- 新增幂等 History Refresh：当前仓库 20 个旧 Cycle 得到摘要和索引层，旧 archives、Manifest 与 live Delivery 原位保留。
+- Session 可通过 Work Placement 选择 Delivery/Experiment 并协调 repository、GPU、port、cache 与 output claim；未绑定 Session 不阻塞普通提示、工具或文件记录。
+- Experiment 默认使用普通 YAML protocol，旧 events 和 status projection 保留为可选兼容面。
+
+### Fixes
+
+- 辅助 Hook 失败时返回有界 warning；明确删除和真实资源冲突仍保持 fail-closed。
+- Root Core 重新导出 sync、TUI、maintenance、project-event 和 notification API，修复 CLI 只读检查的缺失 export。
+- Goal/Plan Discussion 一次展示 Discover、Technical 与 Architecture，只在真实决策和最终 Proposal 处询问。
+
+### Tests
+
+- Hypo-Workflow maintained 回归 704/704 通过，History Refresh 场景 7/7 通过，20/20 历史 Plan/Progress 对齐。
+- VSP-Codex Host Contract、semantic/legacy routing 与 TUI command routing 合计 25/25 通过。
+
+## v14.0.0-alpha.5 - 2026-07-29
+
+### Fixes
+
+- Codex plugin 与 portable bundle 现在携带锁文件约束的 `js-yaml` 和 `argparse` 运行时依赖，解压后无需额外执行 `npm install` 即可运行 Hook。
+- `accepted` 或 `rejected` Delivery 没有 Context Capsule 时，`PreCompact` 与 `PostCompact` 安全返回成功，不再把终态对象当作恢复损坏。
+- 发布验证新增从 ZIP 解压后直接加载 serialization 模块的真实进程测试，避免只验证插件登记成功却未执行 Hook。
+
+### Upgrade
+
+- 更新插件时必须保留仍被存量 Session 引用的旧 cache；新版只对新 Session 生效，确认旧 Session 结束后才能清理旧版本。
+
+## v14.0.0-alpha.4 - 2026-07-29
+
+### Features
+
+- 同一 Project 可同时维护多个 Goal、Plan、兼容 Cycle 与 Experiment；每个 Session 必须显式选择一个 Work Item。
+- 新增 Repository Target 与 Work Placement registry，在启动前原子判定共享 checkout、独立 worktree、资源隔离或阻断，并以 lease/fencing 防止并发资源争用。
+- 源码变更必须通过绑定 registered checkout、branch ref、target HEAD 与 ancestry 的 integration evidence 后才能进入最终验收。
+
+### Fixes
+
+- 合入 v14.0.0-alpha.3 的 Codex Hook reminder 并发修复，并让 Host projection 的并发收尾兼容新增 Work Item/Session 字段。
+- 过期 Placement 不再让 Session 管理操作死锁；Experiment compact 在没有 Delivery Recovery Capsule 时安全降级。
+
+## v14.0.0-alpha.3 - 2026-07-19
+
+### Fixes
+
+- Codex `PostToolUse` 不再追加 `tool.completed` Recovery Journal 事件，也不再 replay Journal 做 reminder 去重。
+- 相同 reminder 改由 workspace runtime 中的 digest marker 原子去重，`Stop`、compact 和 Subagent writer 语义保持不变。
+
 ## v14.0.0-alpha.2 - 2026-07-18
 
 ### Features

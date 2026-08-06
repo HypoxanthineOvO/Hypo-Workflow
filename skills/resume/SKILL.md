@@ -1,31 +1,24 @@
 ---
 name: hypo-workflow-resume
-description: Resume the active manifest-based Hypo-Workflow Delivery from Runtime, Continuation, and the latest valid Recovery Pack. Use for /hw:resume or when tracked Goal/Plan work must continue after restart or compaction.
+description: 从项目索引、当前 Cycle、完整 Progress、最近 Execution 和 Discussion Summary 恢复工作。
 ---
 
 # Resume
 
 ## 输出语言规则
 
-用户可见内容遵循项目输出语言；缺失时跟随当前对话语言。内部 schema key 保持英文。
+用户可见内容跟随当前对话或项目语言；YAML key、命令、路径和必要专名保留英文。
 
-1. Read the reference-only `.pipeline/runtime/active.yaml` and select only `active.delivery`.
-2. Load that object's Runtime and Continuation.
-3. Validate and select its latest Recovery Pack. The Pack supplies bounded context only; Runtime remains lifecycle authority.
-4. If no Pack exists yet, still resume authoritative Runtime/Continuation and report `pack_status: missing`, `pack_ref: null`, and degraded context. Do not block first-use projects merely because no compaction/checkpoint Pack has been sealed.
-5. If Pack Continuation matches current Continuation, report `current`; otherwise report `stale` and replay bounded Journal context without replacing lifecycle state.
-6. Continue the exact `next_action`. Do not replay completed transitions or accept an arbitrary inactive object.
+1. 读取项目与 Cycle 索引，确定当前 Session 聚焦的 Cycle。
+2. 如果有多个可继续 Cycle 而 Session 未聚焦，展示名称、目的、状态、当前位置和下一步，让用户选择一个；不要静默选择最近项。
+3. 如果选中的是 Experiment，转入 `/hw:experiment` 并读取该实验文件。
+4. 读取当前 Cycle 的 `PLAN.md`、`PROGRESS.md`、最近 `EXECUTION.md`、`DISCUSSION-SUMMARY.md`，以及下一步真正需要的 Memory 或 Experiment。
+5. 检查 Plan 与 Progress 的全部 ID 是否一致，`current` 是否存在，最近 Execution 是否支持当前状态。
+6. 在聊天中说明：正在恢复哪个 Cycle、完整计划进度、上次完成内容、当前阻塞和下一步。
+7. 从 `next` 对应的计划项继续，不重放已完成动作。
 
-`await_stone_acceptance` is a real stop: show the Stone's concrete artifact, review scope, and acceptance criteria before asking. All other verified ordinary Milestones continue automatically. `request_explicit_start` occurs only after the user explicitly chose confirm-without-start; ordinary proposal confirmation should already have used `delivery.approve_and_start`.
+`waiting-review` 是真实停止点：展示对应 Stone 的产物、审阅范围、接受标准和核心报告。普通已验证 Milestone 自动继续。
 
-If Runtime or Continuation contains `worker_routing`, validate and reuse that exact semantic decision, Task Assessment, reason codes, failure count, and policy version. Recovery Capsule Worker projections may restore the same bounded fields, but they never override newer Continuation. Do not reclassify on Resume, and do not let routing metadata change role identity, evidence, acceptance, or user authority.
+旧格式工作区可以读取最小必要的恢复信息，但不得写回旧 `state.yaml`、`cycle.yaml`、`log.yaml` 或覆盖旧历史。缺少本地 Discussion 原文时使用 Git 中的 Discussion Summary，并明确说明证据范围。
 
-Use `createDeliveryStore({ clock }).resume(root, {})`. Never shell-execute a saved command and never read legacy state as fallback in a current workspace.
-
-Import `createDeliveryStore` from the installed Skill bundle's `core/src/index.js`; pass the target workspace separately as `root` and use a zero-argument timezone-bearing Clock. Resume itself is read-only and takes no transaction `{ id }`.
-
-The target workspace root and installed Skill bundle root are separate. `repoRoot` identifies the project whose `.pipeline/` is resumed; backend routing uses explicit `skillRoot` or the installed bundle default, never the target repository as a Skill directory.
-
-For worker-separated work, preserve requested -> started -> completed|failed|blocked -> closed|close_failed evidence and distinct identities. When `/hw:resume` stops, blocks, aborts, or completes, close/release workers it opened or record `close_failed`; incomplete lifecycle evidence blocks worker-separated completion.
-
-When a resumed Worker needs a different semantic handoff, start it with no-history or bounded-history context. A full-history fork inherits its parent execution context and cannot be silently switched.
+如果恢复的 Cycle 拥有隔离 worktree 或资源，继续使用原有工作位置和集成目标；不能确认时先停止源码写入并解释冲突。

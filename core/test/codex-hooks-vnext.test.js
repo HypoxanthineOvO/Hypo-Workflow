@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { rm } from "node:fs/promises";
 import { join } from "node:path";
 import * as api from "../src/index.js";
 import {
@@ -68,24 +69,45 @@ test("output validator enforces current event-specific restrictions", () => {
   }
 });
 
-test("PreToolUse is only a guardrail and write-capable events require a unique operation id", async (t) => {
+test("read-only context hooks need no operation id and write-capable events do", async (t) => {
   const root = await temporaryGitWorkspace(t, "hw-m7-hooks-ids-");
   requireHookApi();
-  for (const event of ["SessionStart", "PreToolUse", "PermissionRequest"]) {
+  for (const event of ["SessionStart", "UserPromptSubmit", "PreToolUse", "PermissionRequest"]) {
     const output = await api.evaluateCodexHookEvent(root, await officialHookCase(root, event));
     api.validateCodexHookOutput(event, output);
   }
   const preTool = await api.evaluateCodexHookEvent(root, await officialHookCase(root, "PreToolUse"));
   assert.equal(preTool.hookSpecificOutput.permissionDecision, "deny");
-  assert.match(preTool.hookSpecificOutput.permissionDecisionReason, /receipt|controlled|delete|destructive/i);
+  assert.match(preTool.hookSpecificOutput.permissionDecisionReason, /删除|受控|安全保护/);
 
-  for (const event of OFFICIAL_EVENTS.filter((name) => !["SessionStart", "PreToolUse", "PermissionRequest"].includes(name))) {
+  for (const event of OFFICIAL_EVENTS.filter((name) => !["SessionStart", "UserPromptSubmit", "PreToolUse", "PermissionRequest"].includes(name))) {
     await assert.rejects(
       () => api.evaluateCodexHookEvent(root, officialHookCaseSyncPlaceholder(event, root)),
       /operation|transaction|unique|id/i,
       `${event} must not persist without an operation id`,
     );
   }
+});
+
+test("ordinary SessionStart hides internal state and prompt hooks leave semantics to the Agent", async (t) => {
+  const root = await temporaryGitWorkspace(t, "hw-m7-hooks-context-");
+  requireHookApi();
+  await seedActiveRecovery(root, "m7-context");
+
+  const startup = {
+    ...await officialHookCase(root, "SessionStart"),
+    source: "startup",
+  };
+  const restored = await api.evaluateCodexHookEvent(root, startup);
+  assert.match(restored.hookSpecificOutput.additionalContext, /PLAN\.md/);
+  assert.match(restored.hookSpecificOutput.additionalContext, /PROGRESS\.md/);
+  assert.doesNotMatch(restored.hookSpecificOutput.additionalContext, /Runtime|Continuation|object_ref/i);
+  assert.ok(Buffer.byteLength(restored.hookSpecificOutput.additionalContext) < 16_384);
+
+  const prompt = await api.evaluateCodexHookEvent(root, await officialHookCase(root, "UserPromptSubmit"));
+  assert.match(prompt.hookSpecificOutput.additionalContext, /主模型自行判断/);
+  assert.match(prompt.hookSpecificOutput.additionalContext, /Discussion Ledger/);
+  assert.equal(await exists(join(root, ".pipeline/memory/inbox")), false);
 });
 
 test("compact hooks seal a valid Pack, record the outcome, and restore bounded context", async (t) => {
@@ -113,6 +135,29 @@ test("compact hooks seal a valid Pack, record the outcome, and restore bounded c
   assert.doesNotMatch(context, /full transcript|raw_journal|transcript_path/i);
 });
 
+test("compact hooks ignore terminal Delivery objects without a Context Capsule", async (t) => {
+  const root = await temporaryGitWorkspace(t, "hw-m7-hooks-terminal-");
+  const authorities = await seedActiveRecovery(root, "m7-terminal-compact");
+  await api.writeRuntimeObject(root, {
+    object_ref: OBJECT_REF,
+    runtime: {
+      ...authorities.authorities.runtimeInput.runtime,
+      status: "accepted",
+      phase: "accepted",
+    },
+    continuation: authorities.authorities.runtimeInput.continuation,
+  }, { id: "m7-terminal-compact-runtime" });
+  await rm(join(root, ".pipeline/memory/capsules/delivery/goal-alpha.yaml"));
+
+  for (const event of ["PreCompact", "PostCompact"]) {
+    const output = await api.evaluateCodexHookEvent(root, await officialHookCase(root, event), {
+      id: `m7-terminal-${event.toLowerCase()}`,
+      clock: () => FIXED_NOW,
+    });
+    assert.deepEqual(output, { continue: true });
+  }
+});
+
 test("Subagent streams remain distinct and repeated documentation/Record reminders deduplicate", async (t) => {
   const root = await temporaryGitWorkspace(t, "hw-m7-hooks-workers-");
   requireHookApi();
@@ -138,7 +183,7 @@ test("Subagent streams remain distinct and repeated documentation/Record reminde
   const post = await officialHookCase(root, "PostToolUse");
   const first = await api.evaluateCodexHookEvent(root, post, { id: "m7-reminder-first" });
   const second = await api.evaluateCodexHookEvent(root, post, { id: "m7-reminder-repeat" });
-  assert.match(first.systemMessage, /document|Record/i);
+  assert.match(first.systemMessage, /文档|Progress|项目事实/);
   assert.equal(second.systemMessage, undefined, "identical semantic change must not repeat its reminder");
   assert.equal(await exists(join(root, ".pipeline/chat/journal.yaml")), false);
   assert.equal(await exists(join(root, ".pipeline/inbox/items.yaml")), false);

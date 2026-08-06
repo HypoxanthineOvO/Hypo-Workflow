@@ -29,9 +29,8 @@
 
 | 字段 | 作用 | 常见策略 |
 |---|---|---|
-| `plan.mode` | `interactive` 会进行 Discover / Technical Stack / Architecture / Decompose / Generate gate；`auto` 只在配置允许时自动总结通过 | 用户参与规划时用 `interactive` |
-| `plan.interaction_depth` | `low`/`medium`/`high` 控制 Discover 最少追问轮数 | 复杂 Cycle 用 `high` |
-| `plan.interactive.require_explicit_confirm` | 是否要求明确 Generate final confirmation | 团队或高风险项目设为 `true` |
+| `plan.mode` | `interactive` 展示 Discover / Technical / Architecture artifact 并仅在真实决策处提问；`auto` 只在用户明确委托时连续规划 | 用户参与规划时用 `interactive` |
+| `plan.interactive.require_explicit_confirm` | 是否在完整 Proposal 后提供一次确认并开始 / 确认但不开始 / 继续讨论选择 | 团队或高风险项目设为 `true` |
 | `execution.mode` | `self`、subagent 或 host-specific execution mode | Codex 默认主 Agent 编排，必要时使用 Subagents |
 | `execution.worker_separation.mode` | `off` / `recommended` / `strict` | `recommended` 尽量分离 implement/test/audit；`strict` 不接受降级为 fully accepted |
 | `execution.worker_routing.mode` | `off` / `advisory` / `required` | topology 确定后传递语义能力档；默认 `advisory` |

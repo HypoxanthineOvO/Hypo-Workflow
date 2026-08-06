@@ -51,11 +51,11 @@ try {
     input: "{invalid json\n",
     env: { ...process.env, PLUGIN_ROOT: pluginRoot },
   });
-  assert.notEqual(invalid.status, 0);
-  assert.equal(invalid.stdout, "");
+  assert.equal(invalid.status, 0);
+  assert.deepEqual(JSON.parse(invalid.stdout), {});
   assert.match(invalid.stderr, /invalid|json|parse/i);
 
-  process.stdout.write("Codex Hook synthetic/process smoke: PASS (10 schemas, valid and invalid wrapper paths)\n");
+  process.stdout.write("Codex Hook synthetic/process smoke: PASS (10 schemas and fail-open wrapper path)\n");
 } finally {
   await rm(root, { recursive: true, force: true });
 }

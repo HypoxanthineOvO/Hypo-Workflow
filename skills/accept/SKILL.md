@@ -1,18 +1,20 @@
 ---
 name: accept
-description: Accept the active Goal, Plan, or legacy Cycle at its final pending acceptance gate. Use for /hw:accept or an explicit user acceptance statement.
+description: 接受当前 waiting-review Stone 或 Cycle 最终结果，并更新人类可读记录。
 ---
 
-# Accept Delivery
+# Accept
 
 ## 输出语言规则
 
-用户可见内容遵循项目输出语言；缺失时跟随当前对话语言。内部 schema key 保持英文。
+用户可见内容跟随当前对话或项目语言；YAML key、命令、路径和必要专名保留英文。
 
-Require the active Delivery to be `pending_acceptance`. Build the exact `delivery.accept` Receipt context from current Runtime, issue the user-scoped Receipt through the host decision gate, then call `store.accept`.
+明确的 `/hw:accept` 或无歧义的自然语言接受已经构成授权，不要重复询问。
 
-Import Core from the installed bundle, pass the target workspace as `root`, and create Delivery/Receipt stores with the same explicit zero-argument Clock. Show the complete Receipt binding first; only after explicit user confirmation issue it, then call `accept` with a unique safe mutation `{ id }`.
+1. 确认当前 Cycle、待接受计划 ID、真实产物、验证结果和接受范围与用户表达一致。
+2. 如果目标或范围已经变化，停止并说明差异；不要把接受套到另一个 Stone 或 Cycle。
+3. 将对应 Progress 行从 `waiting-review` 改为 `completed`，更新 `current` 和下一步。
+4. 向 Execution 追加接受 checkpoint，并在 Discussion Summary 记录用户接受了什么。
+5. Stone 接受后继续下一个普通计划项；最终结果接受后关闭 Cycle 并完成 Summary。
 
-Reject stale plan, state, scope, actor, object, or reused Receipt bindings. Acceptance changes only final Delivery state to `accepted`; Plan Stones have already been accepted at their scoped intermediate gates, while ordinary Milestones remain verification-only.
-
-Explain the delivered result, verification evidence, remaining risks, and acceptance effect directly in chat.
+在聊天中说明接受的实际结果、验证证据、剩余风险和接下来发生什么。不要只报告状态值或文件路径。

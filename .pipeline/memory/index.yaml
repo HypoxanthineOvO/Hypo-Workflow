@@ -5,6 +5,8 @@ active_by_dedupe_key:
   cycle.c23-experiment-management.plan: decision-861cb23500113ed79b04c1b99f29ee2e
   cycle.vspi-symbiotic-workflow-core.plan: decision-7abb9842e8e446a8968aab7e3bd8f366
   delivery:vspi-symbiotic-workflow-core:replace-plan-with-goal: feedback-2127b84c8d5667c43f93f06baa8c128a
+  goal.concurrent-work-placement-integration.plan: decision-e38266eeaa70b684754457d9d94a7cb4
+  goal.experiment-protocol-hooks-simplification.plan: decision-7522350fd2ff83aefca8abe125106027
   goal.g22-vsp-distribution-contract.plan: decision-b00efe9e0c4f436329957788887099e8
   goal.vspi-symbiotic-workflow-goal.plan: decision-a2d4390ad9175886f5dbce69a7ce14d9
   hypo-workflow:externalizable-domain-pack-boundary: decision-14ad4beb08b5947edf194f9ced4945e2
@@ -30,14 +32,23 @@ active_by_dedupe_key:
   project:execution:risk-based-worker-separation: requirement-4867abfc7866a9f8d11677e284c4375b
   project:hypo-workflow:decision:audit-quality-optimize-separation: decision-f94caf102e67e22abc3ed3b57d439e41
   project:hypo-workflow:decision:audit-source-id-closure-matrix: decision-4dcaf78c96a385a98a3228e44da69747
+  project:hypo-workflow:decision:discussion-ledger-storage: decision-cafe4ac041fd304d67b3ca2f30846c61
   project:hypo-workflow:decision:integration-sync-internal-release-gate: decision-7a63d8b82a42e5fbae1f8462542de1da
+  project:hypo-workflow:decision:minimal-model-facing-api: decision-1f7e3053d8cb524eb82f5767729de8fe
   project:hypo-workflow:decision:platform-neutral-readme: decision-eb18f86042fcffc6b3c94ef1e2684424
   project:hypo-workflow:decision:portable-core-boundaries: decision-31ef001746bad4f75cc16f906df033b6
   project:hypo-workflow:decision:source-managed-target-owned-boundary: decision-7417f3deb203b117c5aaef25684c8533
   project:hypo-workflow:explore-worktree-isolation-and-dirty-gate: decision-392888aac1a55531a870a4f2040a48f9
   project:hypo-workflow:feedback:c17-unresolved-architecture-quality-followups: feedback-9218e742beeacbd8adb9c2b0dccc645f
   project:hypo-workflow:feedback:c20-target-local-continuations: feedback-c763ea6f517ad7059284d02910992828
+  project:hypo-workflow:requirement:concurrent-cycle-semantics: requirement-435705add0ce2146eb6606977c1a3474
   project:hypo-workflow:requirement:consultation-first-action-boundary: requirement-c364ecf8e0d7b70a766ea730613f256b
+  project:hypo-workflow:requirement:cycle-archive-boundary-and-carry-forward: requirement-9e85ffcb9852a0271e71c8167cc8c07a
+  project:hypo-workflow:requirement:cycle-experiment-maintain-role-separation: requirement-0622573e7c8363808c2a241ce7659c95
+  project:hypo-workflow:requirement:human-readable-execution-records: requirement-03219cf1489b538bfb1f16efb2aab245
+  project:hypo-workflow:requirement:model-tiered-plan-and-progress: requirement-d05a9d83934ed8ea84a5adc6664808da
+  project:hypo-workflow:requirement:semantic-first-recording-and-progress: requirement-8343e82c13849f464f84a7c4b452649c
+  project:hypo-workflow:requirement:semantic-index-and-history-refresh: requirement-9f3deb08ca6dde37fac5a1607e55d3c9
   project:lifecycle:transaction-and-derived-coherence: decision-795ced1ac2116be9b101b6abea1eb41f
   project:maintain:path-helper-workspace-revalidation: feedback-fc067d08fc454424981f2aa58aa0888d
   project:recovery:journal-capsule-pack-authority: decision-2781e42f50ffefa833b55042b3a799ee
@@ -124,6 +135,24 @@ records:
         type: legacy_file
     supersedes: []
     updated_at: 2026-07-12T07:09:58+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-08-05T13:13:32.287Z
+    dedupe_key: project:hypo-workflow:decision:minimal-model-facing-api
+    id: decision-1f7e3053d8cb524eb82f5767729de8fe
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-1f7e3053d8cb524eb82f5767729de8fe.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 1f7e3053d8cb524eb82f5767729de8fe9c1a95f89c94cb8bdc8ec7537a3edf52
+    source_refs:
+      - locator: user-selected Markdown and YAML templates instead of model-facing write APIs
+        ref: conversation/template-first-recording-2026-08-05
+        type: user_turn
+    supersedes:
+      - decision-f9aca98c5a8cdd4bac459a87dc6fe9e9
+    updated_at: 2026-08-05T13:13:32.287Z
   - active: true
     confidence: high
     created_at: 2026-07-11T20:49:59+08:00
@@ -420,6 +449,23 @@ records:
         type: legacy_file
     supersedes: []
     updated_at: 2026-07-12T07:08:38+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-08-03T10:49:11.049Z
+    dedupe_key: goal.experiment-protocol-hooks-simplification.plan
+    id: decision-7522350fd2ff83aefca8abe125106027
+    kind: decision
+    path: .pipeline/memory/records/goal-bc024ed45fd7/decision/decision-7522350fd2ff83aefca8abe125106027.md
+    scope:
+      ref: experiment-protocol-hooks-simplification
+      type: goal
+    semantic_hash: 7522350fd2ff83aefca8abe125106027bcc310a1c78fe91c1008724d71bcd1ab
+    source_refs:
+      - locator: compiled-plan
+        ref: goal:experiment-protocol-hooks-simplification:revision:0
+        type: delivery_plan
+    supersedes: []
+    updated_at: 2026-08-03T10:49:11.049Z
   - active: true
     confidence: high
     created_at: 2026-07-12T00:21:05+08:00
@@ -750,6 +796,23 @@ records:
     supersedes: []
     updated_at: 2026-07-12T08:15:40+08:00
   - active: true
+    confidence: confirmed
+    created_at: 2026-08-05T13:18:27.498Z
+    dedupe_key: project:hypo-workflow:decision:discussion-ledger-storage
+    id: decision-cafe4ac041fd304d67b3ca2f30846c61
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-cafe4ac041fd304d67b3ca2f30846c61.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: cafe4ac041fd304d67b3ca2f30846c61b75a10eb23db8033541139b20f472b41
+    source_refs:
+      - locator: user-selected local verbatim ledger with Git-tracked summary
+        ref: conversation/discussion-ledger-storage-2026-08-05
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-08-05T13:18:27.498Z
+  - active: true
     confidence: high
     created_at: 2026-07-11T20:09:41+08:00
     dedupe_key: project:stash:implementation-model
@@ -807,6 +870,23 @@ records:
         type: workflow_artifact
     supersedes: []
     updated_at: 2026-07-12T11:56:42+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-07-29T04:37:28.974Z
+    dedupe_key: goal.concurrent-work-placement-integration.plan
+    id: decision-e38266eeaa70b684754457d9d94a7cb4
+    kind: decision
+    path: .pipeline/memory/records/goal-4c9faecf3585/decision/decision-e38266eeaa70b684754457d9d94a7cb4.md
+    scope:
+      ref: concurrent-work-placement-integration
+      type: goal
+    semantic_hash: e38266eeaa70b684754457d9d94a7cb4e526fa730c3d2965bbfd767d8270e706
+    source_refs:
+      - locator: compiled-plan
+        ref: goal:concurrent-work-placement-integration:revision:0
+        type: delivery_plan
+    supersedes: []
+    updated_at: 2026-07-29T04:37:28.974Z
   - active: true
     confidence: 0.88
     created_at: 2026-07-12T07:08:38+08:00
@@ -884,6 +964,23 @@ records:
         type: legacy_file
     supersedes: []
     updated_at: 2026-07-12T07:08:38+08:00
+  - active: false
+    confidence: confirmed
+    created_at: 2026-08-05T13:13:10.409Z
+    dedupe_key: project:hypo-workflow:decision:minimal-model-facing-api
+    id: decision-f9aca98c5a8cdd4bac459a87dc6fe9e9
+    kind: decision
+    path: .pipeline/memory/records/project-d604d20eae74/decision/decision-f9aca98c5a8cdd4bac459a87dc6fe9e9.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: f9aca98c5a8cdd4bac459a87dc6fe9e9aa9920cd996a85d06e8c6f0e13534ea1
+    source_refs:
+      - locator: user-selected files-only Experiment records
+        ref: conversation/minimal-model-facing-api-2026-08-05
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-08-05T13:13:10.409Z
   - active: true
     confidence: high
     created_at: 2026-05-21T01:30:00+08:00
@@ -1065,6 +1162,40 @@ records:
     supersedes: []
     updated_at: 2026-07-12T08:15:40+08:00
   - active: true
+    confidence: confirmed
+    created_at: 2026-08-05T13:00:14.516Z
+    dedupe_key: project:hypo-workflow:requirement:human-readable-execution-records
+    id: requirement-03219cf1489b538bfb1f16efb2aab245
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-03219cf1489b538bfb1f16efb2aab245.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 03219cf1489b538bfb1f16efb2aab245f89df5294d3531114839454f599897cd
+    source_refs:
+      - locator: user-confirmed importance and readability of execution records
+        ref: conversation/human-readable-execution-records-2026-08-05
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-08-05T13:00:14.516Z
+  - active: true
+    confidence: confirmed
+    created_at: 2026-08-05T13:08:12.374Z
+    dedupe_key: project:hypo-workflow:requirement:cycle-experiment-maintain-role-separation
+    id: requirement-0622573e7c8363808c2a241ce7659c95
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-0622573e7c8363808c2a241ce7659c95.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 0622573e7c8363808c2a241ce7659c95ef476636d8d5638caf58a32ea5094ca2
+    source_refs:
+      - locator: user-confirmed object responsibility model
+        ref: conversation/cycle-experiment-maintain-separation-2026-08-05
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-08-05T13:08:12.374Z
+  - active: true
     confidence: high
     created_at: 2026-07-11T20:49:59+08:00
     dedupe_key: project:c21:m7-maintain-codex-hook-route
@@ -1178,6 +1309,23 @@ records:
         type: legacy_file
     supersedes: []
     updated_at: 2026-07-12T08:15:40+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-08-05T13:03:43.472Z
+    dedupe_key: project:hypo-workflow:requirement:concurrent-cycle-semantics
+    id: requirement-435705add0ce2146eb6606977c1a3474
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-435705add0ce2146eb6606977c1a3474.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 435705add0ce2146eb6606977c1a34745e01bda59057c1ab5c8a24f59adf32e8
+    source_refs:
+      - locator: user-confirmed parallel Cycle use case
+        ref: conversation/concurrent-cycles-2026-08-05
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-08-05T13:03:43.472Z
   - active: true
     confidence: high
     created_at: 2026-07-11T20:24:08+08:00
@@ -1336,6 +1484,57 @@ records:
     supersedes: []
     updated_at: 2026-07-12T08:15:40+08:00
   - active: true
+    confidence: confirmed
+    created_at: 2026-08-05T12:54:28.481Z
+    dedupe_key: project:hypo-workflow:requirement:semantic-first-recording-and-progress
+    id: requirement-8343e82c13849f464f84a7c4b452649c
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-8343e82c13849f464f84a7c4b452649c.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 8343e82c13849f464f84a7c4b452649c155f6a91d19e5fc5dff5c86dba828506
+    source_refs:
+      - locator: user-confirmed command purposes and workflow responsibility
+        ref: conversation/prompt-cleanup-semantics-2026-08-05
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-08-05T12:54:28.481Z
+  - active: true
+    confidence: confirmed
+    created_at: 2026-08-05T13:02:36.977Z
+    dedupe_key: project:hypo-workflow:requirement:cycle-archive-boundary-and-carry-forward
+    id: requirement-9e85ffcb9852a0271e71c8167cc8c07a
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-9e85ffcb9852a0271e71c8167cc8c07a.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 9e85ffcb9852a0271e71c8167cc8c07ae42ffa9e995954d35527493c0b423724
+    source_refs:
+      - locator: user-confirmed Cycle motivation and archive continuity requirement
+        ref: conversation/cycle-archive-boundary-2026-08-05
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-08-05T13:02:36.977Z
+  - active: true
+    confidence: confirmed
+    created_at: 2026-08-05T13:08:12.374Z
+    dedupe_key: project:hypo-workflow:requirement:semantic-index-and-history-refresh
+    id: requirement-9f3deb08ca6dde37fac5a1607e55d3c9
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-9f3deb08ca6dde37fac5a1607e55d3c9.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 9f3deb08ca6dde37fac5a1607e55d3c9dee852cfb9cffb8902c49ab45bcc305e
+    source_refs:
+      - locator: user-confirmed semantic naming and one-time model-assisted history refresh
+        ref: conversation/semantic-index-history-refresh-2026-08-05
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-08-05T13:08:12.374Z
+  - active: true
     confidence: high
     created_at: 2026-07-11T20:39:36+08:00
     dedupe_key: project:c21:m8-cleanup-deletion-gate-route
@@ -1381,6 +1580,23 @@ records:
         type: legacy_file
     supersedes: []
     updated_at: 2026-07-12T07:08:38+08:00
+  - active: true
+    confidence: confirmed
+    created_at: 2026-08-05T12:58:12.830Z
+    dedupe_key: project:hypo-workflow:requirement:model-tiered-plan-and-progress
+    id: requirement-d05a9d83934ed8ea84a5adc6664808da
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-d05a9d83934ed8ea84a5adc6664808da.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: d05a9d83934ed8ea84a5adc6664808dab4fbd4fc6383447a8670c295b0c1bfd0
+    source_refs:
+      - locator: user-confirmed minimal Plan contract and detailed worker handoff
+        ref: conversation/model-tiered-plan-and-progress-2026-08-05
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-08-05T12:58:12.830Z
   - active: true
     confidence: 0.99
     created_at: 2026-07-12T07:07:51+08:00
