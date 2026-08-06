@@ -8,7 +8,7 @@ status: active
 
 ## 当前工作
 
-- [Cycle 索引](cycles/INDEX.md)：C22 active，20 个历史 Cycle closed。
+- [Cycle 索引](cycles/INDEX.md)：无 active Cycle，21 个 Cycle closed。
 - [Experiment 索引](experiments/INDEX.md)。
 - [Memory History 索引](memory/HISTORY-REFRESH-INDEX.md)。
 - [Legacy 索引](legacy/INDEX.md)：旧 archives、Knowledge、Chats、Patches、PR 和 live Delivery。
