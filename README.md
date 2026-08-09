@@ -40,7 +40,7 @@ INDEX.md
 - **Worker Routing** 在 Worker 启动前显示任务评估并输出语义能力档，不选择具体模型或 Provider。
 - **Legacy compatibility** 保留 manifest Runtime、Receipt 和 Recovery 读取能力，用于尚未结束的旧 Delivery；它们不覆盖语义 Cycle。
 - 旧 archives、Manifest 与 live Delivery 原位保留，History Refresh 只增加摘要和索引层。
-- 跨项目 History Refresh 从目标工作区派生项目身份和实际 Cycle 数；根部旧格式 Cycle 只进入 Legacy 索引，不会被自动关闭或接受。
+- 跨项目 History Refresh 从目标工作区派生项目身份和实际 Cycle 数；根部旧格式 Cycle 只进入 Legacy 索引，不会被自动关闭或接受；缺少 current manifest 时在激活末尾创建，已有有效 manifest 保持原字节。
 
 ## 安装
 

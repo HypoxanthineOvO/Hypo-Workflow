@@ -10,6 +10,7 @@ import {
   treeDigest,
   writeHistoryRefreshPreview,
 } from "../src/history-refresh/index.js";
+import { detectWorkspaceFormat } from "../src/workspace-format/index.js";
 
 test("History Refresh builds deterministic semantic previews from mixed legacy quality", async (t) => {
   const root = await historyFixture(t);
@@ -86,6 +87,13 @@ test("History Refresh derives target workspace identity and preserves a root leg
   assert.equal(written.output, ".pipeline/history-refresh/preview");
   const activated = await activateHistoryRefresh(root, { approved: true });
   assert.equal(activated.marker, ".pipeline/history-refresh/activation.md");
+  assert.equal(activated.manifest_changed, true);
+  const manifest = parseYaml(await readFile(join(root, ".pipeline/manifest.yaml"), "utf8"));
+  assert.equal(manifest.project_id, "sample-product");
+  assert.equal(manifest.format, "hypo-workflow");
+  assert.equal((await detectWorkspaceFormat(root)).kind, "mixed_current_with_legacy_residue");
+  const repeated = await activateHistoryRefresh(root, { approved: true });
+  assert.equal(repeated.status, "unchanged");
   assert.match(await readFile(join(root, ".pipeline/INDEX.md"), "utf8"), /name: sample-product/);
   assert.doesNotMatch(await readFile(join(root, ".pipeline/INDEX.md"), "utf8"), /C22 active/);
   assert.match(await readFile(join(root, ".pipeline/cycles/INDEX.md"), "utf8"), /C008-next/);
@@ -96,7 +104,7 @@ test("History Refresh derives target workspace identity and preserves a root leg
 test("History Refresh prefers the manifest project id over clone-local directory names", async (t) => {
   const root = await historyFixture(t);
   await writeText(join(root, "package.json"), '{"name":"clone-local-name"}\n');
-  await writeText(join(root, ".pipeline/manifest.yaml"), "project_id: StableProject\n");
+  await writeText(join(root, ".pipeline/manifest.yaml"), currentManifest("StableProject"));
 
   const preview = await buildHistoryRefreshPreview(root);
   const mapping = parseYaml(preview.files.get("mapping.yaml"));
@@ -120,6 +128,38 @@ test("History Refresh indexes incomplete root legacy state without cycle metadat
     source: ".pipeline/state.yaml",
     disposition: "preserve-for-explicit-lifecycle-review",
   });
+});
+
+test("History Refresh ignores legacy manifest timestamps without an explicit timezone", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "hw-history-refresh-naive-time-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await writeCycle(root, "C001-naive", {
+    cycle: "cycle:\n  number: 1\n  name: Naive time\n  status: completed\n  started: '2026-01-01T10:00:00'\n",
+    state: "pipeline:\n  status: completed\n",
+    summary: "# Summary\n",
+    progress: "# Progress\n",
+  });
+
+  const preview = await buildHistoryRefreshPreview(root);
+  assert.equal(preview.manifest.content.created_at, "1970-01-01T00:00:00.000Z");
+});
+
+test("History Refresh preserves an existing equivalent manifest byte for byte", async (t) => {
+  const root = await historyFixture(t);
+  await writeText(join(root, "package.json"), '{"name":"existing-project"}\n');
+  const manifest = `# keep this operator comment\n${currentManifest("existing-project", "1970-01-01T00:00:00.000Z")}`;
+  await writeText(join(root, ".pipeline/manifest.yaml"), manifest);
+
+  const preview = await writeHistoryRefreshPreview(root);
+  const mapping = parseYaml(preview.files.get("mapping.yaml"));
+  assert.equal(mapping.manifest.action, "preserve-current");
+  const activated = await activateHistoryRefresh(root, { approved: true });
+  assert.equal(activated.manifest_changed, false);
+  assert.equal(await readFile(join(root, ".pipeline/manifest.yaml"), "utf8"), manifest);
+  assert.match(
+    await readFile(join(root, ".pipeline/history-refresh/activation.md"), "utf8"),
+    /manifest_changed: false/,
+  );
 });
 
 test("History Refresh writes beside legacy history, is idempotent, and preserves source bytes", async (t) => {
@@ -196,7 +236,7 @@ test("History Refresh activates reviewed history once without changing legacy by
   const root = await historyFixture(t);
   const archiveRoot = join(root, ".pipeline/archives");
   const manifestPath = join(root, ".pipeline/manifest.yaml");
-  const manifest = "schema_version: 1\nactive_delivery: live\n";
+  const manifest = currentManifest("fixture-project");
   await writeText(manifestPath, manifest);
   await writeHistoryRefreshPreview(root);
   const archiveBefore = await treeDigest(archiveRoot);
@@ -283,4 +323,8 @@ async function writeText(path, content) {
 
 function tableIds(body) {
   return [...body.matchAll(/^\| `(M\d+|S\d+)` \|/gm)].map((match) => match[1]);
+}
+
+function currentManifest(projectId, createdAt = "2026-01-01T00:00:00.000Z") {
+  return `schema_version: '1'\nformat: hypo-workflow\nworkspace_id: ${projectId}-workspace\nproject_id: ${projectId}\ncreated_at: '${createdAt}'\nzones:\n  runtime: .pipeline/runtime\n  memory: .pipeline/memory\n  snapshots: .pipeline/snapshots\n`;
 }

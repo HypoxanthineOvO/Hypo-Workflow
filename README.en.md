@@ -40,7 +40,7 @@ INDEX.md
 - **Worker Routing** shows a task assessment before Worker start and emits a semantic capability class without choosing a model or provider.
 - **Legacy compatibility** keeps manifest Runtime, Receipt, and Recovery reads for unfinished older Deliveries without overriding semantic Cycles.
 - Old archives, the Manifest, and live Deliveries remain in place. History Refresh adds only a summary and index layer.
-- Cross-project History Refresh derives workspace identity and Cycle counts from the target; a root legacy Cycle is indexed as read-only legacy work and is never auto-closed or accepted.
+- Cross-project History Refresh derives workspace identity and Cycle counts from the target; a root legacy Cycle is indexed as read-only legacy work and is never auto-closed or accepted. Activation creates a missing current manifest last and preserves an existing valid manifest byte for byte.
 
 ## Install
 

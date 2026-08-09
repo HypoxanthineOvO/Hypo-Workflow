@@ -10,11 +10,17 @@ import {
 } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { redactSecrets } from "../evidence/index.js";
+import {
+  createWorkspaceManifest,
+  validateWorkspaceManifest,
+  WORKSPACE_MANIFEST_PATH,
+} from "../manifest/index.js";
 import { parseFrontmatter, parseYaml, stringifyYaml } from "../serialization/index.js";
 
 const DEFAULT_OUTPUT = ".pipeline/history-refresh/preview";
 const ACTIVATION_MARKER = ".pipeline/history-refresh/activation.md";
 const SAFE_PROJECT_ID = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+const ISO_WITH_TIMEZONE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
 
 export async function buildHistoryRefreshPreview(root = ".") {
   const workspace = resolve(root);
@@ -25,6 +31,7 @@ export async function buildHistoryRefreshPreview(root = ".") {
   const projectId = await readProjectId(workspace);
   const cycles = await readArchivedCycles(workspace);
   const legacyWorkItems = await readRootLegacyWorkItems(workspace);
+  const manifest = await buildManifestPlan(workspace, projectId, cycles);
   const memory = await readMemoryRecords(workspace);
   const deliveries = await readLiveDeliveries(workspace);
   const knowledgeFiles = await walkOptional(join(workspace, ".pipeline", "knowledge"));
@@ -49,7 +56,7 @@ export async function buildHistoryRefreshPreview(root = ".") {
   const files = new Map();
 
   files.set("REPORT.md", renderReport(inventory, cycles, deliveries, legacyWorkItems, uncertainties));
-  files.set("mapping.yaml", `${stringifyYaml(renderMapping(projectId, inventory, cycles, deliveries, legacyWorkItems, uncertainties)).trimEnd()}\n`);
+  files.set("mapping.yaml", `${stringifyYaml(renderMapping(projectId, manifest, inventory, cycles, deliveries, legacyWorkItems, uncertainties)).trimEnd()}\n`);
   files.set("proposed/INDEX.md", renderProjectIndex(projectId, cycles, memory, deliveries, legacyWorkItems));
   files.set("proposed/cycles/INDEX.md", renderCycleIndex(cycles));
   files.set("proposed/memory/INDEX.md", renderMemoryIndex(memory, knowledgeFiles));
@@ -64,7 +71,7 @@ export async function buildHistoryRefreshPreview(root = ".") {
     files.set(`${prefix}/SUMMARY.md`, renderCycleSummary(cycle));
   }
 
-  return { files, inventory, cycles, memory, deliveries, legacyWorkItems, projectId, uncertainties };
+  return { files, inventory, cycles, memory, deliveries, legacyWorkItems, manifest, projectId, uncertainties };
 }
 
 export async function writeHistoryRefreshPreview(root = ".", options = {}) {
@@ -114,6 +121,16 @@ export async function activateHistoryRefresh(root = ".", options = {}) {
     throw new Error("History Refresh preview is not an unactivated legacy-preserving review artifact");
   }
   if (!Array.isArray(mapping.cycles) || !mapping.cycles.length) throw new Error("History Refresh preview has no Cycle mapping");
+  const manifestPlan = validateManifestPlan(mapping.manifest);
+  const manifestPath = join(workspace, WORKSPACE_MANIFEST_PATH);
+  const manifestBefore = await readOptional(manifestPath, null);
+  if (manifestPlan.action === "create-current" && manifestBefore !== null) {
+    const currentManifest = parseYaml(manifestBefore);
+    validateWorkspaceManifest(currentManifest);
+    if (stringifyYaml(currentManifest) !== stringifyYaml(manifestPlan.content)) {
+      throw new Error("History Refresh target manifest conflicts with the reviewed preview");
+    }
+  }
 
   const targets = [];
   for (const item of mapping.cycles) {
@@ -131,7 +148,7 @@ export async function activateHistoryRefresh(root = ".", options = {}) {
   const marker = join(workspace, ACTIVATION_MARKER);
 
   const currentPreview = await buildHistoryRefreshPreview(workspace);
-  if (!sameFiles(reviewedPreview, currentPreview.files)) {
+  if (!previewMatchesCurrent(reviewedPreview, currentPreview.files, mapping)) {
     throw new Error("History Refresh preview no longer matches the current legacy history");
   }
 
@@ -146,6 +163,9 @@ export async function activateHistoryRefresh(root = ".", options = {}) {
     [join(workspace, ".pipeline", "legacy", "INDEX.md"), renderLegacyIndex(mapping)],
     [marker, renderActivationMarker(previewRelative, mapping)],
   ]);
+  if (manifestPlan.action === "create-current" && manifestBefore === null) {
+    indexes.set(manifestPath, `${stringifyYaml(manifestPlan.content).trimEnd()}\n`);
+  }
   if (await fileExists(marker) && targets.every((target) => target.existing)) {
     const indexesUnchanged = (await Promise.all(
       [...indexes].map(async ([path, content]) => await readOptional(path, null) === content),
@@ -185,7 +205,7 @@ export async function activateHistoryRefresh(root = ".", options = {}) {
     activated_cycles: targets.length,
     created_cycles: created.length,
     marker: relativePath(workspace, marker),
-    manifest_changed: false,
+    manifest_changed: manifestPlan.action === "create-current" && manifestBefore === null,
     legacy_preserved: true,
   };
 }
@@ -370,6 +390,57 @@ async function readProjectId(root) {
   return normalizeProjectId(basename(root));
 }
 
+async function buildManifestPlan(root, projectId, cycles) {
+  const expected = createWorkspaceManifest({
+    workspace_id: `${projectId}-workspace`,
+    project_id: projectId,
+    created_at: deriveManifestCreatedAt(cycles),
+  });
+  const manifestText = await readOptional(join(root, WORKSPACE_MANIFEST_PATH), null);
+  if (manifestText === null) return { action: "create-current", content: expected };
+
+  let current;
+  try {
+    current = parseYaml(manifestText);
+    validateWorkspaceManifest(current);
+  } catch {
+    throw new Error("History Refresh cannot adopt a workspace with a damaged current manifest");
+  }
+  return { action: "preserve-current", content: current };
+}
+
+function deriveManifestCreatedAt(cycles) {
+  const timestamps = cycles
+    .map((cycle) => String(cycle.started || ""))
+    .filter((value) => ISO_WITH_TIMEZONE.test(value))
+    .map((value) => Date.parse(value))
+    .filter((value) => Number.isFinite(value));
+  if (!timestamps.length) return "1970-01-01T00:00:00.000Z";
+  return new Date(Math.min(...timestamps)).toISOString();
+}
+
+function validateManifestPlan(value) {
+  if (!value || !["create-current", "preserve-current"].includes(value.action)) {
+    throw new Error("History Refresh preview has an invalid manifest plan");
+  }
+  validateWorkspaceManifest(value.content);
+  return value;
+}
+
+function previewMatchesCurrent(reviewedFiles, currentFiles, reviewedMapping) {
+  if (sameFiles(reviewedFiles, currentFiles)) return true;
+  const currentMapping = parseYaml(currentFiles.get("mapping.yaml"));
+  if (reviewedMapping.manifest?.action !== "create-current"
+    || currentMapping.manifest?.action !== "preserve-current"
+    || stringifyYaml(reviewedMapping.manifest.content) !== stringifyYaml(currentMapping.manifest.content)) {
+    return false;
+  }
+  const adjusted = new Map(currentFiles);
+  currentMapping.manifest = reviewedMapping.manifest;
+  adjusted.set("mapping.yaml", `${stringifyYaml(currentMapping).trimEnd()}\n`);
+  return sameFiles(reviewedFiles, adjusted);
+}
+
 async function readRootLegacyWorkItems(root) {
   const cyclePath = join(root, ".pipeline", "cycle.yaml");
   const cycleText = await readOptional(cyclePath, null);
@@ -429,6 +500,7 @@ function isHistoryRefreshDerivedPath(path) {
   return path.startsWith("history-refresh/")
     || path.startsWith("local/")
     || path === "INDEX.md"
+    || path === "manifest.yaml"
     || path.startsWith("cycles/")
     || path === "memory/HISTORY-REFRESH-INDEX.md"
     || path === "experiments/INDEX.md"
@@ -483,6 +555,7 @@ function renderReport(inventory, cycles, deliveries, legacyWorkItems, uncertaint
 - \`confirm-summary.md\` 只作为接受证据引用，不伪造逐字 Discussion。
 - ${inventory.memory_records} 个 Memory Records 保持原路径，预览重建人类可读索引。
 - 旧 Knowledge、Chats、Patches、PR、live deliveries 和 root legacy work items 保留原位，不在没有语义依据时强行归类。
+- Current manifest：缺失时在激活末尾创建；已有有效文件保持原字节。
 
 ## 覆盖与缺口
 
@@ -506,10 +579,11 @@ ${uncertainties.length ? uncertainties.map((item) => `- ${item}`).join("\n") : "
 `;
 }
 
-function renderMapping(projectId, inventory, cycles, deliveries, legacyWorkItems, uncertainties) {
+function renderMapping(projectId, manifest, inventory, cycles, deliveries, legacyWorkItems, uncertainties) {
   return {
     kind: "history-refresh-preview",
     project_id: projectId,
+    manifest,
     status: "waiting-review",
     activation_authorized: false,
     inventory,
@@ -639,13 +713,13 @@ status: active
 activation_authorized: true
 preview: ${preview}
 legacy_policy: read-only-preserve
-manifest_changed: false
+manifest_changed: ${mapping.manifest?.action === "create-current"}
 activated_cycles: ${mapping.cycles.length}
 ---
 
 # History Refresh 激活记录
 
-Stone S2 已接受语义摘要层。${mapping.cycles.length} 个历史 Cycle 已写入正式目录；旧 archives、Knowledge、Chats、live Delivery 和 root legacy work item 原位保留。Manifest 为兼容旧 live Delivery 保持不变。
+Stone S2 已接受语义摘要层。${mapping.cycles.length} 个历史 Cycle 已写入正式目录；旧 archives、Knowledge、Chats、live Delivery 和 root legacy work item 原位保留。${mapping.manifest?.action === "create-current" ? "缺失的 current manifest 已在最后一步创建。" : "已有 current manifest 保持原字节。"}
 `;
 }
 
