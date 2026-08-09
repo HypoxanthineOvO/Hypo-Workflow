@@ -6,7 +6,7 @@
 
 Plan -> Execute -> Independently verify -> Human acceptance -> Resume safely
 
-[![Version](https://img.shields.io/badge/version-15.0.0--alpha.1-blue)](.codex-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-15.0.0--alpha.2-blue)](.codex-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Official%20Codex-black)](docs/en/reference/platforms.md)
 
@@ -16,7 +16,7 @@ Plan -> Execute -> Independently verify -> Human acceptance -> Resume safely
 
 Hypo-Workflow is a Skill protocol, not a runner or background service. The host Agent implements, tests, and reviews project work; `.pipeline/` preserves verifiable, recoverable project facts.
 
-[v15.0.0-alpha.1 Release Notes](docs/en/release/v15.0.0-alpha.1.md)
+[v15.0.0-alpha.2 Release Notes](docs/en/release/v15.0.0-alpha.2.md)
 
 This release supports **Official Codex** as its only current adapter. OpenCode, Claude Code, Cursor, GitHub Copilot, Trae, and custom Codex-fork adapters are deferred. Old platform artifacts that remain in the repository are not current support claims.
 

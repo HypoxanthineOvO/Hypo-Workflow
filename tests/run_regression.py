@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -18,8 +19,8 @@ TEST_BIN = ROOT / "tests" / "bin"
 VALIDATE_CONFIG = ROOT / "scripts" / "validate-config.sh"
 PLUGIN_JSON = ROOT / ".claude-plugin" / "plugin.json"
 DEFAULT_CATALOG = ROOT / "tests" / "regression-catalog.json"
-CLASSIFICATIONS = ("maintained", "quarantined")
-VALID_SETS = (*CLASSIFICATIONS, "all")
+CLASSIFICATIONS = ("maintained", "quarantined", "excluded")
+VALID_SETS = ("maintained", "quarantined", "all")
 
 
 @dataclass
@@ -85,9 +86,9 @@ def canonical_repository_path(value: object, label: str) -> str:
 
 def discover_core_tests() -> list[str]:
     return sorted(
-        f"core/test/{path.name}"
-        for path in (ROOT / "core" / "test").glob("*.test.js")
-        if path.is_file()
+        path.relative_to(ROOT).as_posix()
+        for path in (ROOT / "core" / "test").rglob("*")
+        if path.is_file() and re.search(r"\.(?:test|spec)\.[^.]+$", path.name)
     )
 
 
@@ -109,7 +110,7 @@ def discover_registered_scenarios() -> list[str]:
 
 def validate_partition(value: object, suite: str) -> dict[str, object]:
     if not isinstance(value, dict) or set(value) != set(CLASSIFICATIONS):
-        raise ValueError(f"catalog.suites.{suite} must contain exactly maintained and quarantined")
+        raise ValueError(f"catalog.suites.{suite} must contain exactly maintained, quarantined, and excluded")
     entries: list[dict[str, object]] = []
     paths_by_class: dict[str, list[str]] = {}
     seen: set[str] = set()
@@ -130,13 +131,15 @@ def validate_partition(value: object, suite: str) -> dict[str, object]:
             paths.append(path)
             entries.append(entry)
         paths_by_class[classification] = sorted(paths)
-    if not paths_by_class["maintained"] or not paths_by_class["quarantined"]:
-        raise ValueError(f"{suite} must expose non-empty maintained and quarantined sets")
+    if not paths_by_class["maintained"]:
+        raise ValueError(f"{suite} must expose a non-empty maintained set")
     return {
         "entries": entries,
         "maintained": paths_by_class["maintained"],
         "quarantined": paths_by_class["quarantined"],
+        "excluded": paths_by_class["excluded"],
         "all": sorted(paths_by_class["maintained"] + paths_by_class["quarantined"]),
+        "inventory": sorted(path for classification in CLASSIFICATIONS for path in paths_by_class[classification]),
     }
 
 
@@ -163,8 +166,8 @@ def load_catalog(path: Path) -> dict[str, dict[str, object]]:
         "core": validate_partition(suites["core"], "core"),
         "scenarios": validate_partition(suites["scenarios"], "scenarios"),
     }
-    assert_exact_inventory(partitions["core"]["all"], discover_core_tests(), "core")
-    assert_exact_inventory(partitions["scenarios"]["all"], discover_registered_scenarios(), "scenarios")
+    assert_exact_inventory(partitions["core"]["inventory"], discover_core_tests(), "core")
+    assert_exact_inventory(partitions["scenarios"]["inventory"], discover_registered_scenarios(), "scenarios")
 
     maintained = set(partitions["core"]["maintained"] + partitions["scenarios"]["maintained"])
     for suite, partition in partitions.items():
@@ -172,11 +175,13 @@ def load_catalog(path: Path) -> dict[str, dict[str, object]]:
             reason = entry.get("reason")
             if not isinstance(reason, str) or not reason.strip():
                 raise ValueError(f"{suite}:{entry.get('path')} requires a non-empty reason")
-            if entry["classification"] != "quarantined":
-                continue
             replacement = entry.get("replacement")
-            if not isinstance(replacement, list) or not replacement:
+            if entry["classification"] == "quarantined" and (not isinstance(replacement, list) or not replacement):
                 raise ValueError(f"{suite}:{entry['path']} requires at least one replacement")
+            if replacement is None:
+                continue
+            if not isinstance(replacement, list) or not replacement:
+                raise ValueError(f"{suite}:{entry['path']} has an invalid replacement")
             for target in replacement:
                 if target not in maintained:
                     raise ValueError(f"{suite}:{entry['path']} replacement is not maintained: {target}")
@@ -211,6 +216,8 @@ def selection_payload(selected_set: str, partition: dict[str, object], paths: li
         "selected_set": selected_set,
         "maintained_count": len(partition["maintained"]),
         "quarantined_count": len(partition["quarantined"]),
+        "excluded_count": len(partition["excluded"]),
+        "inventoried_count": len(partition["inventory"]),
         "selected_count": len(paths),
         "selected_paths": paths,
     }
@@ -221,6 +228,8 @@ def print_selection(payload: dict[str, object]) -> None:
         "Scenario regression inventory: "
         f"maintained={payload['maintained_count']} "
         f"quarantined={payload['quarantined_count']} "
+        f"excluded={payload['excluded_count']} "
+        f"inventoried={payload['inventoried_count']} "
         f"selected={payload['selected_count']} set={payload['selected_set']}"
     )
     for path in payload["selected_paths"]:

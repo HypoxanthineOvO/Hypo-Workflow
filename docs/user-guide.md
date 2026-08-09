@@ -4,7 +4,7 @@ Hypo-Workflow 是当前 Codex 宿主中的项目工作协议。`.pipeline/INDEX.
 
 ## 当前入口
 
-v15.0.0-alpha.1 的 Official Codex 发布包公开十个聚焦入口，每次只路由到一个 Child Skill：
+v15.0.0-alpha.2 的 Official Codex 发布包公开十个聚焦入口，每次只路由到一个 Child Skill：
 
 | 入口 | 用途 |
 | --- | --- |
@@ -131,4 +131,4 @@ Runtime 是生命周期权威，Continuation 保存下一步，Recovery Pack 只
 
 ## 发布边界
 
-v15.0.0-alpha.1 的 Host Contract v1、Codex plugin ZIP 和 portable ZIP 均发布十个入口并包含 `/hw:experiment`。Host Contract v1 只承载 legacy compatibility；语义 workspace 通过普通文件恢复。Official Codex 是当前唯一源端支持面，VSP-Codex 的具体模型映射由目标仓独立适配与验证。
+v15.0.0-alpha.2 的 Host Contract v1、Codex plugin ZIP 和 portable ZIP 均发布十个入口并包含 `/hw:experiment`。Host Contract v1 只承载 legacy compatibility；语义 workspace 通过普通文件恢复。Official Codex 是当前唯一源端支持面，VSP-Codex 的具体模型映射由目标仓独立适配与验证。

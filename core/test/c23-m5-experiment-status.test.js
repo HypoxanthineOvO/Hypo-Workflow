@@ -646,14 +646,16 @@ test("C23 M5 source and released Host Contract v1 expose /hw:experiment", async 
   assert.equal(route.skill, "skills/experiment/SKILL.md");
 
   const discovered = await CORE.discoverableCommandMap("codex", { skillRoot: REPOSITORY_ROOT });
-  assert.equal(discovered.length, 10);
   assert.equal(discovered.some(({ canonical }) => canonical === "/hw:experiment"), true);
 
   const releaseCommands = JSON.parse(await readFile(
     join(REPOSITORY_ROOT, "contracts", "host", "v1", "command-manifest.json"),
     "utf8",
   ));
-  assert.equal(releaseCommands.commands.length, 10, "installed Host Contract artifact includes the Experiment lane");
+  assert.deepEqual(
+    releaseCommands.commands.map(({ name }) => `/${name}`).sort(),
+    discovered.map(({ canonical }) => canonical).sort(),
+  );
   assert.equal(releaseCommands.commands.some(({ name }) => name === "hw:experiment"), true);
 });
 

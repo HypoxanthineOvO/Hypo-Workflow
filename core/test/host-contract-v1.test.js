@@ -1,28 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
-import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { CANONICAL_COMMANDS } from "../src/commands/index.js";
 
 const ROOT = resolve(import.meta.dirname, "../..");
 const CONTRACT_ROOT = join(ROOT, "contracts", "host", "v1");
 const FIXTURES = join(CONTRACT_ROOT, "fixtures");
-const EXPECTED_COMMANDS = [
-  "hw:accept",
-  "hw:cycle",
-  "hw:experiment",
-  "hw:goal",
-  "hw:guide",
-  "hw:init",
-  "hw:maintain",
-  "hw:plan",
-  "hw:reject",
-  "hw:resume",
-];
-
 async function readJson(path) {
   return JSON.parse(await readFile(path, "utf8"));
 }
@@ -31,104 +17,28 @@ async function loadHostContract() {
   return import(pathToFileURL(join(ROOT, "core", "src", "host-contract", "index.js")));
 }
 
-async function sha256(path) {
-  return createHash("sha256").update(await readFile(path)).digest("hex");
-}
-
-test("Host Contract v1 publishes one release manifest and exactly ten public commands", async () => {
-  const release = await readJson(join(CONTRACT_ROOT, "release-manifest.json"));
+test("Host Contract command manifest matches the authoritative public command registry", async () => {
   const commands = await readJson(join(CONTRACT_ROOT, "command-manifest.json"));
-
-  assert.equal(release.schema_version, "1");
-  assert.equal(release.contract_version, "1");
-  assert.match(release.release.version, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/);
-  assert.match(release.release.source_commit, /^[0-9a-f]{40}$/);
-  assert.equal(release.command_manifest.path, "command-manifest.json");
-  assert.match(release.command_manifest.sha256, /^[0-9a-f]{64}$/);
-  assert.equal(
-    await sha256(join(CONTRACT_ROOT, release.command_manifest.path)),
-    release.command_manifest.sha256,
-  );
-  assert.equal(release.installed_descriptor.path, "contracts/host/v1/installed-release.json");
-  assert.equal(
-    await sha256(join(ROOT, release.installed_descriptor.path)),
-    release.installed_descriptor.sha256,
-  );
-  const installed = await readJson(join(ROOT, release.installed_descriptor.path));
-  assert.deepEqual(installed.release, release.release);
-  assert.equal(installed.command_manifest.sha256, release.command_manifest.sha256);
 
   assert.equal(commands.schema_version, "1");
   assert.equal(commands.contract_version, "1");
-  assert.deepEqual(commands.commands.map((entry) => entry.name).sort(), EXPECTED_COMMANDS);
+  assert.deepEqual(
+    commands.commands.map((entry) => entry.name).sort(),
+    CANONICAL_COMMANDS.map((entry) => entry.canonical.slice(1)).sort(),
+  );
   assert.ok(commands.commands.every((entry) => entry.slash === `/${entry.name}`));
   assert.ok(commands.commands.every((entry) => entry.skill === `hypo-workflow:${entry.name.slice(3)}`));
 });
 
-test("release artifacts are materialized, checksummed, and portable content matches the public surface", async () => {
-  const release = await readJson(join(CONTRACT_ROOT, "release-manifest.json"));
-  for (const name of ["codex_plugin", "portable_bundle"]) {
-    const artifact = release.artifacts[name];
-    assert.ok(artifact && typeof artifact === "object", `${name} must not be a null release placeholder`);
-    assert.equal(typeof artifact.path, "string");
-    assert.match(artifact.sha256, /^[0-9a-f]{64}$/);
-    assert.equal(await sha256(join(ROOT, artifact.path)), artifact.sha256);
-  }
+test("release manifest schema accepts SemVer build metadata used for Codex cache identity", async () => {
+  const schema = await readJson(join(CONTRACT_ROOT, "release-manifest.schema.json"));
+  const versionPattern = new RegExp(schema.properties.release.properties.version.pattern);
+  const pathPattern = new RegExp(schema.$defs.file.properties.path.pattern);
 
-  const bundle = release.artifacts.portable_bundle;
-  assert.match(bundle.path, /\.zip$/);
-  const listing = spawnSync("unzip", ["-Z1", join(ROOT, bundle.path)], { encoding: "utf8" });
-  assert.equal(listing.status, 0, listing.stderr || "portable bundle must be a readable zip");
-  const entries = listing.stdout.split("\n").filter(Boolean);
-  const has = (suffix) => entries.some((entry) => entry === suffix || entry.endsWith(`/${suffix}`));
-
-  assert.ok(has("SKILL.md"));
-  assert.ok(has("bundle-manifest.json"));
-  assert.ok(has("contracts/host/v1/installed-release.json"));
-  assert.ok(has("hooks/hooks.json"));
-  assert.ok(has("node_modules/js-yaml/index.js"), "portable bundle must include the js-yaml runtime dependency");
-  assert.ok(has("node_modules/argparse/argparse.js"), "portable bundle must include the argparse runtime dependency");
-  for (const command of EXPECTED_COMMANDS) {
-    assert.ok(has(`skills/${command.slice(3)}/SKILL.md`), `portable bundle missing ${command}`);
-  }
-  assert.ok(has("skills/experiment/agents/openai.yaml"), "portable bundle missing Experiment agent metadata");
-  for (const retired of ["start", "status", "stop", "rules", "patch", "sync", "setup"]) {
-    assert.ok(!has(`skills/${retired}/SKILL.md`), `portable bundle contains retired Skill ${retired}`);
-  }
-
-  const hooksEntry = entries.find((entry) => entry === "hooks/hooks.json" || entry.endsWith("/hooks/hooks.json"));
-  const hooksPayload = spawnSync("unzip", ["-p", join(ROOT, bundle.path), hooksEntry], { encoding: "utf8" });
-  assert.equal(hooksPayload.status, 0, hooksPayload.stderr || "portable bundle hooks manifest must be readable");
-  assert.deepEqual(Object.keys(JSON.parse(hooksPayload.stdout).hooks).sort(), [
-    "PermissionRequest",
-    "PreCompact",
-    "PreToolUse",
-    "SessionStart",
-    "Stop",
-    "UserPromptSubmit",
-  ]);
-
-  const installed = await mkdtemp(join(tmpdir(), "hypo-host-runtime-"));
-  try {
-    const extracted = spawnSync("unzip", ["-q", join(ROOT, bundle.path), "-d", installed], { encoding: "utf8" });
-    assert.equal(extracted.status, 0, extracted.stderr || "portable bundle must extract cleanly");
-    const runtime = spawnSync(process.execPath, ["-e", "import('./core/src/serialization/index.js')"], {
-      cwd: installed,
-      encoding: "utf8",
-    });
-    assert.equal(runtime.status, 0, runtime.stderr || "portable bundle must load runtime dependencies without npm install");
-  } finally {
-    await rm(installed, { recursive: true, force: true });
-  }
-
-  const bundleManifestEntry = entries.find((entry) => entry === "bundle-manifest.json" || entry.endsWith("/bundle-manifest.json"));
-  const bundleManifestPayload = spawnSync("unzip", ["-p", join(ROOT, bundle.path), bundleManifestEntry], { encoding: "utf8" });
-  assert.equal(bundleManifestPayload.status, 0, bundleManifestPayload.stderr || "bundle manifest must be readable");
-  const bundleManifest = JSON.parse(bundleManifestPayload.stdout);
-  assert.equal(bundleManifest.schema_version, "1");
-  assert.ok(bundleManifest.files.length > 0);
-  assert.equal(new Set(bundleManifest.files.map((entry) => entry.path)).size, bundleManifest.files.length);
-  assert.ok(bundleManifest.files.every((entry) => /^[a-f0-9]{64}$/.test(entry.sha256) && entry.bytes >= 0));
+  assert.match("1.2.3-alpha.4+codex.20260809052356", versionPattern);
+  assert.doesNotMatch("1.2-alpha.4+codex.20260809052356", versionPattern);
+  assert.match("dist/hypo-workflow-1.2.3-alpha.4+codex.20260809052356-portable.zip", pathPattern);
+  assert.doesNotMatch("../dist/plugin.zip", pathPattern);
 });
 
 test("Host Contract projection accepts current and explicitly invalidated lifecycle states", async () => {

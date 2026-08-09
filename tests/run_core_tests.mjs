@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DEFAULT_CATALOG = join(ROOT, "tests", "regression-catalog.json");
 const VALID_SETS = new Set(["maintained", "quarantined", "all"]);
-const CLASSIFICATIONS = ["maintained", "quarantined"];
+const CLASSIFICATIONS = ["maintained", "quarantined", "excluded"];
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
@@ -32,18 +32,40 @@ async function main() {
   } else {
     printSelection(payload);
   }
+  if (selectedPaths.length === 0) return 0;
 
-  const result = spawnSync(process.execPath, ["--test", ...options.nodeArgs, ...selectedPaths], {
+  const childEnv = { ...process.env };
+  delete childEnv.NODE_TEST_CONTEXT;
+  const result = spawnSync(process.execPath, [
+    "--test",
+    "--test-reporter=tap",
+    ...options.nodeArgs,
+    ...selectedPaths,
+  ], {
     cwd: ROOT,
-    env: process.env,
-    stdio: "inherit",
+    env: childEnv,
+    encoding: "utf8",
   });
+  process.stdout.write(result.stdout || "");
+  process.stderr.write(result.stderr || "");
   if (result.error) throw result.error;
   if (result.signal) {
     process.stderr.write(`Core test runner terminated by signal ${result.signal}\n`);
     return 1;
   }
-  return result.status ?? 1;
+  if (result.status !== 0) return result.status ?? 1;
+  if (options.set === "maintained") {
+    const skippedMatch = /(?:^|\n)# skipped (\d+)(?:\n|$)/.exec(result.stdout || "");
+    const skippedCount = skippedMatch ? Number.parseInt(skippedMatch[1], 10) : 0;
+    const emptyPlanCount = (result.stdout || "").match(/(?:^|\n)1\.\.0(?:\n|$)/g)?.length || 0;
+    if (skippedCount > 0 || emptyPlanCount > 0) {
+      process.stderr.write(
+        `Maintained Core gate rejected skipped=${skippedCount} zero-test-files=${emptyPlanCount}\n`,
+      );
+      return 1;
+    }
+  }
+  return 0;
 }
 
 function parseArgs(argv) {
@@ -97,7 +119,7 @@ async function validateCatalog(catalog) {
     scenarios: await discoverRegisteredScenarios(),
   };
   for (const suite of Object.keys(partitions)) {
-    assertExactInventory(partitions[suite].all, expected[suite], suite);
+    assertExactInventory(partitions[suite].inventory, expected[suite], suite);
   }
 
   const maintained = new Set([
@@ -109,9 +131,12 @@ async function validateCatalog(catalog) {
       if (typeof entry.reason !== "string" || !entry.reason.trim()) {
         throw new Error(`${suite}:${entry.path} requires a non-empty reason`);
       }
-      if (entry.classification !== "quarantined") continue;
-      if (!Array.isArray(entry.replacement) || entry.replacement.length === 0) {
+      if (entry.classification === "quarantined" && (!Array.isArray(entry.replacement) || entry.replacement.length === 0)) {
         throw new Error(`${suite}:${entry.path} requires at least one replacement`);
+      }
+      if (entry.replacement === undefined) continue;
+      if (!Array.isArray(entry.replacement) || entry.replacement.length === 0) {
+        throw new Error(`${suite}:${entry.path} has an invalid replacement`);
       }
       for (const replacement of entry.replacement) {
         if (!maintained.has(replacement)) {
@@ -151,14 +176,16 @@ function validatePartition(input, suite) {
     }
     pathsByClass[classification] = paths.sort();
   }
-  if (pathsByClass.maintained.length === 0 || pathsByClass.quarantined.length === 0) {
-    throw new Error(`${suite} must expose non-empty maintained and quarantined sets`);
+  if (pathsByClass.maintained.length === 0) {
+    throw new Error(`${suite} must expose a non-empty maintained set`);
   }
   return {
     entries,
     maintained: pathsByClass.maintained,
     quarantined: pathsByClass.quarantined,
+    excluded: pathsByClass.excluded,
     all: [...pathsByClass.maintained, ...pathsByClass.quarantined].sort(),
+    inventory: CLASSIFICATIONS.flatMap((classification) => pathsByClass[classification]).sort(),
   };
 }
 
@@ -187,10 +214,20 @@ function validateRetiredSurfaces(surfaces, maintained) {
 }
 
 async function discoverCoreTests() {
-  return (await readdir(join(ROOT, "core", "test"), { withFileTypes: true }))
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".test.js"))
-    .map((entry) => `core/test/${entry.name}`)
-    .sort();
+  const root = join(ROOT, "core", "test");
+  const pending = [root];
+  const paths = [];
+  while (pending.length > 0) {
+    const current = pending.pop();
+    for (const entry of await readdir(current, { withFileTypes: true })) {
+      const path = join(current, entry.name);
+      if (entry.isDirectory()) pending.push(path);
+      else if (entry.isFile() && /\.(?:test|spec)\.[^.]+$/.test(entry.name)) {
+        paths.push(relative(ROOT, path).split(sep).join("/"));
+      }
+    }
+  }
+  return paths.sort();
 }
 
 async function discoverRegisteredScenarios() {
@@ -257,6 +294,8 @@ function selectionPayload(suite, selectedSet, partition, selectedPaths) {
     selected_set: selectedSet,
     maintained_count: partition.maintained.length,
     quarantined_count: partition.quarantined.length,
+    excluded_count: partition.excluded.length,
+    inventoried_count: partition.inventory.length,
     selected_count: selectedPaths.length,
     selected_paths: selectedPaths,
   };
@@ -264,7 +303,7 @@ function selectionPayload(suite, selectedSet, partition, selectedPaths) {
 
 function printSelection(payload) {
   process.stdout.write(
-    `Core regression inventory: maintained=${payload.maintained_count} quarantined=${payload.quarantined_count} selected=${payload.selected_count} set=${payload.selected_set}\n`,
+    `Core regression inventory: maintained=${payload.maintained_count} quarantined=${payload.quarantined_count} excluded=${payload.excluded_count} inventoried=${payload.inventoried_count} selected=${payload.selected_count} set=${payload.selected_set}\n`,
   );
   for (const path of payload.selected_paths) process.stdout.write(`- ${path}\n`);
 }

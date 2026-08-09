@@ -117,8 +117,11 @@ activationBehavior("manifest-last activation installs complete C21 authority and
 
   const index = parseYaml(await readFile(join(root, ".pipeline/memory/index.yaml"), "utf8"));
   assert.equal(index.authority_role, "derived");
-  assert.equal(index.records.length, 7);
-  assert.equal(Object.keys(index.active_by_dedupe_key).length, 6);
+  assert.equal(index.records.length, activated.records.length);
+  assert.equal(
+    Object.keys(index.active_by_dedupe_key).length,
+    activated.records.filter((record) => record.active).length,
+  );
   assert.equal(
     index.active_by_dedupe_key["architecture/product-boundary"],
     activated.records.find((record) => record.key === "architecture-skill-first-current").id,

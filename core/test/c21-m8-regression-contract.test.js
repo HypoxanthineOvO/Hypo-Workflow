@@ -18,70 +18,16 @@ const ROOT = resolve(fileURLToPath(new URL("../../", import.meta.url)));
 const CATALOG_FILE = join(ROOT, "tests", "regression-catalog.json");
 const CORE_RUNNER = join(ROOT, "tests", "run_core_tests.mjs");
 const SCENARIO_RUNNER = join(ROOT, "tests", "run_regression.py");
+const TEST_PATTERN_RUNNER = join(ROOT, "tests", "run-node-test-pattern.mjs");
 const RETIRED_CLI_PATH = ["cli", "bin", "hypo-workflow"].join("/");
-const CLASSIFICATIONS = new Set(["maintained", "quarantined"]);
+const CLASSIFICATIONS = new Set(["maintained", "quarantined", "excluded"]);
 
-const MILESTONE_BEHAVIOR_ANCHORS = Object.freeze({
-  "C21-M1": [
-    "core/test/workspace-format.test.js",
-    "core/test/workspace-transaction.test.js",
-  ],
-  "C21-M2": [
-    "core/test/authority-nonduplication.test.js",
-    "core/test/record-store.test.js",
-    "core/test/receipt-store.test.js",
-    "core/test/runtime-store.test.js",
-    "core/test/snapshot-store.test.js",
-  ],
-  "C21-M3": [
-    "core/test/context-capsule.test.js",
-    "core/test/recovery-faults.test.js",
-    "core/test/recovery-journal.test.js",
-    "core/test/recovery-pack.test.js",
-  ],
-  "C21-M4": [
-    "core/test/command-skill-root-routing.test.js",
-    "core/test/init-bootstrap.test.js",
-    "core/test/legacy-workspace-inspection.test.js",
-    "core/test/root-skill-router.test.js",
-  ],
-  "C21-M5": [
-    "core/test/bootstrap-acceptance.test.js",
-    "core/test/bootstrap-activation.test.js",
-    "core/test/bootstrap-migration.test.js",
-  ],
-  "C21-M6": [
-    "core/test/adaptive-plan.test.js",
-    "core/test/cycle-lifecycle-vnext.test.js",
-    "core/test/delivery-receipts.test.js",
-    "core/test/execution-topology.test.js",
-    "core/test/goal-lifecycle.test.js",
-    "core/test/revision-start-boundary.test.js",
-  ],
-  "C21-M7": [
-    "core/test/c21-m7-adversarial.test.js",
-    "core/test/c21-m7-audit-findings.test.js",
-    "core/test/codex-hook-process.test.js",
-    "core/test/codex-hooks-vnext.test.js",
-    "core/test/maintain-ambient.test.js",
-  ],
-  "C21-M8": [
-    "core/test/c21-m8-regression-contract.test.js",
-    "core/test/c21-m8-surface-cleanup.test.js",
-    "core/test/deletion-gate.test.js",
-  ],
-});
-
-const SCENARIO_BEHAVIOR_ANCHORS = Object.freeze({
-  "tests/scenarios/c21/s70-init-current": "init",
-  "tests/scenarios/c21/s71-goal-delivery": "goal",
-  "tests/scenarios/c21/s72-cycle-delivery": "cycle",
-  "tests/scenarios/c21/s73-maintain-ambient": "maintain",
-  "tests/scenarios/c21/s74-resume-recovery": "resume",
-  "tests/scenarios/c21/s75-accept-reject": "accept-reject",
-  "tests/scenarios/c21/s76-deletion-drift": "deletion-drift",
-  "tests/scenarios/c21/s77-codex-hook-process": "codex-hook-process",
-});
+const REQUIRED_CORE_COVERAGE = Object.freeze([
+  "C21-M1", "C21-M2", "C21-M3", "C21-M4", "C21-M5", "C21-M6", "C21-M7", "C21-M8",
+]);
+const REQUIRED_SCENARIO_COVERAGE = Object.freeze([
+  "init", "goal", "cycle", "maintain", "resume", "accept-reject", "deletion-drift", "codex-hook-process",
+]);
 
 test("regression catalog exactly partitions every Core test and registered scenario", async () => {
   const catalog = await readCatalog();
@@ -93,25 +39,26 @@ test("regression catalog exactly partitions every Core test and registered scena
   const physicalCore = await discoverCoreTests();
   const registeredScenarios = await discoverRegisteredScenarios();
 
-  assert.deepEqual(core.all, physicalCore, "every core/test/*.test.js must be classified exactly once");
+  assert.deepEqual(core.inventory, physicalCore, "every recursive Core test/spec must be classified exactly once");
   assert.deepEqual(
-    scenarios.all,
+    scenarios.inventory,
     registeredScenarios,
     "every non-placeholder registered scenario must be classified exactly once",
   );
-  assert.ok(core.maintained.length > 0 && core.quarantined.length > 0, "Core needs both visible sets");
+  assert.ok(core.maintained.length > 0, "Core needs a maintained gate");
+  assert.ok(scenarios.maintained.length > 0, "scenarios need a maintained gate");
   assert.ok(
-    scenarios.maintained.length > 0 && scenarios.quarantined.length > 0,
-    "scenarios need both visible sets",
+    core.excluded.includes("core/test/fixtures/c21-m4/brownfield/test/server.test.js"),
+    "fixture-owned executable tests remain inventoried without entering the product gate",
   );
 });
 
-test("retired installed-software CLI and every direct dependent stay quarantined", async () => {
+test("retired installed-software CLI and every direct dependent stay outside the maintained gate", async () => {
   const catalog = await readCatalog();
   const core = validatePartition(catalog.suites.core, "core");
   const scenarios = validatePartition(catalog.suites.scenarios, "scenarios");
-  const coreQuarantine = new Set(core.quarantined);
-  const scenarioQuarantine = new Set(scenarios.quarantined);
+  const coreNonMaintained = new Set([...core.quarantined, ...core.excluded]);
+  const scenarioNonMaintained = new Set([...scenarios.quarantined, ...scenarios.excluded]);
   const surface = catalog.retired_surfaces?.find((entry) => entry.path === RETIRED_CLI_PATH);
 
   assert.ok(surface, `${RETIRED_CLI_PATH} needs an explicit retired surface entry`);
@@ -122,14 +69,14 @@ test("retired installed-software CLI and every direct dependent stay quarantined
   assert.deepEqual([...surface.replacement].sort(), ["/hw:guide", "/hw:init"]);
 
   for (const path of await discoverCoreCliDependents()) {
-    assert.ok(coreQuarantine.has(path), `Core test loads or calls retired CLI but is maintained: ${path}`);
+    assert.ok(coreNonMaintained.has(path), `Core test loads or calls retired CLI but is maintained: ${path}`);
   }
   for (const path of await discoverScenarioCliDependents()) {
-    assert.ok(scenarioQuarantine.has(path), `scenario calls retired CLI but is maintained: ${path}`);
+    assert.ok(scenarioNonMaintained.has(path), `scenario calls retired CLI but is maintained: ${path}`);
   }
 });
 
-test("every quarantine has a reason and maintained replacement", async () => {
+test("every non-maintained inventory entry has a reason and valid declared replacements", async () => {
   const catalog = await readCatalog();
   const core = validatePartition(catalog.suites.core, "core");
   const scenarios = validatePartition(catalog.suites.scenarios, "scenarios");
@@ -139,9 +86,9 @@ test("every quarantine has a reason and maintained replacement", async () => {
     for (const entry of partition.entries) {
       assert.equal(typeof entry.reason, "string", `${suite}:${entry.path} needs a reason`);
       assert.ok(entry.reason.trim().length > 0, `${suite}:${entry.path} needs a non-empty reason`);
-      if (entry.classification !== "quarantined") continue;
-      assert.ok(Array.isArray(entry.replacement), `${suite}:${entry.path} needs replacement paths`);
-      assert.ok(entry.replacement.length > 0, `${suite}:${entry.path} needs at least one replacement`);
+      if (entry.classification === "maintained" || entry.replacement === undefined) continue;
+      assert.ok(Array.isArray(entry.replacement), `${suite}:${entry.path} replacement must be an array`);
+      assert.ok(entry.replacement.length > 0, `${suite}:${entry.path} declared replacement cannot be empty`);
       for (const replacement of entry.replacement) {
         assert.ok(
           maintained.has(replacement),
@@ -152,39 +99,23 @@ test("every quarantine has a reason and maintained replacement", async () => {
   }
 });
 
-test("the maintained Core set anchors executable C21 M1-M8 behavior contracts", async () => {
+test("the maintained Core set covers every required behavior area without fixed file ownership", async () => {
   const catalog = await readCatalog();
   const core = validatePartition(catalog.suites.core, "core");
-  const maintained = new Map(
-    core.entries
-      .filter((entry) => entry.classification === "maintained")
-      .map((entry) => [entry.path, entry]),
-  );
-
-  for (const [milestone, paths] of Object.entries(MILESTONE_BEHAVIOR_ANCHORS)) {
-    for (const path of paths) {
-      const entry = maintained.get(path);
-      assert.ok(entry, `${milestone} behavior anchor must stay maintained: ${path}`);
-      assert.ok(Array.isArray(entry.covers), `${path} must declare behavior coverage`);
-      assert.ok(entry.covers.includes(milestone), `${path} must cover ${milestone}`);
-    }
+  const maintained = core.entries.filter((entry) => entry.classification === "maintained");
+  const covered = new Set(maintained.flatMap((entry) => entry.covers || []));
+  for (const milestone of REQUIRED_CORE_COVERAGE) {
+    assert.ok(covered.has(milestone), `maintained Core tests must cover ${milestone}`);
   }
 });
 
-test("the maintained scenario set includes the complete thin C21 behavior lane", async () => {
+test("the maintained scenario set covers the complete thin behavior lane without fixed directory ownership", async () => {
   const catalog = await readCatalog();
   const scenarios = validatePartition(catalog.suites.scenarios, "scenarios");
-  const maintained = new Map(
-    scenarios.entries
-      .filter((entry) => entry.classification === "maintained")
-      .map((entry) => [entry.path, entry]),
-  );
-
-  for (const [path, coverage] of Object.entries(SCENARIO_BEHAVIOR_ANCHORS)) {
-    const entry = maintained.get(path);
-    assert.ok(entry, `current C21 scenario must stay maintained: ${path}`);
-    assert.ok(Array.isArray(entry.covers), `${path} must declare behavior coverage`);
-    assert.ok(entry.covers.includes(coverage), `${path} must cover ${coverage}`);
+  const maintained = scenarios.entries.filter((entry) => entry.classification === "maintained");
+  const covered = new Set(maintained.flatMap((entry) => entry.covers || []));
+  for (const coverage of REQUIRED_SCENARIO_COVERAGE) {
+    assert.ok(covered.has(coverage), `maintained Scenarios must cover ${coverage}`);
   }
 });
 
@@ -222,7 +153,9 @@ test("catalog runners fail closed for unclassified, overlap, missing reason, and
       name: "missing-replacement",
       pattern: /replacement/i,
       mutate(candidate) {
-        delete candidate.suites.core.quarantined[0].replacement;
+        const [entry] = candidate.suites.core.maintained.splice(0, 1);
+        candidate.suites.core.quarantined.push({ ...entry, classification: "quarantined" });
+        delete candidate.suites.core.quarantined.at(-1).replacement;
       },
     },
   ];
@@ -330,6 +263,54 @@ test("scenario runner defaults to maintained and exposes all/quarantine diagnost
   assert.equal(await legacyCorpusDigest(), corpusBefore, "scenario dry-runs must not rewrite old scenario files");
 });
 
+test("excluded inventory cannot be selected for execution by either runner", () => {
+  for (const [command, args, label] of [
+    [process.execPath, [CORE_RUNNER, "--set", "excluded", "--dry-run"], "Core"],
+    ["python3", [SCENARIO_RUNNER, "--set", "excluded", "--dry-run"], "Scenario"],
+  ]) {
+    const result = spawnSync(command, args, { cwd: ROOT, encoding: "utf8" });
+    assert.notEqual(result.status, 0, `${label} runner executed excluded inventory`);
+    assert.match(`${result.stdout}${result.stderr}`, /invalid choice|maintained|quarantined|all/i);
+  }
+});
+
+test("focused Scenario runner rejects a pattern that executes no passing tests", async (t) => {
+  await assertExists(TEST_PATTERN_RUNNER, "focused Node test runner");
+  const sandbox = await mkdtemp(join(tmpdir(), "hw-c21-m8-pattern-"));
+  t.after(() => rm(sandbox, { recursive: true, force: true }));
+  const testFile = join(sandbox, "sample.test.mjs");
+  await writeFile(testFile, 'import test from "node:test"; test("stable-contract-id", () => {});\n', "utf8");
+
+  const unmatched = spawnSync(process.execPath, [TEST_PATTERN_RUNNER, "missing-contract-id", testFile], {
+    cwd: ROOT,
+    encoding: "utf8",
+  });
+  assert.notEqual(unmatched.status, 0);
+  assert.match(`${unmatched.stdout}${unmatched.stderr}`, /matched no passing tests/i);
+
+  const matched = spawnSync(process.execPath, [TEST_PATTERN_RUNNER, "stable-contract-id", testFile], {
+    cwd: ROOT,
+    encoding: "utf8",
+  });
+  assert.equal(matched.status, 0, matched.stderr);
+});
+
+test("maintained Core runner rejects skipped contract tests", () => {
+  const result = spawnSync(process.execPath, [
+    CORE_RUNNER,
+    "--set",
+    "maintained",
+    "--",
+    "--test-name-pattern=__no_maintained_contract_matches__",
+  ], {
+    cwd: ROOT,
+    encoding: "utf8",
+    timeout: 30_000,
+  });
+  assert.notEqual(result.status, 0);
+  assert.match(`${result.stdout}${result.stderr}`, /rejected skipped=\d+ zero-test-files=\d+/i);
+});
+
 async function readCatalog() {
   await assertExists(CATALOG_FILE, "shared regression catalog");
   const catalog = JSON.parse(await readFile(CATALOG_FILE, "utf8"));
@@ -340,7 +321,7 @@ async function readCatalog() {
 
 function validatePartition(input, suite) {
   assert.ok(input && typeof input === "object", `catalog.suites.${suite} is required`);
-  assert.deepEqual(Object.keys(input).sort(), ["maintained", "quarantined"]);
+  assert.deepEqual(Object.keys(input).sort(), [...CLASSIFICATIONS].sort());
   const entries = [];
   const pathsByClass = {};
   for (const classification of CLASSIFICATIONS) {
@@ -364,14 +345,16 @@ function validatePartition(input, suite) {
     entries,
     maintained: pathsByClass.maintained,
     quarantined: pathsByClass.quarantined,
+    excluded: pathsByClass.excluded,
     all: [...pathsByClass.maintained, ...pathsByClass.quarantined].sort(),
+    inventory: [...CLASSIFICATIONS].flatMap((classification) => pathsByClass[classification]).sort(),
   };
 }
 
 async function discoverCoreTests() {
-  return (await readdir(join(ROOT, "core", "test"), { withFileTypes: true }))
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".test.js"))
-    .map((entry) => `core/test/${entry.name}`)
+  return (await walkFiles(join(ROOT, "core", "test")))
+    .filter((path) => /\.(?:test|spec)\.[^.]+$/.test(path))
+    .map((path) => normalizeRepositoryPath(relative(ROOT, path)))
     .sort();
 }
 
@@ -418,6 +401,8 @@ function assertDryRunPayload(payload, { suite, selectedSet, expected, partition 
   assert.equal(payload.selected_set, selectedSet);
   assert.equal(payload.maintained_count, partition.maintained.length);
   assert.equal(payload.quarantined_count, partition.quarantined.length);
+  assert.equal(payload.excluded_count, partition.excluded.length);
+  assert.equal(payload.inventoried_count, partition.inventory.length);
   assert.equal(payload.selected_count, expected.length);
   assert.deepEqual([...payload.selected_paths].sort(), expected);
 }

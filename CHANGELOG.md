@@ -2,10 +2,23 @@
 
 ## Unreleased
 
+## v15.0.0-alpha.2 - 2026-08-09
+
 ### Fixes
 
 - History Refresh 不再硬编码 Hypo-Workflow 自身的项目名、C22 标记或历史 Cycle 数量；跨项目采用时从目标工作区派生语义索引，并将根部旧格式 Cycle 保留为只读 legacy work item，等待显式生命周期处理。
 - Legacy workspace 缺少 current manifest 时，History Refresh 以确定性、manifest-last 方式创建；已有有效 manifest 字节原样保留，损坏 manifest 在写入前 fail closed。
+
+### Test Governance
+
+- Core inventory 递归覆盖 179 个 test/spec，Scenario inventory 覆盖 76 个注册项；当前 release gate 明确区分 `maintained`、`quarantined` 与不可执行的 `excluded` 历史/fixture evidence。
+- Maintained runner 对 skip、零测试、catalog 漏项和显式执行 `excluded` fail closed；title-pattern Scenario 通过统一 helper 拒绝零匹配假绿。
+- 公开命令、Bootstrap 数量和 History 输出从 authority 或实际输入派生；current gate 不再冻结 live repository snapshot、committed release artifact、retired API 或偶然文案/布局。
+
+### Tests
+
+- Maintained Core `709/709`、Scenario `8/8`、History Refresh focused `12/12`、最终受影响 focused `73/73` 通过，0 skipped；其中新增 1 项确保 release manifest schema 接受合法的 Codex SemVer build metadata 与对应 artifact path。
+- 10/10 primary 与 10/10 independent reviewer 完成全量双重审计；最终独立 diff 审计无未解决 High/Medium finding。
 
 ## v15.0.0-alpha.1 - 2026-08-06
 

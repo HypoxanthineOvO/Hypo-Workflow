@@ -20,9 +20,9 @@ test("human response schema requires conclusion explanation and next steps", () 
   assert.equal(validateHumanResponseShape(response).ok, true);
 
   const rendered = renderHumanResponse(response);
-  assert.match(rendered, /## 结论/);
-  assert.match(rendered, /## 解释/);
-  assert.match(rendered, /## 下一步/);
+  assert.match(rendered, /已确认问题/);
+  assert.match(rendered, /证据来自本地报告/);
+  assert.match(rendered, /运行 \/hw:status 检查/);
 });
 
 test("completion response includes manual operations and known risks", () => {
@@ -39,9 +39,8 @@ test("completion response includes manual operations and known risks", () => {
 
   assert.equal(validateHumanResponseShape(response, { completion: true }).ok, true);
   const rendered = renderCompletionResponse(response);
-  assert.match(rendered, /## 手动操作/);
-  assert.match(rendered, /\/hw:report/);
-  assert.match(rendered, /## 已知风险/);
+  assert.match(rendered, /运行 \/hw:report 阅读完成报告/);
+  assert.match(rendered, /宿主模型仍可能压缩回复/);
 });
 
 test("intermediate updates state current work findings and next step", () => {

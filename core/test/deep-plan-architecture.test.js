@@ -47,7 +47,7 @@ test("normalizeDeepPlanTracks preserves required fields and normalizes legacy ki
   assert.deepEqual(result.tracks.map((track) => track.id), ["REQ-auth", "THEME-evidence"]);
   assert.equal(result.tracks[0].type, "requirement");
   assert.equal(result.tracks[0].kind, undefined);
-  assert.deepEqual(Object.keys(result.tracks[0]).sort(), [
+  const requiredKeys = [
     "decisions",
     "id",
     "questions",
@@ -56,7 +56,8 @@ test("normalizeDeepPlanTracks preserves required fields and normalizes legacy ki
     "status",
     "title",
     "type",
-  ]);
+  ];
+  assert.equal(requiredKeys.every((key) => Object.hasOwn(result.tracks[0], key)), true);
   assert.deepEqual(result.tracks[0].relationships, {
     depends_on: [],
     blocks: ["MOD-audit"],

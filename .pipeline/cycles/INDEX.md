@@ -9,12 +9,13 @@ status: active
 
 | Cycle | 目的 | 状态 | 当前项 | 下一步 |
 | --- | --- | --- | --- | --- |
-| 无 | - | - | - | - |
+| [C024-v15-alpha2-distribution-preparation](C024-v15-alpha2-distribution-preparation/PLAN.md) | 准备 `15.0.0-alpha.2` 本地分发候选 | active | `M4` | authorize-local-source-commit-or-stop-before-build |
 
 ## Closed Cycles
 
 | Cycle | 名称 | 状态 | 旧文件 | 映射置信度 |
 | --- | --- | --- | ---: | --- |
+| [C023-test-contract-and-history-refresh-genericity](C023-test-contract-and-history-refresh-genericity/SUMMARY.md) | 测试合同治理与 History Refresh 通用性修复 | closed | - | 当前语义 Cycle，用户已接受 |
 | [C022-workflow-semantic-simplification](C022-workflow-semantic-simplification/SUMMARY.md) | Workflow 语义简化 | closed | - | 当前语义 Cycle，用户已接受 |
 | [C1-v9-opencode-native-adapter](C1-v9-opencode-native-adapter/SUMMARY.md) | V9 OpenCode Native Adapter | closed | 25 | 需审阅：knowledge-summary.md |
 | [C2-new-cycle](C2-new-cycle/SUMMARY.md) | Maintainability, Observability, and Showcase Expansion | closed | 53 | 需审阅：summary.md、knowledge-summary.md |

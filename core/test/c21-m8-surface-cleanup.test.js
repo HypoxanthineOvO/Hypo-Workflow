@@ -10,6 +10,7 @@ import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import * as api from "../src/index.js";
+import { CANONICAL_COMMANDS } from "../src/commands/index.js";
 import { parseFrontmatter } from "../src/serialization/index.js";
 import {
   snapshotTree,
@@ -24,18 +25,7 @@ import {
 } from "./fixtures/c21-m7/helpers.js";
 
 const REPOSITORY_ROOT = resolve(fileURLToPath(new URL("../../", import.meta.url)));
-const PUBLIC_ROUTES = new Map([
-  ["/hw:guide", "skills/guide/SKILL.md"],
-  ["/hw:init", "skills/init/SKILL.md"],
-  ["/hw:goal", "skills/goal/SKILL.md"],
-  ["/hw:plan", "skills/plan/SKILL.md"],
-  ["/hw:cycle", "skills/cycle/SKILL.md"],
-  ["/hw:experiment", "skills/experiment/SKILL.md"],
-  ["/hw:maintain", "skills/maintain/SKILL.md"],
-  ["/hw:resume", "skills/resume/SKILL.md"],
-  ["/hw:accept", "skills/accept/SKILL.md"],
-  ["/hw:reject", "skills/reject/SKILL.md"],
-]);
+const PUBLIC_ROUTES = new Map(CANONICAL_COMMANDS.map(({ canonical, skill }) => [canonical, skill]));
 const INTERNAL_ROUTES = Object.freeze([
   "/hw:chat",
   "/hw:explain",
@@ -81,7 +71,7 @@ const REMOVED_ROUTES = Object.freeze([
 ]);
 const PUBLIC_SKILL_FILES = [...PUBLIC_ROUTES.values()].sort();
 
-test("Codex Plugin filesystem discovery and Registry projection expose exactly the same ten routes", async () => {
+test("Codex Plugin filesystem discovery and Registry projection expose the same public routes", async () => {
   const discoveredSkills = await discoverPluginSkills(REPOSITORY_ROOT);
   const physicalPaths = discoveredSkills.map((entry) => entry.path).sort();
   assert.deepEqual(
@@ -306,11 +296,11 @@ test("Root Skill, Plugin metadata, and current Codex docs describe the replaceme
   }
 
   for (const path of ["README.md", "README.en.md", "docs/reference/commands.md", "docs/en/reference/commands.md"]) {
-    await t.test(`${path} advertises exactly ten routes`, () => {
+    await t.test(`${path} matches the authoritative public routes`, () => {
       assert.deepEqual(
         [...extractAdvertisedRoutes(docs.get(path))].sort(),
         [...PUBLIC_ROUTES.keys()].sort(),
-        `${path} must advertise the same ten routes as the Plugin and Registry`,
+        `${path} must advertise the same routes as the Plugin and Registry`,
       );
     });
   }

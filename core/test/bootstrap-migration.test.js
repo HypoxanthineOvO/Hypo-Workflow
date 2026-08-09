@@ -184,7 +184,10 @@ migrationBehavior("Curator preserves superseded decisions and selects exactly on
     curated.active_by_dedupe_key["architecture/product-boundary"],
     currentDecision.key,
   );
-  assert.equal(curated.records.filter((entry) => entry.active).length, 6);
+  assert.equal(
+    curated.records.filter((entry) => entry.active).length,
+    Object.keys(curated.active_by_dedupe_key).length,
+  );
   assert.equal(oldDecision.active, false);
   assert.equal(currentDecision.active, true);
 });

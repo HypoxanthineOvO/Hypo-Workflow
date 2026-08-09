@@ -339,7 +339,7 @@
         {
           "path": "core/test/history-refresh-preview.test.js",
           "classification": "maintained",
-          "reason": "C22 History Refresh preview, explicit activation, conflict rollback, legacy preservation, and idempotence contract.",
+          "reason": "Generic History Refresh identity, preview, explicit activation, conflict rollback, legacy preservation, and idempotence contract.",
           "covers": [
             "C22-M4",
             "C22-M5"
@@ -351,14 +351,6 @@
           "reason": "Executable current C21 behavior or protection contract used by the maintained release gate.",
           "covers": [
             "C21-M4"
-          ]
-        },
-        {
-          "path": "core/test/knowledge-opencode-gate.test.js",
-          "classification": "maintained",
-          "reason": "Executable current C21 behavior or protection contract used by the maintained release gate.",
-          "covers": [
-            "C21-M5"
           ]
         },
         {
@@ -563,10 +555,11 @@
           ]
         }
       ],
-      "quarantined": [
+      "quarantined": [],
+      "excluded": [
         {
           "path": "core/test/acceptance-policy-status.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises the legacy state.yaml acceptance or worker lifecycle instead of the manifest-based Delivery and topology contract.",
           "replacement": [
             "core/test/cycle-lifecycle-vnext.test.js",
@@ -575,7 +568,7 @@
         },
         {
           "path": "core/test/analysis-command-entry.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -584,7 +577,7 @@
         },
         {
           "path": "core/test/analysis-interaction.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -593,7 +586,7 @@
         },
         {
           "path": "core/test/analysis-preset.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -602,7 +595,7 @@
         },
         {
           "path": "core/test/analysis-runtime.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -611,7 +604,7 @@
         },
         {
           "path": "core/test/analysis-state-ledger.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -620,7 +613,7 @@
         },
         {
           "path": "core/test/artifact-catalog.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -629,7 +622,7 @@
         },
         {
           "path": "core/test/audit-baseline.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -638,7 +631,7 @@
         },
         {
           "path": "core/test/audit-governance-contract.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -647,7 +640,7 @@
         },
         {
           "path": "core/test/audit-memory-contract.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -656,7 +649,7 @@
         },
         {
           "path": "core/test/audit-regression-canonical-examples.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -665,7 +658,7 @@
         },
         {
           "path": "core/test/chat-hooks.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises the legacy Chat state/log writer; C21 keeps Chat as internal Agent behavior without legacy authority writes.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -674,7 +667,7 @@
         },
         {
           "path": "core/test/chat-mode-spec.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises the legacy Chat state/log writer; C21 keeps Chat as internal Agent behavior without legacy authority writes.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -683,7 +676,7 @@
         },
         {
           "path": "core/test/chat-runtime.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises the legacy Chat state/log writer; C21 keeps Chat as internal Agent behavior without legacy authority writes.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -692,7 +685,7 @@
         },
         {
           "path": "core/test/claude-adapter-config.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -701,7 +694,7 @@
         },
         {
           "path": "core/test/claude-codex-plugin.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -710,7 +703,7 @@
         },
         {
           "path": "core/test/claude-hooks.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -719,7 +712,7 @@
         },
         {
           "path": "core/test/claude-model-routing.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -728,7 +721,7 @@
         },
         {
           "path": "core/test/claude-plugin-alias.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -737,7 +730,7 @@
         },
         {
           "path": "core/test/claude-resume-namespace.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -746,7 +739,7 @@
         },
         {
           "path": "core/test/claude-settings-sync.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Directly loads or invokes the retired installed-software CLI and is not a C21 host-loaded Skill contract.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -755,7 +748,7 @@
         },
         {
           "path": "core/test/claude-smoke-readiness.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -764,7 +757,7 @@
         },
         {
           "path": "core/test/claude-status-surface.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -773,7 +766,7 @@
         },
         {
           "path": "core/test/codex-continuation-preflight.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 contract outside the maintained manifest-based Skill release boundary.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js"
@@ -781,7 +774,7 @@
         },
         {
           "path": "core/test/codex-subagent-discipline.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises the legacy state.yaml acceptance or worker lifecycle instead of the manifest-based Delivery and topology contract.",
           "replacement": [
             "core/test/cycle-lifecycle-vnext.test.js",
@@ -790,7 +783,7 @@
         },
         {
           "path": "core/test/command-exposure.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Asserts the retired 54-command or deleted Child-Skill surface instead of the exact nine-route C21 registry.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -799,7 +792,7 @@
         },
         {
           "path": "core/test/compact-end-of-run.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises legacy compact, log, or progress authority files superseded by Journal, Capsule, Pack, Runtime, and Continuation.",
           "replacement": [
             "core/test/recovery-pack.test.js",
@@ -808,7 +801,7 @@
         },
         {
           "path": "core/test/completion-report-contract.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Contains historical documentation or report assertions; current conversation reporting and C21 surface docs have maintained replacements.",
           "replacement": [
             "core/test/response-contract.test.js",
@@ -817,7 +810,7 @@
         },
         {
           "path": "core/test/config.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Covers a legacy configuration/module layout that is not authoritative in the C21 manifest workspace.",
           "replacement": [
             "core/test/workspace-format.test.js",
@@ -826,7 +819,7 @@
         },
         {
           "path": "core/test/cycle-acceptance.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises the legacy state.yaml acceptance or worker lifecycle instead of the manifest-based Delivery and topology contract.",
           "replacement": [
             "core/test/cycle-lifecycle-vnext.test.js",
@@ -835,7 +828,7 @@
         },
         {
           "path": "core/test/daily-project-summary.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Directly loads or invokes the retired installed-software CLI and is not a C21 host-loaded Skill contract.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -844,7 +837,7 @@
         },
         {
           "path": "core/test/deep-plan-integration.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Mixes current Deep Plan intent with retired Child-Skill or platform integration assertions.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -853,7 +846,7 @@
         },
         {
           "path": "core/test/docs-governance.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Contains historical documentation or report assertions; current conversation reporting and C21 surface docs have maintained replacements.",
           "replacement": [
             "core/test/response-contract.test.js",
@@ -862,7 +855,7 @@
         },
         {
           "path": "core/test/domain-pack.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -871,7 +864,7 @@
         },
         {
           "path": "core/test/execution-lease.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a removed Rules, Patch, Showcase, lease, or Watchdog product surface.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -880,7 +873,7 @@
         },
         {
           "path": "core/test/explain-contract.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Mixes internal Explain behavior with the removed public Explain Child Skill.",
           "replacement": [
             "core/test/explain-subagent.test.js",
@@ -889,7 +882,7 @@
         },
         {
           "path": "core/test/explore-contract.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -898,7 +891,7 @@
         },
         {
           "path": "core/test/explore-lifecycle.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -907,7 +900,7 @@
         },
         {
           "path": "core/test/feature-queue-metrics.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -916,7 +909,7 @@
         },
         {
           "path": "core/test/feature-queue-ops.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -925,7 +918,7 @@
         },
         {
           "path": "core/test/final-assistant-output.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Contains historical documentation or report assertions; current conversation reporting and C21 surface docs have maintained replacements.",
           "replacement": [
             "core/test/response-contract.test.js",
@@ -933,8 +926,13 @@
           ]
         },
         {
+          "path": "core/test/fixtures/c21-m4/brownfield/test/server.test.js",
+          "classification": "excluded",
+          "reason": "Executable source-project fixture owned by the brownfield Init corpus; audited as fixture input and excluded from the product Core gate."
+        },
+        {
           "path": "core/test/global-config-registry.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Directly loads or invokes the retired installed-software CLI and is not a C21 host-loaded Skill contract.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -943,7 +941,7 @@
         },
         {
           "path": "core/test/global-consolidation.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Directly loads or invokes the retired installed-software CLI and is not a C21 host-loaded Skill contract.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -952,7 +950,7 @@
         },
         {
           "path": "core/test/global-knowledge-index.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -961,7 +959,7 @@
         },
         {
           "path": "core/test/guide-router.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Asserts the retired 54-command or deleted Child-Skill surface instead of the exact nine-route C21 registry.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -970,7 +968,7 @@
         },
         {
           "path": "core/test/hypo-claw-notification.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -979,7 +977,7 @@
         },
         {
           "path": "core/test/init-automation-contract.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Directly loads or invokes the retired installed-software CLI and is not a C21 host-loaded Skill contract.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -988,7 +986,7 @@
         },
         {
           "path": "core/test/ink-tui.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Directly loads or invokes the retired installed-software CLI and is not a C21 host-loaded Skill contract.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -997,7 +995,7 @@
         },
         {
           "path": "core/test/knowledge-hooks.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 contract outside the maintained manifest-based Skill release boundary.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js"
@@ -1005,7 +1003,7 @@
         },
         {
           "path": "core/test/knowledge-ledger.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1013,8 +1011,13 @@
           ]
         },
         {
+          "path": "core/test/knowledge-opencode-gate.test.js",
+          "classification": "excluded",
+          "reason": "Repository-history snapshot bound to C4/F001 and live generated artifacts; retained as audited legacy evidence, not a generic product gate."
+        },
+        {
           "path": "core/test/layered-config-integration.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Directly loads or invokes the retired installed-software CLI and is not a C21 host-loaded Skill contract.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -1023,7 +1026,7 @@
         },
         {
           "path": "core/test/ledger-jsonl-migration.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1032,7 +1035,7 @@
         },
         {
           "path": "core/test/legacy-write-fence.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Directly loads or invokes the retired installed-software CLI and is not a C21 host-loaded Skill contract.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -1041,7 +1044,7 @@
         },
         {
           "path": "core/test/lifecycle-policy.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises the legacy state.yaml acceptance or worker lifecycle instead of the manifest-based Delivery and topology contract.",
           "replacement": [
             "core/test/cycle-lifecycle-vnext.test.js",
@@ -1050,7 +1053,7 @@
         },
         {
           "path": "core/test/lifecycle-regression.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises the legacy state.yaml acceptance or worker lifecycle instead of the manifest-based Delivery and topology contract.",
           "replacement": [
             "core/test/cycle-lifecycle-vnext.test.js",
@@ -1059,7 +1062,7 @@
         },
         {
           "path": "core/test/log-evidence.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises legacy compact, log, or progress authority files superseded by Journal, Capsule, Pack, Runtime, and Continuation.",
           "replacement": [
             "core/test/recovery-pack.test.js",
@@ -1068,7 +1071,7 @@
         },
         {
           "path": "core/test/maintenance-backfill.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1077,7 +1080,7 @@
         },
         {
           "path": "core/test/maintenance-backup-policy.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1086,7 +1089,7 @@
         },
         {
           "path": "core/test/maintenance-command-map.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1095,7 +1098,7 @@
         },
         {
           "path": "core/test/maintenance-ledger.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1104,7 +1107,7 @@
         },
         {
           "path": "core/test/maintenance-queue.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1113,7 +1116,7 @@
         },
         {
           "path": "core/test/maintenance-run.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1122,7 +1125,7 @@
         },
         {
           "path": "core/test/maintenance-template-learning.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1131,7 +1134,7 @@
         },
         {
           "path": "core/test/model-pool-actions.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -1140,7 +1143,7 @@
         },
         {
           "path": "core/test/notion-apply-gate.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1149,7 +1152,7 @@
         },
         {
           "path": "core/test/notion-project-home-dry-run.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1158,7 +1161,7 @@
         },
         {
           "path": "core/test/opencode-hooks.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -1167,7 +1170,7 @@
         },
         {
           "path": "core/test/opencode-model-matrix-docs.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -1176,7 +1179,7 @@
         },
         {
           "path": "core/test/opencode-panels.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -1185,7 +1188,7 @@
         },
         {
           "path": "core/test/opencode-status.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -1194,7 +1197,7 @@
         },
         {
           "path": "core/test/p0-configure-contract.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -1203,7 +1206,7 @@
         },
         {
           "path": "core/test/p2-technical-route-contract.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -1212,7 +1215,7 @@
         },
         {
           "path": "core/test/patch-acceptance.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a removed Rules, Patch, Showcase, lease, or Watchdog product surface.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1221,7 +1224,7 @@
         },
         {
           "path": "core/test/platform-adapters.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -1230,7 +1233,7 @@
         },
         {
           "path": "core/test/pr-contract.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -1239,7 +1242,7 @@
         },
         {
           "path": "core/test/pr-create-contract.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -1248,7 +1251,7 @@
         },
         {
           "path": "core/test/pr-create-execution.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -1257,7 +1260,7 @@
         },
         {
           "path": "core/test/pr-create.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -1266,7 +1269,7 @@
         },
         {
           "path": "core/test/pr-manual-gates.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -1275,7 +1278,7 @@
         },
         {
           "path": "core/test/pr-readonly-flow.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -1284,7 +1287,7 @@
         },
         {
           "path": "core/test/profile-platform.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -1293,7 +1296,7 @@
         },
         {
           "path": "core/test/progress-table.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises legacy compact, log, or progress authority files superseded by Journal, Capsule, Pack, Runtime, and Continuation.",
           "replacement": [
             "core/test/recovery-pack.test.js",
@@ -1302,7 +1305,7 @@
         },
         {
           "path": "core/test/project-events.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Directly loads or invokes the retired installed-software CLI and is not a C21 host-loaded Skill contract.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -1311,7 +1314,7 @@
         },
         {
           "path": "core/test/project-link-graph.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1320,7 +1323,7 @@
         },
         {
           "path": "core/test/project-linkage-e2e.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1329,7 +1332,7 @@
         },
         {
           "path": "core/test/project-linkage-registry.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1338,7 +1341,7 @@
         },
         {
           "path": "core/test/project-notifications.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Directly loads or invokes the retired installed-software CLI and is not a C21 host-loaded Skill contract.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -1347,7 +1350,7 @@
         },
         {
           "path": "core/test/project-stop-event.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1356,7 +1359,7 @@
         },
         {
           "path": "core/test/readme-feature-queue.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1365,7 +1368,7 @@
         },
         {
           "path": "core/test/readme-spec.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Contains historical documentation or report assertions; current conversation reporting and C21 surface docs have maintained replacements.",
           "replacement": [
             "core/test/response-contract.test.js",
@@ -1374,7 +1377,7 @@
         },
         {
           "path": "core/test/readme-update.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Contains historical documentation or report assertions; current conversation reporting and C21 surface docs have maintained replacements.",
           "replacement": [
             "core/test/response-contract.test.js",
@@ -1383,7 +1386,7 @@
         },
         {
           "path": "core/test/reference-contract.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Contains historical documentation or report assertions; current conversation reporting and C21 surface docs have maintained replacements.",
           "replacement": [
             "core/test/response-contract.test.js",
@@ -1392,7 +1395,7 @@
         },
         {
           "path": "core/test/rejection-rework-blocked-runtime-loop.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises the legacy state.yaml acceptance or worker lifecycle instead of the manifest-based Delivery and topology contract.",
           "replacement": [
             "core/test/cycle-lifecycle-vnext.test.js",
@@ -1401,7 +1404,7 @@
         },
         {
           "path": "core/test/review-artifacts.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Contains historical documentation or report assertions; current conversation reporting and C21 surface docs have maintained replacements.",
           "replacement": [
             "core/test/response-contract.test.js",
@@ -1410,7 +1413,7 @@
         },
         {
           "path": "core/test/root-management-dry-run.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1419,7 +1422,7 @@
         },
         {
           "path": "core/test/rules-authority.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a removed Rules, Patch, Showcase, lease, or Watchdog product surface.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1428,7 +1431,7 @@
         },
         {
           "path": "core/test/rules-capture-habits.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a removed Rules, Patch, Showcase, lease, or Watchdog product surface.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1437,7 +1440,7 @@
         },
         {
           "path": "core/test/session-source-discovery.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1446,7 +1449,7 @@
         },
         {
           "path": "core/test/showcase-report-refresh.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a removed Rules, Patch, Showcase, lease, or Watchdog product surface.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1455,7 +1458,7 @@
         },
         {
           "path": "core/test/skill-quality.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Asserts the retired 54-command or deleted Child-Skill surface instead of the exact nine-route C21 registry.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -1464,7 +1467,7 @@
         },
         {
           "path": "core/test/skill-spec.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Asserts the retired 54-command or deleted Child-Skill surface instead of the exact nine-route C21 registry.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -1473,7 +1476,7 @@
         },
         {
           "path": "core/test/storage-sync-template.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -1482,7 +1485,7 @@
         },
         {
           "path": "core/test/subagent-separation-contract.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises the legacy state.yaml acceptance or worker lifecycle instead of the manifest-based Delivery and topology contract.",
           "replacement": [
             "core/test/cycle-lifecycle-vnext.test.js",
@@ -1491,7 +1494,7 @@
         },
         {
           "path": "core/test/sync-derived-map.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred non-Official-Codex adapter, generator, model-routing, or sync surface outside the C21 release.",
           "replacement": [
             "core/test/c21-m8-surface-cleanup.test.js",
@@ -1500,7 +1503,7 @@
         },
         {
           "path": "core/test/sync-standardization.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Directly loads or invokes the retired installed-software CLI and is not a C21 host-loaded Skill contract.",
           "replacement": [
             "core/test/root-skill-router.test.js",
@@ -1509,7 +1512,7 @@
         },
         {
           "path": "core/test/test-profile.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a deferred engineering lane or pre-C21 planning profile that is not a current public C21 release gate.",
           "replacement": [
             "core/test/adaptive-plan.test.js",
@@ -1518,7 +1521,7 @@
         },
         {
           "path": "core/test/watchdog-lease.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises a removed Rules, Patch, Showcase, lease, or Watchdog product surface.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1527,7 +1530,7 @@
         },
         {
           "path": "core/test/worker-separation-spawn-enforcement.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises the legacy state.yaml acceptance or worker lifecycle instead of the manifest-based Delivery and topology contract.",
           "replacement": [
             "core/test/cycle-lifecycle-vnext.test.js",
@@ -1536,7 +1539,7 @@
         },
         {
           "path": "core/test/workspace-authority.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Exercises unaccepted generic automation, global management, JSONL ledger, notification, or external storage behavior superseded by C21 Records and Maintain.",
           "replacement": [
             "core/test/record-store.test.js",
@@ -1545,7 +1548,7 @@
         },
         {
           "path": "core/test/workspace-module-split.test.js",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Covers a legacy configuration/module layout that is not authoritative in the C21 manifest workspace.",
           "replacement": [
             "core/test/workspace-format.test.js",
@@ -1621,10 +1624,11 @@
           ]
         }
       ],
-      "quarantined": [
+      "quarantined": [],
+      "excluded": [
         {
           "path": "tests/scenarios/v0.5/s07-full-hypo-todo",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1632,7 +1636,7 @@
         },
         {
           "path": "tests/scenarios/v0/s01-fresh-start",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -1640,7 +1644,7 @@
         },
         {
           "path": "tests/scenarios/v0/s02-resume-interrupt",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy resume, compact, status, or log scenario predating Runtime/Continuation/Recovery.",
           "replacement": [
             "tests/scenarios/c21/s74-resume-recovery"
@@ -1648,7 +1652,7 @@
         },
         {
           "path": "tests/scenarios/v0/s03-diff-score-blocks",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1656,7 +1660,7 @@
         },
         {
           "path": "tests/scenarios/v0/s04-skip-step",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1664,7 +1668,7 @@
         },
         {
           "path": "tests/scenarios/v0/s05-implement-only",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1672,7 +1676,7 @@
         },
         {
           "path": "tests/scenarios/v0/s06-custom-sequence",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1680,7 +1684,7 @@
         },
         {
           "path": "tests/scenarios/v1/s08-subagent-self-review",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1688,7 +1692,7 @@
         },
         {
           "path": "tests/scenarios/v1/s09-subagent-full-delegation",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1696,7 +1700,7 @@
         },
         {
           "path": "tests/scenarios/v10/s62-analysis-preset-runtime",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1704,7 +1708,7 @@
         },
         {
           "path": "tests/scenarios/v11/s63-init-automation-non-git",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -1712,7 +1716,7 @@
         },
         {
           "path": "tests/scenarios/v11/s64-audit-governance-contract",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1720,7 +1724,7 @@
         },
         {
           "path": "tests/scenarios/v11/s65-audit-memory-handoff",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1728,7 +1732,7 @@
         },
         {
           "path": "tests/scenarios/v11/s67-worker-separation-spawn-enforcement",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1736,7 +1740,7 @@
         },
         {
           "path": "tests/scenarios/v11/s68-rejection-rework-blocked-runtime-loop",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy acceptance/rejection scenario predating manifest-based Goal/Cycle Delivery.",
           "replacement": [
             "tests/scenarios/c21/s75-accept-reject"
@@ -1744,7 +1748,7 @@
         },
         {
           "path": "tests/scenarios/v11/s69-audit-regression-canonical-examples",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1752,7 +1756,7 @@
         },
         {
           "path": "tests/scenarios/v2.5/s10-progressive-disclosure",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1760,7 +1764,7 @@
         },
         {
           "path": "tests/scenarios/v2.5/s11-scripts-executability",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1768,7 +1772,7 @@
         },
         {
           "path": "tests/scenarios/v3/s12-hook-stop-check",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy or deferred platform/Hook scenario; Official Codex Hook process is the current release boundary.",
           "replacement": [
             "tests/scenarios/c21/s77-codex-hook-process"
@@ -1776,7 +1780,7 @@
         },
         {
           "path": "tests/scenarios/v3/s13-hook-session-start",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy resume, compact, status, or log scenario predating Runtime/Continuation/Recovery.",
           "replacement": [
             "tests/scenarios/c21/s74-resume-recovery"
@@ -1784,7 +1788,7 @@
         },
         {
           "path": "tests/scenarios/v4/s14-multi-dim-scoring",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1792,7 +1796,7 @@
         },
         {
           "path": "tests/scenarios/v4/s15-architecture-drift",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1800,7 +1804,7 @@
         },
         {
           "path": "tests/scenarios/v5/s16-plan-discover",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1808,7 +1812,7 @@
         },
         {
           "path": "tests/scenarios/v5/s17-plan-review",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1816,7 +1820,7 @@
         },
         {
           "path": "tests/scenarios/v5/s18-template-library",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1824,7 +1828,7 @@
         },
         {
           "path": "tests/scenarios/v6/s19-help-list",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1832,7 +1836,7 @@
         },
         {
           "path": "tests/scenarios/v6/s20-help-init",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -1840,7 +1844,7 @@
         },
         {
           "path": "tests/scenarios/v6/s21-check-output",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1848,7 +1852,7 @@
         },
         {
           "path": "tests/scenarios/v6/s22-init-empty-project",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -1856,7 +1860,7 @@
         },
         {
           "path": "tests/scenarios/v6/s23-init-existing-project",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -1864,7 +1868,7 @@
         },
         {
           "path": "tests/scenarios/v6/s24-audit-report",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1872,7 +1876,7 @@
         },
         {
           "path": "tests/scenarios/v6/s25-debug-flow",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1880,7 +1884,7 @@
         },
         {
           "path": "tests/scenarios/v6/s26-release-dry-run",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1888,7 +1892,7 @@
         },
         {
           "path": "tests/scenarios/v6/s27-reset-modes",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1896,7 +1900,7 @@
         },
         {
           "path": "tests/scenarios/v6/s28-log-filters",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy resume, compact, status, or log scenario predating Runtime/Continuation/Recovery.",
           "replacement": [
             "tests/scenarios/c21/s74-resume-recovery"
@@ -1904,7 +1908,7 @@
         },
         {
           "path": "tests/scenarios/v6/s29-plan-review-migration",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1912,7 +1916,7 @@
         },
         {
           "path": "tests/scenarios/v6/s30-init-rescan",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -1920,7 +1924,7 @@
         },
         {
           "path": "tests/scenarios/v8.1/s31-import-history-tags",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -1928,7 +1932,7 @@
         },
         {
           "path": "tests/scenarios/v8.1/s32-import-history-keyword",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -1936,7 +1940,7 @@
         },
         {
           "path": "tests/scenarios/v8.1/s33-import-history-merge",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -1944,7 +1948,7 @@
         },
         {
           "path": "tests/scenarios/v8.1/s34-import-history-time-gap",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -1952,7 +1956,7 @@
         },
         {
           "path": "tests/scenarios/v8.1/s35-import-history-interactive",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -1960,7 +1964,7 @@
         },
         {
           "path": "tests/scenarios/v8.1/s36-import-history-non-git",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -1968,7 +1972,7 @@
         },
         {
           "path": "tests/scenarios/v8.1/s37-import-history-existing-pipeline",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -1976,7 +1980,7 @@
         },
         {
           "path": "tests/scenarios/v8.2/s38-patch-fix-flow",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -1984,7 +1988,7 @@
         },
         {
           "path": "tests/scenarios/v8.2/s39-compact-generator",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy resume, compact, status, or log scenario predating Runtime/Continuation/Recovery.",
           "replacement": [
             "tests/scenarios/c21/s74-resume-recovery"
@@ -1992,7 +1996,7 @@
         },
         {
           "path": "tests/scenarios/v8.2/s40-compact-session-start",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy resume, compact, status, or log scenario predating Runtime/Continuation/Recovery.",
           "replacement": [
             "tests/scenarios/c21/s74-resume-recovery"
@@ -2000,7 +2004,7 @@
         },
         {
           "path": "tests/scenarios/v8.2/s41-full-view-flags",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy resume, compact, status, or log scenario predating Runtime/Continuation/Recovery.",
           "replacement": [
             "tests/scenarios/c21/s74-resume-recovery"
@@ -2008,7 +2012,7 @@
         },
         {
           "path": "tests/scenarios/v8.2/s42-guide-flow",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -2016,7 +2020,7 @@
         },
         {
           "path": "tests/scenarios/v8.2/s43-v8-2-registration",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -2024,7 +2028,7 @@
         },
         {
           "path": "tests/scenarios/v8.3/s44-showcase-skeleton",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -2032,7 +2036,7 @@
         },
         {
           "path": "tests/scenarios/v8.3/s45-showcase-docs",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -2040,7 +2044,7 @@
         },
         {
           "path": "tests/scenarios/v8.3/s46-showcase-slides-poster",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -2048,7 +2052,7 @@
         },
         {
           "path": "tests/scenarios/v8.3/s47-showcase-lifecycle",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -2056,7 +2060,7 @@
         },
         {
           "path": "tests/scenarios/v8.3/s48-i18n-templates",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -2064,7 +2068,7 @@
         },
         {
           "path": "tests/scenarios/v8.3/s49-showcase-bootstrap",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -2072,7 +2076,7 @@
         },
         {
           "path": "tests/scenarios/v8.4/s50-rules-system",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy Rules, ledger, or maintenance scenario superseded by ambient Maintain and Records.",
           "replacement": [
             "tests/scenarios/c21/s73-maintain-ambient"
@@ -2080,7 +2084,7 @@
         },
         {
           "path": "tests/scenarios/v9/s51-opencode-capability-matrix",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy or deferred platform/Hook scenario; Official Codex Hook process is the current release boundary.",
           "replacement": [
             "tests/scenarios/c21/s77-codex-hook-process"
@@ -2088,7 +2092,7 @@
         },
         {
           "path": "tests/scenarios/v9/s52-core-config-artifacts",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -2096,7 +2100,7 @@
         },
         {
           "path": "tests/scenarios/v9/s53-global-cli-tui-setup",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy initialization, import, setup, or registration scenario predating the C21 manifest Init contract.",
           "replacement": [
             "tests/scenarios/c21/s70-init-current"
@@ -2104,7 +2108,7 @@
         },
         {
           "path": "tests/scenarios/v9/s54-opencode-plugin-scaffold",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy or deferred platform/Hook scenario; Official Codex Hook process is the current release boundary.",
           "replacement": [
             "tests/scenarios/c21/s77-codex-hook-process"
@@ -2112,7 +2116,7 @@
         },
         {
           "path": "tests/scenarios/v9/s55-opencode-command-map",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy or deferred platform/Hook scenario; Official Codex Hook process is the current release boundary.",
           "replacement": [
             "tests/scenarios/c21/s77-codex-hook-process"
@@ -2120,7 +2124,7 @@
         },
         {
           "path": "tests/scenarios/v9/s56-agents-ask-todo-plan-discipline",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -2128,7 +2132,7 @@
         },
         {
           "path": "tests/scenarios/v9/s57-opencode-events-auto-continue-file-guard",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy or deferred platform/Hook scenario; Official Codex Hook process is the current release boundary.",
           "replacement": [
             "tests/scenarios/c21/s77-codex-hook-process"
@@ -2136,7 +2140,7 @@
         },
         {
           "path": "tests/scenarios/v9/s58-opencode-full-v84-parity",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy or deferred platform/Hook scenario; Official Codex Hook process is the current release boundary.",
           "replacement": [
             "tests/scenarios/c21/s77-codex-hook-process"
@@ -2144,7 +2148,7 @@
         },
         {
           "path": "tests/scenarios/v9/s59-v9-regression-bundle",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -2152,7 +2156,7 @@
         },
         {
           "path": "tests/scenarios/v9/s60-progress-board-format",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Historical pre-C21 command, planning, automation, or showcase scenario outside the current thin behavior lane.",
           "replacement": [
             "tests/scenarios/c21/s72-cycle-delivery"
@@ -2160,7 +2164,7 @@
         },
         {
           "path": "tests/scenarios/v9/s61-opencode-model-matrix-sync",
-          "classification": "quarantined",
+          "classification": "excluded",
           "reason": "Legacy or deferred platform/Hook scenario; Official Codex Hook process is the current release boundary.",
           "replacement": [
             "tests/scenarios/c21/s77-codex-hook-process"

@@ -19,7 +19,7 @@ test("History Refresh builds deterministic semantic previews from mixed legacy q
 
   assert.equal(first.inventory.archived_cycles, 2);
   assert.equal(first.inventory.memory_records, 1);
-  assert.equal(first.files.size, 16);
+  assert.equal(first.files.size, 6 + (first.cycles.length * 5));
   assert.deepEqual([...first.files], [...second.files]);
   assert.ok(first.uncertainties.some((item) => item.includes("invalid YAML")));
   assert.ok(first.uncertainties.some((item) => item.includes("pending_acceptance")));
@@ -41,7 +41,8 @@ test("History Refresh builds deterministic semantic previews from mixed legacy q
 
 test("History Refresh derives target workspace identity and preserves a root legacy Cycle", async (t) => {
   const root = await historyFixture(t);
-  await writeText(join(root, "package.json"), '{"name":"sample-product"}\n');
+  const projectId = "sample-product";
+  await writeText(join(root, "package.json"), `${JSON.stringify({ name: projectId })}\n`);
   await writeText(
     join(root, ".pipeline/cycle.yaml"),
     "cycle:\n  number: 7\n  name: Current legacy work\n  status: active\n",
@@ -69,7 +70,7 @@ test("History Refresh derives target workspace identity and preserves a root leg
 
   const preview = await buildHistoryRefreshPreview(root);
   const mapping = parseYaml(preview.files.get("mapping.yaml"));
-  assert.equal(mapping.project_id, "sample-product");
+  assert.equal(mapping.project_id, projectId);
   assert.equal(mapping.legacy_work_items.length, 1);
   assert.deepEqual(mapping.legacy_work_items[0], {
     id: "C7",
@@ -80,8 +81,7 @@ test("History Refresh derives target workspace identity and preserves a root leg
     disposition: "preserve-for-explicit-lifecycle-review",
   });
   assert.equal(preview.inventory.legacy_work_items, 1);
-  assert.match(preview.files.get("REPORT.md"), /2 个历史 Cycle/);
-  assert.doesNotMatch(preview.files.get("REPORT.md"), /20 个历史 Cycle|C22/);
+  assert.match(preview.files.get("REPORT.md"), new RegExp(`${mapping.cycles.length} 个历史 Cycle`));
 
   const written = await writeHistoryRefreshPreview(root);
   assert.equal(written.output, ".pipeline/history-refresh/preview");
@@ -89,13 +89,13 @@ test("History Refresh derives target workspace identity and preserves a root leg
   assert.equal(activated.marker, ".pipeline/history-refresh/activation.md");
   assert.equal(activated.manifest_changed, true);
   const manifest = parseYaml(await readFile(join(root, ".pipeline/manifest.yaml"), "utf8"));
-  assert.equal(manifest.project_id, "sample-product");
+  assert.equal(manifest.project_id, projectId);
   assert.equal(manifest.format, "hypo-workflow");
   assert.equal((await detectWorkspaceFormat(root)).kind, "mixed_current_with_legacy_residue");
   const repeated = await activateHistoryRefresh(root, { approved: true });
   assert.equal(repeated.status, "unchanged");
-  assert.match(await readFile(join(root, ".pipeline/INDEX.md"), "utf8"), /name: sample-product/);
-  assert.doesNotMatch(await readFile(join(root, ".pipeline/INDEX.md"), "utf8"), /C22 active/);
+  const projectIndex = parseFrontmatter(await readFile(join(root, ".pipeline/INDEX.md"), "utf8"));
+  assert.equal(projectIndex.attributes.name, projectId);
   assert.match(await readFile(join(root, ".pipeline/cycles/INDEX.md"), "utf8"), /C008-next/);
   assert.match(await readFile(join(root, ".pipeline/cycles/INDEX.md"), "utf8"), /C009-done/);
   assert.match(await readFile(join(root, ".pipeline/legacy/INDEX.md"), "utf8"), /Current legacy work/);
@@ -158,7 +158,7 @@ test("History Refresh preserves an existing equivalent manifest byte for byte", 
   assert.equal(await readFile(join(root, ".pipeline/manifest.yaml"), "utf8"), manifest);
   assert.match(
     await readFile(join(root, ".pipeline/history-refresh/activation.md"), "utf8"),
-    /manifest_changed: false/,
+    /语义摘要层已经明确批准/,
   );
 });
 

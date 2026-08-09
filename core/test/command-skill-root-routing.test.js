@@ -56,17 +56,9 @@ test("discoverableCommandMap discovers installed backends through skillRoot, not
     skillRoot: REPOSITORY_ROOT,
   });
 
-  assert.deepEqual(discovered.map((command) => command.canonical).sort(), [
-    "/hw:accept",
-    "/hw:cycle",
-    "/hw:experiment",
-    "/hw:goal",
-    "/hw:guide",
-    "/hw:init",
-    "/hw:maintain",
-    "/hw:plan",
-    "/hw:reject",
-    "/hw:resume",
-  ]);
+  assert.deepEqual(
+    discovered.map((command) => command.canonical).sort(),
+    COMMANDS.CANONICAL_COMMANDS.map((command) => command.canonical).sort(),
+  );
   assert.deepEqual(await snapshotTree(targetRoot), before);
 });

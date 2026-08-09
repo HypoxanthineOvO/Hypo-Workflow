@@ -1,6 +1,6 @@
 {
   "name": "hypo-workflow",
-  "version": "15.0.0-alpha.1+codex.20260809040716",
+  "version": "15.0.0-alpha.2+codex.20260809052356",
   "description": "Semantic Cycle, Goal, Plan, Experiment, and Memory workflows with readable local records and restart-safe recovery for Codex.",
   "author": {
     "name": "Hypoxanthine",

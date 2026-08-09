@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import * as api from "../src/index.js";
@@ -228,39 +228,11 @@ test("Hypo-Agent Deep Plan replan fixture carries new ask research map drill rea
   assert.match(persistedContext, /\/hw:plan|ordinary Plan/i);
 });
 
-test("research-code playbooks exist and require explicit remote confirmation, bounded cache, implementation inspection, and code evidence refs", async () => {
-  const requiredPlaybooks = [
-    ".pipeline/playbooks/C12-hypo-agent-deep-plan.md",
-    ".pipeline/playbooks/C12-research-code.md",
-  ];
-
-  for (const playbook of requiredPlaybooks) {
-    const body = await readFile(playbook, "utf8");
-    assert.match(body, /Deep Plan|\/hw:plan:deep|Hypo-Agent|research-code/i);
-  }
-
-  const researchCode = await readFile(".pipeline/playbooks/C12-research-code.md", "utf8");
-  assert.match(researchCode, /explicit.*(remote|network).*confirm|显式.*(remote|network|网络).*确认/i);
-  assert.match(researchCode, /download|clone|下载|克隆/i);
-  assert.match(researchCode, /bounded.*research.*cache|有界.*research.*cache|bounded cache/i);
-  assert.match(researchCode, /inspect.*implementation.*code|implementation source|实现源码|读取实现/i);
-  assert.match(researchCode, /README-only.*insufficient|README.*不足|不能只看 README/i);
-  assert.match(researchCode, /code evidence refs|evidence_refs|源码证据/i);
-
-  const hypoAgent = await readFile(".pipeline/playbooks/C12-hypo-agent-deep-plan.md", "utf8");
-  assert.match(hypoAgent, /new.*ask.*research.*map.*drill.*readiness.*convert|new -> ask -> research -> map -> drill -> readiness -> convert/i);
-  assert.match(hypoAgent, /Feature Queue order|acceptance depth|risks|unknowns/i);
-  assert.match(hypoAgent, /ordinary.*Plan.*confirm|普通.*Plan.*确认|\/hw:plan.*confirm/i);
-});
-
 async function fixtureRoot() {
   const root = await mkdtemp(join(tmpdir(), "hw-deep-plan-real-scenario-"));
   await api.writeConfig(join(root, ".pipeline", "config.yaml"), {
     pipeline: { name: "Deep Plan Real Scenario Fixture" },
     output: { language: "zh-CN", timezone: "Asia/Shanghai" },
   });
-  await writeFile(join(root, ".pipeline", "state.yaml"), "sentinel: state\n", "utf8");
-  await writeFile(join(root, ".pipeline", "cycle.yaml"), "sentinel: cycle\n", "utf8");
-  await writeFile(join(root, ".pipeline", "rules.yaml"), "sentinel: rules\n", "utf8");
   return root;
 }

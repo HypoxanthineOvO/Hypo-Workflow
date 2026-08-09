@@ -530,7 +530,7 @@ function renderReport(inventory, cycles, deliveries, legacyWorkItems, uncertaint
 
 当前 ${cycles.length} 个旧 Cycle 可以映射为新的只读语义 Cycle。预览为每个 Cycle 生成 Plan、Progress、Execution、Discussion Summary 和 Summary，但不复制 ${inventory.archive_files} 个旧归档文件；详细 prompts、reports 和 reviews 继续引用原路径。旧文件没有被修改，Manifest 也没有切换。
 
-本预览**不具备激活授权**。当前仍有 ${deliveries.filter((item) => !["accepted", "rejected", "superseded"].includes(item.status)).length} 个非终态 live Delivery，必须在 S2 明确处理。
+本预览**不具备激活授权**。当前仍有 ${deliveries.filter((item) => !["accepted", "rejected", "superseded"].includes(item.status)).length} 个非终态 live Delivery，必须在激活前明确处理。
 
 ## 源数据
 
@@ -569,13 +569,13 @@ function renderReport(inventory, cycles, deliveries, legacyWorkItems, uncertaint
 
 ${uncertainties.length ? uncertainties.map((item) => `- ${item}`).join("\n") : "- 无。"}
 
-## S2 需要判断
+## 激活前需要判断
 
 1. 是否接受“语义摘要层 + 旧详细历史只读引用”，而不是复制全部旧文件。
 2. 非终态 live Delivery 应先完成/拒绝，还是在激活时作为单独 legacy work item 保留。
 3. 旧 Knowledge 与 Memory 的重叠是否交给后续 Maintain 人工去重。
 
-接受 S2 之前，不写 \`.pipeline/cycles/\` 中的 ${cycles.length} 个历史 Cycle，不修改 \`.pipeline/manifest.yaml\`，不删除 \`.pipeline/archives/\`。
+获得明确激活批准之前，不写 \`.pipeline/cycles/\` 中的 ${cycles.length} 个历史 Cycle，不修改 \`.pipeline/manifest.yaml\`，不删除 \`.pipeline/archives/\`。
 `;
 }
 
@@ -719,7 +719,7 @@ activated_cycles: ${mapping.cycles.length}
 
 # History Refresh 激活记录
 
-Stone S2 已接受语义摘要层。${mapping.cycles.length} 个历史 Cycle 已写入正式目录；旧 archives、Knowledge、Chats、live Delivery 和 root legacy work item 原位保留。${mapping.manifest?.action === "create-current" ? "缺失的 current manifest 已在最后一步创建。" : "已有 current manifest 保持原字节。"}
+语义摘要层已经明确批准。${mapping.cycles.length} 个历史 Cycle 已写入正式目录；旧 archives、Knowledge、Chats、live Delivery 和 root legacy work item 原位保留。${mapping.manifest?.action === "create-current" ? "缺失的 current manifest 已在最后一步创建。" : "已有 current manifest 保持原字节。"}
 `;
 }
 

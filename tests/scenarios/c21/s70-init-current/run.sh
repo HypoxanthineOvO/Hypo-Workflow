@@ -5,4 +5,4 @@ script_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 repo_root="$(CDPATH= cd -- "$script_dir/../../../.." && pwd)"
 cd "$repo_root"
 
-exec node --test --test-name-pattern='empty repo Init transaction' core/test/init-bootstrap.test.js
+exec node tests/run-node-test-pattern.mjs 'empty repo Init transaction' core/test/init-bootstrap.test.js

@@ -6,7 +6,7 @@ Hypo-Workflow is a project-work protocol for the current Codex host. `.pipeline/
 
 ## Current Routes
 
-The v15.0.0-alpha.1 Official Codex release exposes ten focused routes. Each route loads exactly one Child Skill:
+The v15.0.0-alpha.2 Official Codex release exposes ten focused routes. Each route loads exactly one Child Skill:
 
 | Route | Purpose |
 | --- | --- |
@@ -133,4 +133,4 @@ Final delivery explains the conclusion, technical approach, modified modules, te
 
 ## Release Boundary
 
-The v15.0.0-alpha.1 Host Contract v1, Codex plugin ZIP, and portable ZIP all publish ten routes and include `/hw:experiment`. Host Contract v1 serves legacy compatibility; semantic workspaces recover from ordinary files. Official Codex is the current source-side support surface, while concrete VSP-Codex model mapping is adapted and validated in the target repository.
+The v15.0.0-alpha.2 Host Contract v1, Codex plugin ZIP, and portable ZIP all publish ten routes and include `/hw:experiment`. Host Contract v1 serves legacy compatibility; semantic workspaces recover from ordinary files. Official Codex is the current source-side support surface, while concrete VSP-Codex model mapping is adapted and validated in the target repository.

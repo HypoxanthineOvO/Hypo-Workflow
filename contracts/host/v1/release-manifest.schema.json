@@ -13,7 +13,7 @@
       "additionalProperties": false,
       "required": ["version", "source_commit"],
       "properties": {
-        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$" },
         "source_commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" }
       }
     },
@@ -35,7 +35,7 @@
       "additionalProperties": false,
       "required": ["path", "sha256"],
       "properties": {
-        "path": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$" },
+        "path": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._+/-]*$" },
         "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
         "bytes": { "type": "integer", "minimum": 1 }
       }

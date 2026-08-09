@@ -2,7 +2,7 @@
 
 [中文](../../platforms/codex.md) | English
 
-Hypo-Workflow v15.0.0-alpha.1 ships as a Codex plugin with ten focused Skills and six semantic or safety Hook events. It is not a runner: the Codex Agent implements, runs experiments, tests, and reviews work, while ordinary semantic files preserve plans and evidence. Host Contract v1 remains for legacy compatibility, and both ZIP artifacts include `/hw:experiment`.
+Hypo-Workflow v15.0.0-alpha.2 ships as a Codex plugin with ten focused Skills and six semantic or safety Hook events. It is not a runner: the Codex Agent implements, runs experiments, tests, and reviews work, while ordinary semantic files preserve plans and evidence. Host Contract v1 remains for legacy compatibility, and both ZIP artifacts include `/hw:experiment`.
 
 ## Installation Shapes
 
