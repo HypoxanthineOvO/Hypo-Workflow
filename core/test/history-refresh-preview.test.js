@@ -38,6 +38,90 @@ test("History Refresh builds deterministic semantic previews from mixed legacy q
   assert.match(plan.body, /M2[^\n]*verify\.report\.md/);
 });
 
+test("History Refresh derives target workspace identity and preserves a root legacy Cycle", async (t) => {
+  const root = await historyFixture(t);
+  await writeText(join(root, "package.json"), '{"name":"sample-product"}\n');
+  await writeText(
+    join(root, ".pipeline/cycle.yaml"),
+    "cycle:\n  number: 7\n  name: Current legacy work\n  status: active\n",
+  );
+  await writeText(
+    join(root, ".pipeline/state.yaml"),
+    "pipeline:\n  status: running\ncurrent:\n  phase: lifecycle_check\n",
+  );
+  await writeText(
+    join(root, ".pipeline/cycles/C008-next/PLAN.md"),
+    "---\nkind: plan\ncycle: C008-next\n---\n\n# Next Cycle\n",
+  );
+  await writeText(
+    join(root, ".pipeline/cycles/C008-next/PROGRESS.md"),
+    "---\nkind: progress\ncycle: C008-next\nstatus: active\ncurrent: M1\nnext: Continue\n---\n\n# Progress\n",
+  );
+  await writeText(
+    join(root, ".pipeline/cycles/C009-done/PLAN.md"),
+    "---\nkind: plan\ncycle: C009-done\n---\n\n# Existing Closed Cycle\n",
+  );
+  await writeText(
+    join(root, ".pipeline/cycles/C009-done/PROGRESS.md"),
+    "---\nkind: progress\ncycle: C009-done\nstatus: closed\ncurrent: M2\nnext: none\n---\n\n# Progress\n",
+  );
+
+  const preview = await buildHistoryRefreshPreview(root);
+  const mapping = parseYaml(preview.files.get("mapping.yaml"));
+  assert.equal(mapping.project_id, "sample-product");
+  assert.equal(mapping.legacy_work_items.length, 1);
+  assert.deepEqual(mapping.legacy_work_items[0], {
+    id: "C7",
+    kind: "legacy-cycle",
+    name: "Current legacy work",
+    status: "running",
+    source: ".pipeline/cycle.yaml",
+    disposition: "preserve-for-explicit-lifecycle-review",
+  });
+  assert.equal(preview.inventory.legacy_work_items, 1);
+  assert.match(preview.files.get("REPORT.md"), /2 个历史 Cycle/);
+  assert.doesNotMatch(preview.files.get("REPORT.md"), /20 个历史 Cycle|C22/);
+
+  const written = await writeHistoryRefreshPreview(root);
+  assert.equal(written.output, ".pipeline/history-refresh/preview");
+  const activated = await activateHistoryRefresh(root, { approved: true });
+  assert.equal(activated.marker, ".pipeline/history-refresh/activation.md");
+  assert.match(await readFile(join(root, ".pipeline/INDEX.md"), "utf8"), /name: sample-product/);
+  assert.doesNotMatch(await readFile(join(root, ".pipeline/INDEX.md"), "utf8"), /C22 active/);
+  assert.match(await readFile(join(root, ".pipeline/cycles/INDEX.md"), "utf8"), /C008-next/);
+  assert.match(await readFile(join(root, ".pipeline/cycles/INDEX.md"), "utf8"), /C009-done/);
+  assert.match(await readFile(join(root, ".pipeline/legacy/INDEX.md"), "utf8"), /Current legacy work/);
+});
+
+test("History Refresh prefers the manifest project id over clone-local directory names", async (t) => {
+  const root = await historyFixture(t);
+  await writeText(join(root, "package.json"), '{"name":"clone-local-name"}\n');
+  await writeText(join(root, ".pipeline/manifest.yaml"), "project_id: StableProject\n");
+
+  const preview = await buildHistoryRefreshPreview(root);
+  const mapping = parseYaml(preview.files.get("mapping.yaml"));
+  assert.equal(mapping.project_id, "StableProject");
+});
+
+test("History Refresh indexes incomplete root legacy state without cycle metadata", async (t) => {
+  const root = await historyFixture(t);
+  await writeText(
+    join(root, ".pipeline/state.yaml"),
+    "pipeline:\n  name: Recovered legacy work\n  status: running\n",
+  );
+
+  const preview = await buildHistoryRefreshPreview(root);
+  assert.equal(preview.legacyWorkItems.length, 1);
+  assert.deepEqual(preview.legacyWorkItems[0], {
+    id: "legacy-cycle",
+    kind: "legacy-cycle",
+    name: "Recovered legacy work",
+    status: "running",
+    source: ".pipeline/state.yaml",
+    disposition: "preserve-for-explicit-lifecycle-review",
+  });
+});
+
 test("History Refresh writes beside legacy history, is idempotent, and preserves source bytes", async (t) => {
   const root = await historyFixture(t);
   const archiveRoot = join(root, ".pipeline/archives");
@@ -121,7 +205,7 @@ test("History Refresh activates reviewed history once without changing legacy by
   assert.equal(activated.status, "activated");
   assert.equal(activated.activated_cycles, 2);
   assert.equal(activated.created_cycles, 2);
-  assert.equal(activated.marker, ".pipeline/history-refresh/C022-activation.md");
+  assert.equal(activated.marker, ".pipeline/history-refresh/activation.md");
   assert.equal(activated.manifest_changed, false);
   assert.equal(activated.legacy_preserved, true);
   assert.equal(await treeDigest(archiveRoot), archiveBefore);
@@ -147,6 +231,11 @@ test("History Refresh activates reviewed history once without changing legacy by
     await readFile(join(root, ".pipeline/experiments/INDEX.md"), "utf8"),
     /没有可高置信识别为 Experiment/,
   );
+
+  await rm(join(root, ".pipeline/INDEX.md"));
+  const repaired = await activateHistoryRefresh(root, { approved: true });
+  assert.equal(repaired.status, "activated");
+  assert.match(await readFile(join(root, ".pipeline/INDEX.md"), "utf8"), /项目索引/);
 
   const repeated = await activateHistoryRefresh(root, { approved: true });
   assert.equal(repeated.status, "unchanged");

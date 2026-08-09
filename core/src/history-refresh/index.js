@@ -12,15 +12,19 @@ import { basename, dirname, join, resolve } from "node:path";
 import { redactSecrets } from "../evidence/index.js";
 import { parseFrontmatter, parseYaml, stringifyYaml } from "../serialization/index.js";
 
-const DEFAULT_OUTPUT = ".pipeline/history-refresh/C022-preview";
+const DEFAULT_OUTPUT = ".pipeline/history-refresh/preview";
+const ACTIVATION_MARKER = ".pipeline/history-refresh/activation.md";
+const SAFE_PROJECT_ID = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 
 export async function buildHistoryRefreshPreview(root = ".") {
   const workspace = resolve(root);
   const pipelineRoot = join(workspace, ".pipeline");
   const sourceFiles = (await walkFiles(pipelineRoot))
-    .filter((path) => !path.startsWith("history-refresh/") && !path.startsWith("local/"));
+    .filter((path) => !isHistoryRefreshDerivedPath(path));
   const counts = countTopLevel(sourceFiles);
+  const projectId = await readProjectId(workspace);
   const cycles = await readArchivedCycles(workspace);
+  const legacyWorkItems = await readRootLegacyWorkItems(workspace);
   const memory = await readMemoryRecords(workspace);
   const deliveries = await readLiveDeliveries(workspace);
   const knowledgeFiles = await walkOptional(join(workspace, ".pipeline", "knowledge"));
@@ -39,13 +43,14 @@ export async function buildHistoryRefreshPreview(root = ".") {
     patch_files: patchFiles.length,
     pr_files: prFiles.length,
     live_deliveries: deliveries.length,
+    legacy_work_items: legacyWorkItems.length,
   };
-  const uncertainties = buildUncertainties(cycles, deliveries, knowledgeFiles, chatFiles);
+  const uncertainties = buildUncertainties(cycles, deliveries, legacyWorkItems, knowledgeFiles, chatFiles);
   const files = new Map();
 
-  files.set("REPORT.md", renderReport(inventory, cycles, deliveries, uncertainties));
-  files.set("mapping.yaml", `${stringifyYaml(renderMapping(inventory, cycles, deliveries, uncertainties)).trimEnd()}\n`);
-  files.set("proposed/INDEX.md", renderProjectIndex(cycles, memory, deliveries));
+  files.set("REPORT.md", renderReport(inventory, cycles, deliveries, legacyWorkItems, uncertainties));
+  files.set("mapping.yaml", `${stringifyYaml(renderMapping(projectId, inventory, cycles, deliveries, legacyWorkItems, uncertainties)).trimEnd()}\n`);
+  files.set("proposed/INDEX.md", renderProjectIndex(projectId, cycles, memory, deliveries, legacyWorkItems));
   files.set("proposed/cycles/INDEX.md", renderCycleIndex(cycles));
   files.set("proposed/memory/INDEX.md", renderMemoryIndex(memory, knowledgeFiles));
   files.set("proposed/experiments/INDEX.md", renderExperimentIndex(memory));
@@ -59,7 +64,7 @@ export async function buildHistoryRefreshPreview(root = ".") {
     files.set(`${prefix}/SUMMARY.md`, renderCycleSummary(cycle));
   }
 
-  return { files, inventory, cycles, memory, deliveries, uncertainties };
+  return { files, inventory, cycles, memory, deliveries, legacyWorkItems, projectId, uncertainties };
 }
 
 export async function writeHistoryRefreshPreview(root = ".", options = {}) {
@@ -123,10 +128,7 @@ export async function activateHistoryRefresh(root = ".", options = {}) {
     targets.push({ id, sourceFiles, target, existing: Boolean(existing) });
   }
 
-  const marker = join(workspace, ".pipeline", "history-refresh", "C022-activation.md");
-  if (await fileExists(marker) && targets.every((target) => target.existing)) {
-    return { status: "unchanged", activated_cycles: targets.length, marker: relativePath(workspace, marker) };
-  }
+  const marker = join(workspace, ACTIVATION_MARKER);
 
   const currentPreview = await buildHistoryRefreshPreview(workspace);
   if (!sameFiles(reviewedPreview, currentPreview.files)) {
@@ -138,12 +140,20 @@ export async function activateHistoryRefresh(root = ".", options = {}) {
   const previewExperimentIndex = await readFile(join(previewRoot, "proposed", "experiments", "INDEX.md"), "utf8");
   const indexes = new Map([
     [join(workspace, ".pipeline", "INDEX.md"), renderActivatedProjectIndex(mapping)],
-    [join(workspace, ".pipeline", "cycles", "INDEX.md"), await renderActivatedCycleIndex(workspace, previewCycleIndex)],
+    [join(workspace, ".pipeline", "cycles", "INDEX.md"), await renderActivatedCycleIndex(workspace, previewCycleIndex, mapping)],
     [join(workspace, ".pipeline", "memory", "HISTORY-REFRESH-INDEX.md"), previewMemoryIndex.replace("status: preview", "status: active").replace("# Memory 索引预览", "# Memory History 索引")],
     [join(workspace, ".pipeline", "experiments", "INDEX.md"), previewExperimentIndex.replace("status: preview", "status: active").replace("# Experiment 索引预览", "# Experiment 索引")],
     [join(workspace, ".pipeline", "legacy", "INDEX.md"), renderLegacyIndex(mapping)],
     [marker, renderActivationMarker(previewRelative, mapping)],
   ]);
+  if (await fileExists(marker) && targets.every((target) => target.existing)) {
+    const indexesUnchanged = (await Promise.all(
+      [...indexes].map(async ([path, content]) => await readOptional(path, null) === content),
+    )).every(Boolean);
+    if (indexesUnchanged) {
+      return { status: "unchanged", activated_cycles: targets.length, marker: relativePath(workspace, marker) };
+    }
+  }
   const oldIndexes = new Map();
   for (const path of indexes.keys()) oldIndexes.set(path, await readOptional(path, null));
   const created = [];
@@ -333,19 +343,112 @@ async function readLiveDeliveries(root) {
   return deliveries;
 }
 
-function buildUncertainties(cycles, deliveries, knowledgeFiles, chatFiles) {
+async function readProjectId(root) {
+  const manifestText = await readOptional(join(root, ".pipeline", "manifest.yaml"), null);
+  if (manifestText) {
+    try {
+      const manifestProjectId = parseYaml(manifestText)?.project_id;
+      if (typeof manifestProjectId === "string" && manifestProjectId.trim()) {
+        const preservedProjectId = manifestProjectId.trim();
+        if (SAFE_PROJECT_ID.test(preservedProjectId)) return preservedProjectId;
+      }
+    } catch {
+      // Invalid manifest metadata is handled by workspace validation; identity falls back here.
+    }
+  }
+  const packageText = await readOptional(join(root, "package.json"), null);
+  if (packageText) {
+    try {
+      const packageName = JSON.parse(packageText)?.name;
+      if (typeof packageName === "string" && packageName.trim()) {
+        return normalizeProjectId(packageName);
+      }
+    } catch {
+      // Invalid package metadata falls back to the workspace directory name.
+    }
+  }
+  return normalizeProjectId(basename(root));
+}
+
+async function readRootLegacyWorkItems(root) {
+  const cyclePath = join(root, ".pipeline", "cycle.yaml");
+  const cycleText = await readOptional(cyclePath, null);
+  const statePath = join(root, ".pipeline", "state.yaml");
+  const stateText = await readOptional(statePath, null);
+  const progressPath = join(root, ".pipeline", "PROGRESS.md");
+  const progressText = await readOptional(progressPath, null);
+  if (cycleText === null && stateText === null && progressText === null) return [];
+
+  let cycle = {};
+  let cycleInvalid = false;
+  if (cycleText?.trim()) {
+    try {
+      cycle = parseYaml(cycleText)?.cycle || {};
+    } catch {
+      cycleInvalid = true;
+    }
+  }
+
+  let state = {};
+  let stateInvalid = false;
+  if (stateText?.trim()) {
+    try {
+      state = parseYaml(stateText) || {};
+    } catch {
+      stateInvalid = true;
+    }
+  }
+  const number = Number(cycle.number);
+  const id = Number.isInteger(number) && number >= 0 ? `C${number}` : "legacy-cycle";
+  const source = cycleText !== null
+    ? ".pipeline/cycle.yaml"
+    : stateText !== null
+      ? ".pipeline/state.yaml"
+      : ".pipeline/PROGRESS.md";
+  return [{
+    id,
+    kind: "legacy-cycle",
+    name: String(cycle.name || state.pipeline?.name || (cycleInvalid || stateInvalid ? "Unparsed root legacy Cycle" : id)),
+    status: String(state.pipeline?.status || cycle.status || (cycleInvalid || stateInvalid ? "unparsed" : "unknown")),
+    source,
+    disposition: "preserve-for-explicit-lifecycle-review",
+  }];
+}
+
+function normalizeProjectId(value) {
+  const normalized = String(value || "project")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^[-._]+|[-._]+$/g, "");
+  return normalized || "project";
+}
+
+function isHistoryRefreshDerivedPath(path) {
+  return path.startsWith("history-refresh/")
+    || path.startsWith("local/")
+    || path === "INDEX.md"
+    || path.startsWith("cycles/")
+    || path === "memory/HISTORY-REFRESH-INDEX.md"
+    || path === "experiments/INDEX.md"
+    || path === "legacy/INDEX.md";
+}
+
+function buildUncertainties(cycles, deliveries, legacyWorkItems, knowledgeFiles, chatFiles) {
   const items = [];
   for (const cycle of cycles) {
     if (cycle.missing.length) items.push(`${cycle.id} 缺少 ${cycle.missing.join("、")}，预览只能使用其他来源补足。`);
   }
   const pending = deliveries.filter((item) => !["accepted", "rejected", "superseded"].includes(item.status));
   for (const item of pending) items.push(`Live Delivery ${item.id} 状态为 ${item.status}，激活前必须解决或明确保留。`);
+  for (const item of legacyWorkItems) items.push(`根部旧 Cycle ${item.id} 状态为 ${item.status}，仅保留为 legacy work item，等待显式生命周期处理。`);
   if (knowledgeFiles.length) items.push(`${knowledgeFiles.length} 个旧 Knowledge 文件可能与 Memory Records 重叠，需要人工去重。`);
   if (chatFiles.length) items.push(`${chatFiles.length} 个旧 Chat 状态文件没有可靠 Cycle 绑定，不自动归入 Discussion。`);
   return items;
 }
 
-function renderReport(inventory, cycles, deliveries, uncertainties) {
+function renderReport(inventory, cycles, deliveries, legacyWorkItems, uncertainties) {
   const missingSummary = cycles.filter((cycle) => cycle.missing.includes("summary.md")).map((cycle) => cycle.id);
   const missingProgress = cycles.filter((cycle) => cycle.missing.includes("PROGRESS.md")).map((cycle) => cycle.id);
   const statusCounts = countValues(deliveries.map((item) => item.status));
@@ -370,6 +473,7 @@ function renderReport(inventory, cycles, deliveries, uncertainties) {
 | Patch 文件 | ${inventory.patch_files} |
 | PR 文件 | ${inventory.pr_files} |
 | Live Delivery | ${inventory.live_deliveries} |
+| Root legacy work item | ${inventory.legacy_work_items} |
 
 ## 映射方式
 
@@ -378,7 +482,7 @@ function renderReport(inventory, cycles, deliveries, uncertainties) {
 - \`summary.md\` 进入新的 Summary；缺失时使用 \`cycle.summary\` 并标记不确定。
 - \`confirm-summary.md\` 只作为接受证据引用，不伪造逐字 Discussion。
 - ${inventory.memory_records} 个 Memory Records 保持原路径，预览重建人类可读索引。
-- 旧 Knowledge、Chats、Patches、PR 和 live deliveries 保留原位，不在没有语义依据时强行归类。
+- 旧 Knowledge、Chats、Patches、PR、live deliveries 和 root legacy work items 保留原位，不在没有语义依据时强行归类。
 
 ## 覆盖与缺口
 
@@ -386,6 +490,7 @@ function renderReport(inventory, cycles, deliveries, uncertainties) {
 - 缺少 \`summary.md\`：${missingSummary.length ? missingSummary.join("、") : "无"}。
 - 缺少 \`PROGRESS.md\`：${missingProgress.length ? missingProgress.join("、") : "无"}。
 - Live Delivery 状态：${Object.entries(statusCounts).map(([status, count]) => `${status}=${count}`).join("，") || "无"}。
+- Root legacy work item：${legacyWorkItems.length ? legacyWorkItems.map((item) => `${item.id}=${item.status}`).join("，") : "无"}。
 
 ## 不确定项与风险
 
@@ -397,13 +502,14 @@ ${uncertainties.length ? uncertainties.map((item) => `- ${item}`).join("\n") : "
 2. 非终态 live Delivery 应先完成/拒绝，还是在激活时作为单独 legacy work item 保留。
 3. 旧 Knowledge 与 Memory 的重叠是否交给后续 Maintain 人工去重。
 
-接受 S2 之前，不写 \`.pipeline/cycles/\` 中的 20 个历史 Cycle，不修改 \`.pipeline/manifest.yaml\`，不删除 \`.pipeline/archives/\`。
+接受 S2 之前，不写 \`.pipeline/cycles/\` 中的 ${cycles.length} 个历史 Cycle，不修改 \`.pipeline/manifest.yaml\`，不删除 \`.pipeline/archives/\`。
 `;
 }
 
-function renderMapping(inventory, cycles, deliveries, uncertainties) {
+function renderMapping(projectId, inventory, cycles, deliveries, legacyWorkItems, uncertainties) {
   return {
     kind: "history-refresh-preview",
+    project_id: projectId,
     status: "waiting-review",
     activation_authorized: false,
     inventory,
@@ -416,6 +522,7 @@ function renderMapping(inventory, cycles, deliveries, uncertainties) {
       detail_policy: "reference-legacy",
     })),
     live_deliveries: deliveries,
+    legacy_work_items: legacyWorkItems,
     uncertainties,
     legacy_policy: "read-only-preserve",
   };
@@ -424,18 +531,18 @@ function renderMapping(inventory, cycles, deliveries, uncertainties) {
 function renderActivatedProjectIndex(mapping) {
   return `---
 kind: project-index
-name: hypo-workflow
+name: ${mapping.project_id}
 status: active
 ---
 
-# Hypo-Workflow 项目索引
+# ${mapping.project_id} 项目索引
 
 ## 当前工作
 
-- [Cycle 索引](cycles/INDEX.md)：C22 active，${mapping.cycles.length} 个历史 Cycle closed。
+- [Cycle 索引](cycles/INDEX.md)：本次映射 ${mapping.cycles.length} 个历史 Cycle；既有 semantic Cycle 按实际状态一并保留。
 - [Experiment 索引](experiments/INDEX.md)。
 - [Memory History 索引](memory/HISTORY-REFRESH-INDEX.md)。
-- [Legacy 索引](legacy/INDEX.md)：旧 archives、Knowledge、Chats、Patches、PR 和 live Delivery。
+- [Legacy 索引](legacy/INDEX.md)：旧 archives、Knowledge、Chats、Patches、PR、live Delivery 和 root legacy work item。
 
 ## 读取顺序
 
@@ -443,8 +550,10 @@ status: active
 `;
 }
 
-async function renderActivatedCycleIndex(root, previewIndex) {
+async function renderActivatedCycleIndex(root, previewIndex, mapping) {
   const active = [];
+  const existingClosed = [];
+  const mappedIds = new Set((mapping.cycles || []).map((item) => basename(String(item.proposed || ""))));
   const cyclesRoot = join(root, ".pipeline", "cycles");
   let entries;
   try {
@@ -454,11 +563,19 @@ async function renderActivatedCycleIndex(root, previewIndex) {
     else throw error;
   }
   for (const entry of entries.sort((left, right) => left.name.localeCompare(right.name))) {
-    if (!entry.isDirectory() || !entry.name.startsWith("C022-")) continue;
+    if (!entry.isDirectory() || !/^C\d+-/.test(entry.name)) continue;
     try {
       const plan = parseFrontmatter(await readFile(join(cyclesRoot, entry.name, "PLAN.md"), "utf8"));
       const progress = parseFrontmatter(await readFile(join(cyclesRoot, entry.name, "PROGRESS.md"), "utf8"));
-      active.push(`| [${entry.name}](${entry.name}/PLAN.md) | ${escapeTable(firstTitle(plan.body) || entry.name)} | ${progress.attributes.status || "active"} | \`${progress.attributes.current || "unknown"}\` | ${escapeTable(progress.attributes.next || "unknown")} |`);
+      const status = progress.attributes.status || "active";
+      const title = escapeTable(firstTitle(plan.body) || entry.name);
+      if (["closed", "completed", "cancelled"].includes(status)) {
+        if (!mappedIds.has(entry.name)) {
+          existingClosed.push(`| [${entry.name}](${entry.name}/PLAN.md) | ${title} | ${status} | semantic | current |`);
+        }
+      } else {
+        active.push(`| [${entry.name}](${entry.name}/PLAN.md) | ${title} | ${status} | \`${progress.attributes.current || "unknown"}\` | ${escapeTable(progress.attributes.next || "unknown")} |`);
+      }
     } catch {
       // Incomplete active Cycles remain visible through explicit validation, not a guessed index row.
     }
@@ -481,12 +598,13 @@ ${active.length ? active.join("\n") : "| 无 | - | - | - | - |"}
 
 | Cycle | 名称 | 状态 | 旧文件 | 映射置信度 |
 | --- | --- | --- | ---: | --- |
-${closedRows.join("\n")}
+${[...closedRows, ...existingClosed].join("\n")}
 `;
 }
 
 function renderLegacyIndex(mapping) {
-  const rows = (mapping.live_deliveries || []).map((item) => `| ${item.id} | \`${item.kind}\` | \`${item.status}\` | \`${item.source}\` |`);
+  const rows = [...(mapping.live_deliveries || []), ...(mapping.legacy_work_items || [])]
+    .map((item) => `| ${item.id} | ${escapeTable(item.name || item.id)} | \`${item.kind}\` | \`${item.status}\` | \`${item.source}\` |`);
   return `---
 kind: legacy-index
 status: read-only
@@ -502,12 +620,13 @@ status: read-only
 - Patches：\`.pipeline/patches/\`
 - PR：\`.pipeline/pr/\`
 - 旧 Manifest 与 live Delivery：\`.pipeline/manifest.yaml\`、\`.pipeline/runtime/objects/delivery/\`
+- Root legacy Cycle：\`.pipeline/cycle.yaml\`、\`.pipeline/state.yaml\`、\`.pipeline/PROGRESS.md\`
 
-## Live Deliveries
+## Legacy Work Items
 
-| ID | 类型 | 状态 | 来源 |
-| --- | --- | --- | --- |
-${rows.length ? rows.join("\n") : "| 无 | - | - | - |"}
+| ID | 名称 | 类型 | 状态 | 来源 |
+| --- | --- | --- | --- | --- |
+${rows.length ? rows.join("\n") : "| 无 | - | - | - | - |"}
 
 非终态项必须通过旧兼容入口单独处理，不自动转成 Cycle，也不自动接受或拒绝。
 `;
@@ -524,25 +643,26 @@ manifest_changed: false
 activated_cycles: ${mapping.cycles.length}
 ---
 
-# C22 History Refresh 激活记录
+# History Refresh 激活记录
 
-Stone S2 已接受语义摘要层。${mapping.cycles.length} 个历史 Cycle 已写入正式目录；旧 archives、Knowledge、Chats 和 live Delivery 原位保留。Manifest 为兼容旧 live Delivery 保持不变。
+Stone S2 已接受语义摘要层。${mapping.cycles.length} 个历史 Cycle 已写入正式目录；旧 archives、Knowledge、Chats、live Delivery 和 root legacy work item 原位保留。Manifest 为兼容旧 live Delivery 保持不变。
 `;
 }
 
-function renderProjectIndex(cycles, memory, deliveries) {
+function renderProjectIndex(projectId, cycles, memory, deliveries, legacyWorkItems) {
   return `---
 kind: project-index
-name: hypo-workflow
+name: ${projectId}
 status: preview
 ---
 
-# Hypo-Workflow History Refresh 预览
+# ${projectId} History Refresh 预览
 
 - [Cycle 索引](cycles/INDEX.md)：${cycles.length} 个旧 Cycle。
 - [Memory 索引](memory/INDEX.md)：${memory.length} 个现有 Memory Record。
 - [Experiment 索引](experiments/INDEX.md)。
 - Live Delivery：${deliveries.length} 个，激活前保留在旧入口。
+- Root legacy work item：${legacyWorkItems.length} 个，激活后保留在 Legacy 索引等待显式处理。
 
 此目录只是预览，不是当前 Workflow 入口。
 `;

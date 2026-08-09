@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixes
+
+- History Refresh 不再硬编码 Hypo-Workflow 自身的项目名、C22 标记或历史 Cycle 数量；跨项目采用时从目标工作区派生语义索引，并将根部旧格式 Cycle 保留为只读 legacy work item，等待显式生命周期处理。
+
 ## v15.0.0-alpha.1 - 2026-08-06
 
 ### Breaking Changes
