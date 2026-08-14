@@ -2,7 +2,7 @@
 kind: plan
 cycle: C027-machine-era-dismantle-and-readable-rewrite
 mode: plan
-status: active
+status: closed
 updated: 2026-08-14
 progress: PROGRESS.md
 execution: EXECUTION.md

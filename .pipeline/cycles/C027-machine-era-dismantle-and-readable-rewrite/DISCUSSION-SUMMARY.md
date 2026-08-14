@@ -30,8 +30,8 @@ raw_discussion: local/discussions/C027-machine-era-dismantle-and-readable-rewrit
 
 - 讨论完成检查点：用户确认十项范围充分，授权写 C027 Proposal（2026-08-14）。
 - S1：用户接受矩阵并勾选全部待定项（含受保护三文件删除）。
-- S2：尚未（等待最终审阅）。
+- S2：两轮反馈修订（记录中文化、知识沉淀）后用户接受，C027 关闭。
 
 ## 未决问题
 
-- S2：用户是否接受清理结果（接受后关闭 Cycle）。
+- 无（后续候选见 `SUMMARY.md`）。

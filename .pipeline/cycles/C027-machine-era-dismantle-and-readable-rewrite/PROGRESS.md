@@ -2,10 +2,10 @@
 kind: progress
 cycle: C027-machine-era-dismantle-and-readable-rewrite
 plan: PLAN.md
-status: active
-updated: 2026-08-14T19:20:00+08:00
-current: S2
-next: 等待用户审阅清理结果
+status: closed
+updated: 2026-08-14T20:10:00+08:00
+current: completed
+next: none
 ---
 
 # 机器时代拆除与人类可读重写进度
@@ -25,7 +25,7 @@ M1–M6 全部完成，验证通过。停在 S2 等待用户审阅最终结果�
 | `M4` | .pipeline 重写与文件清理 | `completed` | .pipeline 收敛为 INDEX/cycles/memory/experiments/local；120 份 evidence 与 architecture/audits 提取到 C027/extracted；顶层按勾选全删；dist 只留最新 | 进入 M5 |
 | `M5` | 规则引擎退役、删除保护移除、反脚手架、AGENTS.md 生成 | `completed` | rules 引擎/受保护文件删除；hooks 6→4 事件；反脚手架入指令面；`scripts/generate-agents.mjs` 从原则源生成 AGENTS.md | 进入 M6 |
 | `M6` | 实验旧机器删除与适配器落位 | `completed` | `core/src/experiment` 删除；Kimi/ZCode 适配 README 落位（DSH = AGENTS.md） | 进入 S2 |
-| `S2` | 审阅清理结果 | `rejected→revision×2` | 反馈1：记录用中文；反馈2：知识要梳理沉淀不堆积 | 修订后重新审阅 |
+| `S2` | 审阅清理结果 | `completed` | 两轮修订后用户接受，C027 关闭（`SUMMARY.md`） | 后续候选见 SUMMARY |
 
 ## 验证结果
 
