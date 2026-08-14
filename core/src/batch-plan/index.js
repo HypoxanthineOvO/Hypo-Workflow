@@ -1,3 +1,5 @@
+// LEGACY (C026, 2026-08-14): C12–C19 批量/阶段制 Plan 机器。
+// 日常语义 Cycle 不再调用本模块；仅旧宿主/迁移兼容保留，见 .pipeline/legacy/INDEX.md。
 import { normalizeDiscoverFeature } from "../progressive-discover/index.js";
 import { normalizeTestProfileSelection } from "../test-profile/index.js";
 

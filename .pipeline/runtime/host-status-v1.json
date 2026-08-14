@@ -2,21 +2,28 @@
   "schema_version": "1",
   "contract_version": "1",
   "projection_status": "current",
-  "generated_at": "2026-07-23T16:53:55.479Z",
-  "generation": 66,
+  "generated_at": "2026-08-10T07:57:29.835Z",
+  "generation": 898,
   "workspace": {
     "format_version": "1",
     "status": "ready"
   },
   "delivery": {
     "kind": "goal",
-    "id": "vspi-symbiotic-workflow-goal",
+    "id": "experiment-protocol-hooks-simplification",
     "status": "pending_acceptance",
     "revision": 0
   },
   "continuation": {
     "available": true,
     "safe_resume_command": "/hw:resume"
+  },
+  "work_items": [],
+  "session": {
+    "host": "codex",
+    "session_id": "019feaa4-dd07-7c53-aee7-1c6c579b3506",
+    "status": "none",
+    "work_item_ref": null
   },
   "invalidation": null
 }

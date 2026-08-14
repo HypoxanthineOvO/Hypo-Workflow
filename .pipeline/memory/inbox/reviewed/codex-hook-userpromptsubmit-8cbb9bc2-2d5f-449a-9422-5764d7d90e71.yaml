@@ -1,0 +1,34 @@
+authority_role: proposal
+journal_ref:
+  event_id: e02ace6951bce7c2d69471595091b9b5ddd0b655f841aa6277bcc906bab5b036
+  path: >-
+    .pipeline/runtime/objects/activity/ambient-maintain/events/019fac1c-4336-7d32-ae7f-0db26aae33d7/main/main/00000001.jsonl
+kind: ambient_maintain
+object_ref:
+  id: ambient-maintain
+  kind: activity
+record_patch:
+  body: 它甚至还会一直冲突，我们会拦截它，说：“你必须得把这个停下来才行。
+  confidence: confirmed
+  created_at: 2026-07-29T04:24:14.464Z
+  dedupe_key: codex-prompt:bb3e6ef0b2089c7cec61df508d660d33db9c83bebdd8313da2168058c5807754
+  kind: requirement
+  scope:
+    ref: project:Hypo-Workflow
+    type: project
+  source_refs:
+    - locator: 019fac1d-adc4-70b1-b118-72ab35eed7ba
+      ref: 019fac1c-4336-7d32-ae7f-0db26aae33d7
+      type: session
+  supersedes: []
+  updated_at: 2026-07-29T04:24:14.464Z
+schema_version: '1'
+session_id: 019fac1c-4336-7d32-ae7f-0db26aae33d7
+source: user_prompt
+staged_at: 2026-07-29T04:24:14.464Z
+status: staged
+summary: 它甚至还会一直冲突，我们会拦截它，说：“你必须得把这个停下来才行。
+turn_id: 019fac1d-adc4-70b1-b118-72ab35eed7ba
+writer:
+  id: main
+  kind: main

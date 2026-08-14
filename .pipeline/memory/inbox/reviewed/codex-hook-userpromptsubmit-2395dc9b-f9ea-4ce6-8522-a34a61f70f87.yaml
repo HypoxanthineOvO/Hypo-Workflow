@@ -1,0 +1,34 @@
+authority_role: proposal
+journal_ref:
+  event_id: 2c5b0cd08239daf742eecd0029f6c64ba37db763e2aea5ea372f37f4f03312e0
+  path: >-
+    .pipeline/runtime/objects/activity/ambient-maintain/events/019fb3a2-e251-7460-b3a7-1f5b735bb2ac/main/main/00000001.jsonl
+kind: ambient_maintain
+object_ref:
+  id: ambient-maintain
+  kind: activity
+record_patch:
+  body: 对，不用明确确认，但是模型应该要求给用户展示以下内容： 我宁可你把这种测试的要求写成类似于文档要求的形式，让模型自己去检查，也不应该随便硬编码成测试。
+  confidence: confirmed
+  created_at: 2026-07-30T15:52:09.108Z
+  dedupe_key: codex-prompt:e380d3359d138ae603059ad55f5385b61b19a3b9e3fda5c251cf3287bcf74cb5
+  kind: requirement
+  scope:
+    ref: project:Hypo-Workflow
+    type: project
+  source_refs:
+    - locator: 019fb3b9-d7ba-75c1-9a58-4bfbc5036149
+      ref: 019fb3a2-e251-7460-b3a7-1f5b735bb2ac
+      type: session
+  supersedes: []
+  updated_at: 2026-07-30T15:52:09.108Z
+schema_version: '1'
+session_id: 019fb3a2-e251-7460-b3a7-1f5b735bb2ac
+source: user_prompt
+staged_at: 2026-07-30T15:52:09.108Z
+status: staged
+summary: 对，不用明确确认，但是模型应该要求给用户展示以下内容： 我宁可你把这种测试的要求写成类似于文档要求的形式，让模型自己去检查，也不应该随便硬编码成测试。
+turn_id: 019fb3b9-d7ba-75c1-9a58-4bfbc5036149
+writer:
+  id: main
+  kind: main

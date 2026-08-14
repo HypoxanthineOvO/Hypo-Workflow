@@ -1,0 +1,27 @@
+delivery_kind: goal
+object_ref:
+  id: experiment-protocol-hooks-simplification
+  kind: delivery
+plan_hash: 1450a5314af05399d43480492d6063a5b028abff144c576abc308fd292d174f3
+plan_record_ref:
+  id: decision-7522350fd2ff83aefca8abe125106027
+  semantic_hash: 7522350fd2ff83aefca8abe125106027bcc310a1c78fe91c1008724d71bcd1ab
+revision: 0
+schema_version: '1'
+status: pending_acceptance
+topology:
+  identity_constraints: []
+  profile: solo-verified
+  required_roles:
+    - implement
+  schema_version: '1'
+  separation_required: false
+  verification_required: true
+updated_at: 2026-08-03T10:57:07.547Z
+verification:
+  evidence_refs:
+    - digest: sha256:82c3703335099c33ba1971dbfcb174674eabcf6d934a84b42deabe287119097e
+      path: .pipeline/runtime/objects/delivery/experiment-protocol-hooks-simplification/evidence/implementation-report.md
+      type: file
+  roles:
+    - implement

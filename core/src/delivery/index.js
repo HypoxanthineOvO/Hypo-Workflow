@@ -1,3 +1,5 @@
+// LEGACY (C026, 2026-08-14): C21 机器时代 Delivery 状态机（Goal/Cycle/Milestone、plan hash、Receipt）。
+// 日常语义 Cycle 用普通 Markdown/YAML 文件，不调用本模块；仅旧宿主/迁移兼容保留，见 .pipeline/legacy/INDEX.md。
 import { createHash } from "node:crypto";
 import { lstat, readFile } from "node:fs/promises";
 import { resolve } from "node:path";

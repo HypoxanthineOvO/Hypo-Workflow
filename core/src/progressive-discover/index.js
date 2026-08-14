@@ -1,3 +1,5 @@
+// LEGACY (C026, 2026-08-14): 阶段制 Plan 的渐进式发现/提问机器。
+// 日常语义 Cycle 不再调用本模块；仅旧宿主/迁移兼容保留，见 .pipeline/legacy/INDEX.md。
 import {
   normalizeAnalysisKind,
   normalizeWorkflowKind,

@@ -1,5 +1,5 @@
 active:
   delivery:
-    id: vspi-symbiotic-workflow-goal
+    id: experiment-protocol-hooks-simplification
     kind: delivery
 schema_version: '1'

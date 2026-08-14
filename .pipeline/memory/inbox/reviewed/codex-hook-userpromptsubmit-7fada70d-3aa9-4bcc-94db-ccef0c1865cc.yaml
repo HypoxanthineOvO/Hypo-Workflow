@@ -1,0 +1,38 @@
+authority_role: proposal
+journal_ref:
+  event_id: 648fcd7c8113d67761317602e03a5502437e717f597ad07174b381c987a67767
+  path: >-
+    .pipeline/runtime/objects/activity/ambient-maintain/events/019fb3a2-e251-7460-b3a7-1f5b735bb2ac/main/main/00000001.jsonl
+kind: ambient_maintain
+object_ref:
+  id: ambient-maintain
+  kind: activity
+record_patch:
+  body: >-
+    除非我明确说“按你的方案来”，或者说“授权你自动进行规划和实现”，只有这种情况他才可以跳过；否则的话，他必须得跟我进行详细的讨论。 说得难听点，后面这些约束现在模型早就已经内化成能力了。
+    我们无非就是提示它做好笔记而已，我觉得都可以进一步简化这些记录签发的要求。
+  confidence: confirmed
+  created_at: 2026-07-30T15:29:08.928Z
+  dedupe_key: codex-prompt:7669f5c565942edc05b89b7966fca9205b19ca9658b7e7279df0055d4b9ee9bb
+  kind: requirement
+  scope:
+    ref: project:Hypo-Workflow
+    type: project
+  source_refs:
+    - locator: 019fb3a4-c7fe-7630-bbe5-8bb1e1215cef
+      ref: 019fb3a2-e251-7460-b3a7-1f5b735bb2ac
+      type: session
+  supersedes: []
+  updated_at: 2026-07-30T15:29:08.928Z
+schema_version: '1'
+session_id: 019fb3a2-e251-7460-b3a7-1f5b735bb2ac
+source: user_prompt
+staged_at: 2026-07-30T15:29:08.928Z
+status: staged
+summary: >-
+  除非我明确说“按你的方案来”，或者说“授权你自动进行规划和实现”，只有这种情况他才可以跳过；否则的话，他必须得跟我进行详细的讨论。 说得难听点，后面这些约束现在模型早就已经内化成能力了。
+  我们无非就是提示它做好笔记而已，我觉得都可以进一步简化这些记录签发的要求。
+turn_id: 019fb3a4-c7fe-7630-bbe5-8bb1e1215cef
+writer:
+  id: main
+  kind: main

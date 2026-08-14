@@ -15,5 +15,5 @@ rules:
   review-strictness: error
   readme-freshness: error
   skill-quality: error
-  stop-hook-self-check: error
-  session-start-context-load: error
+  stop-hook-self-check: warn
+  session-start-context-load: warn

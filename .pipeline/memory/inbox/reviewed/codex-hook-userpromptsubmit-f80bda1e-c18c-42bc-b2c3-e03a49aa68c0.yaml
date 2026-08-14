@@ -1,0 +1,34 @@
+authority_role: proposal
+journal_ref:
+  event_id: 58802a4a2479b182dac9f6b32376371efc9164db708bc471de1a8e8f27d2543f
+  path: >-
+    .pipeline/runtime/objects/activity/ambient-maintain/events/019fac1c-4336-7d32-ae7f-0db26aae33d7/main/main/00000001.jsonl
+kind: ambient_maintain
+object_ref:
+  id: ambient-maintain
+  kind: activity
+record_patch:
+  body: 如果有冲突，就必须有 work 来处理。
+  confidence: confirmed
+  created_at: 2026-07-29T04:30:12.303Z
+  dedupe_key: codex-prompt:32589effbf700450ab751bcf9619106ca40d3ed77b8ea0afcf7184dacecaaf1e
+  kind: requirement
+  scope:
+    ref: project:Hypo-Workflow
+    type: project
+  source_refs:
+    - locator: 019fac23-2478-79d1-9b11-290f2e2b51de
+      ref: 019fac1c-4336-7d32-ae7f-0db26aae33d7
+      type: session
+  supersedes: []
+  updated_at: 2026-07-29T04:30:12.303Z
+schema_version: '1'
+session_id: 019fac1c-4336-7d32-ae7f-0db26aae33d7
+source: user_prompt
+staged_at: 2026-07-29T04:30:12.303Z
+status: staged
+summary: 如果有冲突，就必须有 work 来处理。
+turn_id: 019fac23-2478-79d1-9b11-290f2e2b51de
+writer:
+  id: main
+  kind: main

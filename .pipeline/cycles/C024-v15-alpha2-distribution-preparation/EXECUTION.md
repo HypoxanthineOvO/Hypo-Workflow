@@ -1,7 +1,7 @@
 ---
 kind: execution
 cycle: C024-v15-alpha2-distribution-preparation
-updated: 2026-08-09T13:28:00+08:00
+updated: 2026-08-09T14:02:34+08:00
 ---
 
 # 执行记录
@@ -43,3 +43,32 @@ updated: 2026-08-09T13:28:00+08:00
 - **遇到的问题：** 5 个 derived stale warning 均属于旧 compact/`PROJECT-SUMMARY.md`，adapter metadata 本身 fresh；未在本轮修复。可信 ZIP 需要一个本地 source-prep commit，而现有授权排除了 commit。
 - **计划影响：** M3 完成；M4 在用户决策处暂停，不绕过 clean-source 门禁。
 - **下一步：** 用户授权精确本地 commit 后构建，或保持 source-ready 无 ZIP 状态。
+
+## 2026-08-09T13:52:55+08:00 - 本地 source-prep commit 完成
+
+- **目的：** 满足 builder 的 clean-source/source-commit 绑定，而不混入无关脏工作树内容。
+- **动作：** 用户明确授权本地 commit；按 allowlist 暂存 C023 已接受实现/测试/审计、C023/C024 记录和 alpha.2 版本/文档；排除 runtime、memory 与旧 dist；执行 staged diff 与路径边界检查。
+- **结果：** 创建并定稿 `release: prepare v15.0.0-alpha.2 source`，最终 commit 为 `6e53401019d8b5af0630c80f2d3f59f7f5b35a72`。
+- **证据：** staged 87 files；`git diff --cached --check` 通过；无 `.pipeline/runtime/**`、`.pipeline/memory/**` 或 `dist/**` 进入提交。
+- **遇到的问题：** 首轮 artifact schema 验证发现合法 `+codex` build metadata 与 artifact path 被 schema 拒绝；已扩展 SemVer/path pattern，并新增 maintained 回归。
+- **计划影响：** 本地 commit 授权仅用于 source-prep；tag、push、远端发布与安装仍未授权。
+- **下一步：** 重新执行最终 build 与 artifact-level gates。
+
+## 2026-08-09T13:57:02+08:00 - M4/M5 完成，等待最终审阅
+
+- **目的：** 形成可独立核验的 alpha.2 本地分发候选并交付完整报告。
+- **动作：** 对最终 source commit 构建两次；验证 release schema、实际 checksum、installed descriptor、ZIP 安全清单、插件结构、portable bundle manifest、两个干净解压 runtime import 与逐字可复现性；重跑最终 maintained Core。
+- **结果：** Core 709/709、Scenario 8/8、History 12/12；Codex ZIP SHA-256 `a4337674…493f04`，portable ZIP SHA-256 `78c09e23…119c7`；双构建完全一致。
+- **证据：** `contracts/host/v1/release-manifest.json`、`contracts/host/v1/installed-release.json`、两个 alpha.2 ZIP、`FINAL-REPORT.md`、`/tmp/c024-*` 验证日志。
+- **遇到的问题：** release schema 的两个 build-metadata 缺口已在同一 source-prep commit 内修复并通过 6/6 focused 与完整 JSON Schema validation。
+- **计划影响：** M4/M5 完成；Cycle 进入最终人工接受/拒绝点。
+- **下一步：** 用户接受或拒绝最终本地分发准备结果。
+
+## 2026-08-09T14:02:34+08:00 - M5 接受并关闭
+
+- **目的：** 将用户对 alpha.2 本地分发候选的明确接受绑定到最终报告并完成归档。
+- **动作：** 核对 source commit、两个 ZIP、checksum、最终验证与副作用边界；将 M5 标记为 completed，关闭 Cycle 并生成 `SUMMARY.md`。
+- **结果：** 用户接受 `15.0.0-alpha.2` 本地分发准备结果；C024 状态为 closed。
+- **证据：** 用户选择“接受并关闭 C024”；`FINAL-REPORT.md`；Core 709/709、Scenario 8/8、History 12/12 与 artifact-level gates。
+- **计划影响：** 后续建立独立安装/兼容性 Cycle，更新本机 Eden 与 Nod，确保旧版本不干扰新版本。
+- **下一步：** 发现两个目标的当前安装与 cache 状态。

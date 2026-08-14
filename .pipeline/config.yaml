@@ -1,3 +1,5 @@
+# LEGACY (C026, 2026-08-14): C17 机器时代配置，退役标记。
+# 日常语义 Cycle 不读取本文件；仅旧 CLI/迁移兼容保留，见 .pipeline/legacy/INDEX.md。
 pipeline:
   name: "C21 Hypo-Workflow Skill-first 核心切换"
   source: local

@@ -287,7 +287,9 @@ async function evaluateUserPrompt(root, input, operation) {
   const selection = ["appended", "deduplicated", "selection_required"].includes(discussion.status)
     ? { status: discussion.status }
     : await resolveSessionRouting(root, input, operation.clock);
-  if (selection.status === "selection_required") context.push(renderSelectionContext(selection.candidates));
+  if (selection.status === "selection_required" && Array.isArray(selection.candidates)) {
+    context.push(renderSelectionContext(selection.candidates));
+  }
   if (selection.status === "selected" && selection.object_ref.kind === "experiment") {
     context.push(
       "Experiment 提醒：用普通 Markdown/YAML 保持实验目的、Attempts、证据、结果和下一步最新。可选辅助工具失败不能阻止清楚的普通文件记录。",

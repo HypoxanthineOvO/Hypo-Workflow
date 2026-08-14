@@ -1,5 +1,5 @@
 name: minimal
-description: Minimal defaults that keep only hook safety gates enabled.
+description: Minimal defaults that keep only hook reminders enabled.
 rules:
   git-clean-check: off
   config-valid: off
@@ -15,5 +15,5 @@ rules:
   review-strictness: off
   readme-freshness: off
   skill-quality: off
-  stop-hook-self-check: error
-  session-start-context-load: error
+  stop-hook-self-check: warn
+  session-start-context-load: warn

@@ -138,6 +138,20 @@ test("multiple active Cycles require local Session focus before Discussion write
   });
   assert.equal(skipped.status, "selection_required");
 
+  const prompt = await evaluateCodexHookEvent(root, {
+    session_id: "session-a",
+    transcript_path: null,
+    cwd: root,
+    model: "codex-test",
+    hook_event_name: "UserPromptSubmit",
+    permission_mode: "default",
+    turn_id: "turn-unfocused-hook",
+    prompt: "普通诊断应继续执行。",
+  });
+  assert.equal(prompt.systemMessage, undefined);
+  assert.match(prompt.hookSpecificOutput.additionalContext, /存在多个 active Cycle/);
+  assert.doesNotMatch(prompt.hookSpecificOutput.additionalContext, /辅助处理暂不可用/);
+
   const focusRoot = join(root, ".pipeline/local/sessions/codex");
   await mkdir(focusRoot, { recursive: true });
   await writeFile(join(focusRoot, "session-a.yaml"), "cycle: C002-other\nupdated: 2026-08-05T15:30:00Z\n", "utf8");

@@ -17,6 +17,10 @@ Hooks 是语义文件工作方式的轻量辅助，不是 Workflow 正确性来�
 
 不再注册逐工具证据、压缩后记账或 Worker 生命周期 Hook。普通工具调用、文件读取和上下文压缩不是项目历史；Worker 的任务、结果和证据由 Handoff、Progress 与 Execution 记录。
 
+Core 实现仍保留 `PostToolUse`、`PostCompact`、`SubagentStart`、`SubagentStop` 的处理路径，但只作为兼容实现存在：不注册、不承诺触发，也不产生记录。注册面（`hooks.json` 六类）、实现面（Core）与文档面（本文件）以此处为准，任何一方变化必须三处同步。
+
+未绑定 Work Item 的 Session 不得被 Hook 阻塞普通提示、工具、诊断或普通文件 Experiment 记录；`selection_required` 只有在候选列表确实存在时才渲染选择上下文。
+
 ## Discussion Ledger
 
 用户和助手原文按 Cycle/Session 追加到 `.pipeline/local/discussions/<cycle>/<session>.md`，默认 Git ignore。

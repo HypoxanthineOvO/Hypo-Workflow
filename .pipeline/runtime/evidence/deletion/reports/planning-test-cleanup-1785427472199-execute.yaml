@@ -1,0 +1,22 @@
+actor:
+  id: operator
+  type: user
+authority_role: deletion_execution_report
+deleted_paths:
+  - core/test/adaptive-plan.legacy.test.js
+  - core/test/batch-plan.test.js
+  - core/test/c18-instruction-quality-contract.test.js
+  - core/test/c20-consultation-boundary.test.js
+  - core/test/commands-rules-artifacts.test.js
+  - core/test/deep-plan-contract.test.js
+  - core/test/progressive-discover.test.js
+git:
+  head: d6a2d2524de9ea7d09593e328a23f088232bbce2
+  target_state_hash: 90793b5acf84df248e781f22641cb9c68143dab72ee2f78b8394086aeb6fca23
+  tree: 12cd6efa4986d97de9902dee13e6ba7102b4d909
+manifest_hash: a9c49768af798f63faec215eb1b750a98fd407c85c04f16346fe54429d267c7a
+outcome: applied
+receipt_id: receipt-ccd26408af54cd2748edc8e356837d44
+recorded_at: 2026-07-30T16:04:32.358Z
+schema_version: '1'
+tool_use_id: planning-test-cleanup-1785427472199

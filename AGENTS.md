@@ -11,11 +11,13 @@ Clear imperative requests with a concrete target may use direct execution: when 
 
 Affirmative replies answer the question actually asked. Agreement after a Mini-contract confirms understanding, not execution. Only after a complete Proposal is visible and the Agent explicitly asks whether to start do 确认并开始、按这个方案实施、按你的方案来、go ahead, or apply it authorize execution. 确认但不开始 approves without starting.
 
-Before choosing Goal or Plan, visibly show Discover, Technical, and Architecture artifacts. Discover synthesizes the user's requirements and distinguishes user statements, repository facts, and Agent inference. Technical explains current/proposed technology and reasons. Architecture uses a Mermaid, ASCII, table, or TUI-equivalent diagram; existing projects mark changed components and downstream effects, while new projects show the target components, boundaries, ownership, and data/control flow. These artifacts may be shown together and do not create separate confirmation gates.
+Plan defaults to a guided planning Discussion. Unless the user explicitly asks the Agent to generate a Plan directly from the supplied requirements, the Agent must first discuss the work through relevant Discover, Technical, Architecture, and other scope-specific topics. Discussion starts clarification-first: search the repository and history (project index, current Cycle, memory) before analyzing; then surface the unstated assumptions the user is relying on, the key missing information and how it could change the answer, and the most common mistake for this problem type; then ask the single most critical question (or a few) aimed at the user's real goal and situation, not a generic template. Wait for the user's answer before continuing. Before writing a Proposal, the Agent must: 1) establish a clear, user-visible discussion scope; 2) discuss every item in that scope; 3) recap the scoped items and explicitly ask the user whether they have all been discussed sufficiently and whether Proposal writing may begin. Only the user's explicit confirmation at that checkpoint authorizes Proposal writing. Statements such as "可以", "对", agreement with an idea, or positive feedback on an intermediate recommendation confirm that content only; they do not close Discussion, authorize Proposal writing, or authorize execution. Proposal approval and execution authorization remain separate later gates: never collapse discussion completion, Proposal writing, Proposal approval, and execution start into one inferred transition.
+
+Discover, Technical, and Architecture artifacts must be visible as the material of the scoped Discussion, but their visibility alone does not close it.
 
 After rejection, explain what is wrong, the current state, why the prior reasoning failed, which assumptions change, the proposed correction, and affected Discover/Technical/Architecture deltas before generating a revised Proposal. Never replace this discussion with a Receipt or confirmation card.
 
-An explicit `/hw:accept`, `/hw:reject`, or unmistakable natural-language acceptance/rejection statement authorizes that corresponding action. Validate the Receipt binding internally and report it, but do not ask for a duplicate ordinary confirmation. Ask only when the target, scope, result, or feedback meaning is ambiguous.
+An explicit `/hw:accept`, `/hw:reject`, or unmistakable natural-language acceptance/rejection statement authorizes that corresponding action. Report the accept/reject result without asking for a duplicate ordinary confirmation. Ask only when the target, scope, result, or feedback meaning is ambiguous.
 
 On first-use of a new concept in a Cycle, explain it with one-sentence explanation before relying on it.
 
@@ -33,15 +35,15 @@ Use Ask Questions proactively when a decision materially changes scope, safety, 
 
 Before calling Question Tool / Ask, explain in the conversation why the decision is needed and what will change for each answer. Never open a bare question card before that explanation is visible.
 
-Discover, Technical, and Architecture artifacts must be visible, but visibility does not create a confirmation gate. Show them together when uninterrupted planning is requested. Ask only for a real unresolved decision or the final Proposal choice.
+Discover, Technical, and Architecture artifacts must be visible; show them together as the material of the scoped Discussion. When the scoped Discussion is complete and the user has confirmed it at the discussion checkpoint, ask the single Proposal choice (confirm and start, confirm without starting, or continue Discussion). Do not invent questions, repeat recommended answers, or use a round quota.
 
-Prefer one concise question with the smallest actionable decision. Do not invent questions, repeat recommended answers, or use a round quota.
+Prefer one concise question with the smallest actionable decision.
 
 ## Runtime contract
 
-- Hypo-Workflow is not a runner.
-- The OpenCode Agent performs the actual work.
-- `.pipeline/manifest.yaml`, the selected Work Item Runtime/Continuation, and structured Records are the current authority. Legacy Cycle/Patch files remain migration inputs, not default session context.
+- Hypo-Workflow is not a runner; the host Agent performs the actual work.
+- Daily authority: `.pipeline/INDEX.md` and the active Cycle's `PLAN.md` / `PROGRESS.md` / `EXECUTION.md` / `DISCUSSION-SUMMARY.md`. Recovery reads the project index first, then the focused Cycle's files.
+- `.pipeline/manifest.yaml`, runtime objects, structured Records, and legacy Cycle/Patch files are legacy-compatibility surfaces tracked in the Legacy index; they are migration inputs, not default session context.
 - Use `question` for required user decisions.
 - Use `todowrite` for visible plan discipline, especially in `/hw-plan*` commands.
 
@@ -55,7 +57,7 @@ The final response must also explain the substance of the report in the conversa
 
 Hooks are optimizations, not the source of correctness. At session start, after compaction, or when Workflow context is uncertain:
 
-- Read `.pipeline/manifest.yaml` first.
+- Read `.pipeline/INDEX.md` first, then the focused Cycle's `PLAN.md` / `PROGRESS.md` / `EXECUTION.md` / `DISCUSSION-SUMMARY.md`. `.pipeline/manifest.yaml` and runtime objects are legacy-compatibility surfaces.
 - Resolve the Session's Work Item through Work Placement when authority routing or resource claims require it. Use `.pipeline/runtime/active.yaml` only as a legacy fallback when no Placement registry exists.
 - An unbound Session may receive candidate reminders, but it must not block ordinary prompts, tools, diagnostics, or ordinary-file Experiment records.
 - When a Work Item is selected, read only its Runtime and Continuation, plus the latest valid Recovery Pack when resuming.
@@ -89,6 +91,6 @@ Structured Rules/Habits are authority; Markdown habits and platform instructions
 - prefer-chinese-output (project/warn/style): 面向用户的说明、README 更新、PROGRESS 摘要和交互提示优先使用中文。命令名、配置键、文件名和专有英文术语保持英文。
 - progress-timezone (builtin/warn/style): Keep PROGRESS timestamps aligned with output.timezone.
 - report-language (builtin/warn/style): Keep reports and generated summaries aligned with output.language.
-- session-start-context-load (builtin/error/hook): Preserve SessionStart context loading as a rule-level gate.
+- session-start-context-load (builtin/warn/hook): Surface SessionStart context loading as a reminder, not a correctness gate.
 
 Conflicts are resolved by `cycle > project > global > builtin`; review reports should list overridden sources.

@@ -17,6 +17,7 @@ Derived view. Individual Markdown Records remain authoritative.
 | decision-4ecdd3bbde809617de5ad30b081373f2 | inactive (superseded) | decision | project:project:hypo-workflow | project:architecture:skill-first-single-authority | - |
 | decision-6220729afbd9f6fbce52c39c317c330d | active | decision | project:project:hypo-workflow | project:c21:m4-accepted-init-router-baseline | - |
 | decision-632e54cd38ccd9e7f74858578dfc33ee | active | decision | project:project:hypo-workflow | project:vspi:model-group-tier-capability-contract | - |
+| decision-649bfe230e39bfc41a368d2b09c387dc | active | decision | project:hypo-workflow | decision.nod-managed-daemon-node-path | - |
 | decision-65a61a9a8e0b3a9cd7b0e247f7024e38 | active | decision | project:project:hypo-workflow | project:vspi:explicit-auto-group-switching | - |
 | decision-72848fe812d37fe66a668df82930ec57 | active | decision | project:project:hypo-workflow | project:vspi:embedded-node-core-boundary | - |
 | decision-7356b0a9bd8eaa0cea04437082b0c010 | active | decision | project:project:hypo-workflow | project:roadmap:c21-deferred-scope | - |
@@ -48,6 +49,7 @@ Derived view. Individual Markdown Records remain authoritative.
 | decision-f9aca98c5a8cdd4bac459a87dc6fe9e9 | inactive (superseded) | decision | project:project:hypo-workflow | project:hypo-workflow:decision:minimal-model-facing-api | - |
 | feedback-00e4158e15cc6c1ee730296a9b776f53 | active | feedback | project:project:hypo-workflow | c16-delivered-but-not-human-accepted | - |
 | feedback-2127b84c8d5667c43f93f06baa8c128a | active | feedback | delivery:vspi-symbiotic-workflow-core | delivery:vspi-symbiotic-workflow-core:replace-plan-with-goal | - |
+| feedback-25f492856ad48c40ed080e244863aef3 | active | feedback | project:project:hypo-workflow | project:hypo-workflow:feedback:history-refresh-activator-genericity | - |
 | feedback-542a04ff0c7db58769911941cc18aedb | active | feedback | cycle:c23-experiment-management | cycle.c23-experiment-management.feedback.492b5eb524d3d0ec | - |
 | feedback-8442e50a859a28f7393182f66666ac79 | active | feedback | project:project:hypo-workflow | migration/c12-archive-status-conflict | - |
 | feedback-91a4f46046c59794010afce14819f010 | active | feedback | project:project:hypo-workflow | project:validation:external-effects-and-release-evidence | - |
@@ -74,6 +76,8 @@ Derived view. Individual Markdown Records remain authoritative.
 | requirement-aec5ac2b5d0b0f1cf2bd5a0f66d544ae | active | requirement | project:project:hypo-workflow | project:c21:m8-cleanup-deletion-gate-route | - |
 | requirement-c364ecf8e0d7b70a766ea730613f256b | active | requirement | project:project:hypo-workflow | project:hypo-workflow:requirement:consultation-first-action-boundary | - |
 | requirement-d05a9d83934ed8ea84a5adc6664808da | active | requirement | project:project:hypo-workflow | project:hypo-workflow:requirement:model-tiered-plan-and-progress | - |
+| requirement-f5aec7e7196c5c58f19143b8a139f1f1 | active | requirement | project:project:hypo-workflow | project:hypo-workflow:requirement:plan-discussion-scope-gate | - |
 | requirement-f96524166e1a8217674e9480be062afc | active | requirement | project:project:hypo-workflow | privacy/evidence-redact-before-persist-render | - |
+| requirement-dee5b35939cfe5774c148570aafd6cdb | active | requirement | project:project:hypo-workflow | project:hypo-workflow:requirement:clarification-first-discussion | - |
 
-Records: 71
+Records: 75

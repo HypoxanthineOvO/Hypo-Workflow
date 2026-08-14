@@ -83,9 +83,9 @@ rules: {}
 
 | Preset | Purpose |
 |---|---|
-| `recommended` | Most projects. Guard and style rules warn; hook rules error. |
+| `recommended` | Most projects. Guard and style rules warn; hook rules remind. |
 | `strict` | Team or release mode. Guard and workflow rules become hard gates. |
-| `minimal` | Compatibility mode. Only hook rules stay active as errors. |
+| `minimal` | Compatibility mode. Only hook reminders stay active as warnings. |
 
 ## Optional Packs
 
@@ -121,8 +121,8 @@ extends:
 | `readme-freshness` | release | warn | pre-commit, pre-release |
 | `skill-quality` | quality | warn | pre-milestone, pre-release |
 | `knowledge-ledger-self-check` | hook | warn | post-step, post-milestone |
-| `stop-hook-self-check` | hook | error | post-step |
-| `session-start-context-load` | hook | error | on-session-start |
+| `stop-hook-self-check` | hook | warn | post-step |
+| `session-start-context-load` | hook | warn | on-session-start |
 
 ## Project Config
 

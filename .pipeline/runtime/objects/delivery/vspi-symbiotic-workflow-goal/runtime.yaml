@@ -8,7 +8,7 @@ plan_record_ref:
   semantic_hash: a2d4390ad9175886f5dbce69a7ce14d9619dcfc8aeb2fe803f42836c02cc2433
 revision: 0
 schema_version: '1'
-status: pending_acceptance
+status: accepted
 topology:
   identity_constraints:
     - - test
@@ -25,7 +25,7 @@ topology:
   schema_version: '1'
   separation_required: true
   verification_required: true
-updated_at: 2026-07-23T16:53:55.445Z
+updated_at: 2026-07-24T09:51:48.775Z
 verification:
   evidence_refs:
     - digest: sha256:c451691eb5fa078a1fc704baa885aa6ca3a29b1b7ea0a2ee00248dc57a143f6b

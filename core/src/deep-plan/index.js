@@ -1,3 +1,5 @@
+// LEGACY (C026, 2026-08-14): C12–C19 Deep Plan/Discussion Package 机器。
+// 日常语义 Cycle 不再调用本模块；仅旧宿主/迁移兼容保留，见 .pipeline/legacy/INDEX.md。
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { parseYaml, writeConfig } from "../config/index.js";

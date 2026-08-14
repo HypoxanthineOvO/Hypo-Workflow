@@ -2,7 +2,7 @@
 kind: plan
 cycle: C024-v15-alpha2-distribution-preparation
 mode: goal
-status: active
+status: closed
 updated: 2026-08-09
 progress: PROGRESS.md
 execution: EXECUTION.md

@@ -4,6 +4,7 @@ active_by_dedupe_key:
   cycle.c23-experiment-management.feedback.492b5eb524d3d0ec: feedback-542a04ff0c7db58769911941cc18aedb
   cycle.c23-experiment-management.plan: decision-861cb23500113ed79b04c1b99f29ee2e
   cycle.vspi-symbiotic-workflow-core.plan: decision-7abb9842e8e446a8968aab7e3bd8f366
+  decision.nod-managed-daemon-node-path: decision-649bfe230e39bfc41a368d2b09c387dc
   delivery:vspi-symbiotic-workflow-core:replace-plan-with-goal: feedback-2127b84c8d5667c43f93f06baa8c128a
   goal.concurrent-work-placement-integration.plan: decision-e38266eeaa70b684754457d9d94a7cb4
   goal.experiment-protocol-hooks-simplification.plan: decision-7522350fd2ff83aefca8abe125106027
@@ -41,12 +42,14 @@ active_by_dedupe_key:
   project:hypo-workflow:explore-worktree-isolation-and-dirty-gate: decision-392888aac1a55531a870a4f2040a48f9
   project:hypo-workflow:feedback:c17-unresolved-architecture-quality-followups: feedback-9218e742beeacbd8adb9c2b0dccc645f
   project:hypo-workflow:feedback:c20-target-local-continuations: feedback-c763ea6f517ad7059284d02910992828
+  project:hypo-workflow:feedback:history-refresh-activator-genericity: feedback-25f492856ad48c40ed080e244863aef3
   project:hypo-workflow:requirement:concurrent-cycle-semantics: requirement-435705add0ce2146eb6606977c1a3474
   project:hypo-workflow:requirement:consultation-first-action-boundary: requirement-c364ecf8e0d7b70a766ea730613f256b
   project:hypo-workflow:requirement:cycle-archive-boundary-and-carry-forward: requirement-9e85ffcb9852a0271e71c8167cc8c07a
   project:hypo-workflow:requirement:cycle-experiment-maintain-role-separation: requirement-0622573e7c8363808c2a241ce7659c95
   project:hypo-workflow:requirement:human-readable-execution-records: requirement-03219cf1489b538bfb1f16efb2aab245
   project:hypo-workflow:requirement:model-tiered-plan-and-progress: requirement-d05a9d83934ed8ea84a5adc6664808da
+  project:hypo-workflow:requirement:plan-discussion-scope-gate: requirement-f5aec7e7196c5c58f19143b8a139f1f1
   project:hypo-workflow:requirement:semantic-first-recording-and-progress: requirement-8343e82c13849f464f84a7c4b452649c
   project:hypo-workflow:requirement:semantic-index-and-history-refresh: requirement-9f3deb08ca6dde37fac5a1607e55d3c9
   project:lifecycle:transaction-and-derived-coherence: decision-795ced1ac2116be9b101b6abea1eb41f
@@ -373,6 +376,23 @@ records:
         type: user_turn
     supersedes: []
     updated_at: 2026-07-23T14:58:18.865Z
+  - active: true
+    confidence: confirmed
+    created_at: 2026-08-06T09:34:53.744Z
+    dedupe_key: decision.nod-managed-daemon-node-path
+    id: decision-649bfe230e39bfc41a368d2b09c387dc
+    kind: decision
+    path: .pipeline/memory/records/project-6404a8726a4a/decision/decision-649bfe230e39bfc41a368d2b09c387dc.md
+    scope:
+      ref: hypo-workflow
+      type: project
+    semantic_hash: 649bfe230e39bfc41a368d2b09c387dc50daa571a39882b512e41ebabe5a5cf8
+    source_refs:
+      - locator: 用户选择现在持久修复
+        ref: conversation/nod-hook-repair
+        type: user_feedback
+    supersedes: []
+    updated_at: 2026-08-06T09:34:53.744Z
   - active: true
     confidence: confirmed
     created_at: 2026-07-23T15:10:50.676Z
@@ -1020,6 +1040,28 @@ records:
     updated_at: 2026-07-23T16:02:48.998Z
   - active: true
     confidence: confirmed
+    created_at: 2026-08-09T03:38:55.110Z
+    dedupe_key: project:hypo-workflow:feedback:history-refresh-activator-genericity
+    id: feedback-25f492856ad48c40ed080e244863aef3
+    kind: feedback
+    path: .pipeline/memory/records/project-d604d20eae74/feedback/feedback-25f492856ad48c40ed080e244863aef3.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: 25f492856ad48c40ed080e244863aef3d3a429e935df2480bc4165c9249f3818
+    source_refs:
+      - locator: user-reported installed v15.0.0-alpha.1 activation blocker
+        ref: conversation/history-refresh-activator-genericity-bug-2026-08-09
+        type: user_turn
+      - locator: >-
+          DEFAULT_OUTPUT; activateHistoryRefresh; renderActivatedProjectIndex; renderActivatedCycleIndex;
+          renderActivationMarker
+        ref: core/src/history-refresh/index.js
+        type: source_file
+    supersedes: []
+    updated_at: 2026-08-09T03:38:55.110Z
+  - active: true
+    confidence: confirmed
     created_at: 2026-07-18T07:34:45.334Z
     dedupe_key: cycle.c23-experiment-management.feedback.492b5eb524d3d0ec
     id: feedback-542a04ff0c7db58769911941cc18aedb
@@ -1597,6 +1639,23 @@ records:
         type: user_turn
     supersedes: []
     updated_at: 2026-08-05T12:58:12.830Z
+  - active: true
+    confidence: confirmed
+    created_at: 2026-08-09T03:33:00.248Z
+    dedupe_key: project:hypo-workflow:requirement:plan-discussion-scope-gate
+    id: requirement-f5aec7e7196c5c58f19143b8a139f1f1
+    kind: requirement
+    path: .pipeline/memory/records/project-d604d20eae74/requirement/requirement-f5aec7e7196c5c58f19143b8a139f1f1.md
+    scope:
+      ref: project:hypo-workflow
+      type: project
+    semantic_hash: f5aec7e7196c5c58f19143b8a139f1f1ca019ff1300503f79fd536dec3cd0f8a
+    source_refs:
+      - locator: user-confirmed Plan discussion and Proposal transition semantics
+        ref: conversation/plan-discussion-scope-gate-2026-08-09
+        type: user_turn
+    supersedes: []
+    updated_at: 2026-08-09T03:33:00.248Z
   - active: true
     confidence: 0.99
     created_at: 2026-07-12T07:07:51+08:00
