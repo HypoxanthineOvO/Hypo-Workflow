@@ -1,6 +1,6 @@
 ---
 kind: cycle-index
-status: active
+status: idle
 ---
 
 # Cycle 索引
@@ -9,12 +9,13 @@ status: active
 
 | Cycle | 目的 | 状态 | 当前项 | 下一步 |
 | --- | --- | --- | --- | --- |
-| [C027-machine-era-dismantle-and-readable-rewrite](C027-machine-era-dismantle-and-readable-rewrite/PLAN.md) | 机器时代拆除与人类可读重写 | active | S1 | 等待用户审阅矩阵与勾选清理清单 |
+无。
 
 ## Closed Cycles
 
 | Cycle | 名称 | 状态 | 旧文件 | 映射置信度 |
 | --- | --- | --- | ---: | --- |
+| [C027-machine-era-dismantle-and-readable-rewrite](C027-machine-era-dismantle-and-readable-rewrite/SUMMARY.md) | 机器时代拆除与人类可读重写 | closed | - | 当前语义 Cycle，用户已接受 |
 | [C026-workflow-intent-drift-audit-and-residue-cleanup](C026-workflow-intent-drift-audit-and-residue-cleanup/SUMMARY.md) | 意图漂移审计与残留清理 | closed | - | 当前语义 Cycle，用户已接受 |
 | [C025-alpha2-eden-nod-upgrade-compatibility](C025-alpha2-eden-nod-upgrade-compatibility/SUMMARY.md) | alpha.2 Eden/Nod 更新与兼容性验证 | closed | - | 当前语义 Cycle，用户已接受 |
 | [C024-v15-alpha2-distribution-preparation](C024-v15-alpha2-distribution-preparation/SUMMARY.md) | v15.0.0-alpha.2 本地分发准备 | closed | - | 当前语义 Cycle，用户已接受 |
