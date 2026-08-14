@@ -25,7 +25,7 @@ M1–M6 全部完成，验证通过。停在 S2 等待用户审阅最终结果�
 | `M4` | .pipeline 重写与文件清理 | `completed` | .pipeline 收敛为 INDEX/cycles/memory/experiments/local；120 份 evidence 与 architecture/audits 提取到 C027/extracted；顶层按勾选全删；dist 只留最新 | 进入 M5 |
 | `M5` | 规则引擎退役、删除保护移除、反脚手架、AGENTS.md 生成 | `completed` | rules 引擎/受保护文件删除；hooks 6→4 事件；反脚手架入指令面；`scripts/generate-agents.mjs` 从原则源生成 AGENTS.md | 进入 M6 |
 | `M6` | 实验旧机器删除与适配器落位 | `completed` | `core/src/experiment` 删除；Kimi/ZCode 适配 README 落位（DSH = AGENTS.md） | 进入 S2 |
-| `S2` | 审阅清理结果 | `rejected→revision` | 用户拒绝：记录面语言不符——迁移的 memory 记录正文/标题为英文 | 修订后重新审阅 |
+| `S2` | 审阅清理结果 | `rejected→revision×2` | 反馈1：记录用中文；反馈2：知识要梳理沉淀不堆积 | 修订后重新审阅 |
 
 ## 验证结果
 
@@ -41,7 +41,8 @@ M1–M6 全部完成，验证通过。停在 S2 等待用户审阅最终结果�
 
 ## 计划变化
 
-- S2 反馈新增修订：全部 75 条 memory 记录重写为中文正文+中文标题，索引中文化；新增约束级规则 `records-in-chinese` 并写入 maintain skill 与 memory 模板。
+- S2 反馈修订1：75 条 memory 记录重写为中文；新增约束级规则 `records-in-chinese`。
+- S2 反馈修订2（知识沉淀）：删除 5 条被替代重复、17 条机器时代碎片、4 条 VSPi 边界碎片与 cycle/ 全部 10 条；合并为 2 条叙述记录（机器时代交付史、VSPi 集成边界）；maintain skill 增加"梳理沉淀不堆积"；memory 从 75+ 收敛为 46 条。
 - 矩阵内的 E3 Claude 旧 Stop hook 对齐、VSPi 适配器改读语义文件仍属后续候选，未在本轮执行）。
 
 ## 下一步

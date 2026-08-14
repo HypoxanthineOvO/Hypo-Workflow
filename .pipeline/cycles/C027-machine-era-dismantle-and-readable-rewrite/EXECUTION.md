@@ -47,3 +47,8 @@ updated: 2026-08-14T18:05:00+08:00
 - 反馈：记录必须用中文，只有少数明确术语保留英文。
 - 修订：75 条 memory 记录全部重写为中文标题+中文正文（术语保留英文）；memory/INDEX.md 重新生成（全中文分组）；新增约束级规则 `requirement-records-in-chinese.md`；maintain skill 与 memory 模板写死中文正文要求。
 - 验证：npm test 全绿；generate-agents 无变化；diff-check 干净。
+
+## Checkpoint: S2 拒绝修订2——知识梳理沉淀（2026-08-14）
+
+- 反馈：知识需要梳理和沉淀，而不是随便堆积。
+- 修订：删除被替代重复 5 条、机器时代碎片 17 条、VSPi 边界碎片 4 条、cycle/ 全部 10 条；合并为 `record-machine-era-history.md`（参考级历史脉络）与 `decision-vspi-integration-boundaries.md`；maintain skill 增加第 7 步"梳理沉淀不堆积"；memory 从 75+ 收敛为 46 条（13 约束 + 22 指导 + 11 参考），cycle/ 目录取消。
