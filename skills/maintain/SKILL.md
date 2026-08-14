@@ -13,7 +13,7 @@ Maintain 是记忆动作，不是独立工作轨道。
 
 1. 确认事实内容、来源、适用范围，以及它是否替代已有事实。
 2. 将它归类为 `requirement`、`preference`、`decision` 或 `feedback`，并标 `level`：`constraint`（必须）、`guideline`（应该）、`reference`（参考方法）。
-3. 按 Memory 模板写入语义化 Markdown，使用可读文件名（`kind-语义名.md`），放入 `memory/global/rules`（约束级）、`memory/global/requirements`（需求/决定/偏好）或 `memory/global/knowledge`（知识方法），并更新 `memory/INDEX.md`。不得使用哈希或 UUID 命名。
+3. 按 Memory 模板写入语义化 Markdown，使用可读文件名（`kind-语义名.md`），放入 `memory/global/rules`（约束级）、`memory/global/requirements`（需求/决定/偏好）或 `memory/global/knowledge`（知识方法），并更新 `memory/INDEX.md`。不得使用哈希或 UUID 命名。**正文与标题必须用中文，只有 YAML key、命令名、文件名、路径和必要专名保留英文。**
 4. 如果事实只适用于一个 Cycle 或 Experiment，将 scope 写清；不要错误提升到整个项目。
 5. 如果新事实改变旧事实，通过 `supersedes` 保留关系，不覆盖历史。
 6. 在聊天中说明保存了什么、适用范围、来源和替代关系。

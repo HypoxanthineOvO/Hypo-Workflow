@@ -23,4 +23,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T04:32:18+08:00
 ---
-C21-M3 is accepted with final independent audit PASS and no findings. It delivered object/session/writer-partitioned segmented Journal streams with vector cursors, redaction-first content-addressed blobs, derived Capsules with byte-identical incremental/full rebuild, sealed ancestry-linked Recovery Packs, bounded restore with corrupt-head fallback, and drift-bound deterministic retention. Final validation was focused 47/47 and full 860/860. Locks remain process-local, durability inherits filesystem limits, secret recognition is bounded, Capsule hashes are integrity rather than keyed authenticity, and retention has no cross-process lock across final check and removal.
+
+# C21-M3 恢复基线（历史）
+
+C21 恢复层里程碑记录；对应机器已随 C027 拆除，仅历史参考。

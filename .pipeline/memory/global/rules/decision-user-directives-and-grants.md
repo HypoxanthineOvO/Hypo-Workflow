@@ -28,4 +28,7 @@ supersedes:
   - decision-7db62ec48d26f0a932ca534723106305
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-The generic Rules command and generic Structured Rules authority are retired from the product contract and remain M8 cleanup candidates. User-stated requirements, preferences, feedback, authorization scope, and turn- or Delivery-scoped constraints remain supported at their actual scope: confirmed durable facts become individual Records, while user confirmation, execution grants, and dangerous-operation grants use actor-, scope-, plan-hash-, expiry-, and consumption-bound Receipts. Adapters and Markdown guidance are projections and cannot become competing authority. A scoped constraint or grant must not be silently promoted into a permanent global rule.
+
+# 用户指令与授权是执行边界
+
+用户的明确指令与授权决定执行边界和动作范围；模型推断必须明确标记为推断，不能伪装成用户授权。接受/拒绝等动作只由用户明确表达触发。

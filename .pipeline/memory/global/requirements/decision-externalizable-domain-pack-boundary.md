@@ -23,4 +23,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T07:09:58+08:00
 ---
-领域能力通过可外置 Domain Pack boundary protocol 接入，RTL 是参考实现；规划、Review 与测试可以消费 pack，核心工作流不内嵌具体领域规则。
+
+# 可外置域包边界
+
+域能力以可外置 pack 组织，不在核心里堆平台专属代码。

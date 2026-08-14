@@ -23,4 +23,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T06:32:43+08:00
 ---
-C21-M4 is accepted with final independent audit PASS and no findings. It delivered manifest-last Init for empty and unmanaged Brownfield repositories, one no-input outcome Ask, bounded evidence-backed Adoption Briefs, raw read-only Legacy inspection, and availability-aware Root/Init/Guide routing with non-symlink trust anchors. Final validation was focused 44/44 and full 904/904; command layers were 54 canonical, 53 legacy inventory, and 2 currently discoverable, with 0 Skill-quality issues across 45 Skills. Raw Legacy evidence remains proposal input only, filesystem scans and secret detection are bounded, and the 53-entry compatibility inventory must remain hidden behind filtered discovery until M8.
+
+# C21-M4 Init 路由基线（历史）
+
+C21 Init/Router 里程碑记录；对应机器已随 C027 拆除，仅历史参考。

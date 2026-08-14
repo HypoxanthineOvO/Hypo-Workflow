@@ -27,4 +27,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-Historical authority model: legacy root Workflow state and local stores were treated as protected or authoritative, while remote systems were gated adapters. The C16 source was delivered but not human-accepted. This history is retained only to show what the C21 Skill-first single-authority architecture replaces.
+
+# Skill 优先的单一权威（旧版，已被替代）
+
+上一版记录，已被同名新记录替代。

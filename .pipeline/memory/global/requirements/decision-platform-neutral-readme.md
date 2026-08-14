@@ -20,4 +20,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T07:08:38+08:00
 ---
-**Documentation boundary.** Keep the top-level README platform-neutral. Put platform installation, synchronization responsibilities, and plugin-specific behavior in the relevant platform integration surfaces rather than making one platform the project-wide default narrative.
+
+# 平台中立 README
+
+README 与文档保持平台中立，宿主细节放平台适配文档。

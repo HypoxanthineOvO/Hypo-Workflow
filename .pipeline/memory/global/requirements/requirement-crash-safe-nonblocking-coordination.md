@@ -18,8 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-23T15:13:36.548Z
 ---
-# Crash-safe coordination cannot permanently block a workspace
 
-No lock, lease, pending transaction, or active-session marker may permanently block a Hypo-Workflow workspace after terminal failure, host crash, forced kill, or abandoned process.
+# 崩溃安全协调不得永久阻塞（历史）
 
-Coordination must distinguish a live owner from stale residue, support deterministic recovery or safe takeover, and prevent a stale prior owner from committing after takeover. Long-running Agent turns must not hold a global writer lock. Recovery should occur automatically at startup or before the next write when it is objectively safe; ambiguous drift must fail closed with actionable evidence rather than requiring blind lock deletion.
+曾要求写入中断可自动恢复、残留 lease 不永久阻塞；机器已随 C027 拆除，git 与 worktree 兜底。

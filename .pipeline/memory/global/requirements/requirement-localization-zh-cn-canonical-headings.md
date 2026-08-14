@@ -18,4 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T07:07:51+08:00
 ---
-当项目语言策略为 `zh-CN` 时，Skills 与 references 可以使用中文规范标题，Skill 质量检查必须接受这些中文 canonical headings，不能把英文标题写死为唯一合法形式。
+
+# 中文规范标题
+
+用户可见 Markdown 用中文主体与规范标题；只保留 YAML key、路径、命令和必要专名为英文。

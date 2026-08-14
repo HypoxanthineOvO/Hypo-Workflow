@@ -45,4 +45,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-Future non-Codex adapter work starts from a current capability/interface map and validates the exact host schema instead of assuming parity. Claude integrations expose Workflow under /hw:* and must keep native /resume separate from /hw:resume; settings merges preserve backup/conflict evidence and each hook is validated for its event and exit-code contract. OpenCode user-visible commands require its current native registration surface as well as internal dispatch. These are deferred adapter requirements, not a claim that Claude or OpenCode is a current C21 backend.
+
+# 宿主能力画像与原生注册语义
+
+为每个宿主按可验证能力生成最小适配，不按平台品牌复制大提示词；hook 语义按宿主原生格式注册。（Kim/ZCode 画像见 adapters/。）

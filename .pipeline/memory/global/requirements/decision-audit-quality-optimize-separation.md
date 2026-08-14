@@ -25,4 +25,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T07:08:38+08:00
 ---
-**Instruction-quality capability boundary.** Audit performs preventive engineering review, Quality produces an evidence-backed scorecard, and Optimize coordinates an Audit-plus-Quality improvement loop. Preserve the distinct report and gate contracts even if command discoverability or scheduling changes.
+
+# Audit/Quality/Optimize 独立于执行链
+
+审计、质量与优化能力与执行链分离，按需使用，不作为日常流程的一部分。

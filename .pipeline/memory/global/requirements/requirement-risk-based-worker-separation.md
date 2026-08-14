@@ -33,4 +33,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-Use separated test, implementation, and audit identities for material work, preserving review artifacts and retry evidence; never silently downgrade a prompt that requires separation. Worker input separates the host-rule envelope from task-specific checks, and unavailable worker support must produce an explicit governed fallback. Small reversible changes may use solo-verified only when policy selects it. Migration additionally uses read-only Extractors, a proposal-only Curator, an independent Auditor, and one deterministic writer; proposal workers cannot write authoritative Records.
+
+# 基于风险的 Worker 分离（历史）
+
+曾按风险等级决定 test/implement/audit 角色分离；机器已随 C027 拆除，日常由主模型直接执行。

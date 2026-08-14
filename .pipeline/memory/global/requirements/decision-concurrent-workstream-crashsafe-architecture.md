@@ -18,12 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-23T15:41:38.768Z
 ---
-# Concurrent Workstream and crash-safe recovery architecture
 
-Hypo-Workflow supports multiple non-terminal Deliveries and multiple independently recoverable Workstreams in one project. A Workstream reuses the activity authority kind and binds one VSPi Session to a parent Delivery or work item, model-selection state, Continuation, evidence, recovery context, and code-scope claim.
+# 并发 Workstream 与崩溃安全架构（历史）
 
-The global active pointer becomes a compatibility foreground rather than an exclusivity gate. Session bindings choose the current Workstream in VSPi. Delivery milestone scheduling follows the dependency DAG and may expose multiple ready claims.
-
-Long Agent turns hold no global writer lock. Core commits use a short atomic writer lease with owner token, expiry or heartbeat, fencing validation, expected object revisions, and automatic pending-transaction recovery. A crash or forced kill cannot permanently block project entry or unrelated work. Ambiguous external drift fails closed only for conflicting writes and produces actionable evidence.
-
-The initial implementation remains portable within Node.js and file-backed authority. It does not introduce process management, a native flock dependency, a daemon, or a database.
+曾为多 Session 并发设计 crash-safe writer 与恢复机器；该机器已随 C027 拆除。并行源码修改由 worktree 隔离与 git 兜底，本条仅作历史参考。

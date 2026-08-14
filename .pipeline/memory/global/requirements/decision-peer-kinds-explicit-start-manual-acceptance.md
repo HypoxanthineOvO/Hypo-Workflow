@@ -38,4 +38,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-Goal and Cycle are peer Main Delivery kinds. A Goal has one Design and no user-visible Milestone sequence; a Cycle has ordered Milestones, internal verification at Milestone boundaries, and one final Cycle-level manual acceptance gate. Maintain is ambient. Approval creates waiting_to_start, and only explicit start intent begins work. After that start, authorized execution may continue across ordinary internal Milestone boundaries without repeated approval, but scope, risk, remote-effect, revision, and acceptance gates remain binding. Direction-changing feedback creates needs_revision and a revised proposal rather than edit authorization. Successful Delivery ends only after a scoped acceptance Receipt.
+
+# Goal/Cycle 同级交付与显式启动
+
+Goal 与 Cycle 是同级交付方式；批准后停在等待启动，显式启动才开始实现；最终人工接受。

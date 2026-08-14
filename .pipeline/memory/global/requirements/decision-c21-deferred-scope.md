@@ -21,4 +21,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-11T20:39:36+08:00
 ---
-After C21, prioritize OpenCode adaptation, then Claude Code/other adapters, Workflow Stash/Suspend/Pop, and experiment project management; experiment management is more important than telemetry. Aggregate telemetry and the Docs/PR/Release redesign come later. Dashboard, TUI, and generic Automation Jobs are not currently planned. If one future automation capability is chosen, prefer Codex quota-recovery scheduled follow-up from a saved continuation rather than building a generic scheduler. In C21, deferred Analysis/Audit/Quality/Explore/Docs/PR/Release/Optimize capabilities stay non-discoverable and zero-write; permanent removal candidates wait for M8's approved Manifest.
+
+# C21 之后的延期范围
+
+C21 后优先 OpenCode 适配，再 Claude Code/其他适配器、Workflow Stash/Suspend/Pop 与实验项目管理；聚合遥测和 Docs/PR/Release 重设计靠后；Dashboard、TUI、通用自动化任务暂不做。延期的 Analysis/Audit/Quality/Explore/Docs/PR/Release/Optimize 保持不可发现、零写入。（实验管理已在 C23 交付 pilot 版，语义文件协议保留。）

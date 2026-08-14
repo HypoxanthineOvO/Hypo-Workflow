@@ -23,4 +23,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T00:21:05+08:00
 ---
-C21-M1 is accepted with final audit PASS. It delivered canonical YAML/frontmatter/hashing, six-class zero-write workspace detection, recoverable manifest-last transactions with staged/target hash validation and deterministic recovery, and a central fence covering 22 project mutation families. Final validation was focused 76/76 and full 752/752. Non-blocking limits remain: no cross-process transaction lock, no fsync-backed marker durability, and no generic typed path-ownership guarantee beyond the certified writer inventory.
+
+# C21-M1 内核基线（历史）
+
+C21 内核基线里程碑记录；对应机器已随 C027 拆除，仅历史参考。

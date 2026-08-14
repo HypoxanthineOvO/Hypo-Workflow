@@ -23,4 +23,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-11T20:39:36+08:00
 ---
-C21-M8 starts only after M7 by rescanning the live dependency graph and classifying each candidate as delete, retain_internal, or deferred_hidden. It may generate the complete Deletion Manifest but may not delete anything until the full decision context is shown in chat and the user issues a fresh exact deletion.execute Receipt. Any path hash or relevant Git-state drift invalidates the Receipt. The controlled batch must remove registry/generator sources before derived artifacts, prove regeneration cannot revive removed or deferred surfaces, preserve unrelated changes, update the Codex-facing package/docs, run behavior-based Skill evaluations and full regression, and finish with independent audit. C21 itself still closes through manual acceptance after M8; no Deletion Manifest approval can be inferred from general Cycle authorization.
+
+# C21-M8 清理与删除门路线（历史）
+
+C21-M8 里程碑记录；删除门机器已随 C027 移除，仅历史参考。

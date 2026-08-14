@@ -22,4 +22,7 @@ supersedes:
   - decision-4ecdd3bbde809617de5ad30b081373f2
 updated_at: 2026-07-11T20:24:08+08:00
 ---
-Hypo-Workflow is a Skill-first protocol and control layer, not a runner. The host Agent performs reasoning, implementation, testing, and review; deterministic Core owns schema, transactions, Records, Receipts, recovery, lifecycle transitions, adapter payloads, and mechanical gates. Every fact has one authority. Platform adapters only project behavior. Runtime and memory are local/ignored; accepted or explicit checkpoint Snapshots may enter Git. A valid new manifest selects the new writer, while a damaged manifest fails closed and never falls back to legacy writers.
+
+# Skill 优先的单一权威
+
+Skill 文件是产品语义的单一权威；命令、适配器、文档都从 Skill 派生。

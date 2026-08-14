@@ -18,16 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-08-09T03:33:00.248Z
 ---
-# Plan discussion scope gate
 
-Plan defaults to a guided planning discussion. Unless the user explicitly asks the Agent to generate a Plan directly from the supplied requirements, the Agent must first discuss the work through relevant Discover, Technical, Architecture, and other scope-specific topics.
+# Plan 讨论范围门
 
-Before writing a Proposal, the Agent must:
-
-1. establish a clear, user-visible discussion scope;
-2. discuss every item in that scope;
-3. recap the scoped items and explicitly ask the user whether they have all been discussed sufficiently and whether Proposal writing may begin.
-
-Only the user’s explicit confirmation at that checkpoint authorizes Proposal writing. Statements such as “可以”, “对”, agreement with an idea, or positive feedback on an intermediate recommendation confirm that content only; they do not close Discussion, authorize Proposal writing, or authorize execution.
-
-Proposal approval and execution authorization remain a later, separate gate. The Agent must never collapse discussion completion, Proposal writing, Proposal approval, and execution start into one inferred transition.
+Plan 默认是引导式规划讨论。除非用户明确要求直接从需求生成 Plan，否则必须先按范围相关主题讨论。写 Proposal 前必须：1) 建立用户可见的讨论范围；2) 逐项讨论每一项；3) 复盘并明确询问是否已充分讨论、可否开始写 Proposal。只有用户在该检查点明确确认才授权写 Proposal；"可以/对"只确认对应内容，不关闭讨论、不授权写 Proposal、不授权执行。Proposal 批准与执行授权是后面的独立 gate，绝不把四步折叠成一次推断。

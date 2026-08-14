@@ -54,4 +54,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-C21-M6 implements Goal and Cycle as peer Delivery kinds, adaptive planning, explicit start, separated execution, verification, Resume, manual Accept/Reject, and the exact nine-command surface. Goal uses one Design. Cycle uses ordered Milestones and one final acceptance. Plan first resolves configuration and inherited-state assumptions that materially affect discovery, abstracts user examples into general requirements, and shows the actual technical route and phase artifacts before a major gate. Depth is evidence-driven: concise Goal Design, standard Discover -> Technical Stack -> Architecture -> Decompose -> Generate for weaker models or complex work, and internal durable Deep Plan research when needed. Remove fixed min_rounds and stop asking when material ambiguity is resolved. Approval creates waiting_to_start; directional feedback creates needs_revision until explicit start. Maintain and Codex Hooks are M7, not M6.
+
+# C21-M6 Goal/Cycle 自适应计划路线（历史）
+
+C21-M6 里程碑记录；对应机器已随 C027 拆除，仅历史参考。

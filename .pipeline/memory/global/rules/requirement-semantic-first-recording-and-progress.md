@@ -18,17 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-08-05T12:54:28.481Z
 ---
-# Semantic-first Workflow responsibility
 
-Hypo-Workflow exists to help the model understand the user's work, keep accurate durable records, remind the model to update plans and progress, and make the model's current understanding and progress visible to the user. Workflow mechanisms must support that purpose rather than become user-facing ceremony.
+# 语义优先的记录与进度
 
-Command purposes:
-
-- Guide is used only when the user does not know which Workflow path to choose.
-- Init builds a useful understanding of the project and initializes the project record.
-- Plan is primarily a guided conversation for discovering what the user wants. Its questions adapt to the work type, such as a software project, research task, or experiment. Discover and Technical discussions remain valuable when they help the user understand a personal project, but they are not mandatory fixed-form questions for every task. Generated prompts are optional execution aids rather than Plan's purpose.
-- Experiment manages experiment purpose, design, data, runs, and interpretation without exposing unnecessary engineering machinery.
-- Resume reads the relevant conversation context and Pipeline records so work can continue after interruption or damaged compaction; recovery implementation details should remain internal.
-- APIs may help the model write consistent memory and records, but should remain proportionate and mostly hidden.
-
-Hooks should be quiet reminders for durable recording and plan/progress updates. Core and APIs may enforce storage integrity and recovery, but command prompts should lead with user intent and task semantics.
+日常用普通 Markdown/YAML 写人类可读记录：Plan/Progress/Execution/Discussion Summary 是核心职责。日常不需要机器 API、可见 hash、Receipt 或 routing 机制（这些已随 C027 拆除）。

@@ -24,8 +24,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T11:56:42+08:00
 ---
-# C21-M5 Bootstrap activation accepted
 
-The reference repository completed manifest-last activation and an explicit reconciliation acceptance. The immutable companion binds the sealed rollback checkpoint, verified Snapshot/File evidence, the four-file legacy freeze inventory, Manifest, and the coherent Recovery head. Post-acceptance focused and full regressions passed, the new writer path is active, and legacy lifecycle writers remain frozen.
+# C21-M5 引导激活已接受（历史）
 
-M6 may start from the current Runtime and latest valid Recovery Pack. M7 and M8 must treat current authority plus Bootstrap acceptance, rollback, compatibility, and Pack evidence as protected unless a separately audited retention/replacement plan and fresh exact Receipt authorize a change.
+C21-M5 里程碑接受记录；对应机器已随 C027 拆除，仅历史参考。

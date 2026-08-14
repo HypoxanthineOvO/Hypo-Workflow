@@ -23,4 +23,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-11T20:39:36+08:00
 ---
-C21-M5 converts only history whose absence could materially change a future decision. It is an internal Bootstrap Job for this repository, not a public migration command. Extractors, Curator, and Auditor produce proposals only; an independent audit checks coverage, inference, schema, sources, and privacy; one deterministic writer owns IDs, dedupe, supersedes compilation, indexes, staging, Capsule, Pack, Snapshot, and activation. Activate the manifest last, freeze all legacy writers, retain a usable rollback checkpoint until the Bootstrap checkpoint is accepted, resume C21 in a fresh process from a valid Pack, prove all post-activation writes use only new zones, and prove legacy state.yaml, cycle.yaml, and log.yaml are unchanged. Do not import raw chat/tool logs/secrets, delete tracked legacy files, dual-write, or migrate arbitrary repositories. Derive only a redacted fixed CI fixture from the reference workspace.
+
+# C21-M5 参考仓库引导切换合同（历史）
+
+C21-M5 里程碑记录；对应机器已随 C027 拆除，仅历史参考。

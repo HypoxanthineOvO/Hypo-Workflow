@@ -41,3 +41,9 @@ updated: 2026-08-14T18:05:00+08:00
 - M5：rules 引擎（builtin/presets/rules-spec/HABITS/rules.yaml 及 .pipeline/rules）删除；项目规则迁移为 memory/global 人读记录；hooks.json 6→4 事件、codex-hooks 删除 deny 逻辑；反脚手架写入 AGENTS.md 与生成源；scripts/generate-agents.mjs + agents-template.js 实现 AGENTS.md 真实生成（生成后机器时代引用为 0）。
 - M6：core/src/experiment 删除；adapters/kimi、adapters/zcode 最小适配 README 落位。
 - 验证：npm test 33/33；s70/s77 PASS；codex-hook-smoke PASS；git diff --check 干净；.pipeline 哈希残留 0。
+
+## Checkpoint: S2 拒绝修订——记录中文化（2026-08-14）
+
+- 反馈：记录必须用中文，只有少数明确术语保留英文。
+- 修订：75 条 memory 记录全部重写为中文标题+中文正文（术语保留英文）；memory/INDEX.md 重新生成（全中文分组）；新增约束级规则 `requirement-records-in-chinese.md`；maintain skill 与 memory 模板写死中文正文要求。
+- 验证：npm test 全绿；generate-agents 无变化；diff-check 干净。

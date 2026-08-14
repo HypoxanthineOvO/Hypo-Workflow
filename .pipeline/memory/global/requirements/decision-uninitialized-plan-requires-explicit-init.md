@@ -18,8 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-23T15:09:27.927Z
 ---
-# Uninitialized VSPi Plan behavior
 
-In VSPi 0.2.0, normal chat and model selection remain available when a project has no Hypo-Workflow workspace. The Plan surface requires explicit Workflow initialization: /plan reports that Workflow is not enabled and offers /hw:init.
+# 未初始化时 Plan 需要显式 init
 
-VSPi must not create a Local Plan fallback or initialize .pipeline implicitly. This preserves one canonical Plan authority and keeps a read or navigation action from writing project state.
+项目未初始化时 Plan 不得静默创建结构；必须先显式 /hw:init。

@@ -25,4 +25,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T07:08:38+08:00
 ---
-**Consultation-first action boundary.** When the user is discussing background, an idea, a complaint, a question, or a possible solution without clearly requesting direct execution, first present the concrete understanding and recommended direction, then wait for authorization before editing. A clear bounded imperative or an affirmative reply to an already displayed plan authorizes only that shown scope. Explain a new Workflow concept in one sentence on its first use.
+
+# 协商优先的修改启动边界
+
+讨论/背景/想法/抱怨/提问类输入视为不改文件信号：先回答"我的理解 → 问题原因 → 推荐方案"的 Mini-contract，再谈执行。命名了明确动作与目标的指令可以直接执行。同意 Mini-contract 只确认理解；只有完整 Proposal 可见且明确询问后才算开始授权；拒绝后要先解释失败原因与修正方案再出新 Proposal。

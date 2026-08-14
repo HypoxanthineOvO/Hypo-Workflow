@@ -28,4 +28,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-Historical model through C20: generic Structured Rules/Habits were treated as behavior authority and Markdown/platform instructions as derived views. This history is inactive and retained only so the C21 replacement is explicit.
+
+# 用户指令与授权（旧版，已被替代）
+
+本条是上一版本的记录，已被同名新记录替代（supersedes 关系保留）。

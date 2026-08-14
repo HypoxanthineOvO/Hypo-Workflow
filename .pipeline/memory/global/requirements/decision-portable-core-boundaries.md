@@ -31,4 +31,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-Keep portable layered configuration instead of user-specific paths or seeds, shared utilities instead of duplicated helpers, explicit workspace responsibility boundaries, consistent schema parsing, a repository-root test entry, and an explicit public export surface. The C17 JSONL ledger implementation is historical; after C21, individual Records and their derived indexes are the authority, so portability lessons remain current without reviving the old ledger.
+
+# 可移植核心边界
+
+核心不依赖宿主私有能力；边界之外的能力由宿主适配层提供。

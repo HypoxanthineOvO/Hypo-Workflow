@@ -18,16 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-08-05T13:13:10.409Z
 ---
-# Minimal model-facing API
 
-Routine model-facing Workflow APIs are limited to three semantic capabilities:
+# 最小模型可见 API（旧版，已被替代）
 
-- Cycle lifecycle and focus management;
-- atomic human-readable Progress and Execution checkpoint recording;
-- scoped durable Memory recording and revision.
-
-History Refresh is a one-time migration entry rather than a routine API.
-
-Plan, Discover, Technical notes, Cycle Summary, Experiment definitions, Experiment Attempts, indexes, and Resume context are maintained through human-readable semantic Markdown or YAML files. Experiment uses files only and has no dedicated model-facing Core write API.
-
-Receipts, hashes, transactions, Journal segments, Packs, routing, integrity metadata, and index refresh implementation remain internal and are not described in ordinary command prompts.
+上一版记录，已被同名新记录替代。

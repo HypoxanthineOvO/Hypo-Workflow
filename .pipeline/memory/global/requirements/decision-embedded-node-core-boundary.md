@@ -18,8 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-23T14:58:18.865Z
 ---
-# Embedded Node.js integration boundary
 
-VSPi and the Pi coding-agent SDK use TypeScript, while Hypo-Workflow Core is ESM JavaScript in the same Node.js runtime. VSPi loads Core through a typed adapter; no Python runtime, sidecar service, or mandatory IPC layer is introduced.
+# 内嵌 Node 核心边界
 
-Hypo-Workflow owns durable Workflow truth. VSPi owns TUI interaction, Session presentation, model-selection UX, and adapter calls. Pi owns Agent execution and model transport. Hooks capture relevant events and refresh durable records; they do not become a second authority.
+核心使用内嵌 Node，不引入 Python runtime、常驻 daemon 或数据库依赖。

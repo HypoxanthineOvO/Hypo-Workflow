@@ -23,4 +23,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T07:08:38+08:00
 ---
-**Source/target ownership boundary.** The Hypo-Workflow source repository may own shared behavior contracts, common guidance, managed source adapters, documentation contracts, tests, and handoff matrices. Per-model prompts, runtime prompt tuning, provider behavior, and target-local reminder wording remain target-owned and require a separately scoped target-local Cycle; source closure must not silently write them.
+
+# 源端管理面与目标自有面的边界
+
+源端 direct sync 只覆盖源自有管理面（共享指引、命令/agent 指令、适配器、文档合同、测试、release checklist）；目标自有面（每模型 prompt、运行时调优、提醒措辞）必须走目标本地 Cycle，源端不得直接写。

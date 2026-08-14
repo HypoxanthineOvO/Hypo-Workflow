@@ -18,4 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T07:08:38+08:00
 ---
-**Unresolved, non-blocking follow-ups from C17.** Revalidate `ARCH-05` broader module-boundary refactoring, `QUAL-06` deep-plan file splitting, audit inventory v2, and ledger compaction performance before scheduling new architecture debt work. C17 did not classify these items as release blockers, and their present code status has not been re-audited by this Extractor.
+
+# 教训：未解决的架构质量问题要显式跟踪
+
+经验：评审发现的 High/Medium 问题必须显式跟踪到闭环，不能沉在报告里。

@@ -18,8 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-23T16:02:48.998Z
 ---
-# Replace the proposed Plan with an autonomous Goal
 
-The user explicitly removed the intermediate Architecture Stone and authorized continuous execution in the previously agreed six-stage order. Intermediate reporting is not required; normal internal test, implementation, and audit evidence remains mandatory.
+# 把 Plan 换成自主 Goal（历史）
 
-The proposed Plan is preserved as history and superseded by Goal vspi-symbiotic-workflow-goal. No product implementation was performed under the Plan proposal.
+反馈：把带中途 Stone 的 Plan 换成连续执行的 Goal。仅历史参考。

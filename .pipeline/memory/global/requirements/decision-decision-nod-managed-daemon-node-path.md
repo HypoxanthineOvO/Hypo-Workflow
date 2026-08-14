@@ -18,6 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-08-06T09:34:53.744Z
 ---
+
 # Nod 受管 daemon 的 Node 环境
 
-Nod 上的 VSP-Codex 受管 app-server 必须从非交互环境获得稳定的 Node 路径。使用 `$HOME/.local/share/fnm/aliases/default/bin`，避免 daemon 重启后六个 Hypo-Workflow Hook 因 `node` 不在 `PATH` 中而重复失败。
+Nod 上的 VSP-Codex 受管 app-server 必须从非交互环境获得稳定 Node 路径，使用 ~/.local/share/fnm/aliases/default/bin，避免 daemon 重启后 hook 因 node 不在 PATH 而重复失败。

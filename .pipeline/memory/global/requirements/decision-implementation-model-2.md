@@ -18,4 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-11T20:09:41+08:00
 ---
-Historical, superseded C21 draft: implement Workflow Stash by saving a Git workspace snapshot and restoring it later. This is not current and must not guide implementation.
+
+# Stash 实现模型（旧版，已被替代）
+
+上一版 Stash 实现模型记录，已被同名新记录替代。

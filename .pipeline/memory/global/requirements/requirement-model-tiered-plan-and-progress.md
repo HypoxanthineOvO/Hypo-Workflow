@@ -18,17 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-08-05T12:58:12.830Z
 ---
-# Model-tiered Plan and progress contract
 
-A Plan for a capable lead model should be minimal and outcome-oriented. Its essential contents are:
+# 按模型能力分层的 Plan 与 Progress
 
-- a clear execution objective;
-- a clear execution boundary;
-- a verifiable completion target;
-- an explicit progress record location that the model keeps current throughout execution.
-
-Creating a Plan without updating its progress is a Workflow failure. Progress updates must remain visible and useful to the user, not merely exist as internal lifecycle metadata.
-
-Detailed execution instructions belong in a task-specific Handoff, not in every Plan. When a capable lead model delegates to a less capable worker model, the lead should generate the additional detail that worker needs, including bounded scope, relevant context, concrete inputs and outputs, constraints, ordered actions when necessary, and verification evidence. The detail level should adapt to worker capability.
-
-Journal exists to help the model find relevant prior conversation and work context. Models should retrieve Journal context semantically by current work, topic, and recency. Hashes and integrity structures may remain internal implementation details, but should not burden ordinary planning, progress updates, or resume behavior.
+强模型读薄 Plan；弱模型用具名阶段；Worker 才需要详细 Handoff。

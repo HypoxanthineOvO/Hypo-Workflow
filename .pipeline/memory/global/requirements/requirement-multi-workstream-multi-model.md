@@ -18,8 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-23T15:13:36.548Z
 ---
-# Concurrent Workstreams and models
 
-One project must support multiple active task contexts at the same time. Two or more VSPi Sessions may use different models to develop different parts concurrently, whether those contexts belong to one Delivery or separate Deliveries.
+# 多 Workstream 多模型（历史）
 
-Each concurrent Workstream must isolate its Session binding, model or Auto Group resolution, continuation, evidence, recovery state, and declared code ownership. A single global active Delivery must not prevent independent work. Conflicting writes to the same authority object or overlapping code scope must be detected rather than silently overwritten.
+曾支持同一项目多非终态 Delivery、多 Workstream、多模型并发；机器已随 C027 拆除，并行由 worktree 隔离实现。

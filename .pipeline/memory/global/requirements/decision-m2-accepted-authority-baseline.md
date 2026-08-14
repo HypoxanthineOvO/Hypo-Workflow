@@ -21,4 +21,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T02:42:16+08:00
 ---
-C21-M2 is accepted with fresh re-audit PASS and no findings. It delivered reference-only active pointers; object Runtime and Continuation; one-fact-per-file requirement, preference, decision, and feedback Records with explicit supersedes; derived indexes that fail closed unless each dedupe key has exactly one active leaf; scoped single-use Receipt state machines using host or captured Clock; and portable, content-bound accepted/checkpoint Snapshots. Final validation was focused 61/61, targeted 21/21, and full 813/813. Same-process Receipt reservation is not a cross-process lease, secret detection is a finite corpus, and Snapshot retention remains later work.
+
+# C21-M2 权威基线（历史）
+
+C21 权威层里程碑记录；对应机器已随 C027 拆除，仅历史参考。

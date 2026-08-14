@@ -18,14 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-08-05T13:03:43.472Z
 ---
-# Concurrent Cycle semantics
 
-A project may have multiple active Cycles at the same time. Concurrent Cycles represent independent rounds or directions of work with separate objectives, boundaries, Plans, Progress, Execution Logs, evidence, results, and archives.
+# 并发 Cycle 语义
 
-There is no single project-global current Cycle. Each user or agent Session focuses on exactly one selected Cycle at a time. The project-level Cycle index shows all active, paused, blocked, and closed Cycles so the user can understand parallel progress without mixing their Milestones.
-
-Cycles may read shared project-level requirements, preferences, decisions, and reusable artifacts. One Cycle must not silently modify another Cycle's Plan, Progress, execution history, or result. Cross-Cycle dependencies, imports, conflicts, integration, supersession, and shared decisions are explicit and human-readable.
-
-Concurrent repository or resource isolation is an internal execution concern. Core may use separate branches, worktrees, output directories, ports, devices, or locks when required, while command prompts describe only the user-level conflict or dependency. Compatible work may share resources; conflicting work must be isolated or reported as blocked.
-
-Each Cycle closes and archives independently. A later integration Cycle may explicitly combine selected results from multiple predecessor Cycles without inheriting their Milestone lists.
+允许多个 active Cycle 并存；源码修改需要 worktree 隔离和明确集成目标；资源冲突需要隔离或暂停。一个 Session 只聚焦一个 Cycle。

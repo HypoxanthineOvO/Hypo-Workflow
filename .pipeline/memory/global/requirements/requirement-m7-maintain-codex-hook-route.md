@@ -23,4 +23,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-11T20:49:59+08:00
 ---
-C21-M7 implements ambient Maintain and the primary Codex adapter. Maintain records meaningful Journal/Inbox/Record deltas without taking a workflow pointer; optional cheap recorder workers return proposals only. Thin adapters cover SessionStart, UserPromptSubmit, PreToolUse, PermissionRequest, PostToolUse, PreCompact, PostCompact, SubagentStart, SubagentStop, and Stop; they inject bounded context, collect evidence, seal/restore Packs, and emit targeted deduplicated documentation/Record reminders. Hooks never infer authority or become the sole deletion boundary. Deletion requires a hashed Manifest, scoped Receipt, controlled executor and drift revalidation. OpenCode/Claude adapters, aggregate telemetry, cleanup execution, generic scheduling, and quota automation are out of M7 scope.
+
+# C21-M7 Maintain 与 Codex Hook 路线（历史）
+
+C21-M7 里程碑记录；对应机器已随 C027 拆除，仅历史参考。

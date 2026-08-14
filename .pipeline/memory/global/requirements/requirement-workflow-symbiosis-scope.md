@@ -18,14 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-23T14:58:18.865Z
 ---
-# VSPi and Hypo-Workflow collaboration scope
 
-Hypo-Workflow remains the project record and Workflow state truth. It manages canonical Plan authority and preserves discussion, ideas, decisions, execution evidence, logs, architecture, and recovery context; it is not a project-process manager.
+# VSPi 与 Hypo-Workflow 的共生范围
 
-The collaboration has three product concerns:
-
-1. Hypo-Workflow manages the canonical Plan while VSPi provides the primary interaction and presentation surface.
-2. A later experimental file-backed context retrieval path may use bounded stored context and on-demand project reads to reduce compaction cost.
-3. Workflow task difficulty signals cooperate with VSPi model groups so the concrete model can change without changing Workflow authority.
-
-Generic process ownership, service supervision, and operating-system process control are outside this design.
+VSPi 只读集成 Workflow 计划与状态；Workflow 不做 VSPi 的 runner；两侧各自维护自己的权威面。

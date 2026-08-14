@@ -18,4 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T07:00:44+08:00
 ---
-Explore 工作必须使用隔离 worktree、执行 dirty gate，并保持并行探索互不污染；不能直接把探索写入主项目工作树。
+
+# worktree 隔离与脏树门
+
+并行源码修改用 worktree 隔离，集成目标明确；脏工作树不得混入无关改动。

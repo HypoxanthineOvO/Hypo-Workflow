@@ -21,4 +21,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-User-visible completion responses state the conclusion, change, approach, affected surfaces, test design, validation result, expected result, problems, residual risks, and next action in the conversation. Artifact paths support the explanation but never substitute for it, so the result remains understandable from another Agent or chat surface.
+
+# 完成报告的内容要在对话里讲清
+
+最终回复必须包含报告的核心内容（结论、方案、改动的文件、验证结果、风险与后续），不能只给路径。

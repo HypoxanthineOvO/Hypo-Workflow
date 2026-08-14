@@ -35,4 +35,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-Lifecycle mutations use deterministic transaction and invariant checks, and every derived active, prompt, or continuation pointer must be regenerated coherently with the authoritative object update. Resume must reject or repair a mismatched authority/projection pair and use validated Recovery Packs for bounded restoration. Historical lease, watchdog, and platform-handoff details are not promoted as current authority.
+
+# 事务与派生一致性（历史）
+
+机器时代的事务写入与派生视图一致性原则；机器已随 C027 拆除，派生索引只在需要时由工具重建。

@@ -28,4 +28,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-M7 must explicitly verify path portability, duplicated-helper consolidation, and workspace responsibility boundaries before accepting or reusing legacy Maintain components. C17 reports portability and boundary remediation, but the bounded history does not prove that all three C16 concerns remain closed in the new ambient Maintain/Hook design. This Record is an open verification obligation, not a claim that current code is defective; a later implementation/audit Record must supersede it when each check is evidenced.
+
+# 教训：路径助手要重新校验工作区
+
+经验：路径类工具在每次使用前要重新校验工作区根，避免缓存旧路径。

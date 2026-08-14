@@ -18,4 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T07:08:38+08:00
 ---
-**Pending target follow-up from C20.** Codex-VSP and VSP-Open-Code were each assigned a target-local continuation to consume the consultation-first source contract and decide their managed guidance versus target-owned prompt changes. C20 did not execute those target writes; verify target-local records before treating either adaptation as complete.
+
+# 教训：目标本地续接要单独处理
+
+经验：目标仓库的续接状态与源端分开管理，避免源端改动覆盖目标本地上下文。

@@ -23,4 +23,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T07:08:38+08:00
 ---
-**Integration-sync boundary.** Treat downstream adapter synchronization as an internal development and release gate after source changes, not as a public user command. Target adaptation must be explicitly scoped, validated in the target, and recorded on the target side.
+
+# 集成同步与内部发布门
+
+集成同步与内部发布走明确 gate；发布证据必须可审计。

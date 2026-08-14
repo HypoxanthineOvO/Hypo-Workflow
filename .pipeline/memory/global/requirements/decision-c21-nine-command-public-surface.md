@@ -24,4 +24,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-The authoritative C21 public/contextual discovery surface contains exactly /hw:guide, /hw:init, /hw:goal, /hw:plan, /hw:cycle, /hw:maintain, /hw:resume, /hw:accept, and /hw:reject. User-visible commands must be registered in the authoritative registry; generated documentation, adapters, and command-inventory tests are projections of that registry. Chat, Explain, Status, Report, Log, Check, Compact, Knowledge, consistency Sync, Debug, explicit start, and Plan phases are natural/internal behavior. Setup, Rules, Stop command, Skip, Reset, Showcase, Patch, Help, Watchdog, and plan-confirm remain M8 removal candidates. Deferred or removal-candidate capabilities must not be advertised as executable backends.
+
+# 九命令公开面
+
+对外只暴露确认的九条公开/情境命令；其余能力保持内部，不进入发现面。

@@ -18,19 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-08-05T13:08:12.374Z
 ---
-# Semantic indexes and one-time history refresh
 
-Workflow storage must be primarily understandable through human-readable semantic directory names, filenames, Markdown documents, and layered INDEX.md files. Visible paths and references should describe the project concept, Cycle, Experiment, decision, or artifact. UUIDs, hashes, event segments, and integrity metadata may remain internal but must not be the normal navigation interface for users or models.
+# 语义索引与一次性历史整理
 
-Provide a one-time model-assisted History Refresh for adopting the new format from an existing .pipeline history. The refresh:
-
-- inventories legacy Cycles, Plans, Progress, logs, Journal events, reports, Records, Experiments, evidence, and archives;
-- asks a capable model to synthesize Cycle purposes, outcomes, relationships, durable project memory, Experiment identities, Attempts, lessons, deferred work, and unresolved ambiguities;
-- generates semantic directories, human-readable records, layered INDEX.md files, Cycle summaries, Experiment indexes, and a migration coverage report;
-- presents the proposed mapping, uncertain classifications, conflicts, omissions, and preserved source references before activation;
-- writes the new structure side by side and does not destroy or rewrite legacy history;
-- validates that every selected historical source is represented, intentionally excluded with a reason, or listed for user review;
-- switches the workspace to the new structure only after explicit user approval and successful validation;
-- is idempotent and can be rerun safely after correcting classifications.
-
-After activation, ordinary context uses the new semantic indexes and summaries. Legacy files remain a read-only evidence archive and are opened only for drill-down or migration verification.
+旧历史通过一次性、可审阅的整理迁移为语义结构，旧文件保持只读；未经审阅不得修改旧历史。

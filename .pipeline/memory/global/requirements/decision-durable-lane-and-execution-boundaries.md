@@ -34,4 +34,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-Analysis remains a durable, recoverable investigation lane rather than disposable chat or a Test Profile. It records the question, evidence, conclusion, and next action without converting investigation into Delivery work. Manual mode denies code edits, hybrid mode proposes and requires confirmation, and auto mode may edit only inside configured boundaries. Disproving a hypothesis is valid progress; quality is judged by evidence, traceability, and any required verification.
+
+# Analysis 持久车道与执行边界
+
+Analysis 模式有持久车道：manual 拒绝改代码、hybrid 先确认、auto 在配置边界内改；重启与系统安装需确认。

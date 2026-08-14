@@ -19,4 +19,7 @@ supersedes:
   - decision-f8e8e63dd30d8a90c572e1a699a19f21
 updated_at: 2026-07-11T20:09:41+08:00
 ---
-The deferred Workflow Stash model is Checkpoint + Suspend + Blocking Delivery + Reconciliation, not git stash or a code snapshot. Push records Workflow contracts, evidence, remaining work, blocker, resume condition, HEAD and dirty paths while leaving the worktree in place and warning about overlap risk. Pop waits for the blocker condition, reads the accepted new baseline, creates a Resume Merge Plan, reconciles old assumptions forward, updates affected Milestones and verification, and preserves history. Adaptive mode auto-resolves only low-ambiguity mappings and asks on semantic conflict; strict mode requires approval for every contract difference. Failed reconciliation remains recoverable rather than pretending restoration succeeded.
+
+# Stash 实现模型
+
+Stash/Suspend/Pop 的实现模型记录（机器已随 C027 拆除，仅历史参考）。

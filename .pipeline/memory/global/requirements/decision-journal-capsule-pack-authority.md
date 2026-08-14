@@ -23,4 +23,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-11T20:49:59+08:00
 ---
-Recovery uses an append-only object Journal of explicit rationale/evidence summaries, a derived and rebuildable Context Capsule, and a validated Recovery Pack with cursor, hashes, continuation, relevant Records, evidence, and bounded recent context. Hidden chain-of-thought, scratchpads, raw transcripts, and secret values never become authority. Transcript input is optional convenience only. If the newest Pack is invalid, restore a valid ancestor and replay the required Journal delta. Detailed recovery data stays local/ignored; future telemetry may aggregate redacted events but cannot change recovery correctness semantics.
+
+# Journal/Capsule/Pack 权威（历史）
+
+机器时代的恢复权威分层：journal、capsule、pack。该机器已随 C027 拆除，git 兜底，本条仅历史参考。

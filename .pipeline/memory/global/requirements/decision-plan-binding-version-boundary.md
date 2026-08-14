@@ -18,8 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-23T14:58:18.865Z
 ---
-# VSPi Plan binding version boundary
 
-VSPi 0.1.0 keeps its current Plan capability level. Workflow-backed Plan binding is designed for VSPi 0.2.0. The end state has one canonical Plan authority in Hypo-Workflow rather than permanent dual writes between a VSPi LocalPlanBackend and Workflow storage.
+# VSPi Plan 绑定版本边界
 
-The file-backed context retrieval concept remains experimental and may be specified without being implemented in the first delivery.
+Plan 绑定按版本显式迁移，不隐式升级旧绑定。

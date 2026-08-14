@@ -18,4 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T07:07:51+08:00
 ---
-Evidence-first 命令必须在两个出口之前完成敏感信息脱敏：既要在 evidence packet 持久化之前脱敏，也要在人类可见内容渲染之前脱敏。
+
+# 证据先脱敏再持久化与展示
+
+任何证据在持久化或展示前必须脱敏：token/password/credential 替换为 [REDACTED]，不落盘原文。

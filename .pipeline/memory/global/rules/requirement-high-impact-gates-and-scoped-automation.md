@@ -38,4 +38,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-Destructive or external operations, plugin installation, user-level configuration writes, remote PR/MR writes, Release publication, and remote clone/download require explicit, scope-bound human authorization. Local preparation without remote effects may precede the gate. Durable automation preferences cannot silently waive these boundaries; current authorization is represented by exact, single-use, drift-sensitive Receipts rather than a broad whitelist flag.
+
+# 高影响操作的授权边界（历史）
+
+高影响副作用（删除、远端、发布、重启）必须按明确授权执行。原机器拦截（删除 deny、deletion-gate）已随 C027 移除，现在由宿主权限与讨论门兜底；本条保留为授权边界原则。

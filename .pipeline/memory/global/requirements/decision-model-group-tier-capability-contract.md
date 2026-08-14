@@ -18,8 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-23T14:58:18.865Z
 ---
-# VSPi model-group structure
 
-Model groups use difficulty tiers plus capability filters. Workflow emits model-neutral semantic routing information from task complexity, uncertainty, risk, verification strength, and execution feedback. VSPi maps that result to an ordered model group and resolves an available concrete model.
+# VSPi 模型组层级契约
 
-Vision, tool use, and context-window needs are hard capability filters. Coding, research, review, and other task roles remain Prompt Profile concerns. Provider names, model ids, credentials, and model-specific prompt tuning remain outside Hypo-Workflow Core.
+Core 只输出 routing class 与能力要求；具体模型解析由宿主负责，模型名不泄漏进核心。

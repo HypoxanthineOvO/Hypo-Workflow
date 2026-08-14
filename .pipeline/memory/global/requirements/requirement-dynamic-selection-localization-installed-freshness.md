@@ -33,4 +33,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-Validation derives expected command inventory from authority, uses language-aware assertions, proves that focused selectors changed the executed scenario set, and checks installed Skill bundles plus shared asset references against the source version. A green source-only or selector-ambiguous run does not establish the intended runtime contract.
+
+# 动态选择、本地化与安装新鲜度校验（历史）
+
+动态选择与本地化校验要求；机器校验已随 C027 移除，保留为约定。

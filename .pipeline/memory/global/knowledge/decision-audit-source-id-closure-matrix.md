@@ -18,4 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T07:08:38+08:00
 ---
-**Audit-remediation discipline.** Maintain a source-ID closure matrix from finding to evidence, and classify broad-detector residuals separately from release blockers. A residual match is not automatically a failed release gate, but its classification must be explicit and reviewable.
+
+# 审计的 source-id 闭包矩阵（经验）
+
+经验：审计要对来源 ID 做闭包对账，才能发现"需求记了但没传播到执行面"这类残留。

@@ -21,4 +21,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-05-21T01:30:00+08:00
 ---
-C16 was delivered but not finally accepted by the user. Its Milestone outputs may be evidence or migration input, but must not be treated as accepted requirements or current architecture without a new review.
+
+# 教训：交付不等于被接受
+
+经验：机器标记 completed 不等于用户接受；人工接受是独立 gate。

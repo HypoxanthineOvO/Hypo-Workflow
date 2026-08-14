@@ -19,12 +19,7 @@ supersedes:
   - decision-f9aca98c5a8cdd4bac459a87dc6fe9e9
 updated_at: 2026-08-05T13:13:32.287Z
 ---
-# Template-first recording without routine write APIs
 
-Hypo-Workflow exposes no routine model-facing write API for Cycle, Plan, Progress, Execution, Memory, or Experiment records. Capable models maintain these records directly through ordinary file operations using concise Markdown templates with YAML frontmatter and semantic paths.
+# 最小模型可见 API（经验）
 
-Markdown contains the human-readable purpose, reasoning, progress, result, evidence labels, and next action. YAML frontmatter contains only the small structured fields needed for indexing and relationships, such as kind, semantic name, status, dates, scope, Cycle or Experiment relationship, and supersession.
-
-Core may provide optional validation, semantic index rebuilding, conflict detection, and one-time History Refresh. These helpers check or derive structure but do not replace the model as the ordinary record writer. Internal hashes or transaction details remain invisible implementation metadata when retained.
-
-Templates must be short enough that a capable model can understand and write them without a specialized API. Hooks remind the model to update the relevant file after meaningful checkpoints; they do not require a tool call.
+模型日常只写普通文件；可见写 API、hash、Receipt 等机器接口没有必要（已随 C027 拆除）。

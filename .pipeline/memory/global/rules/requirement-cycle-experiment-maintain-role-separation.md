@@ -18,10 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-08-05T13:08:12.374Z
 ---
-# Cycle, Experiment, and Maintain role separation
 
-Cycle is the bounded project iteration and archive container. It owns the current round's objective, Plan, Progress, Execution Log, evidence, result, and closure Summary.
+# Cycle、Experiment 与 Maintain 的职责分离
 
-Experiment is a stable scientific or empirical object that may span Cycles. It owns purpose, hypotheses, design, data, baselines, Attempts, metrics, results, and interpretation. Each Attempt records the Cycle that produced it. A Cycle may operate on one or more Experiments, and later Cycles may continue an existing Experiment without inheriting prior Milestones.
-
-Maintain is a cross-cutting memory action, not a work container or independent execution lifecycle. It records confirmed durable requirements, preferences, decisions, feedback, lessons, and corrections at the appropriate project, Cycle, or Experiment scope. Cycle closure uses Maintain to promote only selected long-lived facts; raw outputs, brainstorming, and transient diagnostics remain in their source records.
+三者是不同工具：Cycle 是项目迭代与归档边界，Experiment 是人类可读实验协议，Maintain 只保存长期事实；都不是彼此的替代，也不互相包含。

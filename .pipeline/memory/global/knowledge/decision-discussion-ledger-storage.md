@@ -18,14 +18,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-08-05T13:18:27.498Z
 ---
-# Discussion Ledger storage
 
-Each Cycle keeps a strict human-readable Discussion Ledger so later review can determine what the user said, what the assistant replied, what was authorized, and where misunderstanding or responsibility arose.
+# 讨论原文的存储方式（经验）
 
-The complete visible user and assistant messages are stored locally in append-only Cycle- and Session-scoped Markdown files. Raw discussion files are ignored by Git by default. They include local timestamps, speaker labels, Session and turn references, and attachment references. Existing entries are never edited; corrections are appended. System and developer prompts, hidden reasoning, and raw tool output are excluded. Obvious credentials are redacted with an explicit marker rather than persisted.
-
-Each Cycle also keeps a Git-tracked DISCUSSION-SUMMARY.md. It records confirmed requirements, decisions, disagreements, approvals, rejections, corrections, unresolved questions, and human-readable references to the local raw entries. Short relevant quotations may be included after secret-safe review.
-
-Resume and ordinary context load the summary, not the full transcript. The raw ledger is opened only for dispute resolution, diagnosis, detailed historical recovery, or explicit user inspection. Cycle closure preserves the local raw ledger locally and archives the tracked summary with the Cycle.
-
-Lightweight UserPromptSubmit and Stop capture are justified Hook responsibilities. If those Hooks are unavailable, the main Agent remains responsible for appending the visible exchange before relying on it as authority.
+用户与助手的可见原文按 Cycle/Session 追加保存到本地 .pipeline/local/discussions/（gitignore）；Git 内只保存脱敏后的讨论摘要。

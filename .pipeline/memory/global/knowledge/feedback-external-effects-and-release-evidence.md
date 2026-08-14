@@ -24,4 +24,7 @@ source_refs:
 supersedes: []
 updated_at: 2026-07-12T08:15:40+08:00
 ---
-Do not treat local contracts, dry runs, or source-side completion as proof of a remote effect. Remote PR/MR and notification claims require an appropriate provider acknowledgement without persisting private payloads; target release additionally requires an explicit version/tag choice and inspection of both local and remote state before publication.
+
+# 教训：外部效果与发布证据可审计
+
+经验：任何远端/外部副作用都要留可审计证据；发布前验证真实产物而不是快照。
