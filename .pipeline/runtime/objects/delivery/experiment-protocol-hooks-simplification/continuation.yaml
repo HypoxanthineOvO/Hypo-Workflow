@@ -1,8 +1,0 @@
-next_action: await_manual_acceptance
-object_ref:
-  id: experiment-protocol-hooks-simplification
-  kind: delivery
-plan_hash: 1450a5314af05399d43480492d6063a5b028abff144c576abc308fd292d174f3
-revision: 0
-schema_version: '1'
-updated_at: 2026-08-03T10:57:07.547Z

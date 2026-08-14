@@ -6,7 +6,6 @@ import { parseFrontmatter } from "../src/serialization/index.js";
 
 const ROOT = new URL("../../", import.meta.url).pathname;
 const TEMPLATE_ROOT = join(ROOT, "templates", "semantic");
-const EXAMPLE_ROOT = join(ROOT, "examples", "semantic-workflow");
 
 const REQUIRED_TEMPLATES = [
   "cycle.md",
@@ -59,40 +58,3 @@ test("Session focus template names one local Cycle without protocol metadata", a
   assert.match(focus, /^updated: /m);
   assert.doesNotMatch(focus, /hash|receipt|runtime|routing/i);
 });
-
-test("example separates closed Demo, active production, and parallel research Cycles", async () => {
-  const demo = parseFrontmatter(await readFile(join(EXAMPLE_ROOT, "cycles", "C001-renderer-demo", "SUMMARY.md"), "utf8"));
-  const production = parseFrontmatter(await readFile(join(EXAMPLE_ROOT, "cycles", "C002-renderer-production", "PLAN.md"), "utf8"));
-  const research = parseFrontmatter(await readFile(join(EXAMPLE_ROOT, "cycles", "C003-editor-research", "PLAN.md"), "utf8"));
-
-  assert.equal(demo.attributes.status, "closed");
-  assert.equal(production.attributes.status, "active");
-  assert.deepEqual(production.attributes.builds_on, ["C001-renderer-demo"]);
-  assert.equal(research.attributes.status, "active");
-  assert.match(production.body, /不继承 Demo Milestone/);
-  assert.match(research.body, /不修改正式版 renderer Cycle/);
-});
-
-test("example Progress mirrors every Plan item in order", async () => {
-  for (const cycle of ["C002-renderer-production", "C003-editor-research"]) {
-    const plan = parseFrontmatter(await readFile(join(EXAMPLE_ROOT, "cycles", cycle, "PLAN.md"), "utf8"));
-    const progress = parseFrontmatter(await readFile(join(EXAMPLE_ROOT, "cycles", cycle, "PROGRESS.md"), "utf8"));
-
-    assert.equal(plan.attributes.progress, "PROGRESS.md");
-    assert.equal(progress.attributes.plan, "PLAN.md");
-    assert.deepEqual(tableIds(progress.body), tableIds(plan.body), `${cycle} Progress must mirror Plan IDs`);
-    assert.ok(tableIds(plan.body).includes(progress.attributes.current), `${cycle} current ID must exist in Plan`);
-  }
-});
-
-test("example Experiment spans Cycles without owning their task lists", async () => {
-  const experiment = parseFrontmatter(await readFile(join(EXAMPLE_ROOT, "experiments", "renderer-performance.md"), "utf8"));
-  assert.equal(experiment.attributes.kind, "experiment");
-  assert.deepEqual(experiment.attributes.cycles, ["C001-renderer-demo", "C002-renderer-production"]);
-  assert.match(experiment.body, /Attempt 1[\s\S]*C001-renderer-demo/);
-  assert.match(experiment.body, /Attempt 2[\s\S]*C002-renderer-production/);
-});
-
-function tableIds(body) {
-  return [...body.matchAll(/^\| `(M\d+|S\d+)` \|/gm)].map((match) => match[1]);
-}

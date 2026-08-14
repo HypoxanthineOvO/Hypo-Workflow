@@ -1,5 +1,0 @@
-active:
-  delivery:
-    id: experiment-protocol-hooks-simplification
-    kind: delivery
-schema_version: '1'

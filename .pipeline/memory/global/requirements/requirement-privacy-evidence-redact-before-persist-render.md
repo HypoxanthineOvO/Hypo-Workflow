@@ -1,0 +1,21 @@
+---
+authority_role: record
+confidence: 0.99
+created_at: 2026-07-12T07:07:51+08:00
+dedupe_key: privacy/evidence-redact-before-persist-render
+id: requirement-f96524166e1a8217674e9480be062afc
+kind: requirement
+level: guideline
+schema_version: '1'
+scope:
+  ref: project:hypo-workflow
+  type: project
+semantic_hash: f96524166e1a8217674e9480be062afc7878210ed3d497e8a5250385d9edf971
+source_refs:
+  - locator: .pipeline/archives/C9-configuration-governance-pr-explain-claude-resume/cycle.yaml
+    ref: .pipeline/archives/C9-configuration-governance-pr-explain-claude-resume/cycle.yaml#cycle.lessons[0]
+    type: legacy_file
+supersedes: []
+updated_at: 2026-07-12T07:07:51+08:00
+---
+Evidence-first 命令必须在两个出口之前完成敏感信息脱敏：既要在 evidence packet 持久化之前脱敏，也要在人类可见内容渲染之前脱敏。

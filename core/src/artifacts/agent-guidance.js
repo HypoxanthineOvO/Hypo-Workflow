@@ -10,7 +10,7 @@ Prefer one concise question with the smallest actionable decision.`;
 
 export const FOUR_RULE_DISCIPLINE_GUIDANCE = `## Four-Rule Discipline
 
-Project the optional @karpathy/guidelines behavior pack as concise execution discipline without changing its default severity. Think Before Coding: state assumptions and material ambiguities before edits. Simplicity First: choose the smallest sufficient solution. Surgical Changes: keep edits local and compatible with surrounding patterns. Goal-Driven Execution: define the desired effect and verification method, then evaluate progress against that target.`;
+Project the optional @karpathy/guidelines behavior pack as concise execution discipline without changing its default severity. Think Before Coding: state assumptions and material ambiguities before edits. Simplicity First: choose the smallest sufficient solution. Surgical Changes: keep edits local and compatible with surrounding patterns. Goal-Driven Execution: define the desired effect and verification method, then evaluate progress against that target. Necessity First / 反脚手架: before writing any feature, module, or file, ask whether the stated goal can be achieved without it; if yes, do not write it. No scaffolding, reserved interfaces, or defensive branches for "maybe later" requirements.`;
 
 export const CONSULTATION_FIRST_ACTION_BOUNDARY_GUIDANCE = `## Consultation-First Action Boundary / 协商优先
 
@@ -40,7 +40,11 @@ Target-owned scope stays separate: Codex-VSP per-model prompts, model selection 
 
 export const HOOKLESS_WORKFLOW_GUIDANCE = `## Hook-Optional Workflow Context
 
-Hooks are optimizations, not the source of correctness. At session start, after compaction, or when Workflow context is uncertain, read the manifest first. Resolve the Session's Work Item through Work Placement when authority routing or resource claims require it; use \`.pipeline/runtime/active.yaml\` only as a legacy fallback when no Placement registry exists. An unbound Session may receive candidate reminders, but it must not block ordinary prompts, tools, diagnostics, or ordinary-file Experiment records. When a Work Item is selected, read only its Runtime and Continuation, plus the latest valid Recovery Pack when resuming. Do not scan every Record or fall back to legacy \`state.yaml\`, \`cycle.yaml\`, \`log.yaml\`, or \`PROGRESS.md\` as authority.
+Hooks are optimizations, not the source of correctness. At session start, after compaction, or when Workflow context is uncertain:
+
+- Read \`.pipeline/INDEX.md\` first, then the focused Cycle's \`PLAN.md\` / \`PROGRESS.md\` / \`EXECUTION.md\` / \`DISCUSSION-SUMMARY.md\`.
+- An unbound Session may receive candidate reminders, but it must not block ordinary prompts, tools, diagnostics, or ordinary-file Experiment records.
+- Do not scan every Memory file or treat machine-era files as authority; history lives in \`.pipeline/cycles\` and \`.pipeline/memory\` with human-readable names.
 
 The main Agent owns semantic memory judgment even when \`UserPromptSubmit\` is unavailable. After responding to an explicit durable requirement, preference, decision, or feedback item, persist it through Maintain without opening a Delivery or asking for an extra execution gate. Do not record brainstorming, full transcripts, hidden reasoning, secrets, or transient diagnostics. If scope, supersession, or meaning is ambiguous, discuss it instead of guessing.
 

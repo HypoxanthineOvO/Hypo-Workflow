@@ -1,0 +1,26 @@
+---
+authority_role: record
+confidence: high
+created_at: 2026-07-12T04:32:18+08:00
+dedupe_key: project:c21:m3-accepted-recovery-baseline
+id: decision-af3afd6b32d3a919d8f20f803280f856
+kind: decision
+level: guideline
+schema_version: '1'
+scope:
+  ref: project:hypo-workflow
+  type: project
+semantic_hash: af3afd6b32d3a919d8f20f803280f8565f99ec610994bb6fa22a9481e84fb15c
+source_refs:
+  - locator: .pipeline/reports/02-recovery-journal-capsule-and-pack-engine.report.md
+    ref: >-
+      .pipeline/reports/02-recovery-journal-capsule-and-pack-engine.report.md#Completion Narrative; Delivered
+      Architecture; Architecture Plan Review
+    type: legacy_file
+  - locator: .pipeline/reviews/C21/M3/final-audit.md
+    ref: .pipeline/reviews/C21/M3/final-audit.md#Conclusion; First-Audit Closure Matrix; Residual Risks
+    type: legacy_file
+supersedes: []
+updated_at: 2026-07-12T04:32:18+08:00
+---
+C21-M3 is accepted with final independent audit PASS and no findings. It delivered object/session/writer-partitioned segmented Journal streams with vector cursors, redaction-first content-addressed blobs, derived Capsules with byte-identical incremental/full rebuild, sealed ancestry-linked Recovery Packs, bounded restore with corrupt-head fallback, and drift-bound deterministic retention. Final validation was focused 47/47 and full 860/860. Locks remain process-local, durability inherits filesystem limits, secret recognition is bounded, Capsule hashes are integrity rather than keyed authenticity, and retention has no cross-process lock across final check and removal.

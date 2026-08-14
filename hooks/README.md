@@ -4,7 +4,7 @@ Hooks 是语义文件工作方式的轻量辅助，不是 Workflow 正确性来�
 
 ## Official Codex Adapter
 
-`hooks/hooks.json` 只注册六类事件：
+`hooks/hooks.json` 只注册四类事件：
 
 | 事件 | 职责 |
 | --- | --- |
@@ -12,12 +12,10 @@ Hooks 是语义文件工作方式的轻量辅助，不是 Workflow 正确性来�
 | `UserPromptSubmit` | 捕获用户可见原文，并提醒主模型识别长期事实 |
 | `PreCompact` | 检查 Progress、Execution 和 Discussion Summary 是否足以恢复 |
 | `Stop` | 捕获助手可见回复，并提醒同步有意义的进度变化 |
-| `PreToolUse` | 对明显的受保护或破坏性操作提供额外安全保护 |
-| `PermissionRequest` | 对需要用户权限的高影响操作说明原因 |
 
-不再注册逐工具证据、压缩后记账或 Worker 生命周期 Hook。普通工具调用、文件读取和上下文压缩不是项目历史；Worker 的任务、结果和证据由 Handoff、Progress 与 Execution 记录。
+不再注册逐工具证据、压缩后记账、Worker 生命周期或删除保护 Hook（C027 移除删除保护门：破坏性操作由宿主权限与讨论门兜底）。普通工具调用、文件读取和上下文压缩不是项目历史；Worker 的任务、结果和证据由 Handoff、Progress 与 Execution 记录。
 
-Core 实现仍保留 `PostToolUse`、`PostCompact`、`SubagentStart`、`SubagentStop` 的处理路径，但只作为兼容实现存在：不注册、不承诺触发，也不产生记录。注册面（`hooks.json` 六类）、实现面（Core）与文档面（本文件）以此处为准，任何一方变化必须三处同步。
+Core 实现仍保留 `PostToolUse`、`PostCompact`、`SubagentStart`、`SubagentStop`、`PreToolUse`、`PermissionRequest` 的处理路径，但只作为兼容实现存在：不注册、不承诺触发，也不产生记录或拒绝。注册面（`hooks.json` 四类）、实现面（Core）与文档面（本文件）以此处为准，任何一方变化必须三处同步。
 
 未绑定 Work Item 的 Session 不得被 Hook 阻塞普通提示、工具、诊断或普通文件 Experiment 记录；`selection_required` 只有在候选列表确实存在时才渲染选择上下文。
 
@@ -39,6 +37,6 @@ Core 实现仍保留 `PostToolUse`、`PostCompact`、`SubagentStart`、`Subagent
 
 ## Safety And Failure
 
-非安全 Hook 失败时应 fail open，并给出简短警告。只有明确的受保护文件、破坏性命令或其他安全边界可以拒绝动作。Hook 不替代用户授权，也不能自行改变 Plan 或长期事实。
+非安全 Hook 失败时应 fail open，并给出简短警告。Hook 不替代用户授权，也不能自行改变 Plan 或长期事实；破坏性操作由宿主权限与讨论门兜底。
 
 Codex wrapper 必须只向 stdout 输出一行有效 JSON，诊断写入 stderr。项目本地 Hook 仍需通过宿主信任机制启用。

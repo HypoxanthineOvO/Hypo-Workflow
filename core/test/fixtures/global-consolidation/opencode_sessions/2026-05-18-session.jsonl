@@ -1,2 +1,0 @@
-{"id":"opencode-20260518-a","timestamp":"2026-05-18T10:15:00+08:00","role":"user","content":"规则候选：OpenCode 自动维护任务必须使用 system initiated maintenance run，不重启服务。Authorization: Bearer opencode-raw-token"}
-{"id":"opencode-20260518-a","timestamp":"2026-05-18T10:16:00+08:00","role":"assistant","content":"模板候选：每日 04:00 汇总聊天记录并生成中文摘要。"}

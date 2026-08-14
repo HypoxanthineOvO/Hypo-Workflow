@@ -1,6 +1,6 @@
 ---
 kind: cycle-index
-status: idle
+status: active
 ---
 
 # Cycle 索引
@@ -9,7 +9,7 @@ status: idle
 
 | Cycle | 目的 | 状态 | 当前项 | 下一步 |
 | --- | --- | --- | --- | --- |
-无。
+| [C027-machine-era-dismantle-and-readable-rewrite](C027-machine-era-dismantle-and-readable-rewrite/PLAN.md) | 机器时代拆除与人类可读重写 | active | S1 | 等待用户审阅矩阵与勾选清理清单 |
 
 ## Closed Cycles
 

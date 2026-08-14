@@ -1,9 +1,0 @@
-name: progress-verbosity
-label: style
-description: Prefer concise PROGRESS entries unless the project requests detailed progress logs.
-default_severity: off
-hooks:
-  - always
-check: |
-  Keep PROGRESS entries short, outcome-focused, and suitable for context reload.
-  If elevated to warn or error, flag overly verbose progress narration and suggest compact wording.

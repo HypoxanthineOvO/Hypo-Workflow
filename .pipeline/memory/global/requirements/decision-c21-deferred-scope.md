@@ -1,0 +1,24 @@
+---
+authority_role: record
+confidence: high
+created_at: 2026-07-11T20:39:36+08:00
+dedupe_key: project:roadmap:c21-deferred-scope
+id: decision-7356b0a9bd8eaa0cea04437082b0c010
+kind: decision
+level: guideline
+schema_version: '1'
+scope:
+  ref: project:hypo-workflow
+  type: project
+semantic_hash: 7356b0a9bd8eaa0cea04437082b0c01032a61c937f9fcfaaa6af44c4722ea86d
+source_refs:
+  - locator: .pipeline/architecture.md
+    ref: .pipeline/architecture.md#Deferred Scope
+    type: legacy_file
+  - locator: .pipeline/reports/C21-core-cutover-bootstrap-scope.md
+    ref: .pipeline/reports/C21-core-cutover-bootstrap-scope.md#后续 Cycle; 当前版本目标; 兼容策略
+    type: legacy_file
+supersedes: []
+updated_at: 2026-07-11T20:39:36+08:00
+---
+After C21, prioritize OpenCode adaptation, then Claude Code/other adapters, Workflow Stash/Suspend/Pop, and experiment project management; experiment management is more important than telemetry. Aggregate telemetry and the Docs/PR/Release redesign come later. Dashboard, TUI, and generic Automation Jobs are not currently planned. If one future automation capability is chosen, prefer Codex quota-recovery scheduled follow-up from a saved continuation rather than building a generic scheduler. In C21, deferred Analysis/Audit/Quality/Explore/Docs/PR/Release/Optimize capabilities stay non-discoverable and zero-write; permanent removal candidates wait for M8's approved Manifest.

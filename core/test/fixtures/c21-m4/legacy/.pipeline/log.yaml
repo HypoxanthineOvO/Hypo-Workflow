@@ -1,5 +1,0 @@
-events:
-  - id: legacy-event-001
-    event: milestone_started
-    milestone: C7-M2
-    at: 2026-05-01T09:00:00+08:00

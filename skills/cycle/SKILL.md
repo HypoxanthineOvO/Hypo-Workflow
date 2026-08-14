@@ -16,7 +16,7 @@ Cycle 是项目迭代和归档边界，不是 Goal 或 Plan 的竞争选项。Go
 - **列出：** 从项目索引展示 active/closed Cycle 的名称、目的、状态、当前位置和下一步。
 - **聚焦：** 一个 Session 只聚焦一个 Cycle。将 `cycle` 和 `updated` 写入本地 `.pipeline/local/sessions/<host>/<session>.yaml`。切换前确认当前 Cycle 的 Progress、Execution 和 Discussion Summary 已更新。
 - **并行：** 多个 active Cycle 可以同时存在。源码修改需要隔离 worktree 和明确集成目标；资源冲突需要隔离或暂停。
-- **关闭：** 验证完成后写 `SUMMARY.md`，保存目的、边界、结果、证据、重要决定、经验和后续候选。将状态改为 `closed`，但不移动目录或破坏引用。
+- **关闭：** 验证完成后，先整理 Memory：本轮新记忆可读命名、`level` 已标、`memory/INDEX.md` 已更新、无哈希残留。然后写 `SUMMARY.md`，保存目的、边界、结果、证据、重要决定、经验和后续候选。将状态改为 `closed`，但不移动目录或破坏引用。
 
 如果用户要求关闭但结果未验证，清楚说明缺口；不要把“停止继续做”伪装成成功。放弃的 Cycle 也应保留可读原因和已有证据。
 

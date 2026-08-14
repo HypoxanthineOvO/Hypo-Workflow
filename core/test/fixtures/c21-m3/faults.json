@@ -1,6 +1,0 @@
-{
-  "truncated_tail": "{\"schema_version\":\"1\",\"event_id\":\"incomplete",
-  "earlier_corruption": "{\"schema_version\":",
-  "expected_next_action": "seal_recovery_pack_from_verified_capsule",
-  "corrupt_pack_replacement": "CORRUPTED_RECOVERY_PACK_BYTES"
-}

@@ -1,0 +1,245 @@
+---
+authority_role: record
+confidence: confirmed
+created_at: 2026-07-29T04:37:28.974Z
+dedupe_key: goal.concurrent-work-placement-integration.plan
+id: decision-e38266eeaa70b684754457d9d94a7cb4
+kind: decision
+level: reference
+schema_version: '1'
+scope:
+  ref: concurrent-work-placement-integration
+  type: goal
+semantic_hash: e38266eeaa70b684754457d9d94a7cb4e526fa730c3d2965bbfd767d8270e706
+source_refs:
+  - locator: compiled-plan
+    ref: goal:concurrent-work-placement-integration:revision:0
+    type: delivery_plan
+supersedes: []
+updated_at: 2026-07-29T04:37:28.974Z
+---
+# 并发 Work Item 的安全 Placement、隔离与合并闭环
+
+Hypo-Workflow allows multiple Cycle and Experiment Work Items to run concurrently in one Project when deterministic repository and resource claims do not conflict, isolates conflicting work through explicit Host-executed worktrees or resource plans, binds every Session to one selected Work Item, and blocks source-changing completion until verified integration evidence exists.
+
+```json
+{
+  "acceptance_criteria": [
+    {
+      "id": "multi-work-authority",
+      "statement": "Multiple non-terminal Cycle, Goal, Plan, and Experiment objects coexist without a project-global active-work rejection; active.delivery remains compatibility-only.",
+      "verification": "Focused Core tests start at least two Deliveries, two Experiments, and a mixed Delivery/Experiment set, then read and resume each by explicit Work Item reference while the legacy pointer changes."
+    },
+    {
+      "id": "session-selection",
+      "statement": "A Host Session is bound to exactly one selected Work Item; a new unbound Session with multiple candidates receives selection_required instead of silently inheriting the global foreground object.",
+      "verification": "Hook and resume integration tests cover explicit selection, same-Work-Item collaboration, conflicting Session binding, restart, compaction, and event/recovery routing without cross-lane contamination."
+    },
+    {
+      "id": "repository-registry",
+      "statement": "One Project authority root can register multiple Repository Targets, each with a stable repository identity, primary integration target, mutable path locator, Git base, and forward-compatible integration_target_id.",
+      "verification": "Schema and persisted-read tests cover the Cryo-Computing root plus independent Accel-Sim and llm-trace repositories, moved locators, unavailable targets, malformed identities, and legacy single-root workspaces."
+    },
+    {
+      "id": "placement-assessment",
+      "statement": "Before execution, Core deterministically classifies source and resource claims as shared, isolated_worktree, isolated_resources, or blocked.",
+      "verification": "Table-driven tests cover read/read sharing, pinned read/execute sharing, write/build/checkout conflicts, dirty unowned paths, output overlap, GPU/port/cache conflicts, and non-conflicting unique Attempt directories."
+    },
+    {
+      "id": "atomic-leases",
+      "statement": "Conflict assessment and claim reservation are one crash-safe transaction with generation/CAS and fencing so two contenders cannot both acquire an exclusive repository or resource claim.",
+      "verification": "Fresh-process concurrency and fault-injection tests cover simultaneous acquisition, stale owner fencing, crash recovery, release, expired claims, and zero-write rejection on conflict."
+    },
+    {
+      "id": "host-worktree-boundary",
+      "statement": "Workflow remains a protocol rather than a runner: Core validates placement descriptors and evidence, while the Host explicitly creates/removes worktrees, executes commands, and performs merges under existing side-effect gates.",
+      "verification": "Tests prove Core performs no Git/process side effect during assessment; Host-facing descriptors contain bounded argv/path/ref data and reject traversal, symlink escape, unsafe branch names, arbitrary shell strings, and mismatched repository snapshots."
+    },
+    {
+      "id": "integration-gate",
+      "statement": "A source-changing Work Item cannot reach final acceptance or terminal completion until its required Repository Targets carry verified merge, rebase, or squash integration evidence, or the user explicitly abandons/trashes it.",
+      "verification": "Lifecycle tests cover integration_required, integrating, integrated, integration_blocked, retry, explicit abandon, multi-repository partial integration, evidence drift, and refusal to accept an unintegrated Delivery."
+    },
+    {
+      "id": "experiment-interop",
+      "statement": "Pure Experiments may share pinned source/environment state when claims do not conflict, while Experiment source/build mutations and external artifacts participate in the same placement and lease rules.",
+      "verification": "Experiment tests run two compatible read-only Attempts concurrently, serialize conflicting GPU/output claims, require a worktree for source/build mutation, preserve unique physical Attempt paths, and retain scientific review semantics."
+    },
+    {
+      "id": "cryo-pilot-fixture",
+      "statement": "The maintained reference fixture supports an Accel-Sim subproject lane concurrently with a Trace-production lane: isolated Accel-Sim write/build ownership, pinned Accel-Sim read/execute access for tracing, isolated llm-trace writes, unique /data Attempt roots, and explicit GPU claims.",
+      "verification": "A filesystem-only fixture models Nod Cryo-Computing without SSH or real GPU execution and verifies placement decisions, Session isolation, merge targets, status projection, and cleanup; the real-project pilot boundary remains documented."
+    },
+    {
+      "id": "surface-compatibility",
+      "statement": "Guide, Goal/Plan, Experiment, Resume, Codex Hooks, Host status, docs, command contracts, generated bundles, and migration behavior consistently expose multi-Work-Item selection without teaching removed commands or breaking old workspaces.",
+      "verification": "Focused surface tests, npm test, npm run build:host, bundle integrity checks, syntax checks, and git diff --check pass; host-status v1 remains readable while the new projection reports selected and available Work Items."
+    }
+  ],
+  "constraints": [
+    "Zero manual intermediate Stones; execution continues autonomously after explicit Goal approval and start until final acceptance or a newly discovered material decision.",
+    "Keep one Project authority root and one centralized .pipeline store; do not copy mutable Workflow authority into Git worktrees.",
+    "Preserve existing Delivery, Workstream, Experiment, Runtime, Receipt, Recovery, workspace transaction, and immutable event authorities; extend them through a single generalized Work Item/Placement contract rather than parallel competing state.",
+    "A writable checkout or build directory has one active owning Work Item; read/execute sharing requires an immutable code snapshot and no checkout, build, environment, cache, or output mutation.",
+    "Source-changing work binds integration_target_id at start and must integrate into the corresponding Repository Target primary checkout before acceptance; large Experiment artifacts stay outside Git.",
+    "The first release fully supports one Project authority root with multiple Repository Targets and one primary integration target per repository; schema must permit future additional integration targets without claiming full multi-root orchestration.",
+    "Core does not run project commands, create worktrees, merge branches, push remotes, install dependencies, restart services, allocate GPUs, or delete artifacts; the Host performs authorized side effects and returns evidence.",
+    "No system dependency, service restart, remote write, release, push, destructive cleanup, or target-repository mutation is authorized by Goal approval alone.",
+    "Do not modify target-owned Codex-VSP model prompts, provider behavior, VSP-Open-Code reminders, or external project repositories; source-owned Skills, Hooks, Host contracts, adapters, docs, tests, and release artifacts remain in scope.",
+    "Preserve user changes already present in the dirty worktree and avoid unrelated refactors or metadata churn.",
+    "Use the existing Node.js ESM stack, js-yaml, structured validation, atomic workspace transactions, and focused node:test suites; add no dependency unless a newly discovered requirement makes it unavoidable and is separately discussed.",
+    "Never persist raw credentials, hidden reasoning, complete transcripts, unsafe shell strings, or machine-specific secrets in claims, locators, descriptors, events, or evidence."
+  ],
+  "delivery_kind": "goal",
+  "design": {
+    "acceptance_criteria": [
+      {
+        "id": "multi-work-authority",
+        "statement": "Multiple non-terminal Cycle, Goal, Plan, and Experiment objects coexist without a project-global active-work rejection; active.delivery remains compatibility-only.",
+        "verification": "Focused Core tests start at least two Deliveries, two Experiments, and a mixed Delivery/Experiment set, then read and resume each by explicit Work Item reference while the legacy pointer changes."
+      },
+      {
+        "id": "session-selection",
+        "statement": "A Host Session is bound to exactly one selected Work Item; a new unbound Session with multiple candidates receives selection_required instead of silently inheriting the global foreground object.",
+        "verification": "Hook and resume integration tests cover explicit selection, same-Work-Item collaboration, conflicting Session binding, restart, compaction, and event/recovery routing without cross-lane contamination."
+      },
+      {
+        "id": "repository-registry",
+        "statement": "One Project authority root can register multiple Repository Targets, each with a stable repository identity, primary integration target, mutable path locator, Git base, and forward-compatible integration_target_id.",
+        "verification": "Schema and persisted-read tests cover the Cryo-Computing root plus independent Accel-Sim and llm-trace repositories, moved locators, unavailable targets, malformed identities, and legacy single-root workspaces."
+      },
+      {
+        "id": "placement-assessment",
+        "statement": "Before execution, Core deterministically classifies source and resource claims as shared, isolated_worktree, isolated_resources, or blocked.",
+        "verification": "Table-driven tests cover read/read sharing, pinned read/execute sharing, write/build/checkout conflicts, dirty unowned paths, output overlap, GPU/port/cache conflicts, and non-conflicting unique Attempt directories."
+      },
+      {
+        "id": "atomic-leases",
+        "statement": "Conflict assessment and claim reservation are one crash-safe transaction with generation/CAS and fencing so two contenders cannot both acquire an exclusive repository or resource claim.",
+        "verification": "Fresh-process concurrency and fault-injection tests cover simultaneous acquisition, stale owner fencing, crash recovery, release, expired claims, and zero-write rejection on conflict."
+      },
+      {
+        "id": "host-worktree-boundary",
+        "statement": "Workflow remains a protocol rather than a runner: Core validates placement descriptors and evidence, while the Host explicitly creates/removes worktrees, executes commands, and performs merges under existing side-effect gates.",
+        "verification": "Tests prove Core performs no Git/process side effect during assessment; Host-facing descriptors contain bounded argv/path/ref data and reject traversal, symlink escape, unsafe branch names, arbitrary shell strings, and mismatched repository snapshots."
+      },
+      {
+        "id": "integration-gate",
+        "statement": "A source-changing Work Item cannot reach final acceptance or terminal completion until its required Repository Targets carry verified merge, rebase, or squash integration evidence, or the user explicitly abandons/trashes it.",
+        "verification": "Lifecycle tests cover integration_required, integrating, integrated, integration_blocked, retry, explicit abandon, multi-repository partial integration, evidence drift, and refusal to accept an unintegrated Delivery."
+      },
+      {
+        "id": "experiment-interop",
+        "statement": "Pure Experiments may share pinned source/environment state when claims do not conflict, while Experiment source/build mutations and external artifacts participate in the same placement and lease rules.",
+        "verification": "Experiment tests run two compatible read-only Attempts concurrently, serialize conflicting GPU/output claims, require a worktree for source/build mutation, preserve unique physical Attempt paths, and retain scientific review semantics."
+      },
+      {
+        "id": "cryo-pilot-fixture",
+        "statement": "The maintained reference fixture supports an Accel-Sim subproject lane concurrently with a Trace-production lane: isolated Accel-Sim write/build ownership, pinned Accel-Sim read/execute access for tracing, isolated llm-trace writes, unique /data Attempt roots, and explicit GPU claims.",
+        "verification": "A filesystem-only fixture models Nod Cryo-Computing without SSH or real GPU execution and verifies placement decisions, Session isolation, merge targets, status projection, and cleanup; the real-project pilot boundary remains documented."
+      },
+      {
+        "id": "surface-compatibility",
+        "statement": "Guide, Goal/Plan, Experiment, Resume, Codex Hooks, Host status, docs, command contracts, generated bundles, and migration behavior consistently expose multi-Work-Item selection without teaching removed commands or breaking old workspaces.",
+        "verification": "Focused surface tests, npm test, npm run build:host, bundle integrity checks, syntax checks, and git diff --check pass; host-status v1 remains readable while the new projection reports selected and available Work Items."
+      }
+    ],
+    "constraints": [
+      "Zero manual intermediate Stones; execution continues autonomously after explicit Goal approval and start until final acceptance or a newly discovered material decision.",
+      "Keep one Project authority root and one centralized .pipeline store; do not copy mutable Workflow authority into Git worktrees.",
+      "Preserve existing Delivery, Workstream, Experiment, Runtime, Receipt, Recovery, workspace transaction, and immutable event authorities; extend them through a single generalized Work Item/Placement contract rather than parallel competing state.",
+      "A writable checkout or build directory has one active owning Work Item; read/execute sharing requires an immutable code snapshot and no checkout, build, environment, cache, or output mutation.",
+      "Source-changing work binds integration_target_id at start and must integrate into the corresponding Repository Target primary checkout before acceptance; large Experiment artifacts stay outside Git.",
+      "The first release fully supports one Project authority root with multiple Repository Targets and one primary integration target per repository; schema must permit future additional integration targets without claiming full multi-root orchestration.",
+      "Core does not run project commands, create worktrees, merge branches, push remotes, install dependencies, restart services, allocate GPUs, or delete artifacts; the Host performs authorized side effects and returns evidence.",
+      "No system dependency, service restart, remote write, release, push, destructive cleanup, or target-repository mutation is authorized by Goal approval alone.",
+      "Do not modify target-owned Codex-VSP model prompts, provider behavior, VSP-Open-Code reminders, or external project repositories; source-owned Skills, Hooks, Host contracts, adapters, docs, tests, and release artifacts remain in scope.",
+      "Preserve user changes already present in the dirty worktree and avoid unrelated refactors or metadata churn.",
+      "Use the existing Node.js ESM stack, js-yaml, structured validation, atomic workspace transactions, and focused node:test suites; add no dependency unless a newly discovered requirement makes it unavoidable and is separately discussed.",
+      "Never persist raw credentials, hidden reasoning, complete transcripts, unsafe shell strings, or machine-specific secrets in claims, locators, descriptors, events, or evidence."
+    ],
+    "evidence": [
+      {
+        "ref": "core/src/workstreams/index.js",
+        "summary": "Workstream already provides Delivery-bound Session identity, Git base, path claims, CAS, and overlap rejection, but does not cover Experiment or repository/resource placement.",
+        "type": "repository"
+      },
+      {
+        "ref": "core/src/experiment/runs.js",
+        "summary": "Experiment Run identity already binds repository snapshot, uv lock, machine, resources, command, and output, but active Runs do not reserve shared resources against other Work Items.",
+        "type": "repository"
+      },
+      {
+        "ref": "core/src/host-contract/index.js",
+        "summary": "Host status and active foreground projection remain single-Delivery views.",
+        "type": "repository"
+      },
+      {
+        "ref": "core/src/codex-hooks/index.js",
+        "summary": "Codex Hook recovery routing still resolves a single global active object instead of a Session-selected Work Item.",
+        "type": "repository"
+      },
+      {
+        "ref": "core/test/vspi-workstream-contract.test.js",
+        "summary": "Maintained tests already prove multiple non-terminal Deliveries can coexist and explicit resume can ignore the legacy foreground pointer.",
+        "type": "test"
+      },
+      {
+        "ref": "ssh:Nod:/home/heyx/Cryo-Computing",
+        "summary": "One Project authority root coordinates independent Accel-Sim and llm-trace repositories plus external /data artifacts; the requested pilot runs an Accel-Sim subproject while producing more Trace.",
+        "type": "project_pilot"
+      },
+      {
+        "ref": "discussion-2026-07-29-concurrent-work-items",
+        "summary": "The user requires safe concurrent Cycles and Experiments, shared execution only after conflict assessment, local worktree isolation for conflicts, explicit Session selection, permanent primary checkouts, and merge-before-completion for source changes.",
+        "type": "user_request"
+      }
+    ],
+    "outcome": "Hypo-Workflow allows multiple Cycle and Experiment Work Items to run concurrently in one Project when deterministic repository and resource claims do not conflict, isolates conflicting work through explicit Host-executed worktrees or resource plans, binds every Session to one selected Work Item, and blocks source-changing completion until verified integration evidence exists."
+  },
+  "evidence": [
+    {
+      "ref": "core/src/workstreams/index.js",
+      "summary": "Workstream already provides Delivery-bound Session identity, Git base, path claims, CAS, and overlap rejection, but does not cover Experiment or repository/resource placement.",
+      "type": "repository"
+    },
+    {
+      "ref": "core/src/experiment/runs.js",
+      "summary": "Experiment Run identity already binds repository snapshot, uv lock, machine, resources, command, and output, but active Runs do not reserve shared resources against other Work Items.",
+      "type": "repository"
+    },
+    {
+      "ref": "core/src/host-contract/index.js",
+      "summary": "Host status and active foreground projection remain single-Delivery views.",
+      "type": "repository"
+    },
+    {
+      "ref": "core/src/codex-hooks/index.js",
+      "summary": "Codex Hook recovery routing still resolves a single global active object instead of a Session-selected Work Item.",
+      "type": "repository"
+    },
+    {
+      "ref": "core/test/vspi-workstream-contract.test.js",
+      "summary": "Maintained tests already prove multiple non-terminal Deliveries can coexist and explicit resume can ignore the legacy foreground pointer.",
+      "type": "test"
+    },
+    {
+      "ref": "ssh:Nod:/home/heyx/Cryo-Computing",
+      "summary": "One Project authority root coordinates independent Accel-Sim and llm-trace repositories plus external /data artifacts; the requested pilot runs an Accel-Sim subproject while producing more Trace.",
+      "type": "project_pilot"
+    },
+    {
+      "ref": "discussion-2026-07-29-concurrent-work-items",
+      "summary": "The user requires safe concurrent Cycles and Experiments, shared execution only after conflict assessment, local worktree isolation for conflicts, explicit Session selection, permanent primary checkouts, and merge-before-completion for source changes.",
+      "type": "user_request"
+    }
+  ],
+  "id": "concurrent-work-placement-integration",
+  "outcome": "Hypo-Workflow allows multiple Cycle and Experiment Work Items to run concurrently in one Project when deterministic repository and resource claims do not conflict, isolates conflicting work through explicit Host-executed worktrees or resource plans, binds every Session to one selected Work Item, and blocks source-changing completion until verified integration evidence exists.",
+  "revision": 0,
+  "schema_version": "1",
+  "status": "draft",
+  "title": "并发 Work Item 的安全 Placement、隔离与合并闭环",
+  "plan_hash": "8d8bbebd657249da3c7b1f1af0b7c9722bb4bd0de1b2c43c68454bbd7544938d"
+}
+```

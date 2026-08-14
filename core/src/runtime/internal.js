@@ -1,12 +1,4 @@
-import { lstat, readFile } from "node:fs/promises";
-import { resolve } from "node:path";
-import {
-  WORKSPACE_MANIFEST_PATH,
-  isSafeWorkspaceComponent,
-  validateWorkspaceManifest,
-} from "../manifest/index.js";
-import { canonicalHash, parseYaml } from "../serialization/index.js";
-import { assertWorkspacePathAllowed } from "../workspace-store/index.js";
+// C027：internal 只剩人读辅助；manifest/hash/workspace-store 机器已移除。
 
 export const AUTHORITY_SCHEMA_VERSION = "1";
 export const AUTHORITY_OBJECT_KINDS = Object.freeze([
@@ -62,7 +54,7 @@ export function sameObjectRef(left, right) {
 }
 
 export function normalizeSafeIdentifier(value, field) {
-  if (typeof value !== "string" || value !== value.trim() || !isSafeWorkspaceComponent(value)) {
+  if (typeof value !== "string" || value !== value.trim() || !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(value)) {
     throw authorityError("ERR_AUTHORITY_SCHEMA_INVALID", `${field} must be a safe single-component identifier`);
   }
   return value;
@@ -147,37 +139,6 @@ export function containsForbiddenReasoning(value) {
   });
 }
 
-export async function readCurrentManifest(root) {
-  const workspaceRoot = resolve(root || ".");
-  const guarded = await assertWorkspacePathAllowed(workspaceRoot, WORKSPACE_MANIFEST_PATH, {
-    allowedRoots: [".pipeline"],
-    allowTransactionPaths: true,
-  });
-  const stats = await optionalLstat(guarded.path);
-  if (!stats || !stats.isFile() || stats.isSymbolicLink()) {
-    throw authorityError("ERR_WORKSPACE_MANIFEST_INVALID", "Current workspace manifest is missing or not a regular file");
-  }
-  try {
-    return validateWorkspaceManifest(parseYaml(await readFile(guarded.path, "utf8")));
-  } catch (error) {
-    if (error?.code === "ERR_WORKSPACE_MANIFEST_INVALID") throw error;
-    throw authorityError("ERR_WORKSPACE_MANIFEST_INVALID", "Current workspace manifest is unreadable or invalid");
-  }
-}
-
-export function normalizeTransactionOptions(options, operation, derivedSeed) {
-  const value = options ?? {};
-  assertPlainObject(value, `${operation} options`);
-  assertExactKeys(value, ["id", "faultInjector", "now", "tool_use_id"], `${operation} options`);
-  const id = value.id === undefined
-    ? derivedTransactionId(operation, derivedSeed)
-    : normalizeSafeIdentifier(value.id, `${operation} options.id`);
-  if (value.faultInjector !== undefined && typeof value.faultInjector !== "function") {
-    throw authorityError("ERR_AUTHORITY_SCHEMA_INVALID", `${operation} options.faultInjector must be a function`);
-  }
-  return { id, faultInjector: value.faultInjector };
-}
-
 export function assertPlainObject(value, field) {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw authorityError("ERR_AUTHORITY_SCHEMA_INVALID", `${field} must be a mapping`);
@@ -228,14 +189,6 @@ function scanSecrets(value, field, options, seen) {
   seen.delete(value);
 }
 
-function derivedTransactionId(operation, seed) {
-  const prefix = String(operation || "authority")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 24) || "authority";
-  return `${prefix}-${canonicalHash(seed ?? prefix).slice(0, 24)}`;
-}
 
 async function optionalLstat(path) {
   try {

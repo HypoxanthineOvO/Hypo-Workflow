@@ -1,8 +1,0 @@
-<article class="milestone-card">
-  <div class="milestone-title">
-    <span>{{ status_icon(milestone.status) }} {{ milestone.id }}: {{ milestone.name }}</span>
-    {% set badge_status = milestone.status %}
-    {% include "components/status_badge.html" %}
-  </div>
-  <div class="milestone-summary">{{ milestone.summary or "—" }}</div>
-</article>

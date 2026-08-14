@@ -1,6 +1,6 @@
-import { createHash } from "node:crypto";
 import yaml from "js-yaml";
 
+// C027：serialization 只保留 YAML/frontmatter；哈希（canonicalHash）已根除。
 export function parseYaml(source) {
   const text = String(source ?? "");
   if (!text.trim()) return {};
@@ -42,41 +42,6 @@ export function parseFrontmatter(source) {
     attributes,
     body: rest.slice(match.index + match[0].length),
   };
-}
-
-export function canonicalHash(value) {
-  return createHash("sha256").update(canonicalize(value)).digest("hex");
-}
-
-function canonicalize(value, seen = new Set()) {
-  if (value === null) return "null";
-  if (value === undefined) return "undefined";
-  if (typeof value === "string") return `string:${JSON.stringify(value)}`;
-  if (typeof value === "boolean") return `boolean:${value}`;
-  if (typeof value === "number") {
-    if (!Number.isFinite(value)) throw new TypeError("canonicalHash only supports finite numbers");
-    return `number:${Object.is(value, -0) ? 0 : value}`;
-  }
-  if (typeof value === "bigint") return `bigint:${value}`;
-  if (value instanceof Date) return `date:${value.toISOString()}`;
-  if (Buffer.isBuffer(value)) return `buffer:${value.toString("base64")}`;
-  if (typeof value !== "object") {
-    throw new TypeError(`canonicalHash does not support ${typeof value} values`);
-  }
-  if (seen.has(value)) throw new TypeError("canonicalHash does not support cyclic values");
-
-  seen.add(value);
-  let result;
-  if (Array.isArray(value)) {
-    result = `array:[${value.map((item) => canonicalize(item, seen)).join(",")}]`;
-  } else {
-    const entries = Object.keys(value)
-      .sort()
-      .map((key) => `${JSON.stringify(key)}:${canonicalize(value[key], seen)}`);
-    result = `object:{${entries.join(",")}}`;
-  }
-  seen.delete(value);
-  return result;
 }
 
 function isPlainObject(value) {

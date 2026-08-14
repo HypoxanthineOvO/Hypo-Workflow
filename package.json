@@ -2,11 +2,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:host": "node scripts/build-host-artifacts.mjs",
-    "test": "node tests/run_core_tests.mjs --set maintained",
-    "test:all": "node tests/run_core_tests.mjs --set all",
-    "test:quarantine": "node tests/run_core_tests.mjs --set quarantined",
-    "test:inventory": "node tests/run_core_tests.mjs --set all --dry-run"
+    "test": "node --test core/test/*.test.js",
+    "test:scenarios": "bash tests/scenarios/c21/s70-init-current/run.sh && bash tests/scenarios/c21/s77-codex-hook-process/run.sh",
+    "build:host": "node scripts/build-host-artifacts.mjs"
   },
   "dependencies": {
     "js-yaml": "^4.1.1"

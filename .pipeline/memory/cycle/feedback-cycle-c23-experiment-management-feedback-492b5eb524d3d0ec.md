@@ -1,0 +1,27 @@
+---
+authority_role: record
+confidence: confirmed
+created_at: 2026-07-18T07:34:45.334Z
+dedupe_key: cycle.c23-experiment-management.feedback.492b5eb524d3d0ec
+id: feedback-542a04ff0c7db58769911941cc18aedb
+kind: feedback
+level: reference
+schema_version: '1'
+scope:
+  ref: c23-experiment-management
+  type: cycle
+semantic_hash: 542a04ff0c7db58769911941cc18aedb161372a6c4cdcd1d83883c23c199c612
+source_refs:
+  - locator: revision
+    ref: actor:user:operator
+    type: user_feedback
+supersedes: []
+updated_at: 2026-07-18T07:34:45.334Z
+---
+# Delivery feedback
+
+Problem: C23 revision zero binds acceptance to concrete worker models and has no semantic Worker Routing contract.
+Reproduce: Inspect C23 acceptance criterion AC4 and the six-milestone plan. Compare them with the approved five-class semantic Worker Routing specification.
+Expected: Topology and acceptance remain role-based while Workflow emits restart-safe semantic routing intent for host resolution.
+Actual: The active plan names concrete worker models and has no routing API, configuration, persistence, adapter, or validation milestone.
+Context: The user explicitly authorized the topology/routing revision and requested Hypo-Workflow completion before VSP-Codex integration, with no cachebuster update.

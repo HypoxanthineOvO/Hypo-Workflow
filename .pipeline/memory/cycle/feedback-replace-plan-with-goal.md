@@ -1,0 +1,25 @@
+---
+authority_role: record
+confidence: confirmed
+created_at: 2026-07-23T16:02:48.998Z
+dedupe_key: delivery:vspi-symbiotic-workflow-core:replace-plan-with-goal
+id: feedback-2127b84c8d5667c43f93f06baa8c128a
+kind: feedback
+level: reference
+schema_version: '1'
+scope:
+  ref: vspi-symbiotic-workflow-core
+  type: delivery
+semantic_hash: 2127b84c8d5667c43f93f06baa8c128a0ed497fbac9f6516ccd342aed4255209
+source_refs:
+  - locator: remove intermediate Stone and execute autonomously
+    ref: conversation/vspi-workflow-goal-2026-07-23
+    type: user_turn
+supersedes: []
+updated_at: 2026-07-23T16:02:48.998Z
+---
+# Replace the proposed Plan with an autonomous Goal
+
+The user explicitly removed the intermediate Architecture Stone and authorized continuous execution in the previously agreed six-stage order. Intermediate reporting is not required; normal internal test, implementation, and audit evidence remains mandatory.
+
+The proposed Plan is preserved as history and superseded by Goal vspi-symbiotic-workflow-goal. No product implementation was performed under the Plan proposal.

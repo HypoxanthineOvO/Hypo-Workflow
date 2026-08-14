@@ -1,8 +1,0 @@
-next_action: delivery_complete
-object_ref:
-  id: concurrent-work-placement-integration
-  kind: delivery
-plan_hash: 8d8bbebd657249da3c7b1f1af0b7c9722bb4bd0de1b2c43c68454bbd7544938d
-revision: 0
-schema_version: '1'
-updated_at: 2026-07-29T05:45:18.308Z

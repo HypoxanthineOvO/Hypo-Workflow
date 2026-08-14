@@ -1,7 +1,0 @@
-fastapi>=0.100.0
-uvicorn[standard]>=0.23.0
-watchfiles>=0.20.0
-python-multipart>=0.0.6
-pyyaml>=6.0
-markdown>=3.4
-jinja2>=3.1.0
