@@ -2,154 +2,91 @@
 
 # Hypo-Workflow
 
-**A local project workflow protocol for Codex**
-
-Plan -> Execute -> Independently verify -> Human acceptance -> Resume safely
+**Give any coding agent project memory and working discipline — decouple "project" from "agent"**
 
 [![Version](https://img.shields.io/badge/version-15.0.0--alpha.2-blue)](.codex-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Official%20Codex-black)](docs/en/reference/platforms.md)
 
 **Language:** [中文](README.md) | English
 
+> The Chinese README is the primary version; this page mirrors it.
+
 </div>
 
-Hypo-Workflow is a Skill protocol, not a runner or background service. The host Agent implements, tests, and reviews project work; `.pipeline/` preserves verifiable, recoverable project facts.
+---
 
-[v15.0.0-alpha.2 Release Notes](docs/en/release/v15.0.0-alpha.2.md)
+## Why Hypo-Workflow?
 
-This release supports **Official Codex** as its only current adapter. OpenCode, Claude Code, Cursor, GitHub Copilot, Trae, and custom Codex-fork adapters are deferred. Old platform artifacts that remain in the repository are not current support claims.
+### 🧠 Permanent project memory, across agents
 
-## Current Architecture
+Project facts, plans, and decisions live in `.pipeline/` as ordinary Markdown/YAML files — not locked inside one agent's context. You can have **Codex plan and generate the Workflow files, hand execution to ZCode, then ask Kimi Code to review a Cycle**. Every agent reads the same project facts; context compaction, session loss, machine changes, and tool switches don't erase your project's memory.
 
-`.pipeline/INDEX.md` is the semantic workspace entry point. An active Cycle uses ordinary files for plans, progress, evidence, and discussion:
+> Support for some agents is still maturing — issues are welcome.
 
-```text
-INDEX.md
-  -> Cycle: PLAN.md + PROGRESS.md + EXECUTION.md + Discussion
-  -> Experiment: readable YAML/Markdown records
-  -> Memory: confirmed project facts
-  -> Legacy: preserved read-only references
-```
+### 💬 Discussion first: requirements clarified before code
 
-- **Cycle** is the iteration and archive boundary. Use **Goal** for zero-Stone delivery and **Plan** when at least one human Stone is required.
-- **Plan / Progress / Execution** preserve the complete plan, current position, reasons for changes, and verification evidence. Hooks optimize context but are not the source of correctness.
-- **Work Placement / Repository Target** selects one Delivery or Experiment when a Session needs authority routing or resource claims, then atomically chooses a shared checkout, isolated worktree, resource isolation, or blocked placement; an unbound Session does not disable ordinary tools.
-- **Memory** stores only explicit durable requirements, preferences, decisions, and feedback; discussion transcripts remain separate from durable facts.
-- **Experiment records** use ordinary YAML for plans and Attempts; legacy events and status projections remain optional compatibility views.
-- **Worker Routing** shows a task assessment before Worker start and emits a semantic capability class without choosing a model or provider.
-- **Legacy compatibility** keeps manifest Runtime, Receipt, and Recovery reads for unfinished older Deliveries without overriding semantic Cycles.
-- Old archives, the Manifest, and live Deliveries remain in place. History Refresh adds only a summary and index layer.
-- Cross-project History Refresh derives workspace identity and Cycle counts from the target; a root legacy Cycle is indexed as read-only legacy work and is never auto-closed or accepted. Activation creates a missing current manifest last and preserves an existing valid manifest byte for byte.
+Drawing on the ideas behind Grill-Me / SuperPowers-style tools, Hypo-Workflow builds in a full project discussion phase. The agent doesn't start coding from a one-liner; it does requirements discovery, technical selection, and architecture discussion first, surfacing the unstated assumptions and asking you. Only when the requirements are truly clear does planning and execution begin.
+
+### 📜 Full audit trail of every decision
+
+Every discussion, decision, and execution leaves a record: what was decided when, why something changed, and what the verification results were. Confirmed project facts are distilled into project memory via Maintain, becoming context for all future sessions.
 
 ## Install
 
-Use the Codex plugin for full behavior. A development checkout can be added as a local marketplace:
+The easiest way is to **hand the repository to your agent** — tell it:
 
-```bash
-git clone https://github.com/HypoxanthineOvO/Hypo-Workflow.git
-codex plugin marketplace add /absolute/path/to/Hypo-Workflow
-```
+> Read `AGENTS.md` and the matching guide under `docs/platforms/`, install Hypo-Workflow into the current environment as described there, and tell me how to verify the installation.
 
-Install or enable `hypo-workflow` from Codex `/plugins`, then use `/hooks` in a new session to review and trust its plugin Hooks. Changed Hook definitions require trust for the new hash.
+Support for the various agents is still maturing — if you hit problems, issues are welcome!
 
-A symlink under `$CODEX_HOME/skills` loads Skills only. It does not load plugin-bundled Hooks and is therefore not a full installation.
+## How to use it
 
-## Delivery Workflows And The Experiment Lane
+All work goes through Discussion and planning first:
 
-Every new Delivery starts with Discussion: requirements discovery, technical stack, then architecture changes. Goal versus Plan is selected only by whether execution needs a manual intermediate checkpoint.
-
-Use Goal when there is no manual intermediate checkpoint; complexity and acceptance-criteria count do not change this:
+- **Discussion** clarifies the requirement — surfacing unstated assumptions so the agent's understanding of the project fully matches yours;
+- While planning, answer one question: **do I need to review anything midway?**
 
 ```text
-/hw:init -> Discussion -> Goal Design -> confirm and start
-         -> built-in /Goal executes continuously -> verify -> /hw:accept or /hw:reject
+No midway checkpoint planned ──→ Goal          autonomous delivery, final acceptance
+Midway checkpoints planned   ──→ plain Cycle   Milestones; checkpoints (Stones) pause for you
+Open-ended exploration       ──→ Experiment    parameter scans, reruns, continuous iteration...
 ```
 
-Use Plan when at least one intermediate artifact needs user inspection or a decision. A Plan has Milestones, but only Stones pause execution:
+**Real examples**:
 
-```text
-/hw:init -> Discussion -> /hw:plan -> Milestones with at least one Stone
-         -> confirm and start -> ordinary Milestones continue automatically
-         -> accept Stone -> continue -> final acceptance
-```
+- **Goal** — GPU simulator tuning: the Discussion phase works out *how* to tune the simulator (discrepancy analysis, discriminators, layered regression) and writes it into the plan; once confirmed, the agent runs the full RTX 3090 Ti performance/activity loop on its own (analyze diff → change source → regress → back to the real workload), and you only show up for final acceptance.
+- **Plain Cycle (with a Stone)** — adding an Agents panel to a TUI: the agent first builds a standalone Mock showing layout, density, and colors in a real terminal, **pauses at the Stone**, and only proceeds to the real implementation after you approve the visuals; otherwise it iterates on the Mock until the review passes.
+- **Experiment** — HBM memory research: binds Git snapshots, GPU model, parameters, and output directories; run experiments, scan parameters, compare against baselines, and ask "how are the experiments going?" anytime for the current conclusion and next step — baselines, run counts, and results stay reviewable at any moment.
 
-Use Experiment when work has no linear finish and requires repeated runs, parameter scans, and result judgment. Its default record is ordinary YAML and does not depend on a named reporting tool:
+### Core concepts in one minute
 
-```text
-/hw:init -> /hw:experiment -> record environment/knowledge/baselines -> run and supervise
-         -> write ordinary Attempt YAML -> read referenced records -> continue iterating
-```
+- **Cycle**: the full lifecycle of one iteration, and the archive boundary. Each Cycle holds plans, progress, execution evidence, and discussion records.
+- **Goal Cycle vs plain Cycle**: both start with planning. If the plan **has** human midway checkpoints (Stones), it's a plain Cycle; if it has **none**, it can run as a Goal with continuous autonomous delivery. Task complexity plays no role in the choice.
+- **Maintain**: distill one confirmed project fact (requirement, preference, decision, feedback) into long-term memory for all future sessions.
+- **Experiment**: built for open-ended exploratory work — binds Git snapshots, GPU/CUDA environments, parameters, and results; ask "how are the experiments going?" and get a direct answer.
 
-The final Proposal exposes three meanings: confirm and start, confirm without starting, or continue Discussion. A short affirmative reply inherits `delivery.approve_and_start` only when the complete Proposal is visible and the Agent is asking whether to start; otherwise it answers only the current question. Only confirm-without-start enters `waiting_to_start`. Deletion, remote writes, releases, service restarts, and other high-impact actions retain local gates. Use `/hw:resume` after interruption.
-
-### Experiment Capabilities
-
-- Preserve project purpose, paper/document references, metric and dataset meanings, module roles, optimization locations, and concept-to-code mappings, with stale-knowledge checks after code changes.
-- Bind every run to a Git snapshot, `uv` environment, machine/GPU/driver/CUDA facts, data locations, parameters, command, resource limits, and a readable output directory.
-- Separate logical Experiments from Attempts and support one-axis/cross scans, screening expansion, contextual baselines, tmux supervision, interruption recovery, trash/restore history, and confirmation-gated scientific review.
-- Answer “how are the experiments going?” from `experiment.yaml` and its referenced Attempts, leading with baselines, environment, datasets, scan purpose, outcomes, exceptions, and next actions instead of rescanning every result directory.
-
-Real NeRF, AceSim, GitLab, SSH/SCP, large-trace, and multi-week behavior still need a real-project Pilot. The current release records the environment used by an experiment; it is not a whole-computer inventory for proxies, ports, services, tools, or SSH configuration.
-
-## Ten Public Routes
+### Ten commands
 
 | Command | Purpose |
 | --- | --- |
-| `/hw:guide` | recommend one workflow when the next step is unclear |
+| `/hw:guide` | unsure of the next step? get a recommended path |
 | `/hw:init` | initialize, adopt, or inspect a workspace |
-| `/hw:goal` | autonomously deliver a complete zero-Stone requirement after Discussion |
-| `/hw:plan` | deliver Milestones containing at least one Stone after Discussion |
-| `/hw:cycle` | compatibility route for existing Cycle deliveries |
-| `/hw:maintain` | persist one day-to-day project fact |
-| `/hw:experiment` | manage environments, scans, reruns, scientific review, and instant experiment status |
-| `/hw:resume` | recover from Runtime, Continuation, and a Recovery Pack |
-| `/hw:accept` | accept a pending Delivery |
+| `/hw:goal` | autonomous delivery with no midway checkpoint, after Discussion |
+| `/hw:plan` | deliver a plan containing human checkpoints (Stones), after Discussion |
+| `/hw:cycle` | compatibility route for existing Cycles |
+| `/hw:maintain` | distill one project fact into memory |
+| `/hw:experiment` | manage experiment environments, scans, reruns, and status |
+| `/hw:resume` | recover the work context after an interruption |
+| `/hw:accept` | accept the delivery |
 | `/hw:reject` | reject with structured feedback and revise |
 
-Chat, Explain, Status, Report, Log, Check, Compact, Knowledge, Sync, Debug, Start, and Plan phases are internal natural behavior. Analysis, Audit, Quality, Docs, PR, Release, Explore, and Optimize are deferred. Setup, Rules, Stop, Skip, Reset, Showcase, Patch, Help, Watchdog, and plan-confirm are removed; old explicit invocations return zero-write diagnostics.
+## Learn more
 
-## Semantic Worker Routing
-
-Topology decides whether Workers create enough value from bounded independence, parallelism, or an independent oracle to justify coordination cost. Goal, Plan, Milestone, Stone, and acceptance count never determine Worker count; tightly coupled material work may stay with the main Agent. Routing only states the semantic capability required by an already selected Worker.
-
-| Class | Typical work |
-| --- | --- |
-| `mechanical` | status, formatting, read-only summaries, deterministic commands |
-| `standard` | ordinary implementation with clear requirements and acceptance |
-| `explore` | unknown roots, candidate comparison, or high uncertainty |
-| `critical` | architecture, a weak oracle, high blast radius, or independent audit |
-| `escalation` | security, migration, irreversible work, or two distinct failed routes |
-
-Workflow does not emit Luna/Sol, providers, credentials, or reasoning effort; those mappings belong to the host. Routing never relaxes role separation, evidence, acceptance, or user authority.
-
-## Codex Hooks
-
-The plugin loads ten events from `hooks/hooks.json`:
-
-`SessionStart`, `UserPromptSubmit`, `PreToolUse`, `PermissionRequest`, `PostToolUse`, `PreCompact`, `PostCompact`, `SubagentStart`, `SubagentStop`, and `Stop`.
-
-They support ambient Maintain, relevant docs/Record reminders, pre-compaction Pack sealing, post-compaction recovery, worker evidence, and an additional deletion guardrail. Matching Hooks can run concurrently, and `PreToolUse` cannot intercept every equivalent path, so Hooks never replace Core authority or human approval.
-
-Deletion requires the full exact Deletion Manifest in chat, fresh user approval, a `deletion.execute` Receipt bound to that Manifest and Git state, and the controlled executor. Any hash or Git drift invalidates approval.
-
-## Execution Discipline
-
-- Treat discussion, background, ideas, complaints, and revision feedback as consultation, not editing authorization.
-- Use `solo-verified` for trivial reversible work; separate test, implement, audit, or other domain roles when material work benefits from independent evidence.
-- Explain completion reports in chat: conclusion, approach, changed modules, tests, results, problems, and risks. A path alone is insufficient.
-- Preserve unrelated user changes in a dirty worktree.
-
-## Documentation
-
-- [User Guide](docs/en/user-guide.md)
-- [Ten-command Reference](docs/en/reference/commands.md)
-- [Codex Guide](docs/en/platforms/codex.md)
-- [Platform Status](docs/en/reference/platforms.md)
-- [Current Artifacts and Authority](docs/en/reference/generated-artifacts.md)
-- [VSPi 0.2.0 Integration Contract](docs/en/reference/vspi-integration.md)
-- [Command Spec](references/commands-spec.md)
-- [State Contract](references/state-contract.md)
+- [User Guide](docs/en/user-guide.md) — the full path from install to your first delivery
+- [Command Reference](docs/en/reference/commands.md)
+- [Codex Platform Guide](docs/en/platforms/codex.md)
+- [Platform Support Status](docs/en/reference/platforms.md)
+- [Release Notes](docs/en/release/v15.0.0-alpha.2.md)
 
 ## License
 

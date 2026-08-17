@@ -1,5 +1,7 @@
 # Experiment Record Protocol
 
+This page defines the file format and maintenance rules for Experiment records — for Agents and users who run experiments and keep baseline and Attempt (a single experiment run) records.
+
 Experiments use ordinary YAML files by default. The Agent maintains them with normal file-reading and editing capabilities. A host capability named `BatchReport`, Experiment Core write APIs, content-addressed events, and status projections are never prerequisites.
 
 ## Paths
@@ -24,7 +26,9 @@ Record only known facts. An important unknown may be represented as `unknown: <r
 
 ## Lifecycle
 
-Before launch, update `experiment.yaml` with the baseline, dataset, changed and fixed parameters, success evidence, resource boundary, and next action. At launch, create the Attempt file and capture code, environment, command, and output directory. On completion, failure, or interruption, update that Attempt with metrics, log references, failure evidence, scientific review, and the next action.
+- Before launch: update `experiment.yaml` with the baseline, dataset, changed and fixed parameters, success evidence, resource boundary, and next action.
+- At launch: create the Attempt file and capture code, environment, command, and output directory.
+- On completion, failure, or interruption: update that Attempt with metrics, log references, failure evidence, scientific review, and the next action.
 
 Hooks may remind the Agent about these checkpoints, but they do not replace semantic judgment or file writes. If a Hook, batch-report capability, validator, or projection is unavailable, the Agent continues the run and maintains the record directly.
 

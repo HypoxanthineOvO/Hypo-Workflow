@@ -1,6 +1,8 @@
 # Official Codex 指南
 
-Hypo-Workflow v15.0.0-alpha.2 以 Codex plugin、十个 focused Skills 与六类语义/安全 Hooks 发布。它不是 runner；Codex Agent 执行实现、实验、测试和审查，普通语义文件保存计划与证据。Host Contract v1 作为 legacy compatibility 保留，两个 ZIP 均包含 `/hw:experiment`。
+本页说明 Hypo-Workflow 在 Official Codex 上的安装方式、当前能力和边界，适合第一次在 Codex 里使用 Hypo-Workflow 的用户。
+
+Hypo-Workflow v15.0.0-alpha.2 以 Codex plugin、十个 focused Skills 与六类语义/安全 Hooks 发布。它不是 runner：Codex Agent 执行实现、实验、测试和审查，普通语义文件保存计划与证据。Host Contract v1 作为 legacy compatibility 保留，两个 ZIP 均包含 `/hw:experiment`。
 
 ## 安装形态
 
@@ -39,9 +41,13 @@ OpenCode、Claude Code、Cursor、Copilot、Trae 与自定义 Codex fork 适配�
 
 ## Task Assessment 与 Worker Routing
 
-Codex 先用 topology 决定是否需要独立的 test、implement、audit 或其他 Worker 身份，再为每个待启动 Worker 生成并展示 Task Assessment。Assessment 明确说明 `complexity`、`uncertainty`、`oracle_strength`、`blast_radius`、`reversibility`、`risk_flags` 和简短结论；Core 只做 exact、bounded、secret-safe 验证，并确定性输出 `mechanical`、`standard`、`explore`、`critical` 或 `escalation`。
+Codex 先用 topology 决定是否需要独立的 test、implement、audit 或其他 Worker 身份，再为每个待启动 Worker 生成并展示 Task Assessment（任务评估）。
 
-该语义 handoff 不包含具体模型、运行方、凭据、prompt 或 reasoning effort。`SubagentStart` 只把已持久化的 routing class、reason codes、policy version 和可见 assessment 写入 Worker Journal context。`advisory` 在宿主不支持该 handoff 时明确记录 fallback 并继承当前执行上下文；`required` 阻止 Worker 启动；`off` 不传提示。
+Assessment 明确说明 `complexity`、`uncertainty`、`oracle_strength`、`blast_radius`、`reversibility`、`risk_flags` 和简短结论；Core 只做 exact、bounded、secret-safe 验证，并确定性输出 `mechanical`、`standard`、`explore`、`critical` 或 `escalation`。
+
+该语义 handoff 不包含具体模型、运行方、凭据、prompt 或 reasoning effort。`SubagentStart` 只把已持久化的 routing class、reason codes、policy version 和可见 assessment 写入 Worker Journal context。
+
+三种模式的区别：`advisory` 在宿主不支持该 handoff 时明确记录 fallback 并继承当前执行上下文；`required` 阻止 Worker 启动；`off` 不传提示。
 
 路由不会替代 topology，也不会放宽角色隔离、evidence、acceptance 或用户授权。Resume 必须复用 Runtime/Continuation 中的决定；需要不同语义档的新 Worker 使用 no-history 或 bounded-history fork，full-history fork 只继承父执行上下文。完整字段与分类表见 [配置治理参考](../reference/configuration.md)。
 

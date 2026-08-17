@@ -1,5 +1,7 @@
 # VSPi 0.2.0 integration contract
 
+This page defines the integration contract between the VSPi host and Hypo-Workflow — boundaries, concurrency, model routing, and the typed API — mainly for developers integrating on the VSPi/Pi side.
+
 VSPi hosts Hypo-Workflow project facts; it is not a process manager. VSPi and Pi own sessions, model calls, tool execution, and the TUI. Hypo-Workflow owns Plans, Deliveries, Workstreams, evidence, Continuation, Recovery, and auditable records.
 
 ## Authority boundary

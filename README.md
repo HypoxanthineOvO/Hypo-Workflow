@@ -2,156 +2,88 @@
 
 # Hypo-Workflow
 
-**面向 Codex 的本地项目工作流协议**
+**给你的任何 Coding Agent 装上项目记忆和工作纪律，从此解耦“项目”和“Agent”**
 
-规划 -> 执行 -> 独立验证 -> 人工验收 -> 可恢复继续
 
 [![Version](https://img.shields.io/badge/version-15.0.0--alpha.2-blue)](.codex-plugin/plugin.json)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Official%20Codex-black)](docs/reference/platforms.md)
 
 **语言 / Language：中文 | [English](README.en.md)**
 
 </div>
 
-Hypo-Workflow 是 Skill 协议，不是 runner 或后台服务。宿主 Agent 负责实现、测试和审查；`.pipeline/` 负责保存可验证、可恢复的项目事实。
+---
 
-[v15.0.0-alpha.2 发布说明](docs/release/v15.0.0-alpha.2.md)
+## Why Hypo-Workflow？
 
-当前版本以 **Official Codex** 为唯一当前适配平台。OpenCode、Claude Code、Cursor、GitHub Copilot、Trae 和自定义 Codex fork 的适配器均延后，仓库中残留的旧平台产物不代表当前支持。
+### 🧠 跨 Agent 的永久项目记忆
 
-## 当前架构
+项目的事实、计划和决策存在 `.pipeline/` 里的普通 Markdown/YAML 文件中，而不是锁死在某一个 Agent 的上下文里。这意味着你可以让 **Codex 做 Plan 生成 Workflow 文件，换 ZCode 执行；做完之后让 Kimi Code 审查某个 Cycle**——每个 Agent 读的是同一份项目事实，接力不需要重新解释背景。上下文压缩、会话中断、换机器、换工具，项目记忆都在。
 
-`.pipeline/INDEX.md` 是语义工作区入口；当前 Cycle 通过普通文件表达计划、进度、执行证据和讨论：
+> 部分 Agent 的支持尚在完善中，欢迎提 issue。
 
-```text
-INDEX.md
-  -> Cycle: PLAN.md + PROGRESS.md + EXECUTION.md + Discussion
-  -> Experiment: readable YAML/Markdown records
-  -> Memory: confirmed project facts
-  -> Legacy: preserved read-only references
-```
+### 💬 讨论先行，需求问清楚再动手
 
-- **Cycle** 是迭代与归档边界；**Goal** 适合零 Stone 交付，**Plan** 用于至少一个人工 Stone 的交付。
-- **Plan / Progress / Execution** 共同保存完整计划、当前位置、变更原因和验证证据；Hooks 只是上下文优化，不是正确性的来源。
-- **Work Placement / Repository Target** 为需要权威路由或资源 claim 的 Session 选择一个 Delivery 或 Experiment，并在启动前原子判定共享 checkout、独立 worktree、资源隔离或阻断；未绑定状态不会封锁普通工具，源码改动完成后必须回到登记的 integration target。
-- **Memory** 只保存明确、持久的 requirement、preference、decision 和 feedback；讨论原文与长期事实分开。
-- **Experiment records** 使用普通 YAML 保存实验计划和 Attempt；旧 events / status projection 保留为可选兼容视图。
-- **Worker Routing** 在 Worker 启动前显示任务评估并输出语义能力档，不选择具体模型或 Provider。
-- **Legacy compatibility** 保留 manifest Runtime、Receipt 和 Recovery 读取能力，用于尚未结束的旧 Delivery；它们不覆盖语义 Cycle。
-- 旧 archives、Manifest 与 live Delivery 原位保留，History Refresh 只增加摘要和索引层。
-- 跨项目 History Refresh 从目标工作区派生项目身份和实际 Cycle 数；根部旧格式 Cycle 只进入 Legacy 索引，不会被自动关闭或接受；缺少 current manifest 时在激活末尾创建，已有有效 manifest 保持原字节。
+汲取了 Grill-Me / SuperPowers 一类工具的精华思想，Hypo-Workflow 内置了完整的项目讨论阶段：Agent 不会拿到一句话就开始写代码，而是先做需求发掘、技术选型、架构讨论，把 unstated assumption 摆到台面上问你。需求聊透了，才允许进入规划和执行。
+
+### 📜 全程留痕，决策可审计
+
+每一次讨论、每一个决策、每一轮执行都会留下记录：什么时候决定了什么、为什么改、验证结果是什么，全部可查。其中被确认的项目事实还会通过 Maintain 沉淀进项目记忆，成为后续所有会话的上下文。
 
 ## 安装
+最简单的方式是**直接把仓库丢给你的 Agent**——对它说：
 
-完整能力使用 Codex plugin。开发 checkout 可作为本地 marketplace：
+> 请阅读 `AGENTS.md` 和 `docs/platforms/` 下对应平台的指南，按照其中的说明把 Hypo-Workflow 安装到当前环境，装好后告诉我怎么验证。
 
-```bash
-git clone https://github.com/HypoxanthineOvO/Hypo-Workflow.git
-codex plugin marketplace add /absolute/path/to/Hypo-Workflow
-```
+目前对 Agents 的支持尚且不够完善，遇到问题的话，欢迎大家提 issue！
 
-然后在 Codex 的 `/plugins` 中安装或启用 `hypo-workflow`，并在新会话中用 `/hooks` 审查、信任 plugin Hooks。Hook 文件变更后需要重新信任其新 hash。
+## 怎么用？
 
-只把仓库 symlink 到 `$CODEX_HOME/skills` 可以加载 Skills，但不会提供 plugin-bundled Hooks，因此不是完整安装。
-
-## 交付工作流与实验通道
-
-所有新交付先经过 Discussion：需求发掘 -> 技术栈 -> 架构变化。随后只根据执行过程中是否需要人工中途检查选择 Goal 或 Plan。
-
-没有人工中途检查点时使用 Goal；复杂度和验收点数量不影响这个选择：
+所有工作都先经过 Discussion（讨论）和规划：
+* “讨论”是明确需求，把 unstated assumption 摆到台面上，确保 Agent 和你对项目需求的理解是充分一致的；
+* 规划时只需要回答一个问题：**这件事执行过程中，需要我中途审核吗？**
 
 ```text
-/hw:init -> Discussion -> Goal Design -> 确认并开始
-         -> 内置 /Goal 自主连续执行 -> 验证 -> /hw:accept 或 /hw:reject
+规划出来没有中途检查点 ──→ Goal        一口气自主交付，最后验收
+规划出来有中途检查点   ──→ 普通 Cycle   拆成 Milestone，在检查点（Stone）停下来等你验收
+没有线性终点的探索     ──→ Experiment  参数扫描、反复重跑、持续迭代......
 ```
 
-至少有一个中间产物必须由用户检查或决定时使用 Plan。Plan 拆 Milestone，但只有标记为 Stone 的节点暂停：
+**真实例子**：
 
-```text
-/hw:init -> Discussion -> /hw:plan -> Milestones + 至少一个 Stone
-         -> 确认并开始 -> 普通 Milestone 自动连续执行
-         -> Stone 人工验收 -> 继续执行 -> 最终验收
-```
+- **Goal**——GPU 模拟器调优：Discussion 阶段把「怎么分析性能差异、怎么构造 discriminator、怎么分层回归」聊透并写进计划，确认后 Agent 一口气跑完 RTX 3090 Ti 性能/Activity 全量闭环（分析差异 → 改源码 → 回归 → 回到真实 workload 循环），你只在最终验收时出场。
+- **普通 Cycle（含 Stone）**——给 TUI 加 Agents 面板：Agent 先做一个独立 Mock 展示真实终端画面下的布局、密度和配色，**在 Stone 处停下来**，你检查并认可视觉效果后，它才接着进行真实实现。否则，会反复迭代，直到这个审核通过，才会继续执行后续的真实实现。
+- **Experiment**——HBM 显存研究：绑定 Git 快照、GPU 型号、参数和输出目录，反复跑实验、扫描参数、对照 baseline，随时问一句"实验怎么样了"就有当前结论和下一步。任何时候都可以回顾 Baseline / 实验组数 / 实验结果......
 
-没有线性终点、需要持续重跑、参数扫描和结果判断时使用 Experiment。默认记录是普通 YAML，不依赖任何命名报告工具：
+### 核心概念，一分钟搞懂
 
-```text
-/hw:init -> /hw:experiment -> 记录环境/知识/基线 -> 执行与监督
-         -> 普通 YAML 记录 Attempt -> 读取引用记录 -> 持续迭代
-```
+- **Cycle**：一个迭代的完整生命周期，也是归档边界。每个 Cycle 下有计划、进度、执行证据和讨论记录。
+- **Goal Cycle vs 普通 Cycle**：两者都先经过规划。规划出来**有**中途人工检查点（Stone），就是普通 Cycle；**没有**检查点，就可以作为 Goal 自主连续交付。任务复杂度不影响这个选择。
+- **Maintain**：把一条被确认的项目事实（需求、偏好、决定、反馈）沉淀进长期记忆，之后的会话都能用上。
+- **Experiment**：为没有终点的探索性工作设计——绑定 Git 快照、GPU/CUDA 环境、参数和结果，问一句"实验怎么样了"直接得到答案。
 
-最终 Proposal 提供三种明确语义：`确认并开始`、`确认但不开始`、`不确认/继续讨论`。只有在完整 Proposal 已展示且 Agent 正在询问是否开始时，简短肯定回复才继承 `delivery.approve_and_start` 语义；其他“可以”“确认”“OK”只回答当下问题。只有“确认但不开始”进入 `waiting_to_start`。删除、远程写入、发布、服务重启等高影响操作仍保留局部门禁。中断后使用 `/hw:resume`。
+### 十条命令
 
-并发工作不再由单一 `active.delivery` 限制。一个 Project authority root 可以登记多个独立 Git Repository Target，并同时存在多个 Goal、Plan、Cycle 与 Experiment；需要权威写入或资源 claim 时，一个 Session 只选择一个 Work Item。普通提示、工具和 Experiment 文件记录不依赖 Session 绑定。固定快照的只读/执行实验可以共享环境，源码写入使用独立 worktree，GPU、端口、cache 和输出目录在启动前通过原子 lease 与 fencing 检查冲突。永久主 checkout 作为 primary integration target 保留，源码改动在最终完成前必须提供带摘要校验的 Git ancestry 证据。
+| 命令             | 用途                                  |
+| ---------------- | ------------------------------------- |
+| `/hw:guide`      | 不确定下一步？推荐一个流程            |
+| `/hw:init`       | 初始化、接手或检查工作区              |
+| `/hw:goal`       | 讨论后自主交付无中途检查点的需求      |
+| `/hw:plan`       | 讨论后交付含人工检查点（Stone）的计划 |
+| `/hw:cycle`      | 兼容既有 Cycle（新工作不默认推荐）    |
+| `/hw:maintain`   | 沉淀一条项目事实                      |
+| `/hw:experiment` | 管理实验环境、扫描、重跑与状态        |
+| `/hw:resume`     | 中断后恢复工作现场                    |
+| `/hw:accept`     | 验收通过                              |
+| `/hw:reject`     | 带反馈打回修订                        |
 
-### Experiment 能力
+## 深入了解
 
-- 保存项目目的、论文/文档引用、指标和数据集含义、模块职责、优化位置与 concept-to-code 映射，并在代码变化后检查知识是否过期。
-- 每个运行绑定 Git 快照、`uv` 环境、机器/GPU/驱动/CUDA、数据位置、参数、命令、资源限制和可读输出目录。
-- 区分逻辑 Experiment 与多次 Attempt，支持单轴/交叉扫描、screening 扩展、contextual baseline、tmux 监督、中断恢复、trash/restore 和科学合理性确认。
-- “现在实验怎么样”直接读取 `experiment.yaml` 和它引用的 Attempt，先回答 baseline、环境、数据集、扫描目的、结果、异常和下一步，不重新扫描全部目录。
-
-真实 NeRF、AceSim、GitLab、SSH/SCP、大 trace 和多周运行仍需真实项目 Pilot。当前记录的是实验使用的机器环境，不是整台电脑的代理、端口、服务、工具和 SSH 全局资产管理。
-
-## 十个公开入口
-
-| 命令 | 用途 |
-| --- | --- |
-| `/hw:guide` | 不确定下一步时推荐一个流程 |
-| `/hw:init` | 初始化、接手或检查工作区 |
-| `/hw:goal` | Discussion 后自主交付没有 Stone 的完整需求 |
-| `/hw:plan` | Discussion 后交付含至少一个 Stone 的 Milestone Plan |
-| `/hw:cycle` | 兼容既有 Cycle Delivery，新工作不默认推荐 |
-| `/hw:maintain` | 保存一个日常项目事实 |
-| `/hw:experiment` | 管理环境、扫描、重跑、科学审查与即时实验状态 |
-| `/hw:resume` | 从 Runtime、Continuation 和 Recovery Pack 恢复 |
-| `/hw:accept` | 接受待验收 Delivery |
-| `/hw:reject` | 带结构化反馈拒绝并进入修订 |
-
-Chat、Explain、Status、Report、Log、Check、Compact、Knowledge、Sync、Debug、Start 和 Plan 阶段是内部自然行为，不占用命令面。Analysis、Audit、Quality、Docs、PR、Release、Explore、Optimize 延后。Setup、Rules、Stop、Skip、Reset、Showcase、Patch、Help、Watchdog 和 plan-confirm 已移除；旧显式调用只返回零写诊断。
-
-## Semantic Worker Routing
-
-Topology 根据耦合度、可并行性、独立 oracle 和协调成本决定是否使用 Worker；Goal、Plan、Milestone、Stone 和验收点数量都不决定 Worker 数量。紧耦合但规模较大的工作也可以由主 Agent 端到端完成。Routing 只决定某个已经选定的 Worker 需要的语义能力档。
-
-| 档位 | 典型任务 |
-| --- | --- |
-| `mechanical` | 状态、格式化、只读摘要、确定性命令 |
-| `standard` | 需求和验收标准清楚的普通实现 |
-| `explore` | 根因未知、候选方案比较、高不确定性 |
-| `critical` | 架构、weak oracle、高影响面、独立 audit |
-| `escalation` | security、migration、不可逆任务或两条不同路线失败 |
-
-Workflow 不输出 Luna/Sol、Provider、凭据或 reasoning effort；这些映射属于宿主。Routing 也不会放宽角色分离、证据、验收或用户授权。
-
-## Codex Hooks
-
-Plugin 默认从 `hooks/hooks.json` 加载十类事件：
-
-`SessionStart`、`UserPromptSubmit`、`PreToolUse`、`PermissionRequest`、`PostToolUse`、`PreCompact`、`PostCompact`、`SubagentStart`、`SubagentStop`、`Stop`。
-
-它们用于 ambient Maintain、相关文档/Record 提醒、压缩前 Pack 封存、压缩后恢复、worker evidence 和额外删除护栏。多个匹配 Hook 会并发运行，`PreToolUse` 也不能拦截所有等价路径，因此 Hook 不能替代 Core authority 或人工批准。
-
-删除必须先展示 exact Deletion Manifest，经用户重新批准后签发绑定 Manifest 与 Git 状态的 `deletion.execute` Receipt，再由 controlled executor 执行。任何 hash 或 Git drift 都会使批准失效。
-
-## 执行纪律
-
-- 讨论、背景、想法、抱怨和方案反馈先回复“我的理解 -> 问题原因 -> 推荐方案”，不直接编辑。
-- 紧耦合且可客观验证的工作优先由主 Agent 连续完成；只有独立 oracle、真实并行收益或风险足以覆盖协调成本时才拆 Worker。
-- 完成报告必须在会话中讲清结论、方法、改动、测试、结果、问题和风险，不能只给文件路径。
-- 保留 dirty worktree 中不相关的用户修改。
-
-## 文档
-
-- [用户指南](docs/user-guide.md)
-- [十命令参考](docs/reference/commands.md)
-- [Codex 指南](docs/platforms/codex.md)
-- [平台状态](docs/reference/platforms.md)
-- [当前产物与 authority](docs/reference/generated-artifacts.md)
-- [VSPi 0.2.0 集成合同](docs/reference/vspi-integration.md)
-- [命令规范](references/commands-spec.md)
-- [状态契约](references/state-contract.md)
+- [用户指南](docs/user-guide.md) —— 从装好到交付第一个需求的完整路径
+- [十命令参考](docs/reference/commands.md) —— 每条命令的详细行为
+- [Codex 平台指南](docs/platforms/codex.md)
+- [平台支持状态](docs/reference/platforms.md)
+- [发布说明](docs/release/v15.0.0-alpha.2.md)
 
 ## License
 

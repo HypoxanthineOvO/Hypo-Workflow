@@ -2,7 +2,11 @@
 
 [中文](../../../reference/platforms.md) | English
 
-This page summarizes command, Ask, Plan, and event capabilities across supported platforms. Third-party IDE adapters provide repository instruction surfaces; Cursor also syncs one flat Skill and command file per `/hw-*` entry, but none of them imply native hooks or automatic execution.
+This page summarizes command, Ask, Plan, and event capabilities across supported platforms. Use it to judge which Hypo-Workflow behaviors your current host Agent can support — and to avoid overstating automation boundaries.
+
+Third-party IDE adapters provide repository instruction surfaces; Cursor also syncs one flat Skill and command file per `/hw-*` entry, but none of them imply native hooks or automatic execution.
+
+Each column below describes how that platform implements the capability (for example `chat`, `question-tool`, `todowrite`); `host-dependent` means it depends on the host itself:
 
 | Platform | Commands | Ask | Plan | Events |
 |---|---|---|---|---|

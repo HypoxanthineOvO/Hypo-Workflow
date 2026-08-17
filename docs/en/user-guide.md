@@ -1,136 +1,129 @@
 # User Guide
 
-[中文](../user-guide.md) | English
+This guide walks you from installing Hypo-Workflow to delivering your first requirement, and explains the concepts you'll use daily. For "what it is and why", start with the [README](../README.en.md). The Chinese version of this guide is the primary text.
 
-Hypo-Workflow is a project-work protocol for the current Codex host. `.pipeline/INDEX.md` is the semantic entry point, while ordinary Cycle Plan, Progress, Execution, Discussion, Experiment, and Memory files preserve readable restart-safe facts. The host Agent still performs implementation, tests, command execution, and experiment supervision; Workflow is not a runner. Older manifest Deliveries remain readable through the compatibility path.
+Hypo-Workflow is a working protocol: the actual coding, testing, and command execution are done by your host agent (Codex is the fully supported host today), while the Workflow keeps plans, progress, evidence, and memory in `.pipeline/` as ordinary files — human-readable, recoverable, and auditable.
 
-## Current Routes
+## Quick start: from install to first delivery
 
-The v15.0.0-alpha.2 Official Codex release exposes ten focused routes. Each route loads exactly one Child Skill:
+### 1. Install
 
-| Route | Purpose |
-| --- | --- |
-| `/hw:guide` | inspect the repository and recommend one Workflow path |
-| `/hw:init` | initialize or inspect a manifest-based workspace |
-| `/hw:goal` | autonomously deliver a complete zero-Stone requirement after Discussion |
-| `/hw:plan` | deliver Milestones containing at least one Stone after Discussion |
-| `/hw:cycle` | compatibility route for existing Cycle deliveries |
-| `/hw:maintain` | persist one focused requirement, preference, decision, or feedback item |
-| `/hw:experiment` | manage nonlinear experiments, baselines, environments, scans, Attempts, review, and instant status |
-| `/hw:resume` | restore the current Delivery after restart or compaction |
-| `/hw:accept` | accept a verified Delivery at its manual gate |
-| `/hw:reject` | reject pending results with structured feedback |
+**Codex (full support, with Hooks)**:
 
-Ordinary conversation does not require a route choice. Status, reports, explanation, consistency checks, debugging, knowledge lookup, and compaction are semantic Agent behaviors rather than additional public commands.
-
-## Discussion, Goal, Plan, Maintain, And Experiment
-
-- New Delivery work discusses requirements, technical stack, and architecture changes before selecting a mode.
-- Goal has no manual intermediate checkpoint. It may still be complex and have many acceptance criteria, and the built-in `/Goal` mechanism executes it continuously.
-- Plan contains at least one Stone. A Milestone is a verifiable stage outcome; a Stone is a user inspection or decision checkpoint. Ordinary Milestones continue without pausing.
-- `0 Stones -> Goal`; `1+ Stones -> Plan`. Complexity, file count, and acceptance count do not decide this.
-- Maintain records day-to-day project facts without opening a Delivery.
-- Experiment is a durable nonlinear lane for project knowledge, environments, code snapshots, machines, datasets, baselines, scans, Attempts, metrics, exceptions, trash/restore history, and next actions.
-
-When the user asks for experiment status, the Agent first reads `experiment.yaml` and the Attempts explicitly referenced by the [Experiment Record Protocol](reference/experiment-records.md). It summarizes default and contextual baselines, hardware and environment context, dataset meaning, scan purpose, outcomes, suspicious results, resource boundaries, and next actions. A legacy bounded materialized status projection is an optional compatibility source, not a prerequisite for status or continued execution.
-
-## Multiple Work Items And Concurrent Placement
-
-One Project may contain multiple Goals, Plans, compatible Cycles, and Experiments. `active.delivery` is a legacy fallback, not a project-wide mutex. A Session may select one Work Item for context routing. When several candidates exist, SessionStart reports them without blocking ordinary prompts, tools, diagnostics, or Experiment file records. Cross-Work-Item authority writes and resource claims still require an explicit selection.
-
-One Project authority root may register several independent Git Repository Targets, such as `Accel-Sim` and `llm-trace` under `Cryo-Computing`. Stable repository identity is separate from its current locator. Each target has one primary integration target and may later add alternate targets without converting nested repositories into submodules.
-
-Before launch, the Host declares repository and resource claims. Core atomically returns `shared`, `isolated_worktree`, `isolated_resources`, or `blocked`. Compatible pinned `read`/`execute` claims may share; different snapshots or source-changing access use worktrees; relocatable mutable caches use resource isolation; fixed GPU, port, or output conflicts block. Core records lease/fencing and bounded Host actions but does not execute Git or start processes. Source changes must be integrated into the registered target with a digest-verified ancestry proof before a Delivery requests final acceptance.
-
-## Experiment Working Model
-
-### Project Knowledge And Reproducible Context
-
-Experiment knowledge preserves purpose, safe references to papers and documentation, metric semantics, dataset units, major modules, optimization locations, and concept-to-code mappings. It can map a name such as “RE acceleration” to the sampling or occupancy functionality that actually implements it. After code changes, the Agent checks whether those references became stale and either updates them or reports the unresolved difference.
-
-Before a run, record:
-
-- the Git commit/tree snapshot and any relevant worktree variation;
-- the `uv` environment, lockfile digest, and required versions, without introducing Conda by default;
-- machine, GPU, driver, CUDA, resource limits, and server-specific external data locations;
-- dataset, scene, parameters, random seeds, the complete command, log/config/metric references, and a readable output directory.
-
-Experiment records never store raw credentials, Keys, hidden reasoning, full transcripts, or paper PDFs. They store only safe references to authorized locations.
-
-### Experiments, Attempts, Scans, And Baselines
-
-One logical Experiment may have many Attempts. An explicit “rerun this experiment” retains logical identity and creates another Attempt while keeping its code snapshot and failure evidence traceable. A different dataset or scene has a different experiment identity, preventing unrelated NeRF scenes or simulator traces from being mixed.
-
-A scan declares:
-
-- changed axes, fixed parameters, and selected ranges;
-- one-axis frequency sweeps, L1/L2 cross sweeps, or other parameter combinations;
-- why a screening case should expand to all data;
-- memory, GPU memory, disk, and time feasibility boundaries, including OOM or infeasible regions.
-
-Baselines are scoped. A project may have a global default baseline and contextual baselines for a temperature, dataset, method family, or optimization stage. Every change records its rationale and scope.
-
-### Long Runs, Scientific Review, And Retention
-
-The host Agent may wait in the foreground or use a uniquely named tmux session that does not interfere with unrelated work. When asked to watch a run, the Agent polls and updates facts. An interruption preserves evidence; a real checkpoint is resumed, otherwise the record says that execution restarts from scratch.
-
-Operational completion means only that the program ended. Scientific review also considers metric meaning, baselines, paper expectations, neighboring runs, configuration, preprocessing, randomness, and resource limits. A mismatch with a paper produces a cause analysis rather than an immediate “implementation bug” conclusion. Suspicious AI judgments become pending confirmations for the user.
-
-Incorrect or obsolete Attempts go to trash instead of being deleted and remain restorable. Permanent cleanup requires fresh explicit authorization. Before a rerun can overwrite an existing output reference, the Agent must surface the retention risk.
-
-### Ordinary Records, Compatibility Synchronization, And Instant Status
-
-The default record lives under `.pipeline/memory/experiment-records/<project_id>/<experiment_id>/`: one readable `experiment.yaml` holds the current plan and Attempt references, and each Attempt has a separate YAML file. The Agent maintains these records with ordinary file tools and does not require `BatchReport`, a dedicated write API, content hashes, or a projection. Clones use ordinary Git merging; incompatible changes to the same semantic fact stop for an explicit choice unless the user delegates it.
-
-Status leads with baselines, hardware and environment, dataset semantics, scans and their purpose, outcome counts, suspicious or resource-limited results, trash/retention state, and concrete next actions. Legacy content-addressed events and materialized status remain readable or synchronizable by optional tooling, but an auxiliary failure may only warn; it cannot block execution, analysis, or an ordinary record update.
-
-### Experiment Boundaries
-
-Workflow is not a runner, queue, or resident scanner and does not create a fleet of background processes that only mutate status. The host Agent executes commands, tmux, SCP, retries, and analysis; Workflow validates and preserves the facts.
-
-Real NeRF, AceSim, GPU, paper reproduction, GitLab remote, SSH/SCP, large-trace, and multi-week behavior still need a real-project Pilot. Environment records are experiment-specific machine snapshots, not whole-computer management for proxies, subscriptions, ports, services, tools, Key locations, SSH, symlinks, or binaries.
-
-## Task Assessment And Worker Routing
-
-These decisions remain separate:
-
-```text
-Workflow shape -> Worker topology -> Task Assessment -> semantic routing class -> host model mapping
+```bash
+git clone https://github.com/HypoxanthineOvO/Hypo-Workflow.git
+codex plugin marketplace add /absolute/path/to/Hypo-Workflow
 ```
 
-Topology decides whether Workers provide enough value from bounded independence, parallelism, or an independent oracle to justify coordination cost. Goal, Plan, Milestone, Stone, file count, and acceptance count never determine Worker count. The host AI generates and shows a Task Assessment from repository evidence before Worker start:
+Install and enable `hypo-workflow` from Codex `/plugins`, then use `/hooks` in a new session to review and trust the plugin Hooks (re-trust after Hook definitions change).
 
-| Field | Meaning | Mandatory current signal |
+**Kimi Code**: copy `skills/<name>/SKILL.md` to `~/.kimi-code/skills/<name>/SKILL.md` (see [adapters/kimi](../../adapters/kimi/README.md)).
+
+**Other agents (ZCode, etc.)**: support is still maturing. Hand the repository to your agent and let it install by following `AGENTS.md` and the matching guide under `docs/platforms/`; issues are welcome if you hit problems.
+
+### 2. Initialize the workspace
+
+In your project, say:
+
+```text
+/hw:init
+```
+
+The agent inspects the repository, sets up (or adopts) the `.pipeline/` workspace, and reports the current state. Whenever you're unsure of the next step, `/hw:guide` recommends a path.
+
+### 3. Make a request: discuss first, then act
+
+Describe what you want. The agent does not start coding immediately — it enters **Discussion** first: requirements discovery → technical selection → architecture impact. It asks about your unstated assumptions, and planning only begins after you confirm the discussion is complete.
+
+At the end of Discussion, the agent presents a complete Proposal with three responses:
+
+- **Confirm and start** — execute immediately;
+- **Confirm without starting** — save the plan, start it later;
+- **Not confirmed / keep discussing** — go back and refine.
+
+Note: only when the full Proposal is visible and the agent is asking whether to start does a short "OK" mean approval to start; elsewhere, a yes answers only the question at hand.
+
+### 4. Three delivery modes
+
+Once discussion and planning are done, delivery follows the plan:
+
+| Your situation | Use | Behavior |
 | --- | --- | --- |
-| `complexity` | comprehension, implementation, and coordination difficulty | visible only; does not upgrade by itself |
-| `uncertainty` | how unclear the root cause, route, or inputs remain | `high` is at least `explore` |
-| `oracle_strength` | reliability of tests, specifications, or metrics as a correctness judge | `weak` is at least `critical` |
-| `blast_radius` | potentially affected modules, users, or authority surfaces | `high` is at least `critical` |
-| `reversibility` | direct rollback, guarded rollback, or materially irreversible work | `irreversible` is `escalation` |
-| `risk_flags` | special risks such as security, migration, or recovery conflict | any non-empty set is at least `critical` |
+| No midway checkpoint planned | `/hw:goal` | agent executes continuously; you accept at the end |
+| Midway checkpoints planned | `/hw:plan` | split into Milestones; checkpoints (**Stones**) pause for you |
+| Open-ended exploration | `/hw:experiment` | records environment/baselines/parameters; scans, reruns, iteration |
 
-Core calls no classification model. It deterministically applies `escalation > critical > explore > standard > mechanical` and emits one class plus a reason code:
+Both Goals and plain Cycles **start with planning** — the only difference is whether the plan contains Stones. Complexity and the number of acceptance criteria are not reasons to require a Stone.
 
-| Class | Typical trigger |
+Three real examples:
+
+- **Goal** — GPU simulator tuning: the tuning methodology (discrepancy analysis, discriminators, layered regression) is settled in Discussion, then the agent runs the full RTX 3090 Ti performance/activity loop autonomously, with one final acceptance.
+- **Plain Cycle (with a Stone)** — adding an Agents panel to a TUI: a standalone Mock is delivered first for you to check the real-terminal visuals; the real implementation starts only after you approve.
+- **Experiment** — HBM memory research: environment and parameters bound to every run, with scans, baselines, and status you can query anytime.
+
+### 5. Acceptance and revision
+
+When delivery completes, the agent explains in chat: conclusion, approach, changes, tests, results, problems, and risks. Then:
+
+- `/hw:accept` — accept; the Cycle is archived;
+- `/hw:reject` — reject with structured feedback; the work enters a revision loop.
+
+### 6. Interruption and recovery
+
+Context compaction and session interruptions are fine. When you come back:
+
+```text
+/hw:resume
+```
+
+The agent restores the plan, progress, and next step from `.pipeline/` — no need to re-explain anything.
+
+## Core concepts
+
+- **Cycle**: the full lifecycle of one iteration, and the archive boundary. Each Cycle holds `PLAN.md`, `PROGRESS.md`, `EXECUTION.md`, and discussion records, all as ordinary files.
+- **Milestone vs Stone**: a Milestone is an independently verifiable stage; a Stone is a human checkpoint where you inspect a real artifact or make a decision. Only Stones pause execution.
+- **Maintain**: `/hw:maintain` distills one confirmed project fact (requirement, preference, decision, feedback) into long-term memory. Memory is stored separately from discussion transcripts.
+- **Memory**: confirmed project facts under `.pipeline/memory/` — the project's memory across sessions and agents.
+
+## Experiment: the lane for exploratory work
+
+For parameter scans, paper reproduction, performance tuning — work that runs, reads results, and adjusts, repeatedly.
+
+**What gets recorded**: project purpose, paper/document references, metric and dataset meanings; each run binds a Git snapshot, `uv` environment, machine/GPU/driver/CUDA facts, data locations, parameters, seeds, the full command, and the output directory. Credentials, raw keys, and paper PDFs are never written into records — only safe references.
+
+**Experiment vs Attempt**: one logical experiment can have many Attempts; reruns keep the identity and failure evidence traceable. A different dataset or scene is a different experiment.
+
+**Baselines are scoped**: a global default baseline and contextual baselines (per dataset, method family, or optimization stage) can coexist; every change records its reason and scope.
+
+**"How are the experiments going?"**: the agent reads `experiment.yaml` and its referenced Attempts and answers in order — baselines, environment, datasets, scan purpose, outcomes, suspicious results, next actions — without rescanning every directory.
+
+**Result review**: a finished run is only operational completion, not scientific validity. The agent reviews results against baselines, paper expectations, and neighboring runs; suspicious results go to pending confirmation for you to judge. Trashed Attempts can be restored; permanent deletion requires separate authorization.
+
+**Long tasks**: supervised via uniquely named tmux sessions with the agent polling and updating records; interruptions preserve evidence, and runs resume from real checkpoints or are explicitly marked restart-from-scratch.
+
+See the [Experiment Record Protocol](reference/experiment-records.md).
+
+## Concurrent work items
+
+A project can hold multiple Goals, Plans, and Experiments at once. One authority root can register multiple independent Git repository targets. Source writes use isolated worktrees; GPUs, ports, and output directories are checked for conflicts through atomic leases before startup. Source changes must merge back into the registered integration target with Git ancestry evidence before final acceptance.
+
+## Worker routing
+
+The Workflow decides whether to use Workers based on coupling, parallel value, independent verification, and coordination cost — tightly coupled work can stay with the main agent end to end. Each Worker gets a semantic capability class (`mechanical` / `standard` / `explore` / `critical` / `escalation`); the concrete model mapping belongs to the host. See the [command reference](reference/commands.md).
+
+## Ten commands at a glance
+
+| Command | Purpose |
 | --- | --- |
-| `mechanical` | status, formatting, read-only summaries, deterministic test commands, trivial reversible changes |
-| `standard` | ordinary implementation, routine test design, or documentation |
-| `explore` | unknown roots, candidate comparison, high uncertainty, exploratory implementation |
-| `critical` | weak oracle, independent audit, architecture, recovery conflict, or high blast radius |
-| `escalation` | security, migration, irreversible work, or two distinct failed execution routes |
+| `/hw:guide` | unsure of the next step? get a recommended path |
+| `/hw:init` | initialize, adopt, or inspect a workspace |
+| `/hw:goal` | autonomous delivery with no midway checkpoint, after Discussion |
+| `/hw:plan` | deliver a plan containing Stones, after Discussion |
+| `/hw:cycle` | compatibility route for existing Cycles |
+| `/hw:maintain` | distill one project fact into memory |
+| `/hw:experiment` | manage experiment environments, scans, reruns, and status |
+| `/hw:resume` | recover the work context after an interruption |
+| `/hw:accept` | accept the delivery |
+| `/hw:reject` | reject with structured feedback and revise |
 
-Same-route retries, user cancellation, Worker startup failure, and network failure do not increase the distinct failed route count. `off` emits no hint; `advisory` records fallback when the host lacks support; `required` blocks an unsupported semantic handoff. Resume reuses the persisted decision instead of reclassifying.
-
-Workflow does not emit Luna/Sol, providers, credentials, reasoning effort, token limits, or prices. Host mapping cannot change role independence, acceptance evidence, or user authority.
-
-## Execution And Acceptance
-
-Material delivery is driven by verifiable effects. The final Proposal offers confirm and start, confirm without starting, or continue Discussion. A short affirmative reply inherits `delivery.approve_and_start` only when the complete Proposal is visible and the Agent is asking whether to start; otherwise it answers only the current question. Only confirm-without-start enters `waiting_to_start`. High-impact side effects retain local gates.
-
-Runtime owns lifecycle authority, Continuation owns the next action, and a Recovery Pack only supplies bounded recovery context. If no Pack exists, Runtime and Continuation still permit a degraded resume. Legacy `.pipeline` lifecycle files are never fallback authority.
-
-Final delivery explains the conclusion, technical approach, modified modules, test design, validation results, expected behavior, problems encountered, and remaining risks in the conversation. Artifact paths support that explanation but do not replace it.
-
-## Release Boundary
-
-The v15.0.0-alpha.2 Host Contract v1, Codex plugin ZIP, and portable ZIP all publish ten routes and include `/hw:experiment`. Host Contract v1 serves legacy compatibility; semantic workspaces recover from ordinary files. Official Codex is the current source-side support surface, while concrete VSP-Codex model mapping is adapted and validated in the target repository.
+Status, reports, explanations, and checks are natural agent behaviors in ordinary conversation — no dedicated commands needed. Per-command details: [Command Reference](reference/commands.md).

@@ -2,6 +2,8 @@
 
 [中文](../../platforms/codex.md) | English
 
+This page covers how to install Hypo-Workflow on Official Codex, what it can do today, and where its boundaries are — for users trying Hypo-Workflow in Codex for the first time.
+
 Hypo-Workflow v15.0.0-alpha.2 ships as a Codex plugin with ten focused Skills and six semantic or safety Hook events. It is not a runner: the Codex Agent implements, runs experiments, tests, and reviews work, while ordinary semantic files preserve plans and evidence. Host Contract v1 remains for legacy compatibility, and both ZIP artifacts include `/hw:experiment`.
 
 ## Installation Shapes
@@ -41,9 +43,13 @@ OpenCode, Claude Code, Cursor, Copilot, Trae, and custom Codex-fork adapters are
 
 ## Task Assessment And Worker Routing
 
-Codex first uses topology to decide whether independent test, implement, audit, or other Worker identities are required. It then generates and shows a Task Assessment for every Worker before start. The assessment covers `complexity`, `uncertainty`, `oracle_strength`, `blast_radius`, `reversibility`, `risk_flags`, and a concise conclusion. Core only performs exact, bounded, secret-safe validation and deterministically emits `mechanical`, `standard`, `explore`, `critical`, or `escalation`.
+Codex first uses topology to decide whether independent test, implement, audit, or other Worker identities are required. It then generates and shows a Task Assessment for every Worker before start.
 
-This semantic handoff contains no concrete model, execution provider, credential, prompt, or reasoning effort. `SubagentStart` records only the persisted routing class, reason codes, policy version, and visible assessment in Worker Journal context. `advisory` records an explicit fallback and inherits the current execution context when the host lacks this handoff; `required` blocks Worker start; `off` emits no hint.
+The assessment covers `complexity`, `uncertainty`, `oracle_strength`, `blast_radius`, `reversibility`, `risk_flags`, and a concise conclusion. Core only performs exact, bounded, secret-safe validation and deterministically emits `mechanical`, `standard`, `explore`, `critical`, or `escalation`.
+
+This semantic handoff contains no concrete model, execution provider, credential, prompt, or reasoning effort. `SubagentStart` records only the persisted routing class, reason codes, policy version, and visible assessment in Worker Journal context.
+
+The three modes: `advisory` records an explicit fallback and inherits the current execution context when the host lacks this handoff; `required` blocks Worker start; `off` emits no hint.
 
 Routing does not replace topology or relax role separation, evidence, acceptance, or user authority. Resume reuses the Runtime/Continuation decision. A Worker that needs a different semantic class uses a no-history or bounded-history fork; a full-history fork inherits its parent's execution context. See the [configuration governance reference](../reference/configuration.md) for the complete field and classification tables.
 

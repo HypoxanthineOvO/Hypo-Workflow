@@ -2,7 +2,11 @@
 
 [中文](../../../reference/configuration.md) | English
 
-Configuration resolution is project config > global config > built-in default. Project config is usually `.pipeline/config.yaml`; global config is usually `~/.hypo-workflow/config.yaml`. Hypo-Workflow is not a background runner; config only controls how the Agent plans, executes, reviews, and asks for confirmation.
+This page is the configuration matrix for users and Agents: start here when you need a field's meaning, default value, or confirmation boundary.
+
+Configuration resolution is project config > global config > built-in default — project config wins, then global config, then built-in defaults. Project config is usually `.pipeline/config.yaml`; global config is usually `~/.hypo-workflow/config.yaml`.
+
+Hypo-Workflow is not a background runner; config only controls how the Agent plans, executes, reviews, and asks for confirmation.
 
 ## Configuration Layers
 
@@ -40,13 +44,23 @@ Configuration resolution is project config > global config > built-in default. P
 
 `P0 Configure` runs after `cycle new` and before Discover. It lets the user select or reuse automation, Subagent authorization, acceptance, PR/MR remote-write policy, full regression, analysis boundaries, and worker separation. Reuse sources are recorded as `cycle_explicit`, `previous_cycle_snapshot`, `project_config`, `global_config`, or `built_in_default`.
 
-Strict worker separation requires implementation Subagents to stay isolated from test/review/audit roles. Implementation workers do not read test source, fixtures, snapshots, or assertion details; they may receive requirements, public interfaces, allowed edit scope, test command, pass/fail status, and sanitized failure summaries. If the host cannot preserve isolation, the run must explain degraded mode, obtain explicit user confirmation, and record role isolation degradation.
+Strict worker separation requires implementation Subagents to stay isolated from test/review/audit roles:
+
+- implementation workers do not read test source, fixtures, snapshots, or assertion details;
+- they may receive requirements, public interfaces, allowed edit scope, test command, pass/fail status, and sanitized failure summaries.
+
+If the host cannot preserve isolation, the run must explain degraded mode, obtain explicit user confirmation, and record role isolation degradation.
 
 Acceptance hardening: `/hw:accept` blocks missing or colliding implement/test/audit worker evidence, failed or `close_failed` worker lifecycle records, missing Codex `/hw:start` + `/hw:resume` authorization scope, and runtime-only observations being used as worker evidence.
 
 ## Task Assessment And Worker Routing
 
-Worker topology and Worker Routing are separate decisions. Topology first determines whether test, implement, audit, or other independent identities are required. The host AI then generates a visible Task Assessment for each Worker from current repository evidence. Core validates that structured assessment and applies deterministic policy; it does not call another model or choose a concrete model, execution provider, credential, or reasoning effort.
+Worker topology and Worker Routing are separate decisions:
+
+1. Topology first determines whether test, implement, audit, or other independent identities are required.
+2. The host AI then generates a visible Task Assessment for each Worker from current repository evidence.
+
+Core validates that structured assessment and applies deterministic policy; it does not call another model or choose a concrete model, execution provider, credential, or reasoning effort.
 
 The Task Assessment is shown before Worker start:
 
@@ -70,7 +84,13 @@ Deterministic precedence is `escalation > critical > explore > standard > mechan
 | `critical` | Architecture, weak oracle, independent audit, recovery conflict, or high blast radius |
 | `escalation` | Security, migration, irreversible work, or two distinct failed execution routes |
 
-`off` emits no hint. `advisory` permits the Worker to inherit the current execution context when the host lacks semantic routing support and records an explicit fallback. `required` blocks that Worker start when support is absent. Routing never changes role independence, evidence, acceptance, or user authority. Resume reuses the persisted assessment, class, reasons, failure count, and policy version from Runtime/Continuation instead of reclassifying.
+The three modes differ as follows:
+
+- `off` emits no hint.
+- `advisory` permits the Worker to inherit the current execution context when the host lacks semantic routing support and records an explicit fallback.
+- `required` blocks that Worker start when support is absent.
+
+Routing never changes role independence, evidence, acceptance, or user authority. Resume reuses the persisted assessment, class, reasons, failure count, and policy version from Runtime/Continuation instead of reclassifying.
 
 Every routing identifier is limited to 128 UTF-8 bytes. One failure-history input may contain at most 256 attempts, and persisted distinct failed route IDs are limited to 64. Larger inputs fail closed before any Runtime, Journal, or Capsule write.
 

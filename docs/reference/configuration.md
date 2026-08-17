@@ -1,6 +1,10 @@
 # 配置治理参考
 
-本页是面向用户和 Agent 的配置治理矩阵。配置的解析顺序是 project config > global config > built-in default；project config 通常是 `.pipeline/config.yaml`，global config 通常是 `~/.hypo-workflow/config.yaml`。Hypo-Workflow 不是后台 runner，配置只决定 Agent 如何规划、执行、审查和确认。
+本页是面向用户和 Agent 的配置治理矩阵：想查某个配置字段的含义、默认值或确认边界，从这里开始。
+
+配置的解析顺序是 project config > global config > built-in default，即项目配置优先，未设置时回落到全局配置，最后到内置默认值。project config 通常是 `.pipeline/config.yaml`，global config 通常是 `~/.hypo-workflow/config.yaml`。
+
+Hypo-Workflow 不是后台 runner，配置只决定 Agent 如何规划、执行、审查和确认。
 
 ## 配置层级
 
@@ -42,15 +46,27 @@
 
 ## P0 Configure 与 Subagent 授权
 
-`P0 Configure` 是每个新 Cycle 在 Discover 前的配置阶段。用户可以重新选择，也可以明确沿用上一轮或项目/全局默认。该阶段覆盖 automation、Subagent authorization、acceptance、PR/MR remote write、full regression、analysis boundaries 和 worker separation，并把来源记录为 `cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config` 或 `built_in_default`。
+`P0 Configure` 是每个新 Cycle 在 Discover 前的配置阶段。用户可以重新选择，也可以明确沿用上一轮或项目/全局默认。
 
-strict worker separation 要求 implementation Subagent 与 test/review/audit 角色隔离。implementation worker 不读取 test source、fixtures、snapshots 或 assertion details；它只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。若宿主平台不能提供这种隔离，必须在执行前说明 degraded mode，获得 explicit user confirmation，并记录 role isolation degradation。
+该阶段覆盖 automation、Subagent authorization、acceptance、PR/MR remote write、full regression、analysis boundaries 和 worker separation，并把来源记录为 `cycle_explicit`、`previous_cycle_snapshot`、`project_config`、`global_config` 或 `built_in_default`。
+
+strict worker separation 要求 implementation Subagent 与 test/review/audit 角色隔离：
+
+- implementation worker 不读取 test source、fixtures、snapshots 或 assertion details；
+- 它只能接收需求、公开接口、允许编辑范围、test command、pass/fail 和 sanitized failure summary。
+
+若宿主平台不能提供这种隔离，必须在执行前说明 degraded mode，获得 explicit user confirmation，并记录 role isolation degradation。
 
 acceptance hardening：`/hw:accept` 会阻塞缺失或身份碰撞的 implement/test/audit worker evidence、失败或 `close_failed` worker lifecycle、缺少 Codex `/hw:start` + `/hw:resume` 授权范围，以及把 runtime-only observation 当成 worker evidence 的验收。
 
 ## Task Assessment 与 Worker Routing
 
-Worker topology 和 Worker Routing 是两步独立决策。topology 先决定是否需要 test、implement、audit 等独立身份；之后，宿主 AI 根据当前仓库证据为每个待启动 Worker 生成一份可见的 Task Assessment。Core 只验证这份结构化说明并按确定性规则输出语义路由档，不会再调用模型，也不会选择具体模型、运行方、凭据或推理强度。
+Worker topology 和 Worker Routing 是两步独立决策：
+
+1. topology 先决定是否需要 test、implement、audit 等独立身份；
+2. 之后，宿主 AI 根据当前仓库证据为每个待启动 Worker 生成一份可见的 Task Assessment（任务评估）。
+
+Core 只验证这份结构化说明并按确定性规则输出语义路由档，不会再调用模型，也不会选择具体模型、运行方、凭据或推理强度。
 
 Task Assessment 在 Worker 启动前向用户显示，字段含义如下：
 
@@ -74,7 +90,13 @@ Task Assessment 在 Worker 启动前向用户显示，字段含义如下：
 | `critical` | architecture、weak oracle、independent audit、recovery conflict 或高 blast radius |
 | `escalation` | security、migration、不可逆任务，或两条不同执行路线已经失败 |
 
-`off` 不产生路由提示；`advisory` 在宿主不支持语义路由时允许继承当前执行上下文，并明确记录 fallback；`required` 在宿主不支持时阻止该 Worker 启动。路由档不会改变角色独立性、证据要求、acceptance 或用户授权。Resume 复用 Runtime/Continuation 中已持久化的 assessment、route、reason、失败计数和 policy version，不重新猜测。
+三种模式的区别：
+
+- `off` 不产生路由提示；
+- `advisory` 在宿主不支持语义路由时允许继承当前执行上下文，并明确记录 fallback；
+- `required` 在宿主不支持时阻止该 Worker 启动。
+
+路由档不会改变角色独立性、证据要求、acceptance 或用户授权。Resume 复用 Runtime/Continuation 中已持久化的 assessment、route、reason、失败计数和 policy version，不重新猜测。
 
 所有 routing identifier 都限制为 128 UTF-8 bytes。一次失败历史输入最多包含 256 个 attempt，持久化的 distinct failed route IDs 最多 64 个；超过边界时在写入 Runtime、Journal 或 Capsule 前 fail closed。
 

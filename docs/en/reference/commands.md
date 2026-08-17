@@ -2,7 +2,9 @@
 
 [中文](../../reference/commands.md) | English
 
-The v15.0.0-alpha.2 Official Codex surface and Host Contract v1 expose exactly ten public routes. The Root Router normalizes namespaces and checks backend availability; each route loads one ordinary, non-symlink Child Skill. The Codex plugin ZIP and portable ZIP contain the same route set.
+This page lists the ten public slash commands in v15.0.0-alpha.2 — a quick lookup for users and Agents asking "which command does what".
+
+The Official Codex surface and Host Contract v1 expose exactly these ten routes. The Root Router handles namespace normalization (command-name canonicalization) and backend availability checks; each route loads one ordinary, non-symlink Child Skill. The Codex plugin ZIP and portable ZIP contain the same route set.
 
 | Command | Child Skill | Use when |
 | --- | --- | --- |
@@ -19,7 +21,11 @@ The v15.0.0-alpha.2 Official Codex surface and Host Contract v1 expose exactly t
 
 ## Internal Natural Behavior
 
-Chat, Explain, Status, Report, Log, Check, Compact, Knowledge, Sync, and Debug are selected naturally by the Agent. Discussion must show the user Discover, Technical, and Architecture before Stone count selects Goal or Plan; the three artifacts may be presented together and are not separate gates. A short confirmation uses `delivery.approve_and_start` only while the Agent is asking whether to start the visible final Proposal; confirm-without-start enters `waiting_to_start`. These behaviors create no additional Codex commands or Skills.
+Chat, Explain, Status, Report, Log, Check, Compact, Knowledge, Sync, and Debug are selected naturally by the Agent and create no additional Codex commands or Skills.
+
+Discussion must show the user three artifacts — Discover, Technical, and Architecture — before Stone count selects Goal or Plan. The three may be presented together and are not separate gates.
+
+A short confirmation issues `delivery.approve_and_start` only while the Agent is asking whether to start the visible final Proposal; confirm-without-start enters `waiting_to_start`.
 
 ## Deferred And Removed
 

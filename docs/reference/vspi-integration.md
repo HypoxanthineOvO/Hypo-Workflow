@@ -1,5 +1,7 @@
 # VSPi 0.2.0 集成合同
 
+本页定义 VSPi 宿主与 Hypo-Workflow 之间的集成合同（边界、并发、模型路由与 API），主要面向做 VSPi/Pi 侧接入的开发者。
+
 VSPi 与 Hypo-Workflow 的关系是宿主与项目事实内核，不是进程管理器与被管理进程。VSPi/Pi 继续负责 Session、模型调用、工具执行和 TUI；Hypo-Workflow 只负责 Plan、Delivery、Workstream、证据、Continuation、Recovery 与审计记录。
 
 ## Authority 边界

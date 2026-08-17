@@ -1,5 +1,7 @@
 # Experiment Record Protocol
 
+本页定义 Experiment（实验）记录的文件格式与维护方式，面向要跑实验、保存基线和 Attempt（单次实验运行）记录的 Agent 和用户。
+
 Experiment 默认使用普通 YAML 文件记录。Agent 可以通过正常的文件读取和编辑能力维护这些文件；任何名为 `BatchReport` 的宿主能力、Experiment Core 写入 API、内容哈希事件或状态投影都不是前置条件。
 
 ## 路径
@@ -93,7 +95,9 @@ next_action: Review metrics against baseline-v1.
 
 ## 生命周期
 
-启动前更新 `experiment.yaml`，写明 baseline、数据集、变化参数、固定参数、成功证据、资源边界和下一步。启动时创建 Attempt 文件并记录代码、环境、命令和输出目录。完成、失败或中断后更新同一个 Attempt 文件，保存指标、日志引用、失败证据、scientific review 和后续动作。
+- 启动前：更新 `experiment.yaml`，写明 baseline、数据集、变化参数、固定参数、成功证据、资源边界和下一步。
+- 启动时：创建 Attempt 文件并记录代码、环境、命令和输出目录。
+- 完成、失败或中断后：更新同一个 Attempt 文件，保存指标、日志引用、失败证据、scientific review 和后续动作。
 
 Hooks 可以提醒这些检查点，但不得代替语义判断或文件写入。Hooks、批量报告、校验器或投影失败时，Agent 继续运行并直接维护记录。
 
