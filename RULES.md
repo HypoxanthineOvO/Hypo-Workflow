@@ -38,4 +38,4 @@ hw 的代码在 `hw/`，测试在 `tests/`；代码改动的说明写在提交�
 
 ## 不需要描述
 
-templates/、skills/
+hw/、templates/、skills/

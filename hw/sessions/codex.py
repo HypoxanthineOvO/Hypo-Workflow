@@ -4,12 +4,10 @@ from datetime import datetime
 from pathlib import Path
 
 from . import (
-    Failure,
-    ParseError,
     Session,
     clean_text,
     file_mtime,
-    file_mtime_key,
+    reading,
     first_record,
     join_content,
     json_lines,
@@ -20,22 +18,23 @@ from . import (
 )
 
 
-def find(home: Path, target: str) -> Session | Failure | None:
+def find(home: Path, target: str) -> Session | None:
     root = home / ".codex" / "sessions"
     if not root.is_dir():
         return None
-    for path in sorted(root.rglob("*.jsonl"), key=file_mtime_key, reverse=True):
+    for path in sorted(root.rglob("*.jsonl"), key=file_mtime, reverse=True):
         record = first_record(path)
         if not record or record.get("type") != "session_meta":
             continue
         payload = record.get("payload") or {}
+        source = payload.get("source")
+        if isinstance(source, dict) and "subagent" in source:
+            continue
         cwd = str(payload.get("cwd") or "") if isinstance(payload, dict) else ""
         if not matches_cwd(cwd, target):
             continue
-        try:
+        with reading(path):
             return _parse(path, cwd)
-        except ParseError as error:
-            return Failure("codex", path, str(error), file_mtime(path))
     return None
 
 
@@ -76,9 +75,13 @@ def _parse(path: Path, cwd: str) -> Session:
             if text:
                 story.append((when, "assistant", text, str(payload.get("phase") or ""), "assistant"))
 
-    if any(item[4] == "event" for item in story):
-        story = [item for item in story if item[4] != "fallback"]
-    events = [(role, when, text, phase) for when, role, text, phase, _ in story]
+    events = []
+    previous = None
+    for when, role, text, phase, source in story:
+        if role == "user" and previous and previous[0] == role and previous[1] == text and previous[2] != source:
+            continue
+        events.append((role, when, text, phase))
+        previous = (role, text, source)
     return Session(
         host="codex",
         path=path,

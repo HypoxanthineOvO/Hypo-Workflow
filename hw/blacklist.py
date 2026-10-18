@@ -35,7 +35,7 @@ RULES: tuple[Rule, ...] = (
     rule("A1", r"不能声称[^。！？]{0,40}", ALARM),
     rule("A2", r"(?:不能保证[^。！？]{0,40}|无法保证)", ALARM),
     rule("A3", r"不代表[^。！？]{0,40}", ALARM),
-    rule("A4", r"不替代[^。！？]{0,40}", ALARM),
+    rule("A4", r"(?:本次|本轮|此次|这次测试|这次检查|这次验证)[^。！？\n]{0,30}不替代[^。！？]{0,40}", ALARM),
     rule("A5", r"仅作为[^。！？]{0,30}"),
     rule("A6", r"，(?:尚未|暂未)[^。！？]{0,30}[。！？]"),
     rule("A7", r"不构成[^。！？]{0,40}"),
@@ -67,7 +67,7 @@ RULES: tuple[Rule, ...] = (
     rule("B13", r"无虚构细节", ALARM),
     rule("B14", r"全文约\d+\s*字", ALARM),
     rule("B15", r"估算未验证"),
-    rule("B16", r"(?:本文|本报告)"),
+    rule("B16", r"(?:本文(?!件)|本报告)"),
     rule("B17", r"(?:^|\n)\s*摘要\s*[:：]?"),
     rule("B18", r"本次抓取", ALARM),
     rule("B19", r"材料中"),
@@ -75,7 +75,7 @@ RULES: tuple[Rule, ...] = (
     rule("B21", r"(?:自查|自报完美)"),
     rule("B22", r"Hypo-Info 摘要", ALARM),
     rule("B23", r"未验证"),
-    rule("B24", r"已确认"),
+    rule("B24", r"(?:[【\[]已确认[】\]]|^\s*(?:[-*+]\s+|#{1,6}\s+)?(?:\*\*)?已确认(?:\*\*)?\s*(?:[:：]|$))"),
     rule("B25", r"未经(?:核实|证实)"),
     rule("C1", r"\bM\d+[a-z]?\b"),
     rule("C2", r"\bC\d{2,3}\b"),
@@ -113,9 +113,6 @@ RULES: tuple[Rule, ...] = (
     rule("D17", r"(?:真正的[^。！？]{1,20}(?:是|在于)|答案是|问题的关键)"),
     rule("D18", r"(?:这就是[^。！？]{1,20}|这才是[^。！？]{1,20})"),
     rule("D19", r"(?:没有[^。！？]{1,20}没有[^。！？]{1,20}只有|不[^。！？]{1,10}不[^。！？]{1,10}只是)"),
-    rule("D20", r"——"),
-    rule("D21", r"、[^、。！？]{1,15}、[^、。！？]{1,15}、"),
-    rule("D22", r"：\s*$"),
     rule("D23", r"(?:记忆|时间|焦虑|情绪|历史)[^。！？]{0,6}(?:仓库|抽屉|温度|钥匙|形状|重量)"),
     rule("D24", r"(?:赋能|助力|打造|闭环|抓手|颗粒度|底层逻辑|范式|护城河)"),
     rule("D25", r"(?:落盘|臂)"),
@@ -156,7 +153,6 @@ RULES: tuple[Rule, ...] = (
     rule("E30", r"(?:\bit remains to be seen\b|\bonly time will tell\b)"),
     rule("E31", r"\b(?:serves?|stands?) as\b"),
     rule("E32", r"\b(?:in conclusion|to sum up|overall,)\b"),
-    rule("E33", r"\b\w+, \w+,? and \w+\b"),
     rule(
         "E34",
         r"(?:\bbased on (?:the )?available information\b|\bnot widely (?:documented|available)\b|"
@@ -164,7 +160,6 @@ RULES: tuple[Rule, ...] = (
         ALARM,
     ),
     rule("E35", r"\b(?:experts|studies|many)\b[^.!?]{0,20}\b(?:believe|show|argue|suggest)\b"),
-    rule("E36", r"(?<!—)—(?!—)"),
     rule(
         "E37",
         r"(?:\bin the realm of\b|\bnavigate the complexities of\b|\bunlock the potential\b|"
@@ -179,6 +174,13 @@ FENCE = re.compile(r"^\s*(?:```|~~~)")
 INLINE_CODE = re.compile(r"`[^`]*`")
 CONTEXT = re.compile(r"Milestone|Cycle|阶段")
 LEAK = re.compile(r"(?:本文|材料中|本次抓取)")
+PROSE_REFERENCES = re.compile(r"!?\[([^\]]*)\]\([^)]*\)|https?://\S+|[\w.~-]+(?:/[\w.~-]+)*(?:/[\w.~-]+\.[A-Za-z0-9]+|/)|“[^”]*”|「[^」]*」")
+
+
+def prose_line(line: str) -> str:
+    if line.lstrip().startswith(">"):
+        return ""
+    return PROSE_REFERENCES.sub(lambda match: match.group(1) or "", line)
 
 
 @dataclass
@@ -218,6 +220,7 @@ def scan_text(
     paragraph_lines: dict[int, list[str]] = {}
     paragraph = 0
     for number, line in enumerate(lines, start=1):
+        line = prose_line(line)
         if not line.strip():
             paragraph += 1
             continue
@@ -243,7 +246,7 @@ def scan_text(
         for item, number, index, matched in matches:
             if (number, item.code) in seen:
                 continue
-            if item.group == "D" and d_count >= 5:
+            if item.group == "D":
                 continue
             seen.add((number, item.code))
             level = item.level
@@ -251,9 +254,11 @@ def scan_text(
             context = " ".join(paragraph_lines.get(index, []))
             if item.group == "A" and len({sibling.code for sibling in siblings if sibling.group == "A"}) >= 2:
                 level = ALARM
-            if item.group == "B" and any(sibling.group == "B" for sibling in siblings) and LEAK.search(context):
+            if item.group == "B" and any(sibling.group == "B" and sibling.level == ALARM for sibling in siblings) and LEAK.search(context):
                 level = ALARM
-            if item.code in ("C1", "C2") and CONTEXT.search(context):
+            if item.code in ("C1", "C2"):
+                if not CONTEXT.search(context):
+                    continue
                 level = ALARM
             if item.group == "E" and len({sibling.code for sibling in siblings if sibling.group == "E"}) >= 3:
                 level = ALARM
@@ -265,7 +270,8 @@ def scan_text(
             )
 
         if d_count >= 5:
-            findings.append(Finding(HINT, name, f"D 组句式共 {d_count} 处，建议整段重写"))
+            locations = "、".join(str(number) for item, number, _, _ in matches if item.group == "D")
+            findings.append(Finding(HINT, name, f"句式重复 {d_count} 处（第 {locations} 行），建议整段重写"))
 
     filename = PurePosixPath(name).name
     for item, pattern in COMPILED:

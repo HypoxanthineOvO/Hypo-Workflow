@@ -8,32 +8,31 @@ from datetime import datetime
 from pathlib import Path
 
 from . import (
-    Failure,
     ParseError,
     Session,
     Skipped,
     clean_text,
     decode_lines,
     file_mtime,
-    file_mtime_key,
-    first_record as plain_first_record,
+    first_record,
     join_content,
-    json_lines as plain_json_lines,
+    json_lines,
     later,
     matches_cwd,
     pair_turns,
     parse_time,
+    reading,
     user_text,
 )
 
 
-def find(home: Path, target: str) -> Session | Failure | Skipped | None:
+def find(home: Path, target: str) -> Session | Skipped | None:
     root = home / ".dsh" / "sessions"
     if not root.is_dir():
         return None
     files = sorted(
         [*root.rglob("session*.jsonl"), *root.rglob("session*.jsonl.zstd")],
-        key=file_mtime_key,
+        key=file_mtime,
         reverse=True,
     )
     if not files:
@@ -42,21 +41,19 @@ def find(home: Path, target: str) -> Session | Failure | Skipped | None:
         return Skipped("dsh", "没有 zstd 命令")
     for path in files:
         header = _first_record(path)
-        if not header or header.get("type") != "session":
+        if header.get("type") != "session":
             continue
         cwd = str(header.get("cwd") or "")
         if not matches_cwd(cwd, target):
             continue
-        try:
+        with reading(path):
             return _parse(path, cwd)
-        except ParseError as error:
-            return Failure("dsh", path, str(error), file_mtime(path))
     return None
 
 
 def _json_lines(path: Path) -> Iterator[dict]:
     if path.suffix != ".zstd":
-        yield from plain_json_lines(path)
+        yield from json_lines(path)
         return
     try:
         result = subprocess.run(
@@ -73,9 +70,9 @@ def _json_lines(path: Path) -> Iterator[dict]:
     yield from decode_lines(result.stdout.splitlines(), path)
 
 
-def _first_record(path: Path) -> dict | None:
+def _first_record(path: Path) -> dict:
     if path.suffix != ".zstd":
-        return plain_first_record(path)
+        return first_record(path)
     try:
         process = subprocess.Popen(
             ["zstd", "-dc", str(path)],
@@ -85,8 +82,8 @@ def _first_record(path: Path) -> dict | None:
             encoding="utf-8",
             errors="replace",
         )
-    except OSError:
-        return None
+    except OSError as error:
+        raise ParseError(f"无法解压：{error}", path) from error
     try:
         line = process.stdout.readline() if process.stdout else ""
     finally:
@@ -94,11 +91,15 @@ def _first_record(path: Path) -> dict | None:
         process.wait()
         if process.stdout is not None:
             process.stdout.close()
+    if not line.strip():
+        raise ParseError("会话文件为空", path)
     try:
         record = json.loads(line)
-    except (json.JSONDecodeError, ValueError):
-        return None
-    return record if isinstance(record, dict) else None
+    except (json.JSONDecodeError, ValueError) as error:
+        raise ParseError(str(error), path) from error
+    if not isinstance(record, dict):
+        raise ParseError("第 1 行不是 JSON 对象", path)
+    return record
 
 
 def _parse(path: Path, cwd: str) -> Session:
@@ -136,7 +137,7 @@ def _parse(path: Path, cwd: str) -> Session:
         path=path,
         cwd=cwd,
         started=started or file_mtime(path),
-        updated=last or file_mtime(path),
+        updated=later(last, file_mtime(path)),
         model="",
         turns=pair_turns(events),
     )

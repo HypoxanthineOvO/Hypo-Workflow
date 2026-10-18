@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 import os
 import re
+import sqlite3
+from contextlib import contextmanager
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -38,22 +40,12 @@ INJECT_PREFIXES = (
     "<in-app-browser-context",
 )
 
-HOST_ROOTS = {
-    "codex": Path(".codex"),
-    "claude": Path(".claude"),
-    "vspi": Path(".vspi"),
-    "kimi": Path(".kimi-code"),
-    "opencode": Path(".local/share/opencode"),
-    "zcode": Path(".zcode"),
-    "dsh": Path(".dsh"),
-}
-
 EPOCH = datetime.min.replace(tzinfo=timezone.utc)
 WINDOWS_DRIVE = re.compile(r"^[A-Za-z]:/")
 
 
 class ParseError(Exception):
-    def __init__(self, message: str, path: Path | None = None):
+    def __init__(self, message: str, path: Path):
         super().__init__(message)
         self.path = path
 
@@ -110,49 +102,26 @@ def matches_cwd(cwd: str, target: str) -> bool:
     return bool(current) and (current == root or current.startswith(root.rstrip("/") + "/"))
 
 
-def parse_time(value: object) -> datetime | None:
-    def from_number(number: float) -> datetime | None:
-        if number > 1e11:
-            number /= 1000
-        try:
-            return datetime.fromtimestamp(number, tz=timezone.utc)
-        except (OverflowError, OSError, ValueError):
-            return None
-
+def parse_time(value: str | int | float | None) -> datetime | None:
     if value is None or value == "":
         return None
-    if isinstance(value, (int, float)) and not isinstance(value, bool):
-        return from_number(float(value))
-    if isinstance(value, str):
-        text = value.strip()
-        if not text:
-            return None
-        try:
-            return from_number(float(text))
-        except ValueError:
-            pass
-        try:
-            parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
-        except ValueError:
-            return None
-        if parsed.tzinfo is None:
-            parsed = parsed.replace(tzinfo=timezone.utc)
-        return parsed.astimezone(timezone.utc)
-    return None
+    if isinstance(value, (int, float)) or re.fullmatch(r"-?\d+(?:\.\d+)?", value):
+        number = float(value)
+        return datetime.fromtimestamp(number / 1000 if number > 1e11 else number, tz=timezone.utc)
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    return (parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)).astimezone(timezone.utc)
 
 
-def file_mtime(path: Path) -> datetime | None:
+def file_mtime(path: Path) -> datetime:
+    return datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
+
+
+@contextmanager
+def reading(path: Path):
     try:
-        return datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc)
-    except OSError:
-        return None
-
-
-def file_mtime_key(path: Path) -> float:
-    try:
-        return path.stat().st_mtime
-    except OSError:
-        return 0.0
+        yield
+    except (OSError, ValueError, KeyError, TypeError, sqlite3.Error) as error:
+        raise ParseError(str(error), path) from error
 
 
 def later(*values: datetime | None) -> datetime | None:
@@ -218,7 +187,7 @@ def pair_turns(events: list[tuple[str, datetime | None, str, str]]) -> list[Turn
     for role, when, text, phase in events:
         if role == "user":
             flush()
-            user = (when, text)
+            user = (when, text) if text else None
         elif user is not None and text:
             replies.append((when, text, phase))
     flush()
@@ -226,54 +195,37 @@ def pair_turns(events: list[tuple[str, datetime | None, str, str]]) -> list[Turn
 
 
 def decode_lines(lines: Iterable[str], path: Path) -> Iterator[dict]:
-    seen = False
-    for line in lines:
-        line = line.strip()
-        if not line:
+    for number, line in enumerate(lines, start=1):
+        if not line.strip():
             continue
-        try:
-            record = json.loads(line)
-        except (json.JSONDecodeError, ValueError):
-            continue
+        record = json.loads(line)
         if not isinstance(record, dict):
-            continue
-        seen = True
+            raise ParseError(f"第 {number} 行不是 JSON 对象", path)
         yield record
-    if not seen:
-        raise ParseError("没有可解析的 JSON 行", path)
 
 
 def json_lines(path: Path) -> Iterator[dict]:
-    try:
-        handle = path.open("r", encoding="utf-8", errors="replace")
-    except OSError as error:
-        raise ParseError(f"无法读取：{error}", path) from error
-    with handle:
+    with reading(path), path.open(encoding="utf-8") as handle:
         yield from decode_lines(handle, path)
 
 
-def first_record(path: Path) -> dict | None:
+def first_record(path: Path) -> dict:
+    records = json_lines(path)
     try:
-        with path.open("r", encoding="utf-8", errors="replace") as handle:
-            for line in handle:
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    record = json.loads(line)
-                except (json.JSONDecodeError, ValueError):
-                    return None
-                return record if isinstance(record, dict) else None
-    except OSError:
-        return None
-    return None
+        record = next(records, None)
+        if record is None:
+            raise ParseError("会话文件为空", path)
+        return record
+    finally:
+        records.close()
 
 
-def read_json(path: Path) -> object:
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError, ValueError):
-        return None
+def read_json(path: Path) -> dict:
+    with reading(path):
+        value = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(value, dict):
+            raise ParseError("不是 JSON 对象", path)
+        return value
 
 
 def read_index(path: Path) -> dict[str, dict]:

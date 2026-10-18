@@ -19,6 +19,7 @@ from .git import (
     file_text,
     has_head,
     ignored_paths,
+    parent_revision,
     status_entries,
     status_paths,
     tracked_files,
@@ -33,6 +34,7 @@ from .project import (
     section_map,
 )
 from .report import print_json
+from .symbols import definitions, matching_names, owners
 
 ALARM = "alarm"
 HINT = "hint"
@@ -45,14 +47,6 @@ CODE_SUFFIXES = {
     ".jl", ".r", ".f", ".f90", ".f95", ".for", ".zig", ".nim", ".sol",
     ".sql", ".html", ".css", ".scss", ".less",
 }
-SYMBOL_KEYWORDS = (
-    "def|function|class|const|let|var|fn|func|sub|method|module|interface|"
-    "type|enum|struct|impl|trait|object|namespace"
-)
-SYMBOL_MODIFIERS = (
-    "export|default|async|await|pub(?:\\([^)]*\\))?|unsafe|extern|static|inline|"
-    "public|private|protected|abstract|final|synchronized|override|readonly|declare"
-)
 ALLOWED_MARKDOWN = {"README.md", "AGENTS.md", "RULES.md", "STATUS.md", "BOARD.md", "CLAUDE.md"}
 FORMAT_FIELDS = ("Feature", "Code", "Docs", "Verified")
 PREFIX = re.compile(r"^(?:feat|fix|chore|docs|style|refactor|perf|test|build|ci|revert)(?:\([^)]*\))?!?:", re.I)
@@ -61,10 +55,10 @@ CYCLE = re.compile(r"(?<![A-Za-z0-9])C\d{2,}(?![A-Za-z0-9])")
 SHORT_HASH = re.compile(r"(?<![A-Za-z0-9])(?=[a-f0-9]*[0-9])[a-f0-9]{7,}(?![A-Za-z0-9])", re.I)
 LINK = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 README_RULES = (
-    ("进度类内容", re.compile(r"进度|下一步|已完成")),
+    ("进度类内容", re.compile(r"^\s*(?:#{1,6}\s+|[-*+]\s+)?(?:项目|开发|当前|本周|本轮)?(?:进度|下一步|已完成)(?:[:：\s]|$)")),
     ("内部编号", re.compile(r"(?<![A-Za-z0-9])M\d+|Cycle")),
     ("日期开头的段落", re.compile(r"^\s*(?:#{1,6}\s*)?\d{4}[-年/]\d{1,2}")),
-    ("Agent 规则字样", re.compile(r"Agent|AGENTS\.md|规则")),
+    ("Agent 规则", re.compile(r"^\s*(?:#{1,6}\s+|[-*+]\s+)?(?:(?:Agent|开发|协作)\s*(?:规则|须知|指令)|(?:所有\s*)?Agent\s*(?:必须|应当|需要|不得|禁止)|(?:开工前|提交前|完成前).*(?:运行|执行|读取))")),
 )
 
 
@@ -100,10 +94,7 @@ class Collector:
 
 
 def docs_exempted(value: str) -> bool:
-    match = re.search(r"未改", value)
-    if not match:
-        return False
-    return len(value[match.end() :].strip(" ，,：:。.;；\t")) >= 2
+    return bool(re.fullmatch(r"未改\s*[，,:：;；]\s*[^\s，,:：;；。].*", value.strip()))
 
 
 def no_description_patterns(project: Project) -> list[str]:
@@ -143,43 +134,6 @@ def anchor_files(project: Project, anchor: CodeAnchor) -> list[Path]:
     return [path] if path.is_file() else []
 
 
-def _symbol_pattern(symbol: str) -> str:
-    return rf"(?<![\w]){re.escape(symbol)}(?![\w])"
-
-
-def keyword_definitions(line: str, symbols: set[str]) -> set[str]:
-    return {
-        symbol
-        for symbol in symbols
-        if re.search(
-            rf"^\s*(?:(?:{SYMBOL_MODIFIERS})\s+)*(?:{SYMBOL_KEYWORDS})\b[^\n]*?{_symbol_pattern(symbol)}",
-            line,
-        )
-    }
-
-
-def fallback_definitions(line: str, symbols: set[str]) -> set[str]:
-    return {
-        symbol
-        for symbol in symbols
-        if re.search(rf"{_symbol_pattern(symbol)}\s*(?:\(|=|:)", line)
-    }
-
-
-def attribute_symbols(lines: list[str], index: int, symbols: set[str]) -> set[str]:
-    direct = {symbol for symbol in symbols if re.search(_symbol_pattern(symbol), lines[index])}
-    if direct:
-        return direct
-    fallback: set[str] = set()
-    for line in reversed(lines[:index]):
-        defined = keyword_definitions(line, symbols)
-        if defined:
-            return defined
-        if not fallback:
-            fallback = fallback_definitions(line, symbols)
-    return fallback
-
-
 def known_symbols(anchors: list[tuple[Requirement, CodeAnchor]], path: str) -> set[str]:
     result: set[str] = set()
     for _, anchor in anchors:
@@ -200,21 +154,14 @@ def touched_symbols(project: Project, rev: str | None, path: str, symbols: set[s
     if not changed:
         return set()
 
-    old_text = file_text(project.root, f"{rev}^" if rev else "HEAD", path)
+    old_rev = parent_revision(project.root, rev) if rev else ("HEAD" if has_head(project.root) else None)
+    old_text = file_text(project.root, old_rev, path)
     if rev:
         new_text = file_text(project.root, rev, path)
     else:
         new_text = target.read_text(encoding="utf-8", errors="replace") if target.is_file() else ""
-    old_lines = old_text.splitlines()
-    new_lines = new_text.splitlines()
-
-    touched: set[str] = set()
-    for item in changed:
-        lines = old_lines if item.side == "old" else new_lines
-        index = item.number - 1
-        if 0 <= index < len(lines):
-            touched.update(attribute_symbols(lines, index, symbols))
-    return touched
+    sides = {"old": definitions(path, old_text), "new": definitions(path, new_text)}
+    return {name for item in changed for name in owners(sides[item.side], item.number, symbols)}
 
 
 def check_anchors(project: Project, collector: Collector) -> list[tuple[Requirement, CodeAnchor]]:
@@ -225,14 +172,14 @@ def check_anchors(project: Project, collector: Collector) -> list[tuple[Requirem
             if not anchor_files(project, anchor):
                 collector.add(ALARM, "文档", requirement.path, f"代码锚点不存在：{anchor.path}")
                 continue
-            missing = [
-                symbol
-                for symbol in anchor.symbols
-                if not any(
-                    symbol in path.read_text(encoding="utf-8", errors="replace")
-                    for path in anchor_files(project, anchor)
-                )
-            ]
+            if not anchor.symbols:
+                continue
+            found = {
+                name for path in anchor_files(project, anchor)
+                for item in definitions(path.name, path.read_text(encoding="utf-8"))
+                for name in matching_names(item, set(anchor.symbols))
+            }
+            missing = [symbol for symbol in anchor.symbols if symbol not in found]
             if missing:
                 collector.add(
                     ALARM,
@@ -243,15 +190,20 @@ def check_anchors(project: Project, collector: Collector) -> list[tuple[Requirem
     return anchors
 
 
+def commit_requirements(project: Project, commit: Commit) -> list[Requirement]:
+    parent = parent_revision(project.root, commit.hash)
+    previous = Project(project.root, parent).requirements if parent else []
+    return previous + Project(project.root, commit.hash).requirements
+
+
 def check_commit_sync(
     project: Project,
     history: list[Commit],
-    anchors: list[tuple[Requirement, CodeAnchor]],
     collector: Collector,
 ) -> None:
-    if not project.requirements:
-        return
     for commit in history:
+        requirements = commit_requirements(project, commit)
+        anchors = [(requirement, anchor) for requirement in requirements for anchor in requirement.code]
         changed = sorted(set(changed_files(project.root, commit.hash)))
         feature = commit.trailer("Feature")
         docs = commit.trailer("Docs")
@@ -259,7 +211,7 @@ def check_commit_sync(
             path: touched_symbols(project, commit.hash, path, known_symbols(anchors, path))
             for path in changed
         }
-        for requirement in project.requirements:
+        for requirement in requirements:
             if (
                 requirement_matches_feature(requirement, feature)
                 and requirement.path not in changed
@@ -272,7 +224,7 @@ def check_commit_sync(
                     f"声明 Feature: {feature}，但没改 {requirement.path}，Docs 也没写未改及原因",
                 )
         for requirement, anchor in anchors:
-            if requirement.path in changed or requirement_matches_feature(requirement, feature):
+            if requirement_matches_feature(requirement, feature):
                 continue
             for path in changed:
                 if not path_matches(anchor.path, path):
@@ -283,7 +235,7 @@ def check_commit_sync(
                     ALARM,
                     "文档",
                     f"提交 {commit.short}",
-                    f"改了 {path} 的相关代码，但 Feature 未包含“{requirement.title}”，{requirement.path} 也没改，可能漏了牵连或文档",
+                    f"改了 {path} 的相关代码，但 Feature 未包含“{requirement.title}”（{requirement.path}），可能漏了牵连",
                 )
 
 
@@ -292,7 +244,7 @@ def check_worktree_sync(
     anchors: list[tuple[Requirement, CodeAnchor]],
     collector: Collector,
 ) -> list[str]:
-    if not project.requirements or not project.is_git():
+    if not project.is_git():
         return []
     entries = status_entries(project.root)
     changed = [entry.path for entry in entries]
@@ -321,14 +273,13 @@ def check_undescribed(
     project: Project,
     history: list[Commit],
     worktree_changed: list[str],
-    anchors: list[tuple[Requirement, CodeAnchor]],
     collector: Collector,
 ) -> None:
-    if not project.requirements:
+    if not project.rules_text:
         return
     patterns = no_description_patterns(project)
 
-    def undescribed(paths: list[str]) -> list[str]:
+    def undescribed(paths: list[str], anchors: list[tuple[Requirement, CodeAnchor]]) -> list[str]:
         return sorted(
             {
                 path
@@ -340,7 +291,8 @@ def check_undescribed(
         )
 
     for commit in history:
-        paths = undescribed(changed_files(project.root, commit.hash))
+        anchors = [(requirement, anchor) for requirement in commit_requirements(project, commit) for anchor in requirement.code]
+        paths = undescribed(changed_files(project.root, commit.hash), anchors)
         if paths:
             sample = "、".join(paths[:3])
             collector.add(
@@ -349,7 +301,8 @@ def check_undescribed(
                 f"提交 {commit.short}",
                 f"改了 {len(paths)} 个没有需求描述的代码文件，例如 {sample}",
             )
-    paths = undescribed(worktree_changed)
+    anchors = [(requirement, anchor) for requirement in project.requirements for anchor in requirement.code]
+    paths = undescribed(worktree_changed, anchors)
     if paths:
         sample = "、".join(paths[:3])
         collector.add(
@@ -369,12 +322,7 @@ def integrated_commits(history: list[Commit]) -> list[Commit]:
 
 
 def check_commit_format(history: list[Commit], collector: Collector) -> None:
-    integrated = integrated_commits(history)
-    if not integrated:
-        if history:
-            collector.add(HINT, "提交", "最近提交", "最近提交没有使用 Hypo-Workflow 提交格式")
-        return
-    for commit in integrated:
+    for commit in history:
         missing = [field for field in FORMAT_FIELDS if not commit.trailer(field)]
         if missing:
             collector.add(ALARM, "提交", f"提交 {commit.short}", f"缺少 trailer：{', '.join(missing)}")
@@ -491,7 +439,7 @@ def check_board(project: Project, collector: Collector) -> None:
 
     text = path.read_text(encoding="utf-8")
     for number, line in enumerate(text.splitlines(), start=1):
-        if "已完成" in line:
+        if re.match(r"^\s*(?:#{1,6}\s+|[-*+]\s+)已完成(?:[:：\s]|$)", line):
             collector.add(HINT, "BOARD", f"BOARD.md:{number}", "出现“已完成”列表")
             break
     if board.line_count > 80:
@@ -515,13 +463,20 @@ def check_sensitive(project: Project, collector: Collector) -> None:
 
 
 def run_checks(project: Project, since: str | None, collector: Collector) -> None:
-    history = commits(project.root, since=since, limit=10) if project.is_git() else []
+    history = commits(project.root, limit=None) if project.is_git() else []
     integrated = integrated_commits(history)
+    if history and not integrated:
+        collector.add(HINT, "提交", "最近提交", "最近提交没有使用 Hypo-Workflow 提交格式")
+    if since:
+        selected = {commit.hash for commit in commits(project.root, since=since)}
+        integrated = [commit for commit in integrated if commit.hash in selected]
+    else:
+        integrated = integrated[:10]
     anchors = check_anchors(project, collector)
-    check_commit_sync(project, history, anchors, collector)
+    check_commit_sync(project, integrated, collector)
     changed = check_worktree_sync(project, anchors, collector)
-    check_undescribed(project, history, changed, anchors, collector)
-    check_commit_format(history, collector)
+    check_undescribed(project, integrated, changed, collector)
+    check_commit_format(integrated, collector)
     check_blacklist(project, integrated, collector)
     check_map(project, collector)
     check_readme(project, collector)
@@ -535,6 +490,9 @@ def run(project: Project, since: str | None = None, as_json: bool = False) -> in
         run_checks(project, since, collector)
     except GitError as error:
         print(f"git 读取失败：{error}")
+        return 2
+    except SyntaxError as error:
+        print(f"符号解析失败：{error.filename}:{error.lineno}: {error.msg}")
         return 2
 
     if as_json:

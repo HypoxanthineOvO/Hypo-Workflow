@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -11,9 +10,9 @@ from .sessions import (
     EPOCH,
     FINDERS,
     HOSTS,
-    HOST_ROOTS,
     Failure,
     Session,
+    ParseError,
     Skipped,
     Turn,
     clip,
@@ -80,14 +79,12 @@ def collect(
     target = normalize_cwd(str(root))
     results: list[Session | Failure | Skipped] = []
     for name in [host] if host else list(HOSTS):
-        finder = FINDERS.get(name)
-        if finder is None:
-            continue
+        finder = FINDERS[name]
         try:
             result = finder(home, target)
-        except Exception as error:
-            path = getattr(error, "path", None) or home / HOST_ROOTS.get(name, Path("."))
-            result = Failure(name, path, str(error), file_mtime(path))
+        except ParseError as error:
+            path = error.path
+            result = Failure(name, path, str(error), file_mtime(path) if path.exists() else None)
         if result is not None:
             results.append(result)
 
@@ -119,10 +116,7 @@ def collect(
 def display_time(value: str) -> str:
     if not value:
         return "未知"
-    try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        return value
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     return parsed.astimezone().strftime("%Y-%m-%d %H:%M")
 
 
@@ -178,9 +172,6 @@ def render(data: dict) -> None:
 
 def run(args: argparse.Namespace, home: Path | None = None, root: Path | None = None) -> int:
     host = getattr(args, "host", None)
-    if host and host not in FINDERS:
-        print(f"不支持的宿主：{host}（可选：{'、'.join(HOSTS)}）", file=sys.stderr)
-        return 2
     root = root or Project().root
     count = max(1, getattr(args, "turns", 6) or 6)
     data = collect(root, home=home, host=host, turns=count)

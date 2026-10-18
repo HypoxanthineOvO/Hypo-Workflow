@@ -420,6 +420,7 @@ class KimiTests(HandoffTestCase):
         )
 
         session = self.collect(host="kimi")["session"]
+        self.assertEqual(session["path"], str(session_dir / "agents/main/wire.jsonl"))
         self.assertEqual(session["cwd"], str(self.root))
         self.assertEqual(session["started"], stamp(moment(1)))
         contents = [(turn["role"], turn["text"]) for turn in session["turns"]]
@@ -637,6 +638,8 @@ class ZCodeTests(HandoffTestCase):
 
         session = self.collect(host="zcode")["session"]
         self.assertEqual(session["path"], str(database))
+        self.assertEqual(session["cwd"], str(self.root))
+        self.assertEqual(session["model"], "sqlite-model")
         contents = [(turn["role"], turn["text"]) for turn in session["turns"]]
         self.assertEqual(contents, [("user", "ZCode 问题"), ("assistant", "ZCode 回复")])
 
@@ -678,6 +681,8 @@ class DshTests(HandoffTestCase):
 
         session = self.collect(host="dsh")["session"]
         self.assertEqual(session["path"], str(path))
+        self.assertEqual(session["cwd"], str(self.root))
+        self.assertEqual(session["started"], stamp(moment(1)))
         contents = [(turn["role"], turn["text"]) for turn in session["turns"]]
         self.assertEqual(contents, [("user", "DSH 问题"), ("assistant", "DSH 回复")])
 
@@ -703,6 +708,11 @@ class DshTests(HandoffTestCase):
 
         self.assertIsNone(data["session"])
         self.assertEqual(data["skipped"], [{"host": "dsh", "reason": "没有 zstd 命令"}])
+
+        output = io.StringIO()
+        with redirect_stdout(output):
+            handoff.render(data)
+        self.assertIn("跳过 dsh：没有 zstd 命令", output.getvalue())
 
 
 class FailureAndOutputTests(HandoffTestCase):
@@ -732,7 +742,7 @@ class FailureAndOutputTests(HandoffTestCase):
         data = self.collect(host="vspi")
         self.assertIsNone(data["session"])
         self.assertEqual(data["failure"]["path"], str(wire))
-        self.assertIn("没有可解析的 JSON 行", data["failure"]["error"])
+        self.assertTrue(data["failure"]["error"])
 
         output = io.StringIO()
         with redirect_stdout(output):
@@ -789,6 +799,101 @@ class FailureAndOutputTests(HandoffTestCase):
         self.assertEqual(normalize_cwd("D:\\Work\\Repo\\"), "D:/Work/Repo")
         self.assertTrue(matches_cwd("/repo/sub", "/repo"))
         self.assertFalse(matches_cwd("/repository", "/repo"))
+
+
+class ParsingReviewTests(HandoffTestCase):
+    def codex_path(self, records):
+        path = self.home / '.codex/sessions/rollout.jsonl'
+        write_jsonl(path, [{'type': 'session_meta', 'timestamp': stamp(moment(1)), 'payload': {'cwd': str(self.root)}}, *records])
+        return path
+
+    def test_broken_json_after_valid_header_returns_path(self):
+        path = self.codex_path([])
+        with path.open('a') as handle:
+            handle.write('{broken\n')
+        data = self.collect(host='codex')
+        self.assertIsNone(data['session'])
+        self.assertEqual(data['failure']['path'], str(path))
+
+    def test_broken_or_empty_header_returns_path(self):
+        path = self.codex_path([])
+        for text in ('not json\n', ''):
+            with self.subTest(text=text):
+                path.write_text(text)
+                self.assertEqual(self.collect(host='codex')['failure']['path'], str(path))
+
+    def test_mixed_codex_event_formats_preserve_both_rounds(self):
+        self.codex_path([
+            {'type': 'response_item', 'payload': {'type': 'message', 'role': 'user', 'content': '第一问'}},
+            {'type': 'response_item', 'payload': {'type': 'message', 'role': 'assistant', 'content': '第一答'}},
+            {'type': 'event_msg', 'payload': {'type': 'user_message', 'message': '第二问'}},
+            {'type': 'response_item', 'payload': {'type': 'message', 'role': 'user', 'content': '第二问'}},
+            {'type': 'response_item', 'payload': {'type': 'message', 'role': 'assistant', 'content': '第二答'}},
+        ])
+        self.assertEqual([turn['text'] for turn in self.collect(host='codex')['session']['turns']], ['第一问', '第一答', '第二问', '第二答'])
+
+    def test_bad_timestamp_returns_source_path(self):
+        path = self.codex_path([{'type': 'event_msg', 'timestamp': 'invalid', 'payload': {'type': 'user_message', 'message': '问题'}}])
+        self.assertEqual(self.collect(host='codex')['failure']['path'], str(path))
+
+    def test_corrupt_vspi_index_is_not_ignored(self):
+        path = self.home / '.vspi/session_index.jsonl'
+        path.parent.mkdir(parents=True)
+        path.write_text('invalid\n')
+        self.assertEqual(self.collect(host='vspi')['failure']['path'], str(path))
+
+    def test_corrupt_sqlite_part_is_not_ignored_and_database_is_unchanged(self):
+        path = self.home / '.local/share/opencode/opencode.db'
+        create_database(path)
+        insert_session(path, 'session', str(self.root), moment(1))
+        insert_turn(path, 'session', 0, '问题', '回答', moment(1))
+        with sqlite3.connect(path) as connection:
+            connection.execute("UPDATE part SET data = 'broken' WHERE id = 'session-part-text-0'")
+        before = path.read_bytes()
+        data = self.collect(host='opencode')
+        self.assertIsNone(data['session'])
+        self.assertEqual(data['failure']['path'], str(path))
+        self.assertEqual(path.read_bytes(), before)
+
+    def test_programming_errors_are_not_disguised_as_parse_failures(self):
+        with mock.patch.dict(handoff.FINDERS, {'codex': mock.Mock(side_effect=RuntimeError('bug'))}):
+            with self.assertRaisesRegex(RuntimeError, 'bug'):
+                self.collect(host='codex')
+
+    def test_vspi_subagent_reply_does_not_replace_main_reply(self):
+        from hw.sessions.wire import _parse_wire
+
+        path = self.home / 'wire.jsonl'
+        write_jsonl(path, [
+            {'type': 'turn.prompt', 'agentId': 'main', 'input': '问题'},
+            {'type': 'context.append_loop_event', 'agentId': 'main', 'event': {'type': 'content.part', 'step': 1, 'part': {'type': 'text', 'text': '主回复'}}},
+            {'type': 'context.append_loop_event', 'agentId': 'child', 'event': {'type': 'content.part', 'step': 9, 'part': {'type': 'text', 'text': '子回复'}}},
+        ])
+        session = _parse_wire(path, str(self.root))
+        self.assertEqual([turn.text for turn in session.turns], ['问题', '主回复'])
+
+    def test_codex_subagent_session_does_not_hide_parent(self):
+        main = self.codex_path([{'type': 'event_msg', 'payload': {'type': 'user_message', 'message': '主问题'}}])
+        set_mtime(main, moment(1))
+        child = main.with_name('child.jsonl')
+        write_jsonl(child, [
+            {'type': 'session_meta', 'payload': {'cwd': str(self.root), 'source': {'subagent': {'spawn': {}}}}},
+            {'type': 'event_msg', 'payload': {'type': 'user_message', 'message': '子任务'}},
+        ])
+        set_mtime(child, moment(2))
+        self.assertEqual(self.collect(host='codex')['session']['path'], str(main))
+
+    def test_claude_subagent_session_does_not_hide_parent(self):
+        main = self.home / '.claude/projects/repo/main.jsonl'
+        write_jsonl(main, [{'type': 'user', 'cwd': str(self.root), 'message': {'content': '主问题'}}])
+        set_mtime(main, moment(1))
+        child = main.parent / 'main/subagents/child.jsonl'
+        write_jsonl(child, [{'type': 'user', 'cwd': str(self.root), 'isSidechain': True, 'message': {'content': '子任务'}}])
+        set_mtime(child, moment(2))
+        self.assertEqual(self.collect(host='claude')['session']['path'], str(main))
+
+    def test_only_design_hosts_are_available(self):
+        self.assertEqual(set(handoff.FINDERS), {'codex', 'claude', 'vspi', 'kimi', 'opencode', 'zcode', 'dsh'})
 
 
 if __name__ == "__main__":

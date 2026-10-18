@@ -8,7 +8,7 @@ from fnmatch import fnmatch
 from functools import cached_property
 from pathlib import Path, PurePosixPath
 
-from .git import GitError, git
+from .git import GitError, file_text, git, tracked_files
 
 SKIP_DIRS = {".git", "node_modules", ".venv", "venv", "__pycache__", "build", "dist"}
 ARCHIVE_DIRS = {"archive", "archived", ".pipeline", "归档", "旧记录"}
@@ -216,7 +216,12 @@ class Requirement:
 
     @property
     def names(self) -> set[str]:
-        return {self.path, f"{self.path[:-3]}", self.stem, self.filename, self.title} - {""}
+        names = {self.path, self.path[:-3], self.title}
+        if self.filename == "README.md":
+            names.add(PurePosixPath(self.path).parent.name)
+        else:
+            names.update((self.stem, self.filename))
+        return names - {""}
 
     @property
     def now(self) -> str:
@@ -231,7 +236,7 @@ class Requirement:
     def code(self) -> list[CodeAnchor]:
         anchors: list[CodeAnchor] = []
         for line in self.sections.get("代码", "").splitlines():
-            item = clean_item(line)
+            item = clean_item(line).replace("`", "")
             if not item or item.startswith(("（", "(", "|", "...", "…")):
                 continue
             if item in ("无", "（无）", "-", "——"):
@@ -289,8 +294,9 @@ def split_items(body: str) -> list[str]:
     return items
 
 
-def parse_requirement(root: Path, path: Path) -> Requirement:
-    text = path.read_text(encoding="utf-8")
+def parse_requirement(root: Path, path: Path, text: str | None = None) -> Requirement:
+    if text is None:
+        text = path.read_text(encoding="utf-8")
     return Requirement(
         path=relative(root, path),
         title=first_heading(text) or path.stem,
@@ -299,7 +305,7 @@ def parse_requirement(root: Path, path: Path) -> Requirement:
 
 
 def feature_tokens(value: str) -> list[str]:
-    return [token.strip() for token in re.split(r"[,，、;；/|]", value) if token.strip()]
+    return [token.strip().strip("`") for token in re.split(r"[,，、;；|]", value) if token.strip()]
 
 
 def requirement_matches_feature(requirement: Requirement, value: str) -> bool:
@@ -308,27 +314,29 @@ def requirement_matches_feature(requirement: Requirement, value: str) -> bool:
 
 
 def path_matches(anchor: str, path: str) -> bool:
-    anchor = anchor.strip().strip("`").lstrip("./")
-    path = path.strip().lstrip("./")
+    anchor = anchor.strip().strip("`").removeprefix("./")
+    path = path.removeprefix("./")
     if not anchor or not path:
         return False
     if any(char in anchor for char in "*?["):
-        return fnmatch(path, anchor) or fnmatch(PurePosixPath(path).name, anchor)
-    if anchor == path or path.endswith("/" + anchor):
-        return True
-    if "/" not in anchor:
-        return PurePosixPath(path).name == anchor
-    return False
+        return fnmatch(path, anchor)
+    return anchor == path
 
 
 class Project:
-    def __init__(self, root: Path | None = None):
+    def __init__(self, root: Path | None = None, rev: str | None = None):
         self.root = root or find_root() or Path.cwd().resolve()
+        self.rev = rev
+
+    def read_text(self, rel: str) -> str:
+        if self.rev is not None:
+            return file_text(self.root, self.rev, rel)
+        path = self.root / rel
+        return path.read_text(encoding="utf-8") if path.is_file() else ""
 
     @cached_property
     def rules_text(self) -> str:
-        path = self.root / "RULES.md"
-        return path.read_text(encoding="utf-8") if path.is_file() else ""
+        return self.read_text("RULES.md")
 
     @cached_property
     def document_map(self) -> list[MapEntry]:
@@ -349,6 +357,12 @@ class Project:
 
     @cached_property
     def markdown_files(self) -> list[Path]:
+        if self.rev is not None:
+            return [
+                self.root / path for path in tracked_files(self.root, self.rev)
+                if path.endswith(".md")
+                and not any(part in SKIP_DIRS | ARCHIVE_DIRS or part.startswith(".") for part in PurePosixPath(path).parts[:-1])
+            ]
         return list(iter_markdown(self.root))
 
     @cached_property
@@ -356,11 +370,14 @@ class Project:
         result: list[Requirement] = []
         for path in self.markdown_files:
             rel = relative(self.root, path)
-            in_map = any(rel == directory or rel.startswith(directory + "/") for directory in self.map_directories)
-            text = path.read_text(encoding="utf-8")
+            if self.partition_skipped(rel) or rel.startswith(("templates/", "skills/")):
+                continue
+            text = self.read_text(rel)
             named = PurePosixPath(rel).name
-            if in_map or (has_heading(text, "现在") and named not in WORKFLOW_FILES):
-                result.append(parse_requirement(self.root, path))
+            if named in WORKFLOW_FILES:
+                continue
+            if has_heading(text, "现在") or has_heading(text, "代码") or (named == "README.md" and "/" in rel and self.mapped(rel)):
+                result.append(parse_requirement(self.root, path, text))
         return result
 
     @cached_property

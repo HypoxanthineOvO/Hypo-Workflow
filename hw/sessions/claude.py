@@ -4,12 +4,10 @@ from datetime import datetime
 from pathlib import Path
 
 from . import (
-    Failure,
-    ParseError,
     Session,
     clean_text,
     file_mtime,
-    file_mtime_key,
+    reading,
     join_content,
     json_lines,
     matches_cwd,
@@ -19,26 +17,25 @@ from . import (
 )
 
 
-def find(home: Path, target: str) -> Session | Failure | None:
+def find(home: Path, target: str) -> Session | None:
     root = home / ".claude" / "projects"
     if not root.is_dir():
         return None
-    for path in sorted(root.rglob("*.jsonl"), key=file_mtime_key, reverse=True):
-        try:
-            cwd = _first_cwd(path)
-        except ParseError:
+    for path in sorted(root.rglob("*.jsonl"), key=file_mtime, reverse=True):
+        if "subagents" in path.relative_to(root).parts:
             continue
+        cwd = _first_cwd(path)
         if not cwd or not matches_cwd(cwd, target):
             continue
-        try:
+        with reading(path):
             return _parse(path, cwd)
-        except ParseError as error:
-            return Failure("claude", path, str(error), file_mtime(path))
     return None
 
 
 def _first_cwd(path: Path) -> str:
     for record in json_lines(path):
+        if record.get("isSidechain"):
+            continue
         cwd = record.get("cwd")
         if isinstance(cwd, str) and cwd:
             return cwd

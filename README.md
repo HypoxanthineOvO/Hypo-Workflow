@@ -16,8 +16,6 @@
 - 汇报只给文件路径和术语，用户看不到结论。
 - 按日期堆一堆报告，没人读，也说不清项目现在什么样。
 
-3.0 只做一件事：边用边改时，文档和代码一直对得上。
-
 ## 安装
 
 在仓库目录里：
@@ -26,15 +24,15 @@
 uv tool install .
 ```
 
-之后全局有 `hw` 命令。没装的机器也能在仓库目录直接跑：`python3 -m hw ...`。
+需要 Python 3.10+，运行时没有第三方依赖。安装后可用 `hw` 命令；也能在仓库目录直接跑 `python3 -m hw ...`。
 
 ## 接入一个项目
 
-把 `skills/init/` 装进你的 Agent 宿主，让它能读到 SKILL.md；或者直接对 Agent 说：
+保留这份仓库，将其中 `skills/init/` 装进你的 Agent 宿主；也可以让 Agent 直接读取仓库中 `skills/init/SKILL.md` 的绝对路径：
 
-> 用 Hypo-Workflow 接入这个项目，规则看 skills/init/SKILL.md。
+> 用 Hypo-Workflow 接入这个项目，接入说明在 /你的仓库路径/Hypo-Workflow/skills/init/SKILL.md。
 
-接入会做这些事：扫描项目；把旧记录整块归档；把现有项目规则整理进 RULES.md；根目录换成通用 AGENTS.md；按开发、研究、写作三种起步模板出文档地图；从代码建需求文件初稿；分工表留空问你。动手前会先把要改的文件列给你确认。
+接入会扫描项目，把旧记录整块归档，将现有项目规则整理进 RULES.md，安装通用 AGENTS.md，并从代码建立需求初稿。文档地图和分区规则会与你讨论，分工由你填写。
 
 ## 接入后项目里有什么
 
@@ -58,12 +56,4 @@ uv tool install .
 | `hw status` | STATUS 和 BOARD 摘要；等用户决定的事；未提交文件和 git status 是否一致 |
 | `hw log <功能>` | 列出动过这个功能的提交 |
 | `hw check` | 检查改了代码没改文档、提交格式、黑词、地图、README、BOARD、敏感文件 |
-| `hw handoff` | 找最近的会话，抽出用户的话和最后几轮汇报 |
-
-## 版本
-
-| 版本 | 时间 | 做什么 |
-| --- | --- | --- |
-| 1.x（v6–v12） | 2026-04 至 05 | 提示词与 Skill 驱动的计划流水线 |
-| 2.x（v13–v15） | 2026-05 至 08 | Node runtime、manifest、hash 校验、hooks 门禁 |
-| 3.0 | 2026-10 起 | 边用边改时，文档和代码一直对得上 |
+| `hw handoff` | 从 Codex、VSPi、OpenCode、Claude 找最近的会话，抽出用户的话和最后几轮汇报；解析失败时给出路径 |

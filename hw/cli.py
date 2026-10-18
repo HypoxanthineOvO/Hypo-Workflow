@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import sys
 
-from . import __version__, check, find, log, map as map_command, status
+from . import __version__, check, find, handoff, log, map as map_command, status
 from .git import GitError
 from .project import Project
 
@@ -33,7 +32,7 @@ def build_parser() -> argparse.ArgumentParser:
     check_parser.add_argument("--json", action="store_true")
 
     handoff_parser = subparsers.add_parser("handoff", help="找最近的会话记录")
-    handoff_parser.add_argument("--host", help="只看某个宿主")
+    handoff_parser.add_argument("--host", choices=handoff.HOSTS, help="只看某个宿主")
     handoff_parser.add_argument("--turns", type=int, default=6, help="显示最后几轮对话")
     handoff_parser.add_argument("--json", action="store_true")
     return parser
@@ -54,20 +53,11 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "check":
             return check.run(project, args.since, args.json)
         if args.command == "handoff":
-            return run_handoff(args)
+            return handoff.run(args)
     except GitError as error:
         print(f"git 读取失败：{error}", file=sys.stderr)
         return 2
     return 0
-
-
-def run_handoff(args: argparse.Namespace) -> int:
-    if importlib.util.find_spec("hw.handoff") is None:
-        print("handoff 未安装。", file=sys.stderr)
-        return 2
-    from .handoff import run
-
-    return run(args)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 import json
 import os
 import subprocess
@@ -194,13 +193,10 @@ class MapFindLogTests(RepoTestCase):
         self.assertEqual(data["commits"][0]["verified"], "无")
         self.assertEqual(self.json_output("log", "不存在", "--json")["commits"], [])
 
-    @unittest.skipIf(
-        importlib.util.find_spec("hw.handoff") is not None, "handoff 已安装"
-    )
-    def test_handoff_not_installed(self) -> None:
-        process = self.run_hw("handoff")
-        self.assertEqual(process.returncode, 2)
-        self.assertIn("未安装", process.stderr)
+    def test_handoff_command_is_installed(self) -> None:
+        process = self.run_hw("handoff", "--help")
+        self.assertEqual(process.returncode, 0, process.stderr)
+        self.assertIn("--host", process.stdout)
 
 
 class DocumentSyncTests(RepoTestCase):
@@ -277,7 +273,7 @@ class DocumentSyncTests(RepoTestCase):
             "# 合并\n\n## 现在\n合并。\n\n## 代码\n- web/src/sync.js: mergeChanges\n",
         )
         self.commit(
-            "界面同步：加入同步脚本\n\nFeature: 界面同步\n"
+            "界面同步：加入同步脚本\n\nFeature: 界面同步、合并\n"
             "Code: web/src/sync.js: mergeChanges, retryQueue\n"
             "Docs: docs/需求/界面同步.md, docs/需求/合并.md\nVerified: 无"
         )
@@ -306,7 +302,7 @@ class DocumentSyncTests(RepoTestCase):
             "# 合并线程\n\n## 现在\n合并线程。\n\n## 代码\n- src/worker.py: merge\n",
         )
         self.commit(
-            "工作线程：加入脚本\n\nFeature: 工作线程\n"
+            "工作线程：加入脚本\n\nFeature: 工作线程、合并线程\n"
             "Code: src/worker.py: merge, retry\n"
             "Docs: docs/需求/工作线程.md, docs/需求/合并线程.md\nVerified: 无"
         )
@@ -397,13 +393,13 @@ class CommitAndBlacklistTests(RepoTestCase):
         self.assertEqual(alarm_messages.count("B1"), 1)
         self.assertIn("E1", alarm_messages)
         self.assertIn("整段重写", hint_messages)
-        self.assertIn("C1", hint_messages)
+        self.assertIn("C1", alarm_messages)
 
-    def test_blacklist_milestone_without_context_is_hint(self) -> None:
+    def test_blacklist_milestone_without_context_is_quiet(self) -> None:
         self.write("STATUS.md", "# 进度\n\nM1 是芯片。\n")
         data, _ = self.check_json()
         self.assertFalse(any("C1" in issue["message"] for issue in self.alarms(data, "黑词")))
-        self.assertTrue(any("C1" in issue["message"] for issue in self.hints(data, "黑词")))
+        self.assertFalse(any("C1" in issue["message"] for issue in self.hints(data, "黑词")))
 
     def test_c5_c16_skip_commit_messages_and_restrict_to_titles(self) -> None:
         self.write("STATUS.md", "# 进度\n\n记录 20261011 与 abc1234。\n\n## 20261011 计划\n")
@@ -643,7 +639,7 @@ class IntegrationCutoffTests(unittest.TestCase):
         alarms = [issue for issue in data["alarms"] if issue["category"] == "提交"]
         self.assertEqual([issue["location"] for issue in alarms], [f"提交 {bad}"])
 
-    def test_no_requirement_files_skips_document_sync(self) -> None:
+    def test_no_requirement_files_still_reports_undescribed_code(self) -> None:
         self.write(
             "RULES.md",
             "# 规则\n\n## 文档地图\n\n"
@@ -660,7 +656,7 @@ class IntegrationCutoffTests(unittest.TestCase):
         )
         data, _ = self.run_check()
         self.assertEqual([issue for issue in data["alarms"] if issue["category"] == "文档"], [])
-        self.assertEqual([issue for issue in data["hints"] if issue["category"] == "文档"], [])
+        self.assertTrue(any("app.py" in issue["message"] for issue in data["hints"] if issue["category"] == "文档"))
 
 
 class EmptyRepositoryTests(unittest.TestCase):

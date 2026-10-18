@@ -12,7 +12,7 @@ class GitError(RuntimeError):
 
 def git(root: Path, *args: str) -> str:
     process = subprocess.run(
-        ["git", "-c", "core.quotepath=false", *args],
+        ["git", "--no-optional-locks", "-c", "core.quotepath=false", *args],
         cwd=root,
         capture_output=True,
         text=True,
@@ -105,8 +105,8 @@ def commits(root: Path, since: str | None = None, limit: int | None = 10) -> lis
 
 
 def changed_files(root: Path, rev: str) -> list[str]:
-    output = git(root, "show", "--name-only", "--format=", "--no-renames", rev)
-    return [line.strip() for line in output.splitlines() if line.strip()]
+    output = git(root, "show", "--name-only", "-z", "--format=", "--no-renames", rev)
+    return [path for path in output.split("\0") if path]
 
 
 @dataclass(frozen=True)
@@ -116,15 +116,16 @@ class StatusEntry:
 
 
 def status_entries(root: Path) -> list[StatusEntry]:
-    output = git(root, "status", "--porcelain=v1")
+    output = git(root, "status", "--porcelain=v1", "-z", "--untracked-files=all")
     entries: list[StatusEntry] = []
-    for line in output.splitlines():
-        if len(line) < 4:
-            continue
+    records = iter(output.rstrip("\0").split("\0")) if output else iter(())
+    for line in records:
         path = line[3:]
-        if " -> " in path:
-            path = path.split(" -> ", 1)[1]
         entries.append(StatusEntry(line[:2], path))
+        if "R" in line[:2] or "C" in line[:2]:
+            original = next(records)
+            if "R" in line[:2]:
+                entries.append(StatusEntry("D ", original))
     return entries
 
 
@@ -132,8 +133,9 @@ def status_paths(root: Path) -> list[str]:
     return list(dict.fromkeys(entry.path for entry in status_entries(root)))
 
 
-def tracked_files(root: Path) -> list[str]:
-    return [line for line in git(root, "ls-files").splitlines() if line]
+def tracked_files(root: Path, rev: str | None = None) -> list[str]:
+    args = ("ls-tree", "-r", "--name-only", "-z", rev) if rev else ("ls-files", "-z")
+    return [path for path in git(root, *args).split("\0") if path]
 
 
 def ignored_paths(root: Path, paths: list[str]) -> set[str]:
@@ -147,7 +149,7 @@ def ignored_paths(root: Path, paths: list[str]) -> set[str]:
         text=True,
     )
     if process.returncode not in (0, 1):
-        return set()
+        raise GitError(process.stderr.strip())
     return {path for path in process.stdout.split("\0") if path}
 
 
@@ -164,7 +166,7 @@ class ChangedLine:
 def diff_text(root: Path, rev: str | None, path: str) -> str:
     if rev:
         return git(root, "show", "-U0", "--format=", "--no-renames", rev, "--", path)
-    return git(root, "diff", "-U0", "HEAD", "--", path)
+    return git(root, "diff", "-U0", "--no-renames", "HEAD", "--", path)
 
 
 def parse_changed_lines(diff: str) -> list[ChangedLine]:
@@ -196,8 +198,12 @@ def changed_lines(root: Path, rev: str | None, path: str) -> list[ChangedLine]:
     return parse_changed_lines(diff_text(root, rev, path))
 
 
-def file_text(root: Path, rev: str, path: str) -> str:
-    try:
-        return git(root, "show", f"{rev}:{path}")
-    except GitError:
+def parent_revision(root: Path, rev: str) -> str | None:
+    revisions = git(root, "rev-list", "--parents", "-n", "1", rev).split()
+    return revisions[1] if len(revisions) > 1 else None
+
+
+def file_text(root: Path, rev: str | None, path: str) -> str:
+    if rev is None or not git(root, "ls-tree", rev, "--", path):
         return ""
+    return git(root, "show", f"{rev}:{path}")
