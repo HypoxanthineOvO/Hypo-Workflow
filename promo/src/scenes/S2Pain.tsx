@@ -21,24 +21,24 @@ const Caption: React.FC<{ f: number; at: number; out: number; children: React.Re
 );
 
 const APPENDS = [
-  "2026-10-14 最新（覆盖上条）：同步改为逐操作",
-  "2026-10-13 最新裁决：同步恢复整页快照",
-  "2026-10-12 补充（以本条为准）：冲突时整页重试",
-  "2026-10-12 更正：上条作废，见 10-11",
-  "2026-10-11 最新（覆盖 10-09）：前台 5 秒检查",
-  "2026-10-10 追加：后台检查改为 30 秒",
-  "2026-10-09 最新（覆盖上条…）：保留草稿",
-  "2026-10-08 补充：同上，但不含详情卡",
-  "2026-10-07 最新：恢复 localStorage 快照",
-  "2026-10-06 追加（与 10-03 冲突时以此为准）",
-  "2026-10-05 最新（覆盖上条…）",
   "2026-10-04 最新（覆盖上条…）",
+  "2026-10-05 最新（覆盖上条…）",
+  "2026-10-06 追加（与 10-03 冲突时以此为准）",
+  "2026-10-07 最新：恢复 localStorage 快照",
+  "2026-10-08 补充：同上，但不含详情卡",
+  "2026-10-09 最新（覆盖上条…）：保留草稿",
+  "2026-10-10 追加：后台检查改为 30 秒",
+  "2026-10-11 最新（覆盖 10-09）：前台 5 秒检查",
+  "2026-10-12 更正：上条作废，见 10-11",
+  "2026-10-12 补充（以本条为准）：冲突时整页重试",
+  "2026-10-13 最新裁决：同步恢复整页快照",
+  "2026-10-14 最新（覆盖上条…）：同步改为逐操作",
 ];
 
 /** beat 1: append-only rules */
 const Appends: React.FC<{ f: number }> = ({ f }) => {
   const shown = Math.min(APPENDS.length, Math.floor(lin(f, 4, 60) * APPENDS.length) + 1);
-  const lines = Math.round(mix(0, 166, lin(f, 4, 66)));
+  const lines = Math.round(mix(0, 166, lin(f, 4, 54)));
   return (
     <AbsoluteFill style={{ opacity: 1 - lin(f, c1 - 6, c1) }}>
       <div style={{ position: "absolute", left: 420, top: 150, width: 1080 }}>
@@ -137,14 +137,8 @@ const FakeDone: React.FC<{ f: number }> = ({ f }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontFamily: F.mono,
-            fontSize: 20,
-            color: C.fg4,
           }}
-        >
-          {/* deliberately empty page */}
-          <span style={{ opacity: seg(g, 44, 54) }}>空白</span>
-        </div>
+        />
       </div>
       <Caption f={g} at={34} out={75}>Agent 说“做完了”。打开页面，什么都没有。</Caption>
     </AbsoluteFill>

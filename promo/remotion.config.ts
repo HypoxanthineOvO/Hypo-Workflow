@@ -5,7 +5,7 @@ import { homedir } from "node:os";
 Config.setVideoImageFormat("png");
 Config.setOverwriteOutput(true);
 Config.setChromiumOpenGlRenderer("angle");
-Config.setConcurrency(4);
+Config.setConcurrency(16);
 
 // Prefer an existing Chromium (Playwright) over downloading headless shell.
 const candidates = [

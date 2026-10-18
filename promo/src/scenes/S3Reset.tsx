@@ -28,8 +28,8 @@ export const S3: React.FC = () => {
           position: "absolute",
           left: 760,
           right: 760,
-          bottom: 300,
-          height: 420,
+          top: 450,
+          height: 330,
           display: "flex",
           flexDirection: "column-reverse",
           gap: 5,
@@ -38,15 +38,15 @@ export const S3: React.FC = () => {
           transformOrigin: "50% 100%",
         }}
       >
-        {Array.from({ length: 40 }).map((_, i) => {
-          const on = i < grow * 40;
+        {Array.from({ length: 32 }).map((_, i) => {
+          const on = i < grow * 32;
           return (
             <div
               key={i}
               style={{
                 height: 5,
                 width: `${40 + ((i * 37) % 60)}%`,
-                background: on ? (i > 32 ? C.fg2 : C.fg4) : "transparent",
+                background: on ? (i > 25 ? C.fg2 : C.fg4) : "transparent",
                 borderRadius: 2,
               }}
             />
@@ -58,7 +58,7 @@ export const S3: React.FC = () => {
         <div
           style={{
             position: "absolute",
-            top: 200,
+            top: 170,
             fontFamily: F.mono,
             fontSize: 26,
             color: C.fg3,
@@ -78,7 +78,7 @@ export const S3: React.FC = () => {
             opacity: 1 - collapse,
             filter: `blur(${collapse * 10}px)`,
             position: "absolute",
-            top: 250,
+            top: 215,
           }}
         >
           {VERS[vi]}
@@ -121,7 +121,7 @@ export const S3: React.FC = () => {
             fontFamily: F.en,
             fontWeight: 200,
             fontSize: 300,
-            letterSpacing: "-0.04em",
+            letterSpacing: "-0.01em",
             color: C.fg,
             opacity: three,
             filter: `blur(${mix(16, 0, three)}px)`,

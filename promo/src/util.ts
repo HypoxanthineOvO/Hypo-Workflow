@@ -3,7 +3,7 @@ import T from "./timeline.json";
 
 export const TL = T;
 export const EV = T.ev;
-export const S = T.scenes as Record<string, [number, number]>;
+export const S = T.scenes as unknown as Record<string, [number, number]>;
 /** event frame relative to a scene's start */
 export const rel = (scene: string, abs: number) => abs - S[scene][0];
 

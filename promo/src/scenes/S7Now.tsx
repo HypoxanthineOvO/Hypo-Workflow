@@ -113,11 +113,11 @@ export const S8: React.FC = () => {
                 alignItems: "baseline",
                 gap: 36,
                 height: 82,
-                opacity: p * mix(1, 0.45, s),
+                opacity: p * mix(1, 0.8, s),
               }}
             >
               <div style={{ position: "relative", display: "inline-block" }}>
-                <span style={{ fontFamily: F.cn, fontSize: 40, color: s > 0.5 ? C.fg3 : C.fg }}>{w.t}</span>
+                <span style={{ fontFamily: F.cn, fontSize: 40, color: s > 0.5 ? C.fg2 : C.fg }}>{w.t}</span>
                 <div
                   style={{
                     position: "absolute",

@@ -79,11 +79,11 @@ export const S5: React.FC = () => {
       {f < b2 && (
         <div style={{ textAlign: "center", position: "absolute", opacity: 1 - lin(f, b2 - 10, b2) }}>
           <div style={{ position: "relative", display: "inline-block" }}>
-            <div style={{ display: "flex", gap: 22, fontFamily: F.mono, fontSize: 30, color: C.fg3 }}>
+            <div style={{ display: "flex", gap: 22, fontFamily: F.mono, fontSize: 30, color: C.fg2 }}>
               {CHAIN.map((c, i) => (
                 <React.Fragment key={c}>
                   {i > 0 && <span style={{ color: C.fg4, opacity: seg(f, i * 2, i * 2 + 10) }}>→</span>}
-                  <span style={{ opacity: seg(f, i * 2, i * 2 + 10) * mix(1, 0.4, strike) }}>{c}</span>
+                  <span style={{ opacity: seg(f, i * 2, i * 2 + 10) * mix(1, 0.6, strike) }}>{c}</span>
                 </React.Fragment>
               ))}
             </div>
