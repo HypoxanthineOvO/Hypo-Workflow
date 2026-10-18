@@ -25,7 +25,7 @@ description: 把现有项目接入 Hypo-Workflow，规范项目文档。用户�
 
 - 读现有 AGENTS.md、CLAUDE.md，把仍然成立的项目规则搬进 RULES.md：文档地图、分工、汇报格式、禁区、构建与测试。
 - 拿不准是否仍成立的，列出来问用户。
-- 根目录 AGENTS.md 换成这份技能所在仓库的 `templates/AGENTS.md`，整份照搬。模板路径相对本文件为 `../../templates/`。
+- 根目录 AGENTS.md 换成本技能目录下 `templates/AGENTS.md`，整份照搬。
 
 ## 文档地图和分区规则
 

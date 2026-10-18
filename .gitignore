@@ -6,3 +6,6 @@ dist/
 promo/node_modules/
 promo/out/
 promo/public/music.wav
+
+.worktrees/
+research/
