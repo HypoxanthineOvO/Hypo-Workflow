@@ -1,0 +1,8 @@
+[
+  {
+    "name": "hypo-workflow-progress",
+    "command": "node hooks/claude-hook.mjs ProgressMonitor",
+    "description": "Hypo-Workflow progress status notifications",
+    "when": "on-skill-invoke:hw-status"
+  }
+]

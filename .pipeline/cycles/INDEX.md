@@ -1,6 +1,6 @@
 ---
 kind: cycle-index
-status: idle
+status: active
 ---
 
 # Cycle 索引
@@ -9,7 +9,7 @@ status: idle
 
 | Cycle | 目的 | 状态 | 当前项 | 下一步 |
 | --- | --- | --- | --- | --- |
-无。
+| [C028-stop-that-shit-skill-assessment](C028-stop-that-shit-skill-assessment/PLAN.md) | 评估 Stop That Shit Skill 的机制、证据与适配价值 | active | Discussion | 完成源文件阅读并介绍内容与结构 |
 
 ## Closed Cycles
 

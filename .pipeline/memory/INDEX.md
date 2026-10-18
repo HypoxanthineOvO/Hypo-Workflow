@@ -23,6 +23,7 @@ status: active
 - [Plan 讨论范围门](global/rules/requirement-plan-discussion-scope-gate.md)
 - [记录用中文](global/rules/requirement-records-in-chinese.md)
 - [语义优先的记录与进度](global/rules/requirement-semantic-first-recording-and-progress.md)
+- [Stop That Shit 任务边界](global/rules/requirement-stop-that-shit-task-boundary.md)
 
 ## 指导级（应该）
 
