@@ -250,12 +250,16 @@ class DocumentSyncTests(RepoTestCase):
         self.assertTrue(any("找不到符号：nosuch" in message for message in messages))
 
     def test_anchor_accepts_method_names_and_notes(self) -> None:
-        self.write("web/recorder.ts", "export class Recorder {\n  start() {\n    return 1\n  }\n}\n")
+        self.write(
+            "web/recorder.ts",
+            "export class Recorder {\n  start() {\n    return 1\n  }\n\n"
+            "  action(\n    id: string,\n    body: { action?: string; t?: number },\n  ) {\n    return 2\n  }\n}\n",
+        )
         self.write(
             "docs/需求/同步.md",
             "# 同步\n\n## 现在\n逐操作同步。\n\n## 代码\n"
             "- `src/sync.py: retry`（重试分支）\n"
-            "- `web/recorder.ts: Recorder.start`\n",
+            "- `web/recorder.ts: Recorder.start, Recorder.action`\n",
         )
         data, _ = self.check_json()
         messages = [issue["message"] for issue in self.alarms(data, "文档")]

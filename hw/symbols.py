@@ -39,7 +39,7 @@ LITERALS = re.compile(r'//[^\n]*|/\*[\s\S]*?\*/|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\
 DECLARATION = re.compile(
     r'\b(?:function\s*\*?|class|interface|struct|enum|fn|func(?:\s+\([^\n]*?\))?)\s+(?P<declared>\w+)'
     r'|\b(?:const|let|var)\s+(?P<assigned>\w+)\s*(?::[^=;\n]+)?='
-    r'|^[ \t]*(?:(?:[\w:*&<>]+)[ \t]+)*(?P<method>\w+)\s*\([^;{}]*\)[^;{}\n]*\{',
+    r'|^[ \t]*(?:(?:[\w:*&<>]+)[ \t]+)*(?P<method>\w+)\s*\((?:[^;{}()]|\{[^{}]*\}|\([^()]*\))*\)[^;{}\n]*\{',
     re.M,
 )
 CONTROL_WORDS = {'if', 'else', 'for', 'while', 'switch', 'catch', 'return', 'with'}
