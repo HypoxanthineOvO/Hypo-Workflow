@@ -106,7 +106,7 @@ uv tool install git+https://github.com/HypoxanthineOvO/Hypo-Workflow
 
 需要 Python 3.10+，零依赖。没装 uv 的话：`pip install git+https://github.com/HypoxanthineOvO/Hypo-Workflow`。
 
-接入一个项目：把 [`skills/init/`](skills/init/) 整个目录复制到你的 Agent 宿主的 skills 目录（例如 `~/.claude/skills/init`、`~/.codex/skills/init`），然后在项目里说：
+接入一个项目：把 [`skills/init/`](skills/init/) 整个目录复制到你的 Agent 宿主的 skills 目录，例如 `~/.claude/skills/hypo-workflow-init`、`~/.codex/skills/hypo-workflow-init`、`~/.kimi-code/skills/hypo-workflow-init`，然后在项目里说：
 
 > 用 Hypo-Workflow 接入这个项目。
 

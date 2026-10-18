@@ -1,5 +1,5 @@
 ---
-name: init
+name: hypo-workflow-init
 description: 把现有项目接入 Hypo-Workflow，规范项目文档。用户说“用 Hypo-Workflow 接入这个项目”“规范一下这个项目的文档”“给项目接入工作流”时使用。
 ---
 
