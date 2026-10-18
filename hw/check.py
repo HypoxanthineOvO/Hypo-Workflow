@@ -446,20 +446,25 @@ def check_board(project: Project, collector: Collector) -> None:
         collector.add(HINT, "BOARD", "BOARD.md", f"超过 80 行（{board.line_count} 行）")
 
 
+SECRET_DATA_SUFFIXES = ("", ".json", ".yaml", ".yml", ".toml", ".txt", ".ini", ".cfg", ".conf", ".key")
+
+
+def is_sensitive(name: str) -> bool:
+    lower = name.lower()
+    if lower.startswith(".env"):
+        return lower not in (".env.example", ".env.sample", ".env.template")
+    if lower.endswith(".pem") or (lower.startswith("id_rsa") and not lower.endswith(".pub")):
+        return True
+    stem, suffix = PurePosixPath(lower).stem, PurePosixPath(lower).suffix
+    return ("credentials" in stem or "secret" in stem) and suffix in SECRET_DATA_SUFFIXES
+
+
 def check_sensitive(project: Project, collector: Collector) -> None:
     if not project.is_git():
         return
     for path in tracked_files(project.root):
-        base = PurePosixPath(path).name
-        lower = base.lower()
-        if (
-            (lower.startswith(".env") and lower not in (".env.example", ".env.sample", ".env.template"))
-            or lower.endswith(".pem")
-            or (lower.startswith("id_rsa") and not lower.endswith(".pub"))
-            or "credentials" in lower
-            or "secret" in lower
-        ):
-            collector.add(ALARM, "敏感", base, "敏感文件被 git 跟踪")
+        if is_sensitive(PurePosixPath(path).name):
+            collector.add(ALARM, "敏感", path, "敏感文件被 git 跟踪")
 
 
 def run_checks(project: Project, since: str | None, collector: Collector) -> None:

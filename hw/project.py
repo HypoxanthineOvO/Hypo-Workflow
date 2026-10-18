@@ -241,6 +241,7 @@ class Requirement:
                 continue
             if item in ("无", "（无）", "-", "——"):
                 continue
+            item = re.sub(r"\s*[（(][^）)]*[）)]\s*$", "", item)
             path, _, rest = item.partition(":")
             if "：" in path:
                 path, _, rest = item.partition("：")

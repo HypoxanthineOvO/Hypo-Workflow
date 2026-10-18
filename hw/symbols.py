@@ -68,7 +68,19 @@ def brace_definitions(text: str) -> list[Definition]:
                 continue
             end = source.count('\n', 0, ends[opening]) + 1
         definitions.append(Definition(name, start, end))
-    return definitions
+    return qualify(definitions)
+
+
+def qualify(definitions: list[Definition]) -> list[Definition]:
+    qualified: list[Definition] = []
+    for item in definitions:
+        parents = [
+            outer.name for outer in definitions
+            if outer is not item and outer.start < item.start and item.end <= outer.end
+        ]
+        name = '.'.join([*parents, item.name]) if parents else item.name
+        qualified.append(Definition(name, item.start, item.end))
+    return qualified
 
 
 def definitions(path: str, text: str) -> list[Definition]:

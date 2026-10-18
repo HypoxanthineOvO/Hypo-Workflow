@@ -2,3 +2,6 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+
+promo/node_modules/
+promo/out/

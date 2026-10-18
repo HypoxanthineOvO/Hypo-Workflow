@@ -249,6 +249,18 @@ class DocumentSyncTests(RepoTestCase):
         self.assertTrue(any("代码锚点不存在：src/missing.py" in message for message in messages))
         self.assertTrue(any("找不到符号：nosuch" in message for message in messages))
 
+    def test_anchor_accepts_method_names_and_notes(self) -> None:
+        self.write("web/recorder.ts", "export class Recorder {\n  start() {\n    return 1\n  }\n}\n")
+        self.write(
+            "docs/需求/同步.md",
+            "# 同步\n\n## 现在\n逐操作同步。\n\n## 代码\n"
+            "- `src/sync.py: retry`（重试分支）\n"
+            "- `web/recorder.ts: Recorder.start`\n",
+        )
+        data, _ = self.check_json()
+        messages = [issue["message"] for issue in self.alarms(data, "文档")]
+        self.assertFalse(any("代码锚点" in message for message in messages), messages)
+
     def test_uncommitted_change_to_anchored_file_alarms(self) -> None:
         self.write("src/sync.py", "def retry():  # working tree\n    return 1\n")
         data, _ = self.check_json()
@@ -518,13 +530,19 @@ class BoardAndSensitiveTests(RepoTestCase):
         self.write("id_rsa", "key\n")
         self.write("id_rsa.pub", "public\n")
         self.write("client_secret.txt", "secret\n")
+        self.write("config/credentials.json", "{}\n")
+        self.write("server/secrets.ts", "export const load = () => 1\n")
+        self.write("tests/secrets.test.mjs", "test\n")
         self.commit(
             "添加环境文件\n\nFeature: 无\nCode: 无\n"
             "Docs: 未改，只加测试文件\nVerified: 无"
         )
         data, _ = self.check_json()
         locations = {issue["location"] for issue in self.alarms(data, "敏感")}
-        self.assertEqual(locations, {".env", "server.pem", "id_rsa", "client_secret.txt"})
+        self.assertEqual(
+            locations,
+            {".env", "server.pem", "id_rsa", "client_secret.txt", "config/credentials.json"},
+        )
 
     def test_status_reports_uncommitted_mismatch(self) -> None:
         self.write(

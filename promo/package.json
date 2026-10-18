@@ -1,0 +1,21 @@
+{
+  "name": "hypo-workflow-3-film",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "music": "python3 scripts/make-music.py",
+    "render": "remotion render Film out/hypo-workflow-3.mp4 --codec=h264 --crf=18 --audio-codec=aac --audio-bitrate=192k",
+    "contact": "bash scripts/contact-sheet.sh",
+    "studio": "remotion studio --port=3310 --host=127.0.0.1"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.534",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "remotion": "4.0.534"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.0",
+    "typescript": "^5.8.0"
+  }
+}
