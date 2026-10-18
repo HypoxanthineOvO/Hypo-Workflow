@@ -1,20 +1,18 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { C, F } from "../theme";
-import { seg, lin, mix, EV, rel, typed } from "../util";
-import { Mono } from "../components";
+import { seg, lin, mix, EV, rel } from "../util";
 
-const LOGO = rel("s12", EV.s12Logo);
-const LINE = rel("s12", EV.s12Line);
-const CMD = rel("s12", EV.s12Cmd);
+const LOGO = rel("s15", EV.logo);
+const LINE = rel("s15", EV.slogan);
+const CMD = LINE + 30;
 
 export const S12: React.FC = () => {
   const f = useCurrentFrame();
   const lg = seg(f, LOGO, LOGO + 30);
   const ln = seg(f, LINE, LINE + 24);
   const bar = seg(f, LOGO - 14, LOGO + 16);
-  const end = 1 - lin(f, 176, 187);
-  const cmd = "uv tool install hypo-workflow";
+  const end = 1 - lin(f, 136, 150);
   return (
     <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", opacity: end }}>
       <div style={{ textAlign: "center", transform: "translateY(-30px)" }}>
@@ -73,10 +71,9 @@ export const S12: React.FC = () => {
         </div>
       </div>
       <div style={{ position: "absolute", bottom: 150, left: 0, right: 0, textAlign: "center" }}>
-        <Mono style={{ fontSize: 26, color: C.fg3, opacity: seg(f, CMD - 4, CMD + 6) }}>
-          <span style={{ color: C.mint }}>$</span> <span style={{ color: C.fg2 }}>{typed(cmd, f, CMD, 1.1)}</span>
-          <span style={{ opacity: Math.floor(f / 9) % 2 ? 0 : 1, color: C.fg2 }}>▍</span>
-        </Mono>
+        <span style={{ fontFamily: F.cn, fontSize: 24, color: C.fg3, letterSpacing: "0.12em", opacity: seg(f, CMD, CMD + 14) }}>
+          给用 Agent 做项目的人
+        </span>
       </div>
     </AbsoluteFill>
   );

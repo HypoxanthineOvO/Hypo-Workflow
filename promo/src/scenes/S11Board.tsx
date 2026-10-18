@@ -4,9 +4,9 @@ import { C, F } from "../theme";
 import { seg, lin, mix, EV, rel } from "../util";
 import { Header, Mono, Panel } from "../components";
 
-const DRAIN = rel("s11", EV.s11Drain);
-const TAKE = rel("s11", EV.s11Takeover);
-const CHIPS = EV.s11Chips.map((x) => rel("s11", x));
+const DRAIN = rel("s13", EV.s13Drain);
+const TAKE = rel("s13", EV.s13Takeover);
+const CHIPS = EV.s13Chips.map((x) => rel("s13", x));
 const HOSTS = ["Codex", "Claude", "VSPi", "Kimi Code", "OpenCode", "ZCode", "DSH"];
 
 const Row: React.FC<{ k: string; v: React.ReactNode; hi?: number }> = ({ k, v, hi = 0 }) => (
@@ -57,17 +57,18 @@ export const S11: React.FC = () => {
   const drained = f >= DRAIN + 6;
   const read = seg(f, TAKE, TAKE + 16);
   const hi = seg(f, TAKE + 14, TAKE + 24);
-  const b2 = rel("s11", EV.s11Chips[0]) - 14;
+  const b2 = rel("s13", EV.s13Chips[0]) - 14;
   const phase2 = seg(f, b2, b2 + 16);
   return (
-    <AbsoluteFill style={{ opacity: 1 - lin(f, 178, 188) }}>
+    <AbsoluteFill style={{ opacity: 1 - lin(f, 213, 225) }}>
       <Header
         f={f}
         at={2}
         out={b2}
-        idx="06"
-        title="BOARD 即交接"
-        sub="不写交接文档。额度用完，下一个 Agent 读 BOARD 接着干。"
+        idx="05"
+        usual="断了就写一大堆交接总结"
+        title="BOARD 本来就是交接"
+        sub="每个 Agent 随手更新自己那一道。断了，下一个读完接着干。"
       />
       <div style={{ opacity: 1 - phase2 }}>
         <Agent

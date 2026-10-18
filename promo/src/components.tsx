@@ -61,49 +61,137 @@ export const Header: React.FC<{
   at: number;
   out: number;
   idx: string;
+  usual: React.ReactNode;
   title: React.ReactNode;
   sub: React.ReactNode;
   x?: number;
   y?: number;
-  w?: number;
-}> = ({ f, at, out, idx, title, sub, x = 160, y = 120, w }) => (
-  <div style={{ position: "absolute", left: x, top: y, width: w }}>
-    <Reveal f={f} at={at} out={out} y={10} blur={4}>
-      <Mono style={{ fontSize: 20, color: C.mint, letterSpacing: "0.18em" }}>
-        {idx}
-        <span style={{ color: C.fg3 }}> / 06</span>
+}> = ({ f, at, out, idx, usual, title, sub, x = 160, y = 96 }) => {
+  const strike = seg(f, at + 14, at + 26);
+  return (
+    <div style={{ position: "absolute", left: x, top: y }}>
+      <Reveal f={f} at={at} out={out} y={8} blur={4}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 22 }}>
+          <Mono style={{ fontSize: 20, color: C.mint, letterSpacing: "0.18em" }}>
+            {idx}
+            <span style={{ color: C.fg3 }}> / 06</span>
+          </Mono>
+          <span style={{ fontFamily: F.cn, fontSize: 20, color: C.fg3, letterSpacing: "0.1em" }}>常见做法</span>
+          <span style={{ position: "relative", fontFamily: F.cn, fontSize: 26, color: C.fg3 }}>
+            {usual}
+            <span
+              style={{
+                position: "absolute",
+                left: -4,
+                top: "54%",
+                height: 2,
+                width: `calc(${strike * 100}% + 8px)`,
+                background: C.fg3,
+              }}
+            />
+          </span>
+        </div>
+      </Reveal>
+      <Reveal f={f} at={at + 20} out={out}>
+        <div
+          style={{
+            fontFamily: F.cn,
+            fontSize: 64,
+            fontWeight: 600,
+            color: C.fg,
+            letterSpacing: "-0.01em",
+            marginTop: 22,
+            lineHeight: 1.1,
+          }}
+        >
+          {title}
+        </div>
+      </Reveal>
+      <Reveal f={f} at={at + 26} out={out}>
+        <div style={{ fontFamily: F.cn, fontSize: 30, fontWeight: 400, color: C.fg2, marginTop: 16 }}>{sub}</div>
+      </Reveal>
+    </div>
+  );
+};
+
+/** two-line subtitle, bottom-centre */
+export const Caption: React.FC<{
+  f: number;
+  at: number;
+  out: number;
+  main: React.ReactNode;
+  sub?: React.ReactNode;
+  bottom?: number;
+}> = ({ f, at, out, main, sub, bottom = 130 }) => (
+  <div style={{ position: "absolute", left: 0, right: 0, bottom, textAlign: "center" }}>
+    <Reveal f={f} at={at} out={out} y={12}>
+      <div style={{ fontFamily: F.cn, fontSize: 48, fontWeight: 600, color: C.fg }}>{main}</div>
+    </Reveal>
+    {sub && (
+      <Reveal f={f} at={at + 18} out={out} y={10}>
+        <div style={{ fontFamily: F.cn, fontSize: 30, fontWeight: 400, color: C.fg2, marginTop: 18 }}>{sub}</div>
+      </Reveal>
+    )}
+  </div>
+);
+
+/** small pain-index tag top-left */
+export const PainTag: React.FC<{ f: number; n: number; out: number }> = ({ f, n, out }) => (
+  <div style={{ position: "absolute", left: 160, top: 120 }}>
+    <Reveal f={f} at={0} out={out} y={6} blur={3}>
+      <Mono style={{ fontSize: 20, color: C.red, letterSpacing: "0.18em" }}>
+        0{n}
+        <span style={{ color: C.fg3 }}> / 05 · 你一定遇到过</span>
       </Mono>
-    </Reveal>
-    <Reveal f={f} at={at + 4} out={out}>
-      <div
-        style={{
-          fontFamily: F.cn,
-          fontSize: 64,
-          fontWeight: 600,
-          color: C.fg,
-          letterSpacing: "-0.01em",
-          marginTop: 18,
-          lineHeight: 1.1,
-        }}
-      >
-        {title}
-      </div>
-    </Reveal>
-    <Reveal f={f} at={at + 9} out={out}>
-      <div
-        style={{
-          fontFamily: F.cn,
-          fontSize: 30,
-          fontWeight: 400,
-          color: C.fg2,
-          marginTop: 16,
-        }}
-      >
-        {sub}
-      </div>
     </Reveal>
   </div>
 );
+
+/** over-cautious model output bubble */
+export const GptBubble: React.FC<{
+  f: number;
+  at: number;
+  out?: number;
+  x: number;
+  y: number;
+  w?: number;
+  rot?: number;
+  scale?: number;
+  children: React.ReactNode;
+}> = ({ f, at, out, x, y, w = 760, rot = 0, scale = 1, children }) => {
+  const p = seg(f, at, at + 9);
+  const o = out === undefined ? 1 : 1 - lin(f, out - 8, out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        width: w,
+        opacity: p * o,
+        transform: `translateY(${mix(14, 0, p)}px) scale(${mix(0.96, 1, p) * scale}) rotate(${rot}deg)`,
+        transformOrigin: "0 0",
+      }}
+    >
+      <Mono style={{ fontSize: 17, color: C.fg3, letterSpacing: "0.1em" }}>某 GPT · assistant</Mono>
+      <div
+        style={{
+          marginTop: 10,
+          padding: "22px 28px",
+          border: `1px solid ${C.line}`,
+          borderRadius: 14,
+          background: "rgba(255,255,255,0.035)",
+          fontFamily: F.cn,
+          fontSize: 30,
+          lineHeight: 1.55,
+          color: C.fg,
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
 
 export const Panel: React.FC<{
   x: number;

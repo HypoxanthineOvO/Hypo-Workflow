@@ -4,7 +4,7 @@ import { C, F } from "../theme";
 import { seg, lin, mix, EV, rel, typed } from "../util";
 import { Header, Mono, Panel } from "../components";
 
-const TR = EV.s9Trailers.map((x) => rel("s9", x));
+const TR = EV.s12Trailers.map((x) => rel("s12", x));
 const TRAILERS = [
   { k: "Feature", v: "同步", note: "动了哪个功能" },
   { k: "Code", v: "web/src/sync.js: retryQueue, mergeChanges", note: "精确到函数" },
@@ -17,7 +17,7 @@ export const S9: React.FC = () => {
   const subject = "同步：冲突时只重试相关操作";
   return (
     <AbsoluteFill style={{ opacity: 1 - lin(f, 140, 150) }}>
-      <Header f={f} at={2} out={400} idx="04" title="commit 即记录" sub="不写流水文件。每次提交，带上四个字段。" />
+      <Header f={f} at={2} out={400} idx="04" usual="另写变更日志、进度报告" title="commit 即记录" sub="每次提交带四个字段：哪个功能、哪段代码、哪份文档、在哪亲眼看到。" />
       <Panel
         x={160}
         y={420}

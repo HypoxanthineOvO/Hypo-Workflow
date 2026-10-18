@@ -4,11 +4,11 @@ import { C, F } from "../theme";
 import { seg, segIO, lin, mix, EV, rel, typed } from "../util";
 import { Header, Mono, Panel } from "../components";
 
-const T0 = rel("s10", EV.s10TypeStart);
-const ENTER = rel("s10", EV.s10Enter);
-const HIT = rel("s10", EV.hit);
-const FIX = rel("s10", EV.s10Fix);
-const RES = rel("s10", EV.s10Resolve);
+const T0 = rel("s14", EV.typeStart);
+const ENTER = rel("s14", EV.enter);
+const HIT = rel("s14", EV.hit);
+const FIX = rel("s14", EV.fix);
+const RES = rel("s14", EV.resolve);
 const RETYPE = RES - 22;
 
 const ED_X = 160;
@@ -94,11 +94,31 @@ export const S10: React.FC = () => {
   const clear = f >= RETYPE - 2;
   const wire = seg(f, HIT, HIT + 14) * (1 - lin(f, FIX, FIX + 8));
   const ok = seg(f, RES, RES + 12);
+  // camera: push in on the alarm line, pull back for the fix
+  const push = segIO(f, HIT - 2, HIT + 22) * (1 - segIO(f, FIX - 14, FIX + 6));
+  const zoom = mix(1, 1.42, push);
+  const zoomX = mix(0, 644, push);
+  const zoomY = mix(0, 236, push);
 
   return (
     <AbsoluteFill style={{ opacity: 1 - lin(f, 214, 225) }}>
-      <Header f={f} at={2} out={400} idx="05" title={<Mono style={{ fontWeight: 600 }}>hw check</Mono>} sub="改了代码没改文档，机械地查出来。" />
-      <AbsoluteFill style={{ transform: `translateX(${shake}px)` }}>
+      <div style={{ opacity: 1 - push }}>
+      <Header
+        f={f}
+        at={2}
+        out={400}
+        idx="06"
+        usual="靠自觉，或者再加一道审批门"
+        title={<Mono style={{ fontWeight: 600 }}>hw check</Mono>}
+        sub="改了代码没改文档，机械地查出来。"
+      />
+      </div>
+      <AbsoluteFill
+        style={{
+          transform: `translateX(${shake}px) scale(${zoom}) translate(${-zoomX}px, ${-zoomY}px)`,
+          transformOrigin: "0 0",
+        }}
+      >
         <Panel
           x={ED_X}
           y={PY}

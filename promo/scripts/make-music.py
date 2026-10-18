@@ -2,9 +2,9 @@
 """Synthesize the film score from src/timeline.json (no samples).
 
 96 BPM, one bar = 2.5 s = 75 frames, so scene cuts land on bar lines.
-Shape: dark drone (problem) -> collapse to silence -> clean pads (insight)
--> pulse + arp (design) -> riser, impact on `hit` (hw check red) -> major
-resolve -> final chord under the logo, fade out.
+Shape: dark drone + heartbeat (pains) -> comic blips and a punch (the usual
+fix) -> clean pads (insight) -> pulse + arp (design) -> riser, impact on
+`hit` (hw check red) -> major resolve -> final chord under the logo, fade out.
 
 Output: public/music.wav (48 kHz, 16-bit stereo).
 """
@@ -145,129 +145,113 @@ def chime(ms, dur=4.0):
 
 
 # ---------------------------------------------------------------- score
-t_s2 = t_of(SC["s2"][0])
-t_col = t_of(EV["s3Collapse"])
-t_three = t_of(EV["s3Three"])
-t_s4 = t_of(SC["s4"][0])
-t_s6 = t_of(SC["s6"][0])
-t_s10 = t_of(SC["s10"][0])
-t_enter = t_of(EV["s10Enter"])
-t_hit = t_of(EV["hit"])
-t_res = t_of(EV["s10Resolve"])
-t_s11 = t_of(SC["s11"][0])
-t_s12 = t_of(SC["s12"][0])
-t_logo = t_of(EV["s12Logo"])
+def st(k):
+    return t_of(SC[k][0])
 
-# 1. problem: low A drone with a minor 2nd rub, slowly opening filter
-dr = pad(33, t_col + 0.3, 0.6) + 0.6 * pad(45, t_col + 0.3, 0.6) + 0.22 * pad(46, t_col + 0.3, 0.3)
-dr = lp(dr, 700)
-dr *= np.linspace(0.4, 1.0, len(dr))
-add(dr, 0.0, 0.5, 0.30)
-# counter ticks while the number climbs (S1)
-for k in range(28):
-    tt = t_of(18) + (t_of(110) - t_of(18)) * (1 - (1 - k / 28) ** 1.8)
-    add(tick(3000 + 40 * (k % 5), 0.03), tt, 0.3 + 0.4 * (k % 2), 0.05)
-# soft heartbeat pulse through the pain montage
-b = t_s2
-while b < t_col - 0.1:
-    add(lp(kick(0.7), 400), b, 0.5, 0.35)
-    add(lp(kick(0.4), 400), b + BEAT * 0.75, 0.5, 0.25)
+
+t_pain, t_usual, t_ins, t_design = st("s2"), st("s7"), st("s8"), st("s9")
+t_check, t_end = st("s14"), st("s15")
+t_enter, t_hit, t_res = t_of(EV["enter"]), t_of(EV["hit"]), t_of(EV["resolve"])
+t_logo = t_of(EV["logo"])
+
+# 0. open: a single soft chord + typing clicks
+for j, m in enumerate([57, 64, 69]):
+    add(lp(pad(m, 4.0, 0.5), 1500), 0.0, 0.3 + 0.2 * j, 0.05)
+for k in range(10):
+    add(tick(1500 + 100 * (k % 3), 0.025), t_of(6) + k / FPS / 0.4, 0.6, 0.05)
+
+# 1. pains: low A drone with a minor-2nd rub, heartbeat, an accent per pain
+dlen = t_usual - t_pain + 1.0
+dr = pad(33, dlen, 0.6) + 0.6 * pad(45, dlen, 0.6) + 0.2 * pad(46, dlen, 0.3)
+dr = lp(dr, 750) * np.linspace(0.5, 1.0, int(dlen * SR))
+add(dr, t_pain, 0.5, 0.30)
+b = t_pain
+while b < t_usual - 0.1:
+    add(lp(kick(0.7), 400), b, 0.5, 0.32)
+    add(lp(kick(0.4), 400), b + BEAT * 0.75, 0.5, 0.22)
     b += BEAT * 2
-# accents on each pain beat cut and on "B breaks"
-for fr in [SC["s2"][0]] + EV["s2Cuts"]:
-    add(lp(noise_sweep(0.5, 300, 3000, rise=False), 4000), t_of(fr), 0.5, 0.12)
-add(lp(boom(), 900)[: int(1.5 * SR)], t_of(EV["s2Break"]), 0.5, 0.22)
-# version flips: rising ticks
-for k, fr in enumerate(EV["s3Flips"]):
-    add(tick(900 * 2 ** (k / 10), 0.06), t_of(fr), 0.35 + 0.03 * k, 0.11)
-add(noise_sweep(t_col - t_of(EV["s3Flips"][0]), 400, 6000), t_of(EV["s3Flips"][0]), 0.5, 0.05)
-# collapse -> near silence, then "3.0" chime
-add(lp(boom(), 300)[: int(2.0 * SR)], t_col, 0.5, 0.18)
-add(chime([69, 76, 81, 83], 5.0), t_three, 0.5, 0.20)
+for k in ("s2", "s3", "s4", "s5", "s6"):
+    add(lp(noise_sweep(0.5, 300, 3000, rise=False), 4000), st(k), 0.5, 0.12)
+for fr in EV["p3Cuts"]:
+    add(lp(boom(), 900)[: int(0.7 * SR)], t_of(fr), 0.5, 0.16)
+    add(hp(rng.standard_normal(int(0.12 * SR)), 3000) * 0.5, t_of(fr), 0.5, 0.06)
+add(lp(boom(), 900)[: int(1.2 * SR)], t_of(EV["p4Stale"]), 0.5, 0.18)
+# rules piling up: rising ticks
+for k in range(12):
+    add(tick(900 * 2 ** (k / 14), 0.05), st("s2") + 4 / FPS + k * (76 / 12) / FPS, 0.4 + 0.02 * k, 0.06)
 
-# 2. insight + design: Am9 - Fmaj7 - Cmaj7 - G6 pads, 2 bars each
-PROG = [[45, 57, 60, 64, 71], [41, 57, 60, 64, 67], [48, 55, 59, 64, 67], [43, 55, 59, 62, 64]]
-t = t_s4
+# 2. the usual fix: comic "blip" for each over-cautious reply, then the punch
+for j, m in enumerate([45, 52, 57]):
+    add(lp(pad(m, t_ins - t_usual + 0.5, 0.5), 1200), t_usual, 0.3 + 0.2 * j, 0.06)
+for k, fr in enumerate(EV["gptPops"]):
+    t0 = t_of(fr)
+    for q, m in enumerate([76, 79, 84][: 2 + (k == 2)]):
+        add(pluck(m + k * 2, 0.4, 9.0), t0 + q * 0.07, 0.5, 0.07)
+    add(kick(0.5), t0, 0.5, 0.18)
+add(boom(), t_of(EV["gptPunch"]), 0.5, 0.35)
+
+# 3. insight: clean Am9 -> Fmaj7 pads, chime on the brand
+for j, m in enumerate([45, 57, 60, 64, 71]):
+    add(lp(pad(m, 2 * BAR + 1.0, 0.8), 2400), t_ins, 0.25 + 0.12 * j, 0.08)
+for j, m in enumerate([41, 57, 60, 64, 67]):
+    add(lp(pad(m, BAR + 1.5, 0.8), 2400), t_ins + 2 * BAR, 0.25 + 0.12 * j, 0.08)
+add(chime([69, 76, 81, 83], 5.0), t_of(EV["brand"]), 0.5, 0.22)
+
+# 4. design: Cmaj7 - G6 - Am9 - Fmaj7 pads, arp + pulse until the enter key
+PROG = [[48, 55, 59, 64, 67], [43, 55, 59, 62, 64], [45, 57, 60, 64, 71], [41, 57, 60, 64, 67]]
+ARP = [[67, 72, 76, 79], [67, 71, 74, 76], [69, 72, 76, 79], [69, 72, 76, 77]]
+t = t_design
 k = 0
 while t < t_hit - 0.05:
     dur = min(2 * BAR, t_hit - t) + 1.5
     for j, m in enumerate(PROG[k % 4]):
-        g = 0.07 if j else 0.09
-        add(lp(pad(m, dur, 0.8), 2400), t, 0.25 + 0.12 * j, g)
+        add(lp(pad(m, dur, 0.8), 2400), t, 0.25 + 0.12 * j, 0.07 if j else 0.09)
     t += 2 * BAR
     k += 1
-
-# arp from the design section until the enter key
-ARP = [[69, 72, 76, 79], [69, 72, 76, 77], [67, 72, 76, 79], [67, 71, 74, 76]]
-t = t_s6
+t = t_design
 i = 0
 while t < t_enter - 0.05:
-    chord = ARP[int((t - t_s4) // (2 * BAR)) % 4]
+    chord = ARP[int((t - t_design) // (2 * BAR)) % 4]
     m = chord[[0, 2, 1, 3, 2, 0, 3, 1][i % 8]]
-    add(pluck(m, 0.9, 5.0), t, 0.3 + 0.4 * ((i * 3) % 4) / 3, 0.075)
-    add(pluck(m + 12, 0.5, 8.0), t + BEAT * 0.75, 0.75, 0.018)
+    add(pluck(m, 0.9, 5.0), t, 0.3 + 0.4 * ((i * 3) % 4) / 3, 0.07)
+    add(pluck(m + 12, 0.5, 8.0), t + BEAT * 0.75, 0.75, 0.016)
     t += BEAT / 2
     i += 1
-
-# pulse: kick on beats, hats on offbeats, design section only
-t = t_s6
+t = t_design
 while t < t_enter - 0.05:
-    add(kick(0.8), t, 0.5, 0.33)
+    add(kick(0.8), t, 0.5, 0.30)
     add(hat(), t + BEAT / 2, 0.62, 0.05)
     t += BEAT
-# a soft tick for each map card / trailer / strike
-for fr in EV["s6Cards"] + EV["s9Trailers"]:
+for fr in EV["s9Cards"] + EV["s10Reads"] + EV["s12Trailers"]:
     add(tick(1800, 0.05), t_of(fr), 0.55, 0.07)
-for fr in EV["s8Strikes"]:
-    add(hp(noise_sweep(0.18, 2000, 8000), 1500), t_of(fr), 0.45, 0.05)
-add(lp(noise_sweep(0.9, 200, 1600, rise=False), 2000), t_of(EV["s7Fold"]), 0.5, 0.10)
+for fr in EV["s13Chips"]:
+    add(tick(2600, 0.04), t_of(fr) + 8 / FPS, 0.5, 0.05)
+add(lp(noise_sweep(0.9, 200, 1600, rise=False), 2000), t_of(EV["s11Fold"]), 0.5, 0.10)
+add(lp(boom(), 600)[: int(1.2 * SR)], t_of(EV["s13Drain"]), 0.5, 0.12)
 
-# 3. hw check: typing clicks, riser, impact
+# 5. hw check: typing, riser, impact, fix, resolve
 for k in range(8):
-    add(tick(1500 + 120 * (k % 3), 0.025), t_of(EV["s10TypeStart"]) + k * (1 / FPS) / 0.45, 0.6, 0.06)
+    add(tick(1500 + 120 * (k % 3), 0.025), t_of(EV["typeStart"]) + k / FPS / 0.45, 0.6, 0.06)
 add(tick(900, 0.08), t_enter, 0.5, 0.12)
 rise_len = t_hit - t_enter
 add(noise_sweep(rise_len, 300, 9000), t_enter, 0.5, 0.11)
 sw = pad(45, rise_len + 0.05, 1.0) * np.linspace(0, 1, int((rise_len + 0.05) * SR)) ** 2
 add(lp(sw, 1500), t_enter, 0.5, 0.10)
-# impact: sub boom + dissonant cluster (A + Bb + E)
 add(boom(), t_hit, 0.5, 0.65)
-cl = sum(pad(m, 3.2, 1.2) for m in (33, 45, 46, 52, 58)) / 5
+cl = sum(pad(m, 2.6, 1.2) for m in (33, 45, 46, 52, 58)) / 5
 add(lp(cl, 1800), t_hit, 0.5, 0.42)
 add(hp(rng.standard_normal(int(0.25 * SR)) * np.exp(-np.arange(int(0.25 * SR)) / SR * 16), 2000), t_hit, 0.5, 0.10)
-# fix: dull pulse while the doc is edited
-for k in range(3):
-    add(lp(kick(0.6), 300), t_of(EV["s10Fix"]) + k * BEAT, 0.5, 0.28)
-# resolve: bright Cmaj9 chime + pad
-add(chime([72, 76, 79, 83, 86], 5.0), t_res, 0.5, 0.24)
+for k in range(2):
+    add(lp(kick(0.6), 300), t_of(EV["fix"]) + k * BEAT, 0.5, 0.26)
+add(chime([72, 76, 79, 83, 86], 4.0), t_res, 0.5, 0.24)
 for j, m in enumerate([48, 55, 64, 67, 71, 74]):
-    add(lp(pad(m, t_s11 - t_res + 2.0, 0.8), 2600), t_res, 0.3 + 0.08 * j, 0.06)
+    add(lp(pad(m, t_end - t_res + 1.5, 0.8), 2600), t_res, 0.3 + 0.08 * j, 0.06)
 
-# 4. board / handoff: lighter groove, Fmaj7 - G6 - Am9
-t = t_s11
-k = 0
-for ch in ([41, 57, 60, 64, 67], [43, 55, 59, 62, 64], [45, 57, 60, 64, 71]):
-    dur = BAR + 1.5
-    for j, m in enumerate(ch):
-        add(lp(pad(m, dur, 0.8), 2400), t + k * BAR, 0.25 + 0.12 * j, 0.065)
-    k += 1
-t = t_s11
-i = 0
-while t < t_s12 - 0.2:
-    add(pluck([72, 76, 79, 81][i % 4], 0.8, 6.0), t, 0.3 + 0.4 * (i % 2), 0.05)
-    if i % 2 == 0:
-        add(kick(0.55), t, 0.5, 0.2)
-    t += BEAT / 2
-    i += 1
-for fr in EV["s11Chips"]:
-    add(tick(2600, 0.04), t_of(fr) + 8 / FPS, 0.5, 0.05)
-add(lp(boom(), 600)[: int(1.2 * SR)], t_of(EV["s11Drain"]), 0.5, 0.12)
-
-# 5. end: final Fmaj9 -> Cmaj9 under the logo, long tail
-add(noise_sweep(t_logo - t_s12, 300, 4000), t_s12, 0.5, 0.05)
+# 6. end: final Cmaj9 under the logo, long tail
+add(noise_sweep(t_logo - t_end, 300, 4000), t_end, 0.5, 0.05)
 for j, m in enumerate([36, 48, 55, 64, 67, 71, 74]):
     add(lp(pad(m, DUR - t_logo + 3, 0.9), 3000), t_logo, 0.2 + 0.1 * j, 0.07)
-add(chime([72, 79, 84, 86, 88], 7.0), t_logo, 0.5, 0.22)
+add(chime([72, 79, 84, 86, 88], 6.0), t_logo, 0.5, 0.22)
 add(lp(boom(), 200)[: int(3 * SR)], t_logo, 0.5, 0.20)
 
 # ---------------------------------------------------------------- master
@@ -293,7 +277,7 @@ R2 = np.concatenate([np.zeros(240), R2[:-240]]) * 0.5 + R2 * 0.5
 st = np.stack([L2, R2], axis=1)
 st = hp(st.T, 28).T
 fade_in = np.minimum(1, np.arange(N) / (0.6 * SR))
-fade_out = np.clip((DUR - np.arange(N) / SR) / 3.2, 0, 1) ** 1.6
+fade_out = np.clip((DUR - np.arange(N) / SR) / 3.0, 0, 1) ** 1.6
 st *= (fade_in * fade_out)[:, None]
 st = np.tanh(st * 1.4) / 1.4
 peak = np.max(np.abs(st))
