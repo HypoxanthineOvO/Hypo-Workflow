@@ -8,7 +8,7 @@ from fnmatch import fnmatch
 from functools import cached_property
 from pathlib import Path, PurePosixPath
 
-from .git import GitError, file_text, git, tracked_files
+from .git import GitError, file_text, git, tracked_files, worktree_files
 
 SKIP_DIRS = {".git", "node_modules", ".venv", "venv", "__pycache__", "build", "dist"}
 ARCHIVE_DIRS = {"archive", "archived", ".pipeline", "归档", "旧记录"}
@@ -359,12 +359,16 @@ class Project:
     @cached_property
     def markdown_files(self) -> list[Path]:
         if self.rev is not None:
-            return [
-                self.root / path for path in tracked_files(self.root, self.rev)
-                if path.endswith(".md")
-                and not any(part in SKIP_DIRS | ARCHIVE_DIRS or part.startswith(".") for part in PurePosixPath(path).parts[:-1])
-            ]
-        return list(iter_markdown(self.root))
+            paths = tracked_files(self.root, self.rev)
+        elif self.is_git():
+            paths = sorted(worktree_files(self.root))
+        else:
+            return list(iter_markdown(self.root))
+        return [
+            self.root / path for path in paths
+            if path.endswith(".md")
+            and not any(part in SKIP_DIRS | ARCHIVE_DIRS or part.startswith(".") for part in PurePosixPath(path).parts[:-1])
+        ]
 
     @cached_property
     def requirements(self) -> list[Requirement]:

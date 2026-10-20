@@ -138,6 +138,11 @@ def tracked_files(root: Path, rev: str | None = None) -> list[str]:
     return [path for path in git(root, *args).split("\0") if path]
 
 
+def worktree_files(root: Path) -> list[str]:
+    output = git(root, "ls-files", "--cached", "--others", "--exclude-standard", "-z")
+    return list(dict.fromkeys(path for path in output.split("\0") if path and (root / path).is_file()))
+
+
 def ignored_paths(root: Path, paths: list[str]) -> set[str]:
     if not paths:
         return set()

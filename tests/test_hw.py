@@ -486,6 +486,20 @@ class DocumentScopeTests(RepoTestCase):
         }
         self.assertEqual(locations, {"README.md", "docs/需求/同步.md"})
 
+    def test_documents_follow_gitignore_and_negation(self) -> None:
+        self.write("RULES.md", RAW_RULES)
+        self.write("README.md", "# 项目\n")
+        self.write("research/notes.md", "# 笔记\n\n已核验 数据。\n[坏](missing.md)\n")
+        self.write("research/keep.md", "# 保留\n\n已核验 数据。\n")
+        self.write(".gitignore", "research/*\n!research/keep.md\n")
+        data, _ = self.check_json()
+        locations = {
+            issue["location"].split(":", 1)[0]
+            for issue in data["alarms"] + data["hints"]
+        }
+        self.assertNotIn("research/notes.md", locations)
+        self.assertIn("research/keep.md", locations)
+
     def test_blacklist_skips_source_and_raw_partitions(self) -> None:
         self.write("RULES.md", RAW_RULES)
         self.write("README.md", "# 项目\n\n已核验 结果。\n")
