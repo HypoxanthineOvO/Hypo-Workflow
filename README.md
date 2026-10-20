@@ -106,13 +106,27 @@ uv tool install git+https://github.com/HypoxanthineOvO/Hypo-Workflow
 
 需要 Python 3.10+，零依赖。没装 uv 的话：`pip install git+https://github.com/HypoxanthineOvO/Hypo-Workflow`。
 
-接入一个项目：把 [`skills/init/`](skills/init/) 整个目录复制到你的 Agent 宿主的 skills 目录，例如 `~/.claude/skills/hypo-workflow-init`、`~/.codex/skills/hypo-workflow-init`、`~/.kimi-code/skills/hypo-workflow-init`，然后在项目里说：
+接入一个项目：把 [`skills/`](skills/) 下的三个目录复制到你的 Agent 宿主的 skills 目录，目录名用 skill 名。以 Claude Code 为例：
+
+```bash
+git clone https://github.com/HypoxanthineOvO/Hypo-Workflow && cd Hypo-Workflow
+cp -r skills/init ~/.claude/skills/hypo-workflow-init
+cp -r skills/experience ~/.claude/skills/hypo-workflow-experience
+cp -r skills/cleanup ~/.claude/skills/hypo-workflow-cleanup
+```
+
+Codex、Kimi Code 换成 `~/.codex/skills/`、`~/.kimi-code/skills/`。然后在项目里说：
 
 > 用 Hypo-Workflow 接入这个项目。
 
 Agent 会先扫描项目、出一份方案给你看：哪些旧文档归档、哪些规则搬进 RULES.md、需求怎么按功能切分。你确认后它才动手。开发、研究、写作三类项目各有一份起步地图。
 
 接入之后不需要任何斜杠命令。你说“继续”，它读 BOARD；说“检查一下文档”，它跑 `hw check`。
+
+另外两件事只在你开口时做：
+
+- **“用 Hypo-Workflow 体验一下”**：派一个没看过代码的 Agent，只拿 README 和你的产品入口，当一回新用户走一遍，告诉你卡在哪、README 哪里和实际对不上。它只汇报，不改文件。用户是谁写在 RULES.md 里，没写它会先问你。
+- **“用 Hypo-Workflow 清理一下”**：按项目自己的规则，清掉没用的代码、重复写法、过时的文档和规则。先列清单给你看，你点头后再动手。
 
 ## hw
 

@@ -17,7 +17,7 @@ python3 -m unittest discover -s tests -v
 | 给用户看的说明 | README.md | 是什么、怎么装、怎么用 |
 | 设计依据 | docs/设计.md | 只写现在，推翻就改写 |
 | 安装到项目的模板 | skills/init/templates/ | 通用 AGENTS.md、RULES.md、STATUS.md、BOARD.md、需求文件、三种起步地图 |
-| 宿主技能 | skills/ | init 等，装进 Agent 宿主 |
+| 宿主技能 | skills/ | init、experience、cleanup，装进 Agent 宿主 |
 | 状态与进度 | STATUS.md | 只写现在 |
 
 hw 的代码在 `hw/`，测试在 `tests/`；代码改动的说明写在提交信息里，3.0 暂不为 hw 自己建需求文件。
