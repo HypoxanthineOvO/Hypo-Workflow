@@ -110,6 +110,7 @@ uv tool install git+https://github.com/HypoxanthineOvO/Hypo-Workflow
 
 ```bash
 git clone https://github.com/HypoxanthineOvO/Hypo-Workflow && cd Hypo-Workflow
+mkdir -p ~/.claude/skills
 cp -r skills/init ~/.claude/skills/hypo-workflow-init
 cp -r skills/experience ~/.claude/skills/hypo-workflow-experience
 cp -r skills/cleanup ~/.claude/skills/hypo-workflow-cleanup
