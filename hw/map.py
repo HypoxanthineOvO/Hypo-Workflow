@@ -38,6 +38,17 @@ def _first_line(path: Path | None) -> str:
     return ""
 
 
+def _how_summary(text: str) -> str:
+    if display_width(text) <= 32:
+        return text
+    summary = ""
+    for char in text:
+        if display_width(summary + char) > 31:
+            break
+        summary += char
+    return summary + "…"
+
+
 def run(project: Project, as_json: bool = False) -> int:
     data = collect(project)
     if as_json:
@@ -53,13 +64,14 @@ def run(project: Project, as_json: bool = False) -> int:
 
     print(f"项目根：{data['root']}")
     print()
-    headers = ("分区", "路径", "存在", "文件", "分区 AGENTS.md")
+    headers = ("分区", "路径", "存在", "文件", "怎么写", "分区 AGENTS.md")
     rows = [
         (
             item["what"],
             item["path"],
             "是" if item["exists"] else "否",
             str(item["files"]),
+            _how_summary(item["how"]),
             f"{item['agents_file']} — {item['agents_first_line']}" if item["agents_file"] else "无",
         )
         for item in data["partitions"]

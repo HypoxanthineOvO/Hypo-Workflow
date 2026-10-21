@@ -152,6 +152,24 @@ class MapFindLogTests(RepoTestCase):
         self.assertEqual(entry["agents_file"], "docs/需求/AGENTS.md")
         self.assertEqual(entry["agents_first_line"], "# 需求规则")
 
+    def test_map_text_shows_how_with_bounded_width(self) -> None:
+        from hw.report import display_width
+
+        long_how = "中文A" * 30
+        self.write("RULES.md", RULES.replace("简短", long_how))
+        process = self.run_hw("map")
+        self.assertEqual(process.returncode, 0, process.stderr)
+        self.assertIn("怎么写", process.stdout)
+        self.assertIn("见 docs/需求/AGENTS.md", process.stdout)
+        row = next(line for line in process.stdout.splitlines() if "给用户看的说明" in line)
+        summary = [cell.strip() for cell in row.split("  ") if cell.strip()][4]
+        self.assertTrue(summary.endswith("…"), row)
+        self.assertLessEqual(display_width(summary), 32)
+        self.assertNotIn(long_how, row)
+        data = self.json_output("map", "--json")
+        entry = next(item for item in data["partitions"] if item["path"] == "README.md")
+        self.assertEqual(entry["how"], long_how)
+
     def test_map_without_rules_explains_instead_of_crashing(self) -> None:
         (self.repo / "RULES.md").unlink()
         process = self.run_hw("map")
