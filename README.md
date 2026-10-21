@@ -8,7 +8,7 @@
 
 给用 Agent 做项目的人：一套“文档放哪、怎么写”的约定，加一个只读的检查工具 `hw`。
 
-[![version](https://img.shields.io/badge/version-3.0.0-111?style=flat-square)](https://github.com/HypoxanthineOvO/Hypo-Workflow/releases)
+[![version](https://img.shields.io/badge/version-3.1.0-111?style=flat-square)](https://github.com/HypoxanthineOvO/Hypo-Workflow/releases)
 [![python](https://img.shields.io/badge/python-3.10+-111?style=flat-square)](pyproject.toml)
 [![deps](https://img.shields.io/badge/dependencies-0-3ddc97?style=flat-square)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT-111?style=flat-square)](LICENSE)
@@ -100,13 +100,20 @@ $ hw check
 
 ## 开始
 
+一共两步：装 `hw` 命令，再把三个 skill 放进你的 Agent。
+
+**1. 装 hw**
+
 ```bash
 uv tool install git+https://github.com/HypoxanthineOvO/Hypo-Workflow
+hw --version
 ```
 
 需要 Python 3.10+，零依赖。没装 uv 的话：`pip install git+https://github.com/HypoxanthineOvO/Hypo-Workflow`。
 
-接入一个项目：把 [`skills/`](skills/) 下的三个目录复制到你的 Agent 宿主的 skills 目录，目录名用 skill 名。以 Claude Code 为例：
+**2. 装 skill**
+
+把 [`skills/`](skills/) 下的三个目录复制到你的 Agent 宿主的 skills 目录，目录名用 skill 名。以 Claude Code 为例：
 
 ```bash
 git clone https://github.com/HypoxanthineOvO/Hypo-Workflow && cd Hypo-Workflow
@@ -116,13 +123,25 @@ cp -r skills/experience ~/.claude/skills/hypo-workflow-experience
 cp -r skills/cleanup ~/.claude/skills/hypo-workflow-cleanup
 ```
 
-Codex、Kimi Code 换成 `~/.codex/skills/`、`~/.kimi-code/skills/`。然后在项目里说：
+Codex、Kimi Code 换成 `~/.codex/skills/`、`~/.kimi-code/skills/`。
+
+**3. 接入项目**
+
+在项目目录打开你的 Agent，在对话里说：
 
 > 用 Hypo-Workflow 接入这个项目。
 
-Agent 会先扫描项目、出一份方案给你看：哪些旧文档归档、哪些规则搬进 RULES.md、需求怎么按功能切分。你确认后它才动手。开发、研究、写作三类项目各有一份起步地图。
+Agent 会先扫描项目、出一份方案给你看：哪些旧文档归档、哪些规则搬进 RULES.md、需求怎么按功能切分。你确认后它才动手。开发、研究、写作三类项目各有一份起步地图。还没接入的项目里跑 `hw map` 或 `hw check`，它们也会提醒你这一步。
 
-接入之后不需要任何斜杠命令。你说“继续”，它读 BOARD；说“检查一下文档”，它跑 `hw check`。
+## 日常怎么说
+
+接入之后不需要任何斜杠命令，直接对 Agent 说话：
+
+| 你说 | Agent 做什么 |
+| --- | --- |
+| “继续” | 读 BOARD，接着上次的下一步干 |
+| “检查一下文档” | 跑 `hw check`，按提示补文档 |
+| “维护一下” | 从 STATUS、BOARD 留言和 `hw check` 里挑事，先说打算做哪几件 |
 
 另外两件事只在你开口时做：
 
@@ -141,6 +160,15 @@ Agent 会先扫描项目、出一份方案给你看：哪些旧文档归档、�
 | `hw handoff` | 这个目录最近的会话，跨七种宿主 |
 
 `hw` 只读，不改任何文件。每个命令都支持 `--json`。
+
+## 升级
+
+```bash
+uv tool upgrade hypo-workflow
+cd Hypo-Workflow && git pull
+```
+
+再把 `skills/` 下的三个目录按“开始”第 2 步重新复制一遍，覆盖旧的。已经接入的项目里，根目录 `AGENTS.md` 换成 `skills/init/templates/AGENTS.md` 的新版。各版本的变化见 [Releases](https://github.com/HypoxanthineOvO/Hypo-Workflow/releases)。
 
 ## 版本
 

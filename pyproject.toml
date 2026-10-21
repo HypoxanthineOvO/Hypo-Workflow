@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hypo-workflow"
-version = "3.0.0"
+version = "3.1.0"
 description = "给 Agent 用的项目文档与代码一致性检查工具"
 requires-python = ">=3.10"
 dependencies = []

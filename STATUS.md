@@ -3,9 +3,9 @@
 Hypo-Workflow 3.0。设计见 [docs/设计.md](docs/设计.md)。
 
 ## 现在
-- 3.0.0 已发布：通用模板、三种起步地图、init skill，以及 `hw` 的 map、find、status、log、check、handoff。
+- 3.1.0 已发布：通用模板、三种起步地图，init、体验、清理三个 skill，以及 `hw` 的 map、find、status、log、check、handoff。
 - 第一个接入的真实项目已经跑通：按功能建了十个需求文件，hw check 0 报警。
-- 新增两个用户叫才做的 skill：体验（新用户视角走一遍）和清理（按项目规则清代码和文档）。
+- 体验和清理已在本仓库各走过一遍：新用户照 README 能装上并用起来；真实 Agent 里跑 init 还没验证。
 
 ## 下一步
 1. 在一个开发项目和一个科研项目上各试用两周，按 docs/设计.md 第 11 节判断规则的去留。
