@@ -189,9 +189,6 @@ class Finding:
     location: str
     message: str
 
-    def to_dict(self) -> dict:
-        return {"level": self.level, "category": "黑词", "location": self.location, "message": self.message}
-
 
 def mask_code(text: str) -> list[str]:
     lines = text.splitlines()

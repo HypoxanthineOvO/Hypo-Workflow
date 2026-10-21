@@ -11,8 +11,8 @@ from pathlib import Path, PurePosixPath
 from .git import GitError, file_text, git, tracked_files, worktree_files
 
 SKIP_DIRS = {".git", "node_modules", ".venv", "venv", "__pycache__", "build", "dist"}
-ARCHIVE_DIRS = {"archive", "archived", ".pipeline", "归档", "旧记录"}
-SOURCE_DIRS = {"sources", "archive", "archived", "归档", "旧记录"}
+ARCHIVE_DIRS = {"archive", "archived", "归档", "旧记录"}
+SOURCE_DIRS = ARCHIVE_DIRS | {"sources"}
 SKIP_PARTITION_WORDS = ("原样保存", "不再更新", "原件", "不修改")
 PLACEHOLDER = re.compile(r"<[^>/]+>")
 SEPARATOR = re.compile(r":?-{3,}:?$")
@@ -33,15 +33,13 @@ def relative(root: Path, path: Path) -> str:
     return path.relative_to(root).as_posix()
 
 
-def iter_markdown(root: Path, include_archives: bool = False) -> Iterator[Path]:
+def skip_directory(name: str) -> bool:
+    return name in SKIP_DIRS | ARCHIVE_DIRS or name.startswith(".")
+
+
+def iter_markdown(root: Path) -> Iterator[Path]:
     for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = sorted(
-            name
-            for name in dirnames
-            if name not in SKIP_DIRS
-            and not name.startswith(".")
-            and (include_archives or name not in ARCHIVE_DIRS)
-        )
+        dirnames[:] = sorted(name for name in dirnames if not skip_directory(name))
         for name in sorted(filenames):
             if name.endswith(".md"):
                 yield Path(dirpath) / name
@@ -79,8 +77,8 @@ def section_map(text: str) -> dict[str, str]:
     return result
 
 
-def first_heading(text: str, level: int = 1) -> str:
-    pattern = re.compile(rf"^#{{{level}}}\s+(.+?)\s*$")
+def first_heading(text: str) -> str:
+    pattern = re.compile(r"^#\s+(.+?)\s*$")
     fenced = False
     for line in text.splitlines():
         if FENCE.match(line):
@@ -295,9 +293,7 @@ def split_items(body: str) -> list[str]:
     return items
 
 
-def parse_requirement(root: Path, path: Path, text: str | None = None) -> Requirement:
-    if text is None:
-        text = path.read_text(encoding="utf-8")
+def parse_requirement(root: Path, path: Path, text: str) -> Requirement:
     return Requirement(
         path=relative(root, path),
         title=first_heading(text) or path.stem,
@@ -367,7 +363,7 @@ class Project:
         return [
             self.root / path for path in paths
             if path.endswith(".md")
-            and not any(part in SKIP_DIRS | ARCHIVE_DIRS or part.startswith(".") for part in PurePosixPath(path).parts[:-1])
+            and not any(skip_directory(part) for part in PurePosixPath(path).parts[:-1])
         ]
 
     @cached_property
@@ -384,10 +380,6 @@ class Project:
             if has_heading(text, "现在") or has_heading(text, "代码") or (named == "README.md" and "/" in rel and self.mapped(rel)):
                 result.append(parse_requirement(self.root, path, text))
         return result
-
-    @cached_property
-    def requirement_by_path(self) -> dict[str, Requirement]:
-        return {requirement.path: requirement for requirement in self.requirements}
 
     def is_git(self) -> bool:
         try:
