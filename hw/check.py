@@ -345,7 +345,7 @@ def check_blacklist(project: Project, history: list[Commit], collector: Collecto
 
 def check_map(project: Project, collector: Collector) -> None:
     if not project.rules_text:
-        collector.add(HINT, "地图", "RULES.md", "项目还没接入 Hypo-Workflow（没有 RULES.md）")
+        collector.add(HINT, "地图", "RULES.md", "项目还没接入 Hypo-Workflow（没有 RULES.md）；在 Agent 里说“用 Hypo-Workflow 接入这个项目”")
         check_links(project, collector)
         return
     if not project.document_map:

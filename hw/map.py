@@ -38,17 +38,6 @@ def _first_line(path: Path | None) -> str:
     return ""
 
 
-def _how_summary(text: str) -> str:
-    if display_width(text) <= 32:
-        return text
-    summary = ""
-    for char in text:
-        if display_width(summary + char) > 31:
-            break
-        summary += char
-    return summary + "…"
-
-
 def run(project: Project, as_json: bool = False) -> int:
     data = collect(project)
     if as_json:
@@ -57,21 +46,20 @@ def run(project: Project, as_json: bool = False) -> int:
 
     if not data["map_found"]:
         if not data["rules_found"]:
-            print("找不到 RULES.md，未找到文档地图。")
+            print("找不到 RULES.md，这个项目还没接入 Hypo-Workflow。在 Agent 里说“用 Hypo-Workflow 接入这个项目”。")
         else:
             print("RULES.md 里没有“## 文档地图”一节。")
         return 0
 
     print(f"项目根：{data['root']}")
     print()
-    headers = ("分区", "路径", "存在", "文件", "怎么写", "分区 AGENTS.md")
+    headers = ("分区", "路径", "存在", "文件", "分区 AGENTS.md")
     rows = [
         (
             item["what"],
             item["path"],
             "是" if item["exists"] else "否",
             str(item["files"]),
-            _how_summary(item["how"]),
             f"{item['agents_file']} — {item['agents_first_line']}" if item["agents_file"] else "无",
         )
         for item in data["partitions"]
@@ -86,4 +74,10 @@ def run(project: Project, as_json: bool = False) -> int:
     print("  ".join("-" * widths[index] for index in range(len(headers))))
     for row in rows:
         print("  ".join(pad(cell, widths[index]) for index, cell in enumerate(row)).rstrip())
+    described = [item for item in data["partitions"] if item["how"]]
+    if described:
+        print()
+        print("怎么写")
+        for item in described:
+            print(f"- {item['what']}（{item['path']}）：{item['how']}")
     return 0

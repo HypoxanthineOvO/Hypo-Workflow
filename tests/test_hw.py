@@ -152,20 +152,15 @@ class MapFindLogTests(RepoTestCase):
         self.assertEqual(entry["agents_file"], "docs/需求/AGENTS.md")
         self.assertEqual(entry["agents_first_line"], "# 需求规则")
 
-    def test_map_text_shows_how_with_bounded_width(self) -> None:
-        from hw.report import display_width
-
+    def test_map_text_lists_full_how_below_table(self) -> None:
         long_how = "中文A" * 30
         self.write("RULES.md", RULES.replace("简短", long_how))
         process = self.run_hw("map")
         self.assertEqual(process.returncode, 0, process.stderr)
-        self.assertIn("怎么写", process.stdout)
         self.assertIn("见 docs/需求/AGENTS.md", process.stdout)
-        row = next(line for line in process.stdout.splitlines() if "给用户看的说明" in line)
-        summary = [cell.strip() for cell in row.split("  ") if cell.strip()][4]
-        self.assertTrue(summary.endswith("…"), row)
-        self.assertLessEqual(display_width(summary), 32)
-        self.assertNotIn(long_how, row)
+        table, how = process.stdout.split("\n怎么写\n", 1)
+        self.assertNotIn(long_how, table)
+        self.assertIn(f"- 给用户看的说明（README.md）：{long_how}", how)
         data = self.json_output("map", "--json")
         entry = next(item for item in data["partitions"] if item["path"] == "README.md")
         self.assertEqual(entry["how"], long_how)
@@ -175,6 +170,7 @@ class MapFindLogTests(RepoTestCase):
         process = self.run_hw("map")
         self.assertEqual(process.returncode, 0, process.stderr)
         self.assertIn("找不到 RULES.md", process.stdout)
+        self.assertIn("用 Hypo-Workflow 接入这个项目", process.stdout)
         self.assertNotIn("Traceback", process.stderr)
 
     def test_find_shows_reverse_relation_and_board_agent(self) -> None:
