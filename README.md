@@ -100,7 +100,7 @@ $ hw check
 
 ## 开始
 
-一共两步：装 `hw` 命令，再把三个 skill 放进你的 Agent。
+两步：装 `hw` 命令，再把 skill 放进你的 Agent。
 
 **1. 装 hw**
 
@@ -113,14 +113,16 @@ hw --version
 
 **2. 装 skill**
 
-把 [`skills/`](skills/) 下的三个目录复制到你的 Agent 宿主的 skills 目录，目录名用 skill 名。以 Claude Code 为例：
+把 [`skills/`](skills/) 下的三个目录复制到你的 Agent 宿主的 skills 目录，目录名用 skill 名；再装上写汇报、文档和界面文字用的 [Hypo-Expression](https://github.com/HypoxanthineOvO/Hypo-Expression)（`hypo-exp`），接入后的 AGENTS.md 会让 Agent 用它。以 Claude Code 为例：
 
 ```bash
-git clone https://github.com/HypoxanthineOvO/Hypo-Workflow && cd Hypo-Workflow
+git clone https://github.com/HypoxanthineOvO/Hypo-Workflow
+git clone https://github.com/HypoxanthineOvO/Hypo-Expression
 mkdir -p ~/.claude/skills
-cp -r skills/init ~/.claude/skills/hypo-workflow-init
-cp -r skills/experience ~/.claude/skills/hypo-workflow-experience
-cp -r skills/cleanup ~/.claude/skills/hypo-workflow-cleanup
+cp -r Hypo-Workflow/skills/init ~/.claude/skills/hypo-workflow-init
+cp -r Hypo-Workflow/skills/experience ~/.claude/skills/hypo-workflow-experience
+cp -r Hypo-Workflow/skills/cleanup ~/.claude/skills/hypo-workflow-cleanup
+cp -r Hypo-Expression/skills/hypo-exp ~/.claude/skills/hypo-exp
 ```
 
 Codex、Kimi Code 换成 `~/.codex/skills/`、`~/.kimi-code/skills/`。
@@ -165,10 +167,11 @@ Agent 会先扫描项目、出一份方案给你看：哪些旧文档归档、�
 
 ```bash
 uv tool upgrade hypo-workflow
-cd Hypo-Workflow && git pull
+git -C Hypo-Workflow pull
+git -C Hypo-Expression pull
 ```
 
-再把 `skills/` 下的三个目录按“开始”第 2 步重新复制一遍，覆盖旧的。已经接入的项目里，根目录 `AGENTS.md` 换成 `skills/init/templates/AGENTS.md` 的新版。各版本的变化见 [Releases](https://github.com/HypoxanthineOvO/Hypo-Workflow/releases)。
+再把四个 skill 按“开始”第 2 步重新复制一遍，先删掉旧目录再复制。已经接入的项目里，根目录 `AGENTS.md` 换成 `skills/init/templates/AGENTS.md` 的新版。各版本的变化见 [Releases](https://github.com/HypoxanthineOvO/Hypo-Workflow/releases)。
 
 ## 版本
 
