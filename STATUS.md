@@ -3,10 +3,10 @@
 Hypo-Workflow 3.0。设计见 [docs/设计.md](docs/设计.md)。
 
 ## 现在
-- 3.1.0 已发布：通用模板、三种起步地图，init、体验、清理三个 skill，以及 `hw` 的 map、find、status、log、check、handoff。
+- 3.2.0 已发布：通用模板、三种起步地图，init、体验、清理三个 skill，以及 `hw` 的 map、find、status、log、check、handoff。
 - 第一个接入的真实项目已经跑通：按功能建了十个需求文件，hw check 0 报警。
 - 体验和清理已在本仓库各走过一遍：新用户照 README 能装上并用起来；真实 Agent 里跑 init 还没验证。
-- 表达约束以 Hypo-Expression 为准，安装时一起装上 `hypo-exp`，关系见 [docs/设计.md](docs/设计.md) 5.1 节。通用 AGENTS.md 新增四行：讨论时先找现成方案、防御性复杂度在汇报里单独交代、界面默认不加次要标签和说明、写东西用 hypo-exp。这些还没发版。
+- 表达约束以 Hypo-Expression 为准，安装时一起装上 `hypo-exp`，关系见 [docs/设计.md](docs/设计.md) 5.1 节。通用 AGENTS.md 新增四行：讨论时先找现成方案、防御性复杂度在汇报里单独交代、界面默认不加次要标签和说明、写东西用 hypo-exp。
 
 ## 下一步
 1. 在一个开发项目和一个科研项目上各试用两周，按 docs/设计.md 第 11 节判断规则的去留。
