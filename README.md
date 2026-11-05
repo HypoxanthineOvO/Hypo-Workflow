@@ -8,7 +8,7 @@
 
 给用 Agent 做项目的人：一套“文档放哪、怎么写”的约定，加一个只读的检查工具 `hw`。
 
-[![version](https://img.shields.io/badge/version-3.2.0-111?style=flat-square)](https://github.com/HypoxanthineOvO/Hypo-Workflow/releases)
+[![version](https://img.shields.io/badge/version-3.3.0-111?style=flat-square)](https://github.com/HypoxanthineOvO/Hypo-Workflow/releases)
 [![python](https://img.shields.io/badge/python-3.10+-111?style=flat-square)](pyproject.toml)
 [![deps](https://img.shields.io/badge/dependencies-0-3ddc97?style=flat-square)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT-111?style=flat-square)](LICENSE)
