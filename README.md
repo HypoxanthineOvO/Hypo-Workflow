@@ -109,7 +109,15 @@ uv tool install git+https://github.com/HypoxanthineOvO/Hypo-Workflow
 hw --version
 ```
 
-需要 Python 3.10+，零依赖。没装 uv 的话：`pip install git+https://github.com/HypoxanthineOvO/Hypo-Workflow`。
+需要 Python 3.10+，没有第三方 Python 依赖。没装 uv 的话：`pip install git+https://github.com/HypoxanthineOvO/Hypo-Workflow`。
+
+可选但推荐安装 Universal Ctags，用来检查非 Python 代码的符号和改动范围：
+
+```bash
+sudo apt install universal-ctags
+```
+
+也可以从 [Universal Ctags 官方静态包](https://github.com/universal-ctags/ctags-nightly-build/releases) 下载，把 `ctags` 放进 PATH 或 `~/.local/bin/`。Python 始终用 ast 解析；没装 ctags 时，跳过非 Python 文件的符号检查，`hw status` 会提示安装。需求文件里的 `Foo::bar`、`Foo.bar`、`Foo#bar`、`Foo->bar` 视为同一个限定名，也可以只写 `bar`。
 
 **2. 装 skill**
 

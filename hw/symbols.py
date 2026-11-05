@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 import ast
+import json
 import re
+import shutil
+import subprocess
+import tempfile
 from dataclasses import dataclass
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 
 
 @dataclass(frozen=True)
@@ -35,62 +39,59 @@ def python_definitions(path: str, text: str) -> list[Definition]:
     return definitions
 
 
-LITERALS = re.compile(r'//[^\n]*|/\*[\s\S]*?\*/|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|`(?:\\.|[^`\\])*`')
-DECLARATION = re.compile(
-    r'\b(?:function\s*\*?|class|interface|struct|enum|fn|func(?:\s+\([^\n]*?\))?)\s+(?P<declared>\w+)'
-    r'|\b(?:const|let|var)\s+(?P<assigned>\w+)\s*(?::[^=;\n]+)?='
-    r'|^[ \t]*(?:(?:[\w:*&<>]+)[ \t]+)*(?P<method>\w+)\s*\((?:[^;{}()]|\{[^{}]*\}|\([^()]*\))*\)[^;{}\n]*\{',
-    re.M,
-)
-CONTROL_WORDS = {'if', 'else', 'for', 'while', 'switch', 'catch', 'return', 'with'}
+class SymbolError(Exception):
+    pass
 
 
-def brace_definitions(text: str) -> list[Definition]:
-    source = LITERALS.sub(lambda match: re.sub(r'[^\n]', ' ', match.group()), text)
-    ends: dict[int, int] = {}
-    stack: list[int] = []
-    for index, char in enumerate(source):
-        if char == '{':
-            stack.append(index)
-        elif char == '}' and stack:
-            ends[stack.pop()] = index
-    definitions: list[Definition] = []
-    for match in DECLARATION.finditer(source):
-        name = match.group('declared') or match.group('assigned') or match.group('method')
-        if name in CONTROL_WORDS:
-            continue
-        start = source.count('\n', 0, match.start()) + 1
-        boundary = re.search(r'[{};\n]' if match.group('assigned') else r'[{};]', source[match.start():])
-        end = start
-        if boundary and boundary.group() == '{':
-            opening = match.start() + boundary.start()
-            if opening not in ends:
+def ctags_path() -> str | None:
+    return shutil.which("ctags") or shutil.which(str(Path.home() / ".local/bin/ctags"))
+
+
+def supported(path: str) -> bool:
+    return PurePosixPath(path).suffix.lower() in {".py", ".pyi"} or ctags_path() is not None
+
+
+def qualified_name(name: str) -> str:
+    return re.sub(r"::|->|#", ".", name)
+
+
+def ctags_definitions(path: str, text: str) -> list[Definition]:
+    executable = ctags_path()
+    if executable is None or not text:
+        return []
+    try:
+        with tempfile.TemporaryDirectory(prefix="hw-symbols-") as directory:
+            source = Path(directory) / PurePosixPath(path).name
+            source.write_text(text, encoding="utf-8")
+            result = subprocess.run(
+                [executable, "--options=NONE", "--output-format=json", "--fields=+ne", "-o", "-", str(source)],
+                capture_output=True, text=True, encoding="utf-8", check=True,
+            )
+        items = []
+        for line in result.stdout.splitlines():
+            tag = json.loads(line)
+            if tag.get("_type") != "tag" or not tag.get("line"):
                 continue
-            end = source.count('\n', 0, ends[opening]) + 1
-        definitions.append(Definition(name, start, end))
-    return qualify(definitions)
-
-
-def qualify(definitions: list[Definition]) -> list[Definition]:
-    qualified: list[Definition] = []
-    for item in definitions:
-        parents = [
-            outer.name for outer in definitions
-            if outer is not item and outer.start < item.start and item.end <= outer.end
-        ]
-        name = '.'.join([*parents, item.name]) if parents else item.name
-        qualified.append(Definition(name, item.start, item.end))
-    return qualified
+            name = qualified_name(tag["name"])
+            scope = qualified_name(tag.get("scope", ""))
+            if scope:
+                name = f"{scope}.{name}"
+            items.append(Definition(name, tag["line"], tag.get("end", tag["line"])))
+        return items
+    except (OSError, subprocess.CalledProcessError, ValueError, KeyError) as error:
+        raise SymbolError(f"{path}: ctags 解析失败：{error}") from error
 
 
 def definitions(path: str, text: str) -> list[Definition]:
-    if PurePosixPath(path).suffix in {'.py', '.pyi'}:
+    if PurePosixPath(path).suffix.lower() in {".py", ".pyi"}:
         return python_definitions(path, text)
-    return brace_definitions(text)
+    return ctags_definitions(path, text)
 
 
 def matching_names(definition: Definition, symbols: set[str]) -> set[str]:
-    return symbols & {definition.name, definition.name.rsplit('.', 1)[-1]}
+    name = qualified_name(definition.name)
+    accepted = {name, name.rsplit(".", 1)[-1]}
+    return {symbol for symbol in symbols if qualified_name(symbol) in accepted}
 
 
 def owners(items: list[Definition], number: int, symbols: set[str]) -> set[str]:

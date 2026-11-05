@@ -4,6 +4,7 @@ from .board import Board, parse_board
 from .git import GitError, status_paths
 from .project import Project, path_matches, split_sections
 from .report import print_json
+from .symbols import ctags_path
 
 
 def status_sections(project: Project) -> list[dict]:
@@ -52,6 +53,7 @@ def collect(project: Project) -> dict:
         "board": board.to_dict(),
         "messages_to_user": [message.to_dict() for message in board.messages if message.to_user],
         "uncommitted": uncommitted_consistency(project, board),
+        "hints": [] if ctags_path() else ["装 universal-ctags 可检查非 Python 代码"],
     }
 
 
@@ -61,6 +63,8 @@ def run(project: Project, as_json: bool = False) -> int:
         print_json(data)
         return 0
 
+    for hint in data["hints"]:
+        print(hint)
     print("STATUS.md")
     if data["status"]:
         for section in data["status"]:

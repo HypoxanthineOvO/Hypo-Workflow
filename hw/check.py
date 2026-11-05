@@ -34,7 +34,7 @@ from .project import (
     section_map,
 )
 from .report import print_json
-from .symbols import definitions, matching_names, owners
+from .symbols import SymbolError, definitions, matching_names, owners, supported
 
 ALARM = "alarm"
 HINT = "hint"
@@ -172,10 +172,11 @@ def check_anchors(project: Project, collector: Collector) -> list[tuple[Requirem
             if not anchor_files(project, anchor):
                 collector.add(ALARM, "文档", requirement.path, f"代码锚点不存在：{anchor.path}")
                 continue
-            if not anchor.symbols:
+            paths = anchor_files(project, anchor)
+            if not anchor.symbols or not all(supported(path.name) for path in paths):
                 continue
             found = {
-                name for path in anchor_files(project, anchor)
+                name for path in paths
                 for item in definitions(path.name, path.read_text(encoding="utf-8"))
                 for name in matching_names(item, set(anchor.symbols))
             }
@@ -495,6 +496,9 @@ def run(project: Project, since: str | None = None, as_json: bool = False) -> in
         run_checks(project, since, collector)
     except GitError as error:
         print(f"git 读取失败：{error}")
+        return 2
+    except SymbolError as error:
+        print(f"符号解析失败：{error}")
         return 2
     except SyntaxError as error:
         print(f"符号解析失败：{error.filename}:{error.lineno}: {error.msg}")
