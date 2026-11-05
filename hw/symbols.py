@@ -90,7 +90,8 @@ def definitions(path: str, text: str) -> list[Definition]:
 
 def matching_names(definition: Definition, symbols: set[str]) -> set[str]:
     name = qualified_name(definition.name)
-    accepted = {name, name.rsplit(".", 1)[-1]}
+    parts = name.split(".")
+    accepted = {".".join(parts[index:]) for index in range(len(parts))}
     return {symbol for symbol in symbols if qualified_name(symbol) in accepted}
 
 

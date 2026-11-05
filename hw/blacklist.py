@@ -203,12 +203,20 @@ def mask_code(text: str) -> list[str]:
     return result
 
 
+def without_review_levels(text: str, review_levels: set[str] | None = None) -> str:
+    if not review_levels:
+        return text
+    names = "|".join(re.escape(name) for name in sorted(review_levels, key=len, reverse=True))
+    return re.sub(rf"(?<![A-Za-z0-9])(?:{names})(?![A-Za-z0-9])", lambda match: " " * len(match.group()), text)
+
+
 def scan_text(
     name: str,
     text: str,
     show_lines: bool = True,
     skip_codes: set[str] | None = None,
     restrict_codes: set[str] | None = None,
+    review_levels: set[str] | None = None,
 ) -> list[Finding]:
     skip = set(skip_codes or ())
     restrict = set(restrict_codes or ())
@@ -225,7 +233,8 @@ def scan_text(
         for item, pattern in COMPILED:
             if item.code in skip:
                 continue
-            found = pattern.search(line)
+            candidate = without_review_levels(line, review_levels) if item.group == "C" else line
+            found = pattern.search(candidate)
             if not found:
                 continue
             if item.code in restrict and not line.lstrip().startswith("#"):
@@ -274,7 +283,8 @@ def scan_text(
     for item, pattern in COMPILED:
         if item.code not in restrict or item.code in skip:
             continue
-        found = pattern.search(filename)
+        candidate = without_review_levels(filename, review_levels) if item.group == "C" else filename
+        found = pattern.search(candidate)
         if found:
             advice = item.advice or GROUP_ADVICE[item.group]
             findings.append(
@@ -293,11 +303,11 @@ def document_texts(project: Project) -> list[tuple[str, str]]:
 def scan_documents(project: Project) -> list[Finding]:
     findings: list[Finding] = []
     for name, text in document_texts(project):
-        findings.extend(scan_text(name, text, restrict_codes={"C5", "C16"}))
+        findings.extend(scan_text(name, text, restrict_codes={"C5", "C16"}, review_levels=project.review_level_names))
     return findings
 
 
-def scan_commit(short: str, message: str) -> list[Finding]:
+def scan_commit(short: str, message: str, review_levels: set[str] | None = None) -> list[Finding]:
     lines = [
         line
         for line in message.splitlines()
@@ -308,4 +318,5 @@ def scan_commit(short: str, message: str) -> list[Finding]:
         "\n".join(lines),
         show_lines=False,
         skip_codes={"C5", "C16"},
+        review_levels=review_levels,
     )

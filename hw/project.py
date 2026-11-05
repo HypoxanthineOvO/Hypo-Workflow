@@ -193,6 +193,39 @@ def parse_document_map(text: str) -> list[MapEntry]:
 
 
 @dataclass(frozen=True)
+class ReviewLevel:
+    name: str
+    definition: str
+    example: str
+    blocking: str
+
+
+def parse_review_levels(text: str) -> list[ReviewLevel]:
+    body = section_map(text).get("审核分级", "")
+    levels: list[ReviewLevel] = []
+    columns: dict[str, int] = {}
+    fenced = False
+    for line in body.splitlines():
+        if FENCE.match(line):
+            fenced = not fenced
+            continue
+        if fenced or not line.strip().startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if all(SEPARATOR.fullmatch(cell) for cell in cells):
+            continue
+        if set(("级别", "通用定义", "本项目的例子", "阻塞吗")) <= set(cells):
+            columns = {name: cells.index(name) for name in ("级别", "通用定义", "本项目的例子", "阻塞吗")}
+            continue
+        if not columns or len(cells) <= max(columns.values()):
+            continue
+        name = cells[columns["级别"]].strip("`* ")
+        if name and name not in {"（填）", "(填)"}:
+            levels.append(ReviewLevel(name, cells[columns["通用定义"]], cells[columns["本项目的例子"]], cells[columns["阻塞吗"]]))
+    return levels
+
+
+@dataclass(frozen=True)
 class CodeAnchor:
     path: str
     symbols: tuple[str, ...] = ()
@@ -334,6 +367,14 @@ class Project:
     @cached_property
     def rules_text(self) -> str:
         return self.read_text("RULES.md")
+
+    @cached_property
+    def review_levels(self) -> list[ReviewLevel]:
+        return parse_review_levels(self.rules_text)
+
+    @cached_property
+    def review_level_names(self) -> set[str]:
+        return {level.name for level in self.review_levels}
 
     @cached_property
     def document_map(self) -> list[MapEntry]:

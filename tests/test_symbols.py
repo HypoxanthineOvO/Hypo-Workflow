@@ -18,6 +18,11 @@ class QualifiedNameTests(unittest.TestCase):
         self.assertEqual(matching_names(Definition('Foo.bar', 1, 3), names), names)
         self.assertEqual(matching_names(Definition('Other.bar', 1, 3), {'Foo::bar'}), set())
 
+    def test_qualified_name_suffixes_respect_segment_boundaries(self):
+        names = {'bar', 'Foo::bar', 'ns.Foo.bar', 'Foo#bar', 'Foo->bar'}
+        self.assertEqual(matching_names(Definition('ns.Foo.bar', 1, 3), names), names)
+        self.assertEqual(matching_names(Definition('ns.Foo.bar', 1, 3), {'oo.bar', 'wrong.Foo.bar'}), set())
+
     def test_local_bin_lookup(self):
         with patch('hw.symbols.shutil.which', side_effect=[None, '/home/test/.local/bin/ctags']) as which:
             self.assertEqual(ctags_path(), '/home/test/.local/bin/ctags')
@@ -42,6 +47,15 @@ class CtagsTests(RepoTestCase):
         self.assertEqual(touched_symbols(Project(self.repo), None, 'src/a.cpp', {'Foo::bar'}), {'Foo::bar'})
         self.write('src/a.cpp', 'void Foo::bar() {\n  work(1);\n}\nvoid Other::bar() {\n  work(3);\n}\n')
         self.assertEqual(touched_symbols(Project(self.repo), None, 'src/a.cpp', {'Foo::bar'}), set())
+
+    @unittest.skipUnless(ctags_path(), '需要 Universal Ctags')
+    def test_namespaced_cpp_definition_accepts_class_qualified_anchor(self):
+        self.write('src/a.cpp', 'namespace ns {\nclass Foo { void bar(); };\nvoid Foo::bar() {\n  work(1);\n}\n}\n')
+        self.write('docs/需求/同步.md', SYNC.replace('src/sync.py: retry', 'src/a.cpp: Foo::bar'))
+        collector = Collector()
+        check_anchors(Project(self.repo), collector)
+        self.assertEqual(collector.alarms, [])
+        self.assertEqual(touched_symbols(Project(self.repo), None, 'src/a.cpp', {'Foo::bar'}, '??'), {'Foo::bar'})
 
     def test_missing_ctags_skips_non_python_symbols_and_status_hints_once(self):
         self.cpp_project()

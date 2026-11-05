@@ -14,4 +14,5 @@ Hypo-Workflow 3.0。设计见 [docs/设计.md](docs/设计.md)。
 3. hw 黑词表改为以 Hypo-Expression 验证过的词表为准，等那边建完语料库后同步。
 
 ## 以后
+- P2：单文件 ctags 解析失败时，hw check 会返回 2 并停止本次检查；cleanup 时评估是否改成逐文件提示并继续，使其余文件仍能查完（[hw/check.py:517–519](hw/check.py#L517-L519)）。
 - 多 Agent 协作（下一个大版本）：大量子 Agent 并行做改进和测试；worktree 到时一起考虑。等这一版试用成功后开始。

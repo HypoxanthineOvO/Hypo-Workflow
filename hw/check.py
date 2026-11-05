@@ -322,16 +322,17 @@ def integrated_commits(history: list[Commit]) -> list[Commit]:
     return history[: oldest + 1] if oldest is not None else []
 
 
-def check_commit_format(history: list[Commit], collector: Collector) -> None:
+def check_commit_format(history: list[Commit], collector: Collector, review_levels: set[str] | None = None) -> None:
     for commit in history:
         missing = [field for field in FORMAT_FIELDS if not commit.trailer(field)]
         if missing:
             collector.add(ALARM, "提交", f"提交 {commit.short}", f"缺少 trailer：{', '.join(missing)}")
         if PREFIX.match(commit.subject):
             collector.add(ALARM, "提交", f"提交 {commit.short}", f"第一行带类型前缀：{commit.subject}")
-        if MILESTONE.search(commit.subject) or CYCLE.search(commit.subject):
+        subject = blacklist.without_review_levels(commit.subject, review_levels)
+        if MILESTONE.search(subject) or CYCLE.search(subject):
             collector.add(ALARM, "提交", f"提交 {commit.short}", f"第一行带内部编号：{commit.subject}")
-        if SHORT_HASH.search(commit.subject):
+        if SHORT_HASH.search(subject):
             collector.add(ALARM, "提交", f"提交 {commit.short}", f"第一行带 hash：{commit.subject}")
 
 
@@ -340,8 +341,22 @@ def check_blacklist(project: Project, history: list[Commit], collector: Collecto
         collector.add(finding.level, "黑词", finding.location, finding.message)
     for commit in history:
         message = "\n".join(part for part in (commit.subject, commit.body) if part)
-        for finding in blacklist.scan_commit(commit.short, message):
+        for finding in blacklist.scan_commit(commit.short, message, project.review_level_names):
             collector.add(finding.level, "黑词", finding.location, finding.message)
+
+
+def check_review_levels(project: Project, collector: Collector) -> None:
+    if not project.rules_text:
+        return
+    if "审核分级" not in section_map(project.rules_text):
+        collector.add(HINT, "规则", "RULES.md", "缺少“审核分级”，请按模板补充分级定义和本项目的例子")
+        return
+    if not project.review_levels:
+        collector.add(HINT, "规则", "RULES.md", "“审核分级”没有有效表格，请填写级别、通用定义、本项目的例子、阻塞吗")
+        return
+    pending = [level.name for level in project.review_levels if not level.example or re.search(r"[（(]填[）)]", level.example)]
+    if pending:
+        collector.add(HINT, "规则", "RULES.md", f"“审核分级”的本项目例子还没填：{'、'.join(pending)}")
 
 
 def check_map(project: Project, collector: Collector) -> None:
@@ -401,7 +416,8 @@ def check_readme(project: Project, collector: Collector) -> None:
         for label, pattern in README_RULES:
             if label in seen:
                 continue
-            if pattern.search(line):
+            candidate = blacklist.without_review_levels(line, project.review_level_names) if label == "内部编号" else line
+            if pattern.search(candidate):
                 seen.add(label)
                 collector.add(HINT, "README", f"README.md:{number}", f"出现{label}：{line.strip()}")
 
@@ -482,9 +498,10 @@ def run_checks(project: Project, since: str | None, collector: Collector) -> Non
     check_commit_sync(project, integrated, collector)
     changed = check_worktree_sync(project, anchors, collector)
     check_undescribed(project, integrated, changed, collector)
-    check_commit_format(integrated, collector)
+    check_commit_format(integrated, collector, project.review_level_names)
     check_blacklist(project, integrated, collector)
     check_map(project, collector)
+    check_review_levels(project, collector)
     check_readme(project, collector)
     check_board(project, collector)
     check_sensitive(project, collector)
