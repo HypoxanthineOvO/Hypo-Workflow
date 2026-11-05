@@ -207,6 +207,9 @@ git -C Hypo-Expression pull
 | 1.x | 2026-04 至 05 | 提示词驱动的计划流水线 |
 | 2.x | 2026-05 至 08 | runtime、manifest、hooks 门禁 |
 | **3.0** | 2026-10 | 只管结果：文档和代码一直对得上 |
+| 3.1 | 2026-10 | 新增体验、清理两个 skill |
+| 3.2 | 2026-10 | 表达约束以 Hypo-Expression 为准 |
+| 3.3 | 2026-11 | 审核分级、红线，ctags 识别代码锚点，BOARD 按目录登记占用 |
 
 设计依据见 [docs/设计.md](docs/设计.md)。宣传片源码在 [promo/](promo/)。
 
