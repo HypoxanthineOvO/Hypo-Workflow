@@ -36,19 +36,10 @@ class Occupancy:
 
 
 @dataclass
-class Lane:
+class LegacyLane:
     name: str
-    updated: datetime | None = None
     doing: str = ""
-    next: str = ""
     uncommitted: list[str] = field(default_factory=list)
-
-    @property
-    def owner(self) -> str:
-        return self.name.split("·", 1)[0].strip()
-
-    def to_dict(self) -> dict:
-        return {"name": self.name, "updated": self.updated.strftime("%Y-%m-%d %H:%M") if self.updated else "", "doing": self.doing, "next": self.next, "uncommitted": self.uncommitted}
 
 
 @dataclass
@@ -58,31 +49,21 @@ class Message:
     recipient: str
     text: str
 
-    @property
-    def to_user(self) -> bool:
-        return self.recipient.strip() == "用户"
-
     def to_dict(self) -> dict:
         return {"time": self.at.strftime("%Y-%m-%d %H:%M") if self.at else "", "from": self.sender, "to": self.recipient, "text": self.text}
 
 
 @dataclass
 class Board:
-    lanes: list[Lane]
-    messages: list[Message]
-    line_count: int
     occupancies: list[Occupancy] = field(default_factory=list)
+    messages: list[Message] = field(default_factory=list)
     hints: list[tuple[int, str]] = field(default_factory=list)
-
-    def lane_for(self, name: str) -> Lane | None:
-        return next((lane for lane in self.lanes if lane.name == name.strip() or lane.owner == name.strip()), None)
 
     def to_dict(self) -> dict:
         return {
             "occupancies": [item.to_dict() for item in self.occupancies],
             "messages": [message.to_dict() for message in self.messages],
             "hints": [{"line": line, "message": message} for line, message in self.hints],
-            "lanes": [lane.to_dict() for lane in self.lanes],
         }
 
 
@@ -96,15 +77,6 @@ def directory_contains(directory: str, path: str) -> bool:
     if directory == ".":
         return not path.startswith(("../", "/")) and path != ".."
     return path.startswith(directory.rstrip("/") + "/")
-
-
-def parse_update(value: str) -> datetime | None:
-    for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%d"):
-        try:
-            return datetime.strptime(value.strip(), fmt)
-        except ValueError:
-            continue
-    return None
 
 
 def month_day(value: str, reference: datetime) -> datetime | None:
@@ -136,12 +108,13 @@ def split_files(value: str) -> list[str]:
 
 def parse_board(path: Path, now: datetime | None = None) -> Board:
     if not path.is_file():
-        return Board([], [], 0)
+        return Board()
     now = now or datetime.now()
     text = path.read_text(encoding="utf-8")
-    board = Board([], [], len(text.splitlines()))
+    board = Board()
+    legacy_lanes: list[LegacyLane] = []
     section = ""
-    lane: Lane | None = None
+    lane: LegacyLane | None = None
     fenced = False
     legacy_seen = False
     for number, line in enumerate(text.splitlines(), start=1):
@@ -176,28 +149,25 @@ def parse_board(path: Path, now: datetime | None = None) -> Board:
                 board.hints.append((number, f"{name} 占用行格式不对：写清在做什么，只列项目内的目录，不列文件或通配符"))
         elif section == "各 Agent 当前":
             if line.startswith("### "):
-                lane = Lane(line[4:].strip())
-                board.lanes.append(lane)
+                lane = LegacyLane(line[4:].strip())
+                legacy_lanes.append(lane)
             elif lane and (match := FIELD.match(line)):
                 key, value = match.groups()
-                if key.startswith("更新"):
-                    lane.updated = parse_update(value)
-                elif key == "在做":
+                if key == "在做":
                     lane.doing = value.strip()
-                elif key == "下一步":
-                    lane.next = value.strip()
                 elif key == "未提交":
                     lane.uncommitted = split_files(value)
         elif section == "留言":
             if match := MESSAGE.match(line):
                 board.messages.append(Message(None, "", match.group(1).strip(), match.group(2).strip()))
             elif match := OLD_MESSAGE.match(line):
+                legacy_seen = True
                 at = month_day(f"{match[1]}-{match[2]} {match[3]}:{match[4]}", now)
                 if at:
                     board.messages.append(Message(at, match[5].strip(), match[6].strip(), match[7].strip()))
     if legacy_seen:
         board.hints.insert(0, (0, "BOARD 使用旧分道格式，建议改成“正在改”的一行目录占用格式"))
-        for lane in board.lanes:
+        for lane in legacy_lanes:
             directories = sorted({PurePosixPath(item).parent.as_posix().rstrip("/") + "/" for item in lane.uncommitted})
             board.occupancies.append(Occupancy(lane.name, lane.doing, directories, "", legacy=True))
     return board

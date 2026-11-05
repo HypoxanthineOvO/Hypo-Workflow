@@ -530,7 +530,7 @@ class DocumentScopeTests(RepoTestCase):
 
 
 class BoardAndSensitiveTests(RepoTestCase):
-    def test_board_message_not_handled_hint(self) -> None:
+    def test_old_board_has_one_migration_hint(self) -> None:
         now = datetime.now().replace(second=0, microsecond=0)
         message_time = now - timedelta(hours=1)
         self.write(
@@ -544,16 +544,16 @@ class BoardAndSensitiveTests(RepoTestCase):
         )
         data, _ = self.check_json()
         hints = [issue["message"] for issue in self.hints(data, "BOARD")]
-        self.assertTrue(any("留言可能没处理" in hint for hint in hints))
+        self.assertEqual(len(hints), 1)
+        self.assertIn("旧分道格式", hints[0])
 
-    def test_board_completed_and_too_long_hints(self) -> None:
-        lines = ["# Board", "", "## 各 Agent 当前", "", "- 已完成：同步", ""]
+    def test_board_has_no_obsolete_completed_or_length_checks(self) -> None:
+        lines = ["# Board", "", "## 正在改", "", "## 留言", "", "说明里出现已完成。", ""]
         lines.extend("填充" * 3 for _ in range(85))
         self.write("BOARD.md", "\n".join(lines) + "\n")
         data, _ = self.check_json()
         hints = [issue["message"] for issue in self.hints(data, "BOARD")]
-        self.assertTrue(any("已完成" in hint for hint in hints))
-        self.assertTrue(any("80 行" in hint for hint in hints))
+        self.assertEqual(hints, [])
 
     def test_sensitive_tracked_files_alarm(self) -> None:
         self.write(".env", "TOKEN=abc\n")
@@ -576,7 +576,7 @@ class BoardAndSensitiveTests(RepoTestCase):
             {".env", "server.pem", "id_rsa", "client_secret.txt", "config/credentials.json"},
         )
 
-    def test_status_reports_uncommitted_mismatch(self) -> None:
+    def test_status_converts_old_file_list_to_directory_occupancy(self) -> None:
         self.write(
             "BOARD.md",
             "# Board\n\n## 各 Agent 当前\n\n"
@@ -586,9 +586,9 @@ class BoardAndSensitiveTests(RepoTestCase):
         )
         self.write("src/new.py", "def new():\n    return 1\n")
         data = self.json_output("status", "--json")
-        missing = data["uncommitted"]["listed_missing"]
-        self.assertEqual(missing[0]["file"], "src/missing.py")
-        self.assertIn("src/new.py", data["uncommitted"]["unlisted"])
+        self.assertEqual(data["board"]["occupancies"][0]["directories"], ["src/"])
+        self.assertTrue(any("旧分道格式" in hint for hint in data["hints"]))
+        self.assertNotIn("uncommitted", data)
 
 
 class MapCheckTests(RepoTestCase):

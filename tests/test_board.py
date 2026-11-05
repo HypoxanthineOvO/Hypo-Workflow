@@ -7,6 +7,10 @@ from pathlib import Path
 from unittest.mock import patch
 
 from hw.board import claimed_name, directory_contains, parse_board
+from hw.check import Collector, check_board
+from hw.project import Project
+from hw import status
+from test_hw import RepoTestCase
 
 
 NOW = datetime(2026, 11, 5, 14, 30)
@@ -76,6 +80,86 @@ class BoardParserTests(unittest.TestCase):
         with patch.dict('os.environ', {'HW_BOARD_NAME': 'DSH 11-05 14:05'}):
             self.assertEqual(claimed_name(), 'DSH 11-05 14:05')
             self.assertEqual(claimed_name('Codex 11-05 14:20'), 'Codex 11-05 14:20')
+
+
+class BoardIntegrationTests(RepoTestCase):
+    def board(self, expected='预计 14:00', directory='src/', name='DSH 11-05 13:00'):
+        self.write('BOARD.md', f'# 协作板\n\n## 正在改\n- {name} · 测试 · {directory} · {expected}\n\n## 留言\n')
+
+    def test_expired_clean_directory_is_hint_without_deleting_row(self):
+        self.board()
+        before = (self.repo / 'BOARD.md').read_bytes()
+        data = status.collect(Project(self.repo), now=NOW)
+        self.assertTrue(any('这行可能已经过期，确认后删掉' in hint for hint in data['hints']))
+        self.assertEqual((self.repo / 'BOARD.md').read_bytes(), before)
+
+    def test_expired_directory_with_uncommitted_change_is_not_hint(self):
+        self.board()
+        self.write('src/new.txt', '正在改\n')
+        data = status.collect(Project(self.repo), now=NOW)
+        self.assertFalse(any('过期' in hint for hint in data['hints']))
+
+    def test_not_expired_directory_is_not_hint(self):
+        self.board('预计 15:00')
+        data = status.collect(Project(self.repo), now=NOW)
+        self.assertFalse(any('过期' in hint for hint in data['hints']))
+
+    def test_status_reports_invalid_estimate(self):
+        self.board('预计 明天')
+        data = status.collect(Project(self.repo), now=NOW)
+        self.assertTrue(any('预计结束格式不对' in hint for hint in data['hints']))
+
+    def test_unknown_owner_overlap_alarms_and_as_claim_suppresses_it(self):
+        self.board('预计 15:00')
+        self.write('src/new.txt', '改动\n')
+        data, code = self.check_json()
+        self.assertEqual(code, 1)
+        self.assertTrue(any('与 BOARD 上 DSH 11-05 13:00 的占用重叠，确认是不是你自己那行' in item['message'] for item in self.alarms(data, 'BOARD')))
+        data, code = self.check_json('--as', 'DSH 11-05 13:00')
+        self.assertEqual(code, 0)
+        self.assertEqual(self.alarms(data, 'BOARD'), [])
+
+    def test_claim_does_not_hide_other_owner_on_overlapping_directory(self):
+        self.write('BOARD.md', '# 协作板\n\n## 正在改\n- DSH 11-05 13:00 · 测试 · src/ · 预计 15:00\n- Codex 11-05 13:10 · 同步 · src/nested/ · 预计 15:00\n')
+        self.write('src/nested/new.txt', '改动\n')
+        data, code = self.check_json('--as', 'DSH 11-05 13:00')
+        self.assertEqual(code, 1)
+        self.assertEqual(len(self.alarms(data, 'BOARD')), 1)
+        self.assertIn('Codex 11-05 13:10', self.alarms(data, 'BOARD')[0]['message'])
+
+    def test_directory_prefix_is_not_a_false_overlap(self):
+        self.board(directory='src/')
+        self.write('src-other/new.txt', '改动\n')
+        collector = Collector()
+        check_board(Project(self.repo), collector)
+        self.assertEqual(collector.alarms, [])
+
+    def test_environment_claim_and_explicit_parameter_priority(self):
+        self.board('预计 15:00')
+        self.write('src/new.txt', '改动\n')
+        with patch.dict('os.environ', {'HW_BOARD_NAME': 'DSH 11-05 13:00'}):
+            data, code = self.check_json()
+            self.assertEqual(code, 0)
+            data, code = self.check_json('--as', '其他对话')
+            self.assertEqual(code, 1)
+            data = self.json_output('status', '--as', 'Codex 11-05 13:10', '--json')
+            self.assertEqual(data['as'], 'Codex 11-05 13:10')
+
+    def test_find_shows_occupied_code_and_requirement_directories(self):
+        self.write('BOARD.md', '# 协作板\n\n## 正在改\n- DSH 11-05 13:00 · 同步 · src/ · 预计 15:00\n- Codex 11-05 13:10 · 文档 · docs/需求/ · 预计 15:00\n')
+        data = self.json_output('find', '同步', '--json')
+        agents = data['files'][0]['board_agents']
+        self.assertEqual([item['directories'] for item in agents], [['src/'], ['docs/需求/']])
+        text = self.run_hw('find', '同步').stdout
+        self.assertIn('占用 src/', text)
+        self.assertNotIn('未提交', text)
+
+    def test_duplicate_names_cannot_suppress_two_rows(self):
+        self.write('BOARD.md', '# 协作板\n\n## 正在改\n- DSH 11-05 13:00 · 测试 · src/ · 预计 15:00\n- DSH 11-05 13:00 · 文档 · docs/ · 预计 15:00\n')
+        self.write('src/new.txt', '改动\n')
+        collector = Collector()
+        check_board(Project(self.repo), collector, 'DSH 11-05 13:00')
+        self.assertTrue(collector.alarms)
 
 
 if __name__ == '__main__':

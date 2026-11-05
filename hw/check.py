@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from datetime import datetime, timedelta
 from fnmatch import fnmatch
 from pathlib import Path, PurePosixPath
 from urllib.parse import unquote
 
 from . import blacklist
-from .board import parse_board
+from .board import claimed_name, directory_contains, parse_board
 from .git import (
     ChangedLine,
     Commit,
@@ -422,45 +421,23 @@ def check_readme(project: Project, collector: Collector) -> None:
                 collector.add(HINT, "README", f"README.md:{number}", f"出现{label}：{line.strip()}")
 
 
-def check_board(project: Project, collector: Collector) -> None:
-    path = project.root / "BOARD.md"
-    if not path.is_file():
-        return
-    board = parse_board(path)
+def check_board(project: Project, collector: Collector, as_name: str | None = None) -> None:
+    board = parse_board(project.root / "BOARD.md")
+    for line, message in board.hints:
+        collector.add(HINT, "BOARD", f"BOARD.md:{line}" if line else "BOARD.md", message)
+    identity = claimed_name(as_name)
+    own_rows = sum(item.name == identity for item in board.occupancies)
     changed = status_paths(project.root) if project.is_git() else []
-    now = datetime.now()
-
-    for message in board.messages:
-        if message.to_user:
-            continue
-        lane = board.lane_for(message.recipient)
-        if lane and lane.updated and message.at < lane.updated:
+    for path in changed:
+        for item in board.occupancies:
+            if not any(directory_contains(directory, path) for directory in item.directories):
+                continue
+            if identity and item.name == identity and own_rows == 1:
+                continue
             collector.add(
-                HINT,
-                "BOARD",
-                "BOARD.md",
-                f"给 {message.recipient} 的留言可能没处理：该道更新于 {lane.updated:%Y-%m-%d %H:%M}，晚于留言 {message.at:%m-%d %H:%M}",
+                ALARM, "BOARD", "工作区",
+                f"{path} 与 BOARD 上 {item.name} 的占用重叠，确认是不是你自己那行；用 --as \"自己那行的名字\" 认领",
             )
-
-    for lane in board.lanes:
-        if not lane.updated:
-            continue
-        clean = all(not any(path_matches(item, path) for path in changed) for item in lane.uncommitted)
-        if now - lane.updated > timedelta(days=7) and clean:
-            collector.add(
-                HINT,
-                "BOARD",
-                "BOARD.md",
-                f"{lane.name} 超过 7 天没更新，未提交文件也不在 git status 中",
-            )
-
-    text = path.read_text(encoding="utf-8")
-    for number, line in enumerate(text.splitlines(), start=1):
-        if re.match(r"^\s*(?:#{1,6}\s+|[-*+]\s+)已完成(?:[:：\s]|$)", line):
-            collector.add(HINT, "BOARD", f"BOARD.md:{number}", "出现“已完成”列表")
-            break
-    if board.line_count > 80:
-        collector.add(HINT, "BOARD", "BOARD.md", f"超过 80 行（{board.line_count} 行）")
 
 
 SECRET_DATA_SUFFIXES = ("", ".json", ".yaml", ".yml", ".toml", ".txt", ".ini", ".cfg", ".conf", ".key")
@@ -484,7 +461,7 @@ def check_sensitive(project: Project, collector: Collector) -> None:
             collector.add(ALARM, "敏感", path, "敏感文件被 git 跟踪")
 
 
-def run_checks(project: Project, since: str | None, collector: Collector) -> None:
+def run_checks(project: Project, since: str | None, collector: Collector, as_name: str | None = None) -> None:
     history = commits(project.root, limit=None) if project.is_git() else []
     integrated = integrated_commits(history)
     if history and not integrated:
@@ -503,14 +480,14 @@ def run_checks(project: Project, since: str | None, collector: Collector) -> Non
     check_map(project, collector)
     check_review_levels(project, collector)
     check_readme(project, collector)
-    check_board(project, collector)
+    check_board(project, collector, as_name)
     check_sensitive(project, collector)
 
 
-def run(project: Project, since: str | None = None, as_json: bool = False) -> int:
+def run(project: Project, since: str | None = None, as_json: bool = False, as_name: str | None = None) -> int:
     collector = Collector()
     try:
-        run_checks(project, since, collector)
+        run_checks(project, since, collector, as_name)
     except GitError as error:
         print(f"git 读取失败：{error}")
         return 2

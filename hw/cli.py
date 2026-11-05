@@ -20,8 +20,9 @@ def build_parser() -> argparse.ArgumentParser:
     find_parser.add_argument("word")
     find_parser.add_argument("--json", action="store_true")
 
-    status_parser = subparsers.add_parser("status", help="显示 STATUS、BOARD 和未提交对比")
+    status_parser = subparsers.add_parser("status", help="显示 STATUS 和 BOARD 目录占用")
     status_parser.add_argument("--json", action="store_true")
+    status_parser.add_argument("--as", dest="as_name", help="认领 BOARD 上自己那行的名字；优先于 HW_BOARD_NAME")
 
     log_parser = subparsers.add_parser("log", help="按功能查看提交")
     log_parser.add_argument("feature")
@@ -30,6 +31,7 @@ def build_parser() -> argparse.ArgumentParser:
     check_parser = subparsers.add_parser("check", help="检查文档、提交、黑词、地图和敏感文件")
     check_parser.add_argument("--since")
     check_parser.add_argument("--json", action="store_true")
+    check_parser.add_argument("--as", dest="as_name", help="认领 BOARD 上自己那行的名字；优先于 HW_BOARD_NAME")
 
     handoff_parser = subparsers.add_parser("handoff", help="找最近的会话记录")
     handoff_parser.add_argument("--host", choices=handoff.HOSTS, help="只看某个宿主")
@@ -47,11 +49,11 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "find":
             return find.run(project, args.word, args.json)
         if args.command == "status":
-            return status.run(project, args.json)
+            return status.run(project, args.json, args.as_name)
         if args.command == "log":
             return log.run(project, args.feature, args.json)
         if args.command == "check":
-            return check.run(project, args.since, args.json)
+            return check.run(project, args.since, args.json, args.as_name)
         if args.command == "handoff":
             return handoff.run(args)
     except GitError as error:

@@ -196,13 +196,13 @@ class AdditionalSyncReviewTests(RepoTestCase):
         data, _ = self.check_json()
         self.assertFalse(any(issue['location'] == '工作区' for issue in self.alarms(data, '文档')))
 
-    def test_board_instruction_is_not_a_completed_list(self):
+    def test_obsolete_board_completed_list_check_is_removed(self):
         self.write('BOARD.md', '# 协作板\n\n不写已完成的事。\n')
         data, _ = self.check_json()
         self.assertEqual(self.hints(data, 'BOARD'), [])
         self.write('BOARD.md', '# 协作板\n\n## 已完成\n- 同步。\n')
         data, _ = self.check_json()
-        self.assertEqual(len(self.hints(data, 'BOARD')), 1)
+        self.assertEqual(self.hints(data, 'BOARD'), [])
 
 
 if __name__ == "__main__":

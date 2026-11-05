@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from .board import parse_board
-from .project import Project, Requirement, path_matches
+from .board import directory_contains, parse_board
+from .project import Project, Requirement
 from .report import print_json
 
 
@@ -24,14 +24,17 @@ def reverse_relations(project: Project, target: Requirement) -> list[dict]:
 def board_agents(project: Project, target: Requirement) -> list[dict]:
     board = parse_board(project.root / "BOARD.md")
     result = []
-    for lane in board.lanes:
-        hits = [
-            anchor.path
-            for anchor in target.code
-            if any(path_matches(anchor.path, item) for item in lane.uncommitted)
-        ]
+    related = {target.path}
+    for anchor in target.code:
+        if any(char in anchor.path for char in "*?["):
+            related.update(path.relative_to(project.root).as_posix() for path in project.root.glob(anchor.path) if path.is_file())
+        else:
+            related.add(anchor.path)
+    for item in board.occupancies:
+        directories = [directory for directory in item.directories if any(directory_contains(directory, path) for path in related)]
+        hits = [path for path in related if any(directory_contains(directory, path) for directory in directories)]
         if hits:
-            result.append({"agent": lane.name, "files": sorted(set(hits))})
+            result.append({"agent": item.name, "directories": directories, "files": sorted(hits)})
     return result
 
 
@@ -86,5 +89,5 @@ def run(project: Project, query: str, as_json: bool = False) -> int:
         if item["undecided"]:
             print(f"  未定：{'；'.join(item['undecided'])}")
         for agent in item["board_agents"]:
-            print(f"  BOARD：{agent['agent']} 未提交 {'、'.join(agent['files'])}")
+            print(f"  BOARD：{agent['agent']} 占用 {'、'.join(agent['directories'])}")
     return 0

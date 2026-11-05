@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from .board import Board, parse_board
+from datetime import datetime
+
+from .board import claimed_name, directory_contains, parse_board
 from .git import GitError, status_paths
-from .project import Project, path_matches, split_sections
+from .project import Project, split_sections
 from .report import print_json
 from .symbols import ctags_path
 
@@ -20,51 +22,36 @@ def status_sections(project: Project) -> list[dict]:
     return sections
 
 
-def uncommitted_consistency(project: Project, board: Board) -> dict:
-    if not project.is_git():
-        return {"git": False, "compared": False, "listed_missing": [], "unlisted": []}
-    try:
-        changed = status_paths(project.root)
-    except GitError:
-        return {"git": False, "compared": False, "listed_missing": [], "unlisted": []}
-    if not board.lanes:
-        return {"git": True, "compared": False, "listed_missing": [], "unlisted": []}
-
-    listed_missing = []
-    listed: list[str] = []
-    for lane in board.lanes:
-        for item in lane.uncommitted:
-            listed.append(item)
-            if not any(path_matches(item, path) for path in changed):
-                listed_missing.append({"agent": lane.name, "file": item})
-    unlisted = [
-        path
-        for path in changed
-        if not any(path_matches(item, path) for item in listed)
-    ]
-    return {"git": True, "compared": True, "listed_missing": listed_missing, "unlisted": unlisted}
-
-
-def collect(project: Project) -> dict:
-    board = parse_board(project.root / "BOARD.md")
+def collect(project: Project, as_name: str | None = None, now: datetime | None = None) -> dict:
+    now = now or datetime.now()
+    board = parse_board(project.root / "BOARD.md", now)
+    hints = [] if ctags_path() else ["装 universal-ctags 可检查非 Python 代码"]
+    hints.extend(f"BOARD.md{':' + str(line) if line else ''}: {message}" for line, message in board.hints)
+    changed = None
+    if project.is_git():
+        try:
+            changed = status_paths(project.root)
+        except GitError:
+            pass
+    if changed is not None:
+        for item in board.occupancies:
+            if item.until is not None and item.until < now and not any(directory_contains(directory, path) for directory in item.directories for path in changed):
+                hints.append(f"BOARD.md:{item.line}: {item.name} 这行可能已经过期，确认后删掉")
     return {
         "root": str(project.root),
         "status": status_sections(project),
         "board": board.to_dict(),
-        "messages_to_user": [message.to_dict() for message in board.messages if message.to_user],
-        "uncommitted": uncommitted_consistency(project, board),
-        "hints": [] if ctags_path() else ["装 universal-ctags 可检查非 Python 代码"],
+        "as": claimed_name(as_name),
+        "hints": hints,
     }
 
 
-def run(project: Project, as_json: bool = False) -> int:
-    data = collect(project)
+def run(project: Project, as_json: bool = False, as_name: str | None = None) -> int:
+    data = collect(project, as_name)
     if as_json:
         print_json(data)
         return 0
 
-    for hint in data["hints"]:
-        print(hint)
     print("STATUS.md")
     if data["status"]:
         for section in data["status"]:
@@ -75,40 +62,20 @@ def run(project: Project, as_json: bool = False) -> int:
         print("  没有 STATUS.md。")
 
     print()
-    print("BOARD.md")
-    if data["board"]["lanes"]:
-        for lane in data["board"]["lanes"]:
-            updated = f"（更新 {lane['updated']}）" if lane["updated"] else ""
-            print(f"  {lane['name']}{updated}")
-            if lane["doing"]:
-                print(f"    在做：{lane['doing']}")
-            if lane["next"]:
-                print(f"    下一步：{lane['next']}")
-            if lane["uncommitted"]:
-                print(f"    未提交：{'、'.join(lane['uncommitted'])}")
-    else:
-        print("  没有 BOARD.md，或其中没有 Agent 道。")
-
-    print()
-    print("等用户决定")
-    if data["messages_to_user"]:
-        for message in data["messages_to_user"]:
-            print(f"  [{message['time'][5:]}] {message['from']}：{message['text']}")
+    print("BOARD.md · 正在改")
+    if data["board"]["occupancies"]:
+        for item in data["board"]["occupancies"]:
+            own = "（自己）" if item["name"] == data["as"] else ""
+            print(f"  {item['name']}{own} · {item['doing']} · {'、'.join(item['directories'])} · {item['expected']}")
     else:
         print("  无。")
-
-    print()
-    print("未提交对比")
-    uncommitted = data["uncommitted"]
-    if not uncommitted["git"]:
-        print("  不在 git 仓库，跳过对比。")
-    elif not uncommitted["compared"]:
-        print("  没有 BOARD 道，跳过对比。")
-    else:
-        for item in uncommitted["listed_missing"]:
-            print(f"  BOARD 列了但 git status 没有：{item['file']}（{item['agent']}）")
-        for path in uncommitted["unlisted"]:
-            print(f"  git status 有改动但 BOARD 没列：{path}")
-        if not uncommitted["listed_missing"] and not uncommitted["unlisted"]:
-            print("  一致。")
+    if data["board"]["messages"]:
+        print("留言")
+        for message in data["board"]["messages"]:
+            print(f"  给 {message['to']}：{message['text']}")
+    if data["hints"]:
+        print()
+        print("提示")
+        for hint in data["hints"]:
+            print(f"  {hint}")
     return 0
