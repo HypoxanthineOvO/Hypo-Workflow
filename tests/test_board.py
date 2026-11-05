@@ -48,6 +48,11 @@ class BoardParserTests(unittest.TestCase):
         board = self.parse(BOARD, datetime(2026, 11, 6, 0, 5))
         self.assertEqual(board.occupancies[0].until, datetime(2026, 11, 5, 15))
 
+    def test_night_task_with_short_estimate_rolls_into_next_day(self):
+        board = self.parse('# 协作板\n\n## 正在改\n- DSH 11-05 23:00 · 压力测试 · tests/ · 预计 02:00\n', datetime(2026, 11, 5, 23, 30))
+        self.assertEqual(board.occupancies[0].until, datetime(2026, 11, 6, 2))
+        self.assertEqual(board.hints, [])
+
     def test_explicit_date_crosses_year_boundary(self):
         board = self.parse('# 协作板\n\n## 正在改\n- DSH 12-31 23:00 · 测试 · src/ · 预计 01-01 08:00\n', datetime(2027, 1, 1))
         self.assertEqual(board.occupancies[0].until, datetime(2027, 1, 1, 8))
@@ -102,6 +107,11 @@ class BoardIntegrationTests(RepoTestCase):
     def test_not_expired_directory_is_not_hint(self):
         self.board('预计 15:00')
         data = status.collect(Project(self.repo), now=NOW)
+        self.assertFalse(any('过期' in hint for hint in data['hints']))
+
+    def test_status_does_not_expire_night_task_before_next_morning(self):
+        self.board('预计 02:00', name='DSH 11-05 23:00')
+        data = status.collect(Project(self.repo), now=datetime(2026, 11, 5, 23, 30))
         self.assertFalse(any('过期' in hint for hint in data['hints']))
 
     def test_status_reports_invalid_estimate(self):

@@ -4,7 +4,7 @@ import os
 import posixpath
 import re
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path, PurePosixPath
 
 FIELD = re.compile(r"^-\s*(更新|更新时间|在做|做到哪|下一步|未提交)\s*[:：]\s*(.*)$")
@@ -97,7 +97,8 @@ def parse_expected(value: str, started: datetime) -> datetime | None:
     if day:
         return month_day(f"{day} {time}", started)
     try:
-        return datetime.strptime(f"{started:%Y-%m-%d} {time}", "%Y-%m-%d %H:%M")
+        until = datetime.strptime(f"{started:%Y-%m-%d} {time}", "%Y-%m-%d %H:%M")
+        return until + timedelta(days=1) if until < started else until
     except ValueError:
         return None
 
